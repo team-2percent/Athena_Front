@@ -6,20 +6,26 @@ import Header from "./Header"
 import AccountList from "./AccountList"
 import EmptyAccountList from "./EmptyAccountList"
 import type { Account } from "./interfaces"
+import BackButton from "./BackButton"
 
 // View types
 // "accounts" : 메인(계좌 목록)
 // "form" : 계좌 추가
 // "refund" : 환불 내역
-type ViewType = "accounts" | "form" | "refund"
+type ViewType = "main" | "form" | "refund"
 
 interface RefundModalProps {
   initialView?: ViewType
   accounts?: Array<Account>
 }
 
-export default function RefundModal({ initialView = "accounts", accounts = [] }: RefundModalProps) {
+export default function RefundModal({ initialView = "main", accounts = [] }: RefundModalProps) {
   const [currentView, setCurrentView] = useState<ViewType>(initialView)
+
+  // 메인 영역으로 이동
+  const handleBackClick = () => {
+    setCurrentView("main")
+  }
 
   // 계좌 추가 영역으로 이동
   const handleAddAccountClick = () => {
@@ -40,7 +46,7 @@ export default function RefundModal({ initialView = "accounts", accounts = [] }:
   // 내부 영역 변환
   const renderInnerContent = () => {
     switch (currentView) {
-      case "accounts":
+      case "main":
         return accounts.length > 0 ? <AccountList accounts={accounts} onDelete={handleDeleteAccount} /> : <EmptyAccountList />
       case "form":
         return (
@@ -64,8 +70,13 @@ export default function RefundModal({ initialView = "accounts", accounts = [] }:
             <X className="h-5 w-5" />
           </button>
         </div>
-
-        <Header moveToAddAccount={handleAddAccountClick} moveToRefund={handleRefundClick}/>
+        {
+          currentView === "main" ?
+          <Header moveToAddAccount={handleAddAccountClick} moveToRefund={handleRefundClick}/>
+          :
+          <BackButton onClick={handleBackClick} />
+        }
+        
         {renderInnerContent()}
       </div>
     </div>
