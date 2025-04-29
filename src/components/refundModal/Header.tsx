@@ -7,17 +7,17 @@ export default function Header({ moveToAddAccount, moveToRefund }: HeaderProps) 
   return (
     <>
       {/* Balance Card */}
-      <div className="flex items-stretch mb-6 bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div className="flex items-stretch mb-6 bg-white rounded-2xl shadow-sm overflow-hidden min-w-fit">
         <div className="flex-1 p-5">
           <p className="text-sm font-medium text-gray-700">보유 코인</p>
-          <h1 className="text-4xl font-bold mt-1">
+          <h1 className="text-4xl font-bold mt-1 whitespace-nowrap">
             10000<span className="text-2xl">코인</span>
           </h1>
         </div>
-        <div className="bg-pink-400 rounded-r-[20px] flex">
+        <div className="bg-pink-400 rounded-r-[20px] flex w-fit">
           <button
             type="button"
-            className="text-white font-medium text-xl px-6 h-full flex items-center justify-center"
+            className="text-white font-medium text-xl px-6 h-full flex items-center justify-center min-w-fit whitespace-nowrap"
             onClick={moveToRefund}
           >
             정산하기
