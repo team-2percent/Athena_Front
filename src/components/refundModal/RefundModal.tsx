@@ -31,11 +31,17 @@ export default function RefundModal({ initialView = "accounts", accounts = [] }:
     setCurrentView("refund");
   }
 
+  // 계좌 삭제
+  const handleDeleteAccount = (id: number) => {
+    // 계좌 삭제 로직 삽입 필요
+    console.log(`계좌 ${id} 삭제`)
+  }
+
   // 내부 영역 변환
   const renderInnerContent = () => {
     switch (currentView) {
       case "accounts":
-        return accounts.length > 0 ? <AccountList accounts={accounts} /> : <EmptyAccountList />
+        return accounts.length > 0 ? <AccountList accounts={accounts} onDelete={handleDeleteAccount} /> : <EmptyAccountList />
       case "form":
         return (
           <div>계좌 추가</div>
@@ -45,7 +51,7 @@ export default function RefundModal({ initialView = "accounts", accounts = [] }:
           <div>정산</div>
         )
       default:
-        return accounts.length > 0 ? <AccountList accounts={accounts} /> : <EmptyAccountList />
+        return accounts.length > 0 ? <AccountList accounts={accounts} onDelete={handleDeleteAccount}  /> : <EmptyAccountList />
     }
   }
 

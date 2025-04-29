@@ -5,7 +5,7 @@ import type { Account } from "./interfaces"
 
 interface AccountListProps {
   accounts: Account[]
-  onDelete?: (id: number) => void
+  onDelete: (id: number) => void
 }
 
 export default function AccountList({ accounts, onDelete }: AccountListProps) {
@@ -20,7 +20,7 @@ export default function AccountList({ accounts, onDelete }: AccountListProps) {
           <button
             type="button"
             className="text-pink-300"
-            onClick={() => onDelete?.(account.id)}
+            onClick={() => onDelete(account.id)}
             aria-label="계좌 삭제"
           >
             <Trash2 className="h-5 w-5" />
