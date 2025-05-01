@@ -3,6 +3,11 @@
 import { useState, useEffect } from "react"
 import { ChevronDown } from "lucide-react"
 
+interface PopularSearchProps {
+  onSearchChange: (word: string) => void
+  onSearch: (word: string) => void
+}
+
 // mock data: 인기 검색어 데이터 추후 삭제
 const popularSearches = [
   { id: 1, term: "타로" },
@@ -17,7 +22,7 @@ const popularSearches = [
   { id: 10, term: "사주팔자" },
 ]
 
-export default function PopularSearch() {
+export default function PopularSearch({ onSearchChange, onSearch }: PopularSearchProps) {
   const [currentIndex, setCurrentIndex] = useState(0) // 현재 순위
   const [nextIndex, setNextIndex] = useState(1) // 다음 순위
   const [isAnimating, setIsAnimating] = useState(false) // 애니메이션 상태
@@ -46,8 +51,8 @@ export default function PopularSearch() {
 
   // 검색어 클릭
   const handleSearchClick = (word: string) => {
-    console.log(`검색어 "${word}" 클릭됨`)
-    // 여기에 검색 페이지로 이동하는 로직 추가
+    onSearchChange(word)
+    onSearch(word);
   }
 
   // 드롭다운 열기/닫기
@@ -56,9 +61,11 @@ export default function PopularSearch() {
   }
 
     // 드롭다운 내 검색어 클릭
-  const handleDropdownItemClick = (word: string) => {
+  const handleDropdownItemClick = async (word: string) => {
     setIsDropdownOpen(false)
-    handleSearchClick(word);
+    onSearchChange(word)
+    onSearch(word);
+    console.log(`드롭다운에서 선택된 검색어: ${word}`)
   }
 
   return (

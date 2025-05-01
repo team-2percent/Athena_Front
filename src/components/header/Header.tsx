@@ -3,15 +3,30 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Search, Percent, Heart, Bell, X, Trash2 } from "lucide-react"
+import { Percent, Heart, Bell, X, Trash2 } from "lucide-react"
 import CouponModal from "./CouponModal"
 import PopularSearch from "./PopularSearch"
 import SearchBar from "./SearchBar"
+import { useRouter } from 'next/navigation';
+
 
 const Header = () => {
   const [activeTab, setActiveTab] = useState("전체")
   const [showNotifications, setShowNotifications] = useState(false)
   const [showCouponModal, setShowCouponModal] = useState(false)
+  const [searchWord, setSearchWord] = useState("");
+  const router = useRouter();
+
+  const handleSearchChange = (word: string) => {
+    setSearchWord(word)
+  }
+
+  const moveToSearchPage = (word: string) => {
+    console.log(searchWord)
+    if (word) {
+      router.push(`/search?query=${word}`);
+    }
+  }
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab)
@@ -61,7 +76,11 @@ const Header = () => {
 
           {/* 검색창 및 우측 아이콘 및 프로필 */}
           <div className="flex items-center space-x-6">
-            <SearchBar />
+            <SearchBar
+              searchWord={searchWord}
+              onSearchChange={handleSearchChange}
+              onSearch={moveToSearchPage}
+            />
             <button
               type="button" 
               aria-label="쿠폰"
@@ -107,7 +126,7 @@ const Header = () => {
               </button>
             ))}
           </nav>
-          <PopularSearch />
+          <PopularSearch onSearchChange={handleSearchChange} onSearch={moveToSearchPage}/>
         </div>
       </div>
 

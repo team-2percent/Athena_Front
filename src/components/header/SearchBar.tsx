@@ -3,9 +3,14 @@
 import { useState, useRef, useEffect } from "react"
 import { Search, X } from "lucide-react"
 
-export default function SearchBar() {
+interface SearchBarProps {
+  searchWord: string
+  onSearchChange: (word: string) => void
+  onSearch: (word: string) => void
+}
+
+export default function SearchBar({ searchWord, onSearchChange, onSearch }: SearchBarProps) {
   const [isOpen, setIsOpen] = useState(false) // 드롭다운 열림 여부
-  const [searchTerm, setSearchTerm] = useState("") // 검색어
   const [autoCompletes, setAutoCompletes] = useState<string[]>([]) // 자동완성 단어
   const [recentSearches, setRecentSearches] = useState<{ id: number, word: string }[]>([]) // 최근 검색어
   const searchRef = useRef<HTMLDivElement>(null)
@@ -46,11 +51,11 @@ export default function SearchBar() {
 
   // 검색어 변화 시 자동완성 단어 불러오기
   useEffect(() => {
-    if (searchTerm) {
+    if (searchWord) {
       // 불러오기 로직 삽입 필요
       setAutoCompletes(autoCompleteItems);
     }
-  }, [searchTerm])
+  }, [searchWord])
 
   // 최근 검색어 중 삭제
   const removeRecentSearch = (id: number) => {
@@ -61,15 +66,23 @@ export default function SearchBar() {
 
   // 검색
   const search = () => {
-    console.log("검색");
     setIsOpen(false);
-    // 검색 페이지로 이동
+    onSearch(searchWord);
   }
 
   // 검색어 클릭
   const handleSearchWordClick = (word: string) => {
-    setSearchTerm(word);
-    search();
+    onSearchChange(word);
+    onSearch(word);
+  }
+
+  // 엔터키로 검색
+  const activeEnter = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      setIsOpen(false);
+      onSearch(searchWord);
+    }
   }
 
   return (
@@ -78,9 +91,10 @@ export default function SearchBar() {
         <input
           type="text"
           placeholder="제목, 작가로 검색"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          value={searchWord}
+          onChange={(e) => onSearchChange(e.target.value)}
           onFocus={() => setIsOpen(true)}
+          onKeyDown={(e) => activeEnter(e)}
           className="w-full px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200"
         />
         <button
