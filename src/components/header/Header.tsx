@@ -4,10 +4,14 @@ import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Search, Percent, Heart, Bell, X, Trash2 } from "lucide-react"
+import CouponModal from "./CouponModal"
+import PopularSearch from "./PopularSearch"
+import SearchBar from "./SearchBar"
 
 const Header = () => {
   const [activeTab, setActiveTab] = useState("전체")
   const [showNotifications, setShowNotifications] = useState(false)
+  const [showCouponModal, setShowCouponModal] = useState(false)
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab)
@@ -15,6 +19,10 @@ const Header = () => {
 
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications)
+  }
+
+  const handleCouponClick = () => {
+    setShowCouponModal(!showCouponModal)
   }
 
   const notifications = [
@@ -40,6 +48,7 @@ const Header = () => {
 
   return (
     <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)]">
+      {showCouponModal && <CouponModal isOpen={showCouponModal} onClose={() => setShowCouponModal(false)} />}
       <div className="container mx-auto px-4 py-4">
         {/* 상단 헤더 영역 */}
         <div className="flex items-center justify-between">
@@ -48,29 +57,26 @@ const Header = () => {
             <Link href="/" className="flex items-center">
               <Image src="/src/athenna_logo.png" alt="Athenna 로고" width={40} height={40} className="h-10 w-auto" />
             </Link>
-
-            {/* 검색창 - 크기 줄이고 플레이스홀더 변경 */}
-            <div className="relative">
-              <div className="flex items-center rounded-full border border-gray-300 px-4 py-2">
-                <input type="text" placeholder="검색..." className="w-48 bg-transparent text-sm outline-none" />
-                <Search className="ml-2 h-5 w-5 text-gray-500" />
-              </div>
-            </div>
           </div>
 
-          {/* 우측 아이콘 및 프로필 */}
+          {/* 검색창 및 우측 아이콘 및 프로필 */}
           <div className="flex items-center space-x-6">
-            <button aria-label="쿠폰">
+            <SearchBar />
+            <button
+              type="button" 
+              aria-label="쿠폰"
+              onClick={handleCouponClick}
+            >
               <Percent className="h-6 w-6 text-gray-600" />
             </button>
-            <button aria-label="찜 목록">
+            <button type="button" aria-label="찜 목록">
               <Heart className="h-6 w-6 text-gray-600" />
             </button>
-            <button aria-label="알림" onClick={toggleNotifications}>
+            <button type="button" aria-label="알림" onClick={toggleNotifications}>
               <Bell className="h-6 w-6 text-gray-600" />
             </button>
             <div className="flex items-center space-x-3">
-              <span className="text-sm font-medium">대충사는사람</span>
+              <span className="text-sm font-medium whitespace-nowrap">대충사는사람</span>
               <div className="h-10 w-10 overflow-hidden rounded-full">
                 <Image
                   src="/abstract-profile.png"
@@ -85,10 +91,11 @@ const Header = () => {
         </div>
 
         {/* 하단 네비게이션 탭 */}
-        <div className="mt-4 flex border-b border-gray-200">
-          <nav className="flex space-x-8">
+        <div className="mt-4 flex justify-between items-center">
+          <nav className="flex space-x-8 border-b border-gray-200">
             {["전체", "카테고리", "신규", "마감임박"].map((tab) => (
               <button
+                type="button"
                 key={tab}
                 className={`relative pb-3 text-base font-medium ${
                   activeTab === tab ? "text-pink-500" : "text-gray-800"
@@ -96,10 +103,11 @@ const Header = () => {
                 onClick={() => handleTabClick(tab)}
               >
                 {tab}
-                {activeTab === tab && <span className="absolute bottom-0 left-0 h-0.5 w-full bg-pink-500"></span>}
+                {activeTab === tab && <span className="absolute bottom-0 left-0 h-0.5 w-full bg-pink-500" />}
               </button>
             ))}
           </nav>
+          <PopularSearch />
         </div>
       </div>
 
@@ -109,8 +117,8 @@ const Header = () => {
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">알림</h2>
             <div className="flex items-center space-x-4">
-              <button className="text-sm text-gray-500 hover:text-gray-700">모두 지우기</button>
-              <button onClick={toggleNotifications}>
+              <button type="button" className="text-sm text-gray-500 hover:text-gray-700">모두 지우기</button>
+              <button type="button" onClick={toggleNotifications}>
                 <X className="h-6 w-6" />
               </button>
             </div>
@@ -133,7 +141,7 @@ const Header = () => {
                     <p className="mb-1">{notification.message}</p>
                     <p className="text-sm text-gray-500">{notification.date}</p>
                   </div>
-                  <button className="ml-2 text-gray-400 hover:text-gray-600">
+                  <button type="button" className="ml-2 text-gray-400 hover:text-gray-600">
                     <Trash2 className="h-5 w-5" />
                   </button>
                 </div>

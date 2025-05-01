@@ -62,7 +62,7 @@ export default function PopularSearch() {
   }
 
   return (
-    <div className="w-[200px] mx-auto">
+    <div className="w-[200px]">
       <div className="flex items-center">
         <div className="text-pink-400 font-medium mr-auto">인기 검색</div>
         <div className="relative flex items-center border-b border-gray-300 w-[120px]">
