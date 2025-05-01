@@ -1,0 +1,150 @@
+"use client"
+
+import { useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { Search, Percent, Heart, Bell, X, Trash2 } from "lucide-react"
+
+const Header = () => {
+  const [activeTab, setActiveTab] = useState("전체")
+  const [showNotifications, setShowNotifications] = useState(false)
+
+  const handleTabClick = (tab: string) => {
+    setActiveTab(tab)
+  }
+
+  const toggleNotifications = () => {
+    setShowNotifications(!showNotifications)
+  }
+
+  const notifications = [
+    {
+      id: 1,
+      message: "가작가님의 새로운 작품이 공개되었습니다! 지금 바로 확인해보세요.",
+      date: "2025-04-25",
+      profileImage: "/abstract-profile.png",
+    },
+    {
+      id: 2,
+      message: "가작가님의 새로운 작품이 공개되었습니다! 지금 바로 확인해보세요.",
+      date: "2025-04-25",
+      profileImage: "/abstract-profile.png",
+    },
+    {
+      id: 3,
+      message: "가작가님의 새로운 작품이 공개되었습니다! 지금 바로 확인해보세요.",
+      date: "2025-04-25",
+      profileImage: "/abstract-profile.png",
+    },
+  ]
+
+  return (
+    <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)]">
+      <div className="container mx-auto px-4 py-4">
+        {/* 상단 헤더 영역 */}
+        <div className="flex items-center justify-between">
+          {/* 로고와 검색창 */}
+          <div className="flex items-center space-x-4">
+            <Link href="/" className="flex items-center">
+              <Image src="/src/athenna_logo.png" alt="Athenna 로고" width={40} height={40} className="h-10 w-auto" />
+            </Link>
+
+            {/* 검색창 - 크기 줄이고 플레이스홀더 변경 */}
+            <div className="relative">
+              <div className="flex items-center rounded-full border border-gray-300 px-4 py-2">
+                <input type="text" placeholder="검색..." className="w-48 bg-transparent text-sm outline-none" />
+                <Search className="ml-2 h-5 w-5 text-gray-500" />
+              </div>
+            </div>
+          </div>
+
+          {/* 우측 아이콘 및 프로필 */}
+          <div className="flex items-center space-x-6">
+            <button aria-label="쿠폰">
+              <Percent className="h-6 w-6 text-gray-600" />
+            </button>
+            <button aria-label="찜 목록">
+              <Heart className="h-6 w-6 text-gray-600" />
+            </button>
+            <button aria-label="알림" onClick={toggleNotifications}>
+              <Bell className="h-6 w-6 text-gray-600" />
+            </button>
+            <div className="flex items-center space-x-3">
+              <span className="text-sm font-medium">대충사는사람</span>
+              <div className="h-10 w-10 overflow-hidden rounded-full">
+                <Image
+                  src="/abstract-profile.png"
+                  alt="프로필 이미지"
+                  width={40}
+                  height={40}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 하단 네비게이션 탭 */}
+        <div className="mt-4 flex border-b border-gray-200">
+          <nav className="flex space-x-8">
+            {["전체", "카테고리", "신규", "마감임박"].map((tab) => (
+              <button
+                key={tab}
+                className={`relative pb-3 text-base font-medium ${
+                  activeTab === tab ? "text-pink-500" : "text-gray-800"
+                }`}
+                onClick={() => handleTabClick(tab)}
+              >
+                {tab}
+                {activeTab === tab && <span className="absolute bottom-0 left-0 h-0.5 w-full bg-pink-500"></span>}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      {/* 알림 패널 */}
+      {showNotifications && (
+        <div className="absolute right-4 top-20 z-50 w-96 rounded-2xl border border-gray-200 bg-white p-6 shadow-lg">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-2xl font-bold">알림</h2>
+            <div className="flex items-center space-x-4">
+              <button className="text-sm text-gray-500 hover:text-gray-700">모두 지우기</button>
+              <button onClick={toggleNotifications}>
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+          </div>
+
+          <div>
+            {notifications.map((notification, index) => (
+              <div key={notification.id}>
+                <div className="flex py-4">
+                  <div className="mr-4 h-12 w-12 overflow-hidden rounded-full">
+                    <Image
+                      src={notification.profileImage || "/placeholder.svg"}
+                      alt="프로필 이미지"
+                      width={48}
+                      height={48}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <p className="mb-1">{notification.message}</p>
+                    <p className="text-sm text-gray-500">{notification.date}</p>
+                  </div>
+                  <button className="ml-2 text-gray-400 hover:text-gray-600">
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </div>
+                {index < notifications.length - 1 && <hr className="border-gray-200" />}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </header>
+  )
+}
+
+export default Header
