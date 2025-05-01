@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { ChevronDown } from "lucide-react"
 
-// 인기 검색어 데이터
+// mock data: 인기 검색어 데이터 추후 삭제
 const popularSearches = [
   { id: 1, term: "타로" },
   { id: 2, term: "별자리" },
@@ -18,9 +18,10 @@ const popularSearches = [
 ]
 
 export default function PopularSearch() {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [nextIndex, setNextIndex] = useState(1)
-  const [isAnimating, setIsAnimating] = useState(false)
+  const [currentIndex, setCurrentIndex] = useState(0) // 현재 순위
+  const [nextIndex, setNextIndex] = useState(1) // 다음 순위
+  const [isAnimating, setIsAnimating] = useState(false) // 애니메이션 상태
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false) // 드롭다운 열림 여부
 
   // 현재 항목과 다음 항목
   const currentItem = popularSearches[currentIndex]
@@ -35,24 +36,36 @@ export default function PopularSearch() {
         setCurrentIndex(nextIndex)
         setNextIndex((nextIndex + 1) % popularSearches.length)
         setIsAnimating(false)
-      }, 500) // 애니메이션 지속 시간과 일치
+      }, 500)
 
       return () => clearTimeout(timer)
-    }, 3000) // 3초마다 변경
+    }, 3000) // 검색어 유지 시간 3초
 
     return () => clearInterval(interval)
   }, [nextIndex])
 
-  const handleSearchClick = (term: string) => {
-    console.log(`검색어 "${term}" 클릭됨`)
+  // 검색어 클릭
+  const handleSearchClick = (word: string) => {
+    console.log(`검색어 "${word}" 클릭됨`)
     // 여기에 검색 페이지로 이동하는 로직 추가
+  }
+
+  // 드롭다운 열기/닫기
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen)
+  }
+
+    // 드롭다운 내 검색어 클릭
+  const handleDropdownItemClick = (word: string) => {
+    setIsDropdownOpen(false)
+    handleSearchClick(word);
   }
 
   return (
     <div className="w-[200px] mx-auto">
       <div className="flex items-center">
         <div className="text-pink-400 font-medium mr-auto">인기 검색</div>
-        <div className="flex items-center border-b border-gray-300 w-[120px]">
+        <div className="relative flex items-center border-b border-gray-300 w-[120px]">
           <div className="relative overflow-hidden h-6 flex-grow">
             <div className="inner-wrapper relative w-full h-full">
               {/* 현재 항목 */}
@@ -81,10 +94,35 @@ export default function PopularSearch() {
             </div>
           </div>
           <button type="button" className="ml-1">
-            <ChevronDown className="h-5 w-5 text-gray-500" />
+            <ChevronDown
+              className={`h-5 w-5 text-gray-500 transition-transform duration-300 ${
+                isDropdownOpen ? "rotate-180" : ""
+              }`}
+              onClick={toggleDropdown}
+            />
           </button>
+          {/* 드롭다운 메뉴 */}
+            {isDropdownOpen && (
+            <div className="absolute top-full right-0 mt-1 w-[140px] bg-white border border-gray-200 rounded-xl shadow-lg z-10 h-fit">
+                <div className="py-2">
+                {popularSearches.map(item => (
+                    <button
+                    key={item.id}
+                    type="button"
+                    className="flex items-center w-full px-4 py-2 text-left hover:bg-gray-50"
+                    onClick={() => handleDropdownItemClick(item.term)}
+                    >
+                    <span className="text-pink-400 font-bold mr-4">{item.id}</span>
+                    <span className="text-gray-800">{item.term}</span>
+                    </button>
+                ))}
+                </div>
+            </div>
+            )}
         </div>
+        
       </div>
+      
     </div>
   )
 }
