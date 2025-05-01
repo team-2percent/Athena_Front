@@ -3,6 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* iOS Safari에서의 글꼴이 비정상적으로 굵어지는 문제 해결 */
+body {
+  font-synthesis: none;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
