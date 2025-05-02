@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -51,7 +51,17 @@ export default function CardCarousel() {
     router.push(`/product/${carouselCards[currentIndex].id}`);
   }
 
-  const currentCard = carouselCards[currentIndex]
+  const currentCard = carouselCards[currentIndex];
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    const newIndex = currentIndex === carouselCards.length - 1 ? 0 : currentIndex + 1
+    const interval = setInterval(() => {
+      setCurrentIndex(newIndex);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>

@@ -60,7 +60,8 @@ export default function ProductCard({
         </div>
       }
 
-      <button type="button" onClick={handleCardClick} className="w-fit rounded-lg overflow-hidden text-left">
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+      <div onClick={handleCardClick} className="w-fit rounded-lg overflow-hidden text-left">
         <div className="relative" style={{ width: size, height: size }}>
           <Image src={image || "/placeholder.svg"} alt={productName} fill className="rounded-lg object-cover" />
           <button
@@ -98,7 +99,7 @@ export default function ProductCard({
             </div>
           )}
         </div>
-      </button>
+      </div>
     </div>
   )
 }

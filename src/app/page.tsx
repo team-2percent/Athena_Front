@@ -1,3 +1,5 @@
+"use client"
+
 import Carousel from "@/components/main/Carousel";
 import CategorySlider from "@/components/main/CategorySlider";
 import RankProduct from "@/components/main/RankProduct";
