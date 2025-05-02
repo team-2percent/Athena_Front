@@ -36,12 +36,13 @@ export default function ProductCard({
   className,
 }: ProductCardProps) {
   const isDeadlineSoon = daysLeft && daysLeft <= 3 // 마감 임박 여부 확인 추후 수정
+  const [likedCheck, setLikedCheck] = useState(liked);
   const router = useRouter();
 
   const handleLikedClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     // 좋아요 변경 api 호출
-    liked = !liked;
+    setLikedCheck(!likedCheck);
   }
 
   const handleCardClick = () => {
@@ -49,17 +50,17 @@ export default function ProductCard({
   }
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative", "w-fit", className)}>
       {/* Custom rank element */}
       {rankElement && <div className="absolute -top-6 left-0 z-10">{rankElement}</div>}
       {/* 마감 임박 */}
       {isDeadlineSoon &&
-        <div className="absolute top-2 left-2 z-20 bg-[#FF0040] text-white px-3 py-1 rounded-sm text-sm font-bold">
+        <div className="absolute top-2 left-2 z-20 bg-[#FF0040] text-white px-3 py-1 rounded-sm text-xs font-bold">
           마감임박
         </div>
       }
 
-      <button type="button" onClick={handleCardClick} className="w-full rounded-lg overflow-hidden text-left">
+      <button type="button" onClick={handleCardClick} className="w-fit rounded-lg overflow-hidden text-left">
         <div className="relative" style={{ width: size, height: size }}>
           <Image src={image || "/placeholder.svg"} alt={productName} fill className="rounded-lg object-cover" />
           <button
@@ -67,7 +68,7 @@ export default function ProductCard({
             onClick={handleLikedClick}
             className="absolute bottom-2 right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center"
           >
-            {liked ? (
+            {likedCheck ? (
               <Heart className="w-3 h-3 text-[#FF0040] fill-[#FF0040]" />
             ) : (
               <Heart className="w-3 h-3 text-black/50" />
@@ -75,12 +76,12 @@ export default function ProductCard({
           </button>
         </div>
 
-        <div className="p-2">
-          <p className="text-xm text-[#545454]">{sellerName}</p>
-          <p className="text-xm font-medium">{productName}</p>
+        <div className="p-1 pt-2" style={{ width: size}}>
+          <p className="text-xs text-[#545454]">{sellerName}</p>
+          <p className="text-xs font-medium">{productName}</p>
           {description && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{description}</p>}
           <p
-            className="text-xm font-bold text-[#ff8fab]"
+            className="text-xs font-bold text-[#ff8fab]"
             style={{ marginTop: showProgressBar ? "2rem" : "0" }}
           >{achievementRate * 100}% 달성!</p>
           {showProgressBar && daysLeft && (
@@ -92,7 +93,7 @@ export default function ProductCard({
                 />
               </div>
               <div className="flex justify-end mt-1">
-                <p className="text-xm font-semibold">{daysLeft}일 남았어요.</p>
+                <p className="text-xs font-semibold">{daysLeft}일 남았어요.</p>
               </div>
             </div>
           )}
