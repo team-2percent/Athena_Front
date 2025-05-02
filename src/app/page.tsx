@@ -55,7 +55,7 @@ export default function Home() {
   }))
 
   return (
-    <main className="min-h-screen bg-white">
+    <div className="w-full h-fit flex flex-col items-center justify-center">
       <div className="container mx-auto px-4 py-8">
       <Carousel />
       {/* Popular Products */}
@@ -121,6 +121,6 @@ export default function Home() {
           </div>
         </section>
     </div>
-    </main>
+    </div>
   );
 }
