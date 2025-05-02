@@ -14,6 +14,7 @@ export default function SearchBar({ searchWord, onSearchChange, onSearch }: Sear
   const [autoCompletes, setAutoCompletes] = useState<string[]>([]) // 자동완성 단어
   const [recentSearches, setRecentSearches] = useState<{ id: number, word: string }[]>([]) // 최근 검색어
   const searchRef = useRef<HTMLDivElement>(null)
+  const maxLength = 30;
 
   // mock data. 로직 구현 후 삭제
   const autoCompleteItems = ["타로 버블티", "타로 버블티 품추가", "타로 버블티 버블 추가"]
@@ -87,7 +88,7 @@ export default function SearchBar({ searchWord, onSearchChange, onSearch }: Sear
 
   return (
     <div ref={searchRef} className="w-80 max-w-xl relative">
-      <div className="relative">
+      <div className="flex gap-2 rounded-full border border-gray-300 px-4 py-3">
         <input
           type="text"
           placeholder="제목, 작가로 검색"
@@ -95,11 +96,12 @@ export default function SearchBar({ searchWord, onSearchChange, onSearch }: Sear
           onChange={(e) => onSearchChange(e.target.value)}
           onFocus={() => setIsOpen(true)}
           onKeyDown={(e) => activeEnter(e)}
-          className="w-full px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200"
+          className="w-full focus:outline-none"
+          maxLength={maxLength}
         />
         <button
           type="button"
-          className="absolute right-3 top-1/2 transform -translate-y-1/2"
+          className=""
           onClick={search}
         >
           <Search className="h-6 w-6 text-gray-500" />
@@ -108,7 +110,7 @@ export default function SearchBar({ searchWord, onSearchChange, onSearch }: Sear
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute w-full mt-2 bg-white rounded-3xl border border-gray-300 shadow-lg z-10">
+        <div className="absolute w-full mt-2 bg-white rounded-3xl border border-gray-300 shadow-lg z-20">
           <div className="p-4">
             {/* Auto-complete section */}
             <div className="mb-4">
