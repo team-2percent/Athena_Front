@@ -53,15 +53,15 @@ export default function CardCarousel() {
 
   const currentCard = carouselCards[currentIndex];
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
-    const newIndex = currentIndex === carouselCards.length - 1 ? 0 : currentIndex + 1
-    const interval = setInterval(() => {
-      setCurrentIndex(newIndex);
+    const timeout = setTimeout(() => {
+      const isLastCard = currentIndex === carouselCards.length - 1
+      const newIndex = isLastCard ? 0 : currentIndex + 1
+      setCurrentIndex(newIndex)
     }, 5000);
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(timeout);
+  }, [currentIndex]);
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
