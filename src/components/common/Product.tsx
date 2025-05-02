@@ -50,9 +50,9 @@ export default function ProductCard({
   }
 
   return (
-    <div className={cn("relative", "w-fit", className)}>
+    <div className={cn("relative", "w-fit", "flex-col", className)}>
       {/* Custom rank element */}
-      {rankElement && <div className="absolute -top-6 left-0 z-10">{rankElement}</div>}
+      {rankElement && <div className="mb-2">{rankElement}</div>}
       {/* 마감 임박 */}
       {isDeadlineSoon &&
         <div className="absolute top-2 left-2 z-20 bg-[#FF0040] text-white px-3 py-1 rounded-sm text-xs font-bold">
@@ -77,11 +77,11 @@ export default function ProductCard({
         </div>
 
         <div className="p-1 pt-2" style={{ width: size}}>
-          <p className="text-xs text-[#545454]">{sellerName}</p>
-          <p className="text-xs font-medium">{productName}</p>
+          <p className="text-sm text-[#545454]">{sellerName}</p>
+          <p className="text-sm font-medium">{productName}</p>
           {description && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{description}</p>}
           <p
-            className="text-xs font-bold text-[#ff8fab]"
+            className="text-sm font-bold text-[#ff8fab]"
             style={{ marginTop: showProgressBar ? "2rem" : "0" }}
           >{achievementRate * 100}% 달성!</p>
           {showProgressBar && daysLeft && (

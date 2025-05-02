@@ -24,7 +24,7 @@ export default function RootLayout({
         className={`${pretendard.className}`} // Pretendard 사용
       >
         <Header />
-        <main className="min-h-screen bg-white">
+        <main className="min-h-screen bg-white mt-1">
           <div className="container mx-auto px-4 py-8">
             {children}
           </div>

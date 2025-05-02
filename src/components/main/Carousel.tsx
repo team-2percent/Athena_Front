@@ -56,7 +56,7 @@ export default function CardCarousel() {
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
     <div
-        className="relative bg-[#d9d9d9] w-full max-w-[720px] h-[200px] sm:h-[250px] md:h-[300px] my-2 mx-auto rounded-lg overflow-hidden cursor-pointer"
+        className="relative bg-[#d9d9d9] w-full max-w-[900px] h-[200px] sm:h-[250px] md:h-[300px] my-2 mx-auto rounded-lg overflow-hidden cursor-pointer"
         onClick={handleCardClick}
     >
       {/* Background Card Image */}
@@ -71,12 +71,12 @@ export default function CardCarousel() {
       </div>
 
       {/* Overlay for better text visibility */}
-      <div className="absolute inset-0 bg-black/20 z-10 bg-[linear-gradient(180deg,rgba(51,51,51,0)0%,rgba(51,51,51,0.1)65%,rgba(51,51,51,0.5)80%,rgba(51,51,51,0.8)100%)]" />
+      <div className="absolute inset-0 bg-black/20 z-10 bg-[linear-gradient(180deg,rgba(51,51,51,0)60%,rgba(51,51,51,0.1)65%,rgba(51,51,51,0.5)80%,rgba(51,51,51,0.8)100%)]" />
 
       {/* Title at bottom left with semi-transparent background */}
-      <div className="absolute bottom-0 left-0 p-4 z-20 rounded-tr-lg">
-        <h2 className="text-lg font-bold text-white">{currentCard.title}</h2>
-        <p className="text-xs mt-1 text-white/80">{currentCard.description}</p>
+      <div className="absolute bottom-0 left-0 p-8 z-20 rounded-tr-lg">
+        <h2 className="text-2xl font-bold text-white">{currentCard.title}</h2>
+        <p className="text-md mt-1 text-white/80">{currentCard.description}</p>
       </div>
 
       {/* Navigation Controls */}
