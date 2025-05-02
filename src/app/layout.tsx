@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local"; // 지정한 폰트를 사용하기 위해 불러옴
 import "./globals.css";
+import Header from "@/components/header/Header";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+// Pretendard 폰트를 사용하기 위해 불러옴
+const pretendard = localFont({
+  src: "../../public/fonts/PretendardVariable.woff2"
 });
 
 export const metadata: Metadata = {
@@ -25,9 +21,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${pretendard.className}`} // Pretendard 사용
       >
-        {children}
+        <Header />
+        <div className="container mx-auto px-4 py-12">
+          { children}
+        </div>
       </body>
     </html>
   );
