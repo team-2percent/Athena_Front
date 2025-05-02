@@ -47,13 +47,14 @@ export default function CardCarousel() {
   }
 
   // 캐러셀 상품 클릭 시 상품 페이지로 이동
-  const handleCardClick = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCardClick = () => {
     router.push(`/product/${carouselCards[currentIndex].id}`);
   }
 
   const currentCard = carouselCards[currentIndex]
 
   return (
+    // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
     <div
         className="relative bg-[#d9d9d9] w-[720px] h-[300px] my-2 mx-2 rounded-lg overflow-hidden"
         onClick={handleCardClick}
