@@ -190,12 +190,10 @@ const DonateDock = () => {
                 </div>
               </div>
 
-              {/* 추가 옵션 */}
-              {/* 추후 API에 따른 반복문으로 확장 가능한 형태로 구현 */}
-              <div>
+              {/* 추가 옵션 영역. 백엔드 요청에 따라 주석 처리. /*}
+              {/* <div>
                 <h3 className="mb-4 text-lg font-medium">추가 옵션</h3>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {/* 색상 선택 - 커스텀 드롭다운 */}
                   <div>
                     <label className="mb-2 block text-sm text-gray-600">색상 선택</label>
                     <div className="relative color-dropdown">
@@ -224,7 +222,6 @@ const DonateDock = () => {
                     </div>
                   </div>
 
-                  {/* 맵기 정도 - 커스텀 드롭다운 */}
                   <div>
                     <label className="mb-2 block text-sm text-gray-600">맵기 정도</label>
                     <div className="relative spiciness-dropdown">
@@ -253,7 +250,7 @@ const DonateDock = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* 결제 수단 */}
               <div>
