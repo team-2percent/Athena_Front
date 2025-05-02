@@ -111,12 +111,12 @@ const Header = () => {
 
         {/* 하단 네비게이션 탭 */}
         <div className="mt-4 flex justify-between items-center">
-          <nav className="flex space-x-8 border-b border-gray-200">
+          <nav className="flex space-x-8">
             {["전체", "카테고리", "신규", "마감임박"].map((tab) => (
               <button
                 type="button"
                 key={tab}
-                className={`relative pb-3 text-base font-medium ${
+                className={`relative pb-1 text-base font-medium ${
                   activeTab === tab ? "text-pink-500" : "text-gray-800"
                 }`}
                 onClick={() => handleTabClick(tab)}
