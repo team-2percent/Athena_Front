@@ -1,11 +1,10 @@
-import Product from "@/components/common/Product";
 import Carousel from "@/components/main/Carousel";
+import CategorySlider from "@/components/main/CategorySlider";
 import RankProduct from "@/components/main/RankProduct";
 import { Trophy } from "lucide-react";
-import Image from "next/image";
 
 export default function Home() {
-  // Sample product data
+  // Sample product data 추후 삭제
   const topProducts = {
     1 :{
       id: 1,
@@ -54,12 +53,141 @@ export default function Home() {
     liked: false,
   }))
 
+  const categories = [
+    {
+      id: 1,
+      name: "다재한 문구",
+      image: "/product-test.png",
+    },
+    {
+      id: 2,
+      name: "다재한 문구2",
+      image: "/product-test.png",
+    },
+    // More categories...
+  ]
+  const categoryProducts: Record<number, { id: number; image: string; sellerName: string; productName: string; achievementRate: number; daysLeft: number; liked: boolean; }[]> = {
+    // 다재한 문구 카테고리 상품
+    1: [
+      {
+        id: 101,
+        image: "/product-test3.png",
+        sellerName: "문구천국1212312",
+        productName: "귀여운 동물 스티커 세트",
+        achievementRate: 0.5,
+        daysLeft: 5,
+        liked: true,
+      },
+      {
+        id: 102,
+        image: "/product-test3.png",
+        sellerName: "문구천국",
+        productName: "귀여운 동물 스티커 세트",
+        achievementRate: 0.5,
+        daysLeft: 5,
+        liked: true,
+      },
+      {
+        id: 103,
+        image: "/product-test3.png",
+        sellerName: "문구천국",
+        productName: "귀여운 동물 스티커 세트",
+        achievementRate: 0.5,
+        daysLeft: 5,
+        liked: true,
+      },
+      {
+        id: 104,
+        image: "/product-test3.png",
+        sellerName: "문구천국",
+        productName: "귀여운 동물 스티커 세트",
+        achievementRate: 0.5,
+        daysLeft: 5,
+        liked: true,
+      },
+      {
+        id: 56,
+        image: "/product-test3.png",
+        sellerName: "문구천국",
+        productName: "귀여운 동물 스티커 세트",
+        achievementRate: 0.5,
+        daysLeft: 5,
+        liked: true,
+      },
+      {
+        id: 545,
+        image: "/product-test3.png",
+        sellerName: "문구천국",
+        productName: "귀여운 동물 스티커 세트",
+        achievementRate: 0.5,
+        daysLeft: 5,
+        liked: true,
+      },
+      {
+        id: 23,
+        image: "/product-test3.png",
+        sellerName: "문구천국",
+        productName: "귀여운 동물 스티커 세트",
+        achievementRate: 0.5,
+        daysLeft: 5,
+        liked: true,
+      },
+      {
+        id: 123123,
+        image: "/product-test3.png",
+        sellerName: "문구천국",
+        productName: "귀여운 동물 스티커 세트",
+        achievementRate: 0.5,
+        daysLeft: 5,
+        liked: true,
+      },
+    ],
+    2: [
+      {
+        id: 9,
+        image: "/product-test2.png",
+        sellerName: "문구천국",
+        productName: "귀여운 동물 스티커 세트",
+        achievementRate: 0.5,
+        daysLeft: 5,
+        liked: true,
+      },
+      {
+        id: 14324,
+        image: "/product-test2.png",
+        sellerName: "문구천국",
+        productName: "귀여운 동물 스티커 세트",
+        achievementRate: 0.5,
+        daysLeft: 5,
+        liked: true,
+      },
+      {
+        id: 1243243,
+        image: "/product-test2.png",
+        sellerName: "문구천국",
+        productName: "귀여운 동물 스티커 세트",
+        achievementRate: 0.5,
+        daysLeft: 5,
+        liked: true,
+      },
+      {
+        id: 7656,
+        image: "/product-test2.png",
+        sellerName: "문구천국",
+        productName: "귀여운 동물 스티커 세트",
+        achievementRate: 1,
+        daysLeft: 5,
+        liked: true,
+      },
+    ],
+  }
+
   return (
     <div className="w-full h-fit flex flex-col items-center justify-center">
       <Carousel />
       {/* Popular Products */}
-      <section className="mt-6 px-4">
-          <h2 className="text-lg font-bold mb-4">인기 상품</h2>
+      <section className="mt-16 px-4">
+          <h2 className="text-2xl font-bold mb-4 text-center">인기 상품</h2>
 
           {/* Top 3 Products - Responsive */}
           <div className="flex flex-col md:flex-row gap-4 md:gap-20 mb-10 md:mb-2 md:items-end md:justify-center items-center">
@@ -118,6 +246,24 @@ export default function Home() {
               ))}
             </div>
           </div>
+        </section>
+
+        {/* Category Products */}
+        <section className="mt-16 px-4">
+          <h2 className="text-2xl font-bold mb-14 text-center">카테고리별 상품</h2>
+          {
+            categories.map((category) => {
+              const products = categoryProducts[category.id] || [];
+              return (
+                <CategorySlider
+                  key={category.id}
+                  category={category}
+                  products={products}
+                  className="mb-10"
+                />
+              )
+            })
+          }
         </section>
     </div>
   );
