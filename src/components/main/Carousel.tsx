@@ -56,7 +56,7 @@ export default function CardCarousel() {
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
     <div
-        className="relative bg-[#d9d9d9] w-[720px] h-[300px] my-2 mx-2 rounded-lg overflow-hidden"
+        className="relative bg-[#d9d9d9] w-full max-w-[720px] h-[200px] sm:h-[250px] md:h-[300px] my-2 mx-auto rounded-lg overflow-hidden cursor-pointer"
         onClick={handleCardClick}
     >
       {/* Background Card Image */}
