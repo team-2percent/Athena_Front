@@ -249,7 +249,7 @@ export default function Home() {
         </section>
 
         {/* Category Products */}
-        <section className="mt-16 px-4">
+        {/* <section className="mt-16 px-4">
           <h2 className="text-2xl font-bold mb-14 text-center">카테고리별 상품</h2>
           {
             categories.map((category) => {
@@ -264,7 +264,7 @@ export default function Home() {
               )
             })
           }
-        </section>
+        </section> */}
     </div>
   );
 }
