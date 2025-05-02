@@ -23,7 +23,7 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
       productName: "상품 이름",
       description:
         "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개...",
-      imageUrl: "/placeholder.svg?height=192&width=256",
+      imageUrl: "/tteokbokki/tteokbokki.jpg",
       achievementRate: 10,
       daysLeft: 1,
       isCompleted: false,
@@ -34,7 +34,7 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
       productName: "상품 이름",
       description:
         "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개...",
-      imageUrl: "/placeholder.svg?height=192&width=256",
+      imageUrl: "/tteokbokki/tteokbokki.jpg",
       achievementRate: 10000,
       daysLeft: 20,
       isCompleted: false,
@@ -45,7 +45,7 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
       productName: "상품 이름",
       description:
         "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개...",
-      imageUrl: "/placeholder.svg?height=192&width=256",
+      imageUrl: "/tteokbokki/tteokbokki.jpg",
       achievementRate: 10000,
       daysLeft: null,
       isCompleted: true,
@@ -56,7 +56,7 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
       productName: "상품 이름",
       description:
         "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개...",
-      imageUrl: "/placeholder.svg?height=192&width=256",
+      imageUrl: "/tteokbokki/tteokbokki.jpg",
       achievementRate: 10000,
       daysLeft: null,
       isCompleted: true,
@@ -69,37 +69,37 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
       id: 1,
       username: "팔로워 이름",
       purchaseCount: 255,
-      profileImage: "/placeholder.svg?height=80&width=80",
+      profileImage: "/abstract-profile.png",
     },
     {
       id: 2,
       username: "팔로워 이름",
       purchaseCount: 255,
-      profileImage: "/placeholder.svg?height=80&width=80",
+      profileImage: "/abstract-profile.png",
     },
     {
       id: 3,
       username: "팔로워 이름",
       purchaseCount: 255,
-      profileImage: "/placeholder.svg?height=80&width=80",
+      profileImage: "/abstract-profile.png",
     },
     {
       id: 4,
       username: "팔로워 이름",
       purchaseCount: 255,
-      profileImage: "/placeholder.svg?height=80&width=80",
+      profileImage: "/abstract-profile.png",
     },
     {
       id: 5,
       username: "팔로워 이름",
       purchaseCount: 255,
-      profileImage: "/placeholder.svg?height=80&width=80",
+      profileImage: "/abstract-profile.png",
     },
     {
       id: 6,
       username: "팔로워 이름",
       purchaseCount: 255,
-      profileImage: "/placeholder.svg?height=80&width=80",
+      profileImage: "/abstract-profile.png",
     },
   ]
 
@@ -108,37 +108,37 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
       id: 1,
       username: "팔로워 이름",
       purchaseCount: 3000,
-      profileImage: "/placeholder.svg?height=80&width=80",
+      profileImage: "/abstract-profile.png",
     },
     {
       id: 2,
       username: "팔로워 이름",
       purchaseCount: 3000,
-      profileImage: "/placeholder.svg?height=80&width=80",
+      profileImage: "/abstract-profile.png",
     },
     {
       id: 3,
       username: "팔로워 이름",
       purchaseCount: 3000,
-      profileImage: "/placeholder.svg?height=80&width=80",
+      profileImage: "/abstract-profile.png",
     },
     {
       id: 4,
       username: "팔로워 이름",
       purchaseCount: 3000,
-      profileImage: "/placeholder.svg?height=80&width=80",
+      profileImage: "/abstract-profile.png",
     },
     {
       id: 5,
       username: "팔로워 이름",
       purchaseCount: 3000,
-      profileImage: "/placeholder.svg?height=80&width=80",
+      profileImage: "/abstract-profile.png",
     },
     {
       id: 6,
       username: "팔로워 이름",
       purchaseCount: 3000,
-      profileImage: "/placeholder.svg?height=80&width=80",
+      profileImage: "/abstract-profile.png",
     },
   ]
 
@@ -150,7 +150,7 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
       productName: "상품 이름",
       reviewDate: "2025. 04. 23.",
       reviewContent: "스마케어 맨날 이딴 거나 팔아재끼지말고\n게임이나 똑바로 만들어라 ㅡㅡ",
-      productImage: "/placeholder.svg?height=192&width=256",
+      productImage: "/tteokbokki/tteokbokki.jpg",
       likes: 358,
     },
     {
@@ -160,7 +160,7 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
       reviewDate: "2025. 04. 23.",
       reviewContent:
         "//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////",
-      productImage: "/placeholder.svg?height=192&width=256",
+      productImage: "/tteokbokki/tteokbokki.jpg",
       likes: 358,
     },
   ]

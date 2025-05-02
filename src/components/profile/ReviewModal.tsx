@@ -51,7 +51,7 @@ export default function ReviewModal({ isOpen, onClose, reviewContent, reviewDate
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div ref={modalRef} className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <div className="text-gray-500">{reviewDate}</div>

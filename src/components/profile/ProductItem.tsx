@@ -33,7 +33,7 @@ export default function ProductItem({
           alt={productName}
           width={256}
           height={192}
-          className={`w-full h-full object-cover rounded-lg ${isCompleted ? "brightness-75" : ""}`}
+          className={`w-full h-full object-cover rounded-lg ${isCompleted ? "brightness-50" : ""}`}
         />
 
         {/* 하트 아이콘 */}
