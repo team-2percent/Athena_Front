@@ -44,10 +44,10 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
 
     // 10자리 이상 구성 여부 검사
     if (password.length < 10) {
-      return true;
-    } else {
-      return true; // 10자리 이상 구성인 경우 true 반환
-    }
+      return false;
+    } 
+
+    return true;
   }
 
   // 전체 폼 유효성 검사
