@@ -77,7 +77,6 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
 
   // 회원가입 로직
   const handleSubmit = (e: React.FormEvent) => {
-    console.log("handleSubmit");
     e.preventDefault()
     if (checkValidation()) {
       // 회원가입 로직 추후 구현
@@ -89,7 +88,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
 
   // 비밀번호 양식 확인
   useEffect(() => {
-    setIsPasswordValid(checkPassword())
+    setIsPasswordValid(checkPassword() || password === "")
   }, [password])
 
   // 비밀번호 일치 확인
