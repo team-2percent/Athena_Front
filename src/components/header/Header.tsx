@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Percent, Heart, Bell, X, Trash2 } from "lucide-react"
@@ -8,14 +8,37 @@ import CouponModal from "./CouponModal"
 import PopularSearch from "./PopularSearch"
 import SearchBar from "./SearchBar"
 import { useRouter } from 'next/navigation';
+import LoginModal from "../login/LoginModal"
+import SignupModal from "../login/SignUpModal"
 
 
 const Header = () => {
+  const [isLogin, setIsLogin] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
   const [activeTab, setActiveTab] = useState("전체")
   const [showNotifications, setShowNotifications] = useState(false)
   const [showCouponModal, setShowCouponModal] = useState(false)
   const [searchWord, setSearchWord] = useState("");
   const router = useRouter();
+
+  // 로그인 모달 열기 / 닫기
+  const openLoginModal = () => {
+    setShowLoginModal(true)
+  }
+
+  const closeLoginModal = () => {
+    setShowLoginModal(false)
+  }
+
+  // 회원가입 모달 열기 / 닫기
+  const openSignupModal = () => {
+    setShowSignupModal(true)
+  }
+
+  const closeSignupModal = () => {
+    setShowSignupModal(false)
+  }
 
   const handleSearchChange = (word: string) => {
     setSearchWord(word)
@@ -61,9 +84,24 @@ const Header = () => {
     },
   ]
 
+  // 모달 뒷배경 스크롤 방지
+  useEffect(() => {
+    if (showLoginModal || showSignupModal || showCouponModal) {
+      // 모달이 열릴 때 body 스크롤 방지
+      document.body.style.overflow = "hidden"
+    }
+
+    return () => {
+      // 모달이 닫힐 때 body 스크롤 복원
+      document.body.style.overflow = ""
+    }
+  }, [showLoginModal, showSignupModal, showCouponModal])
+
   return (
     <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)]">
       {showCouponModal && <CouponModal isOpen={showCouponModal} onClose={() => setShowCouponModal(false)} />}
+      {showLoginModal && <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} />}
+      {showSignupModal && <SignupModal isOpen={showSignupModal} onClose={closeSignupModal} />}
       <div className="container mx-auto px-4 py-4">
         {/* 상단 헤더 영역 */}
         <div className="flex items-center justify-between">
@@ -77,35 +115,54 @@ const Header = () => {
           {/* 검색창 및 우측 아이콘 및 프로필 */}
           <div className="flex items-center space-x-6">
             <SearchBar
+              isLogin={isLogin}
               searchWord={searchWord}
               onSearchChange={handleSearchChange}
               onSearch={moveToSearchPage}
             />
-            <button
-              type="button" 
-              aria-label="쿠폰"
-              onClick={handleCouponClick}
-            >
-              <Percent className="h-6 w-6 text-gray-600" />
-            </button>
-            <button type="button" aria-label="찜 목록">
-              <Heart className="h-6 w-6 text-gray-600" />
-            </button>
-            <button type="button" aria-label="알림" onClick={toggleNotifications}>
-              <Bell className="h-6 w-6 text-gray-600" />
-            </button>
-            <div className="flex items-center space-x-3">
-              <span className="text-sm font-medium whitespace-nowrap">대충사는사람</span>
-              <div className="h-10 w-10 overflow-hidden rounded-full">
-                <Image
-                  src="/abstract-profile.png"
-                  alt="프로필 이미지"
-                  width={40}
-                  height={40}
-                  className="h-full w-full object-cover"
-                />
+            
+            {
+              isLogin ? 
+              <>
+                <button
+                type="button" 
+                aria-label="쿠폰"
+                onClick={handleCouponClick}
+              >
+                <Percent className="h-6 w-6 text-gray-600" />
+              </button>
+                <button type="button" aria-label="찜 목록">
+                <Heart className="h-6 w-6 text-gray-600" />
+              </button>
+              <button type="button" aria-label="알림" onClick={toggleNotifications}>
+                <Bell className="h-6 w-6 text-gray-600" />
+              </button>
+              <div className="flex items-center space-x-3">
+                <span className="text-sm font-medium whitespace-nowrap">대충사는사람</span>
+                <div className="h-10 w-10 overflow-hidden rounded-full">
+                  <Image
+                    src="/abstract-profile.png"
+                    alt="프로필 이미지"
+                    width={40}
+                    height={40}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
               </div>
-            </div>
+              </>
+              :
+              <div className="text-pink-400 font-medium mr-auto flex items-center gap-2">
+                <button type="button" aria-label="로그인" onClick={openLoginModal}>
+                  로그인
+                </button>
+                /
+                <button type="button" aria-label="로그인" onClick={openSignupModal}>
+                  회원가입
+                </button>
+              </div>
+            }
+
+            
           </div>
         </div>
 

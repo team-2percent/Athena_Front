@@ -4,12 +4,13 @@ import { useState, useRef, useEffect } from "react"
 import { Search, X } from "lucide-react"
 
 interface SearchBarProps {
+  isLogin: boolean
   searchWord: string
   onSearchChange: (word: string) => void
   onSearch: (word: string) => void
 }
 
-export default function SearchBar({ searchWord, onSearchChange, onSearch }: SearchBarProps) {
+export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearch }: SearchBarProps) {
   const [isOpen, setIsOpen] = useState(false) // 드롭다운 열림 여부
   const [autoCompletes, setAutoCompletes] = useState<string[]>([]) // 자동완성 단어
   const [recentSearches, setRecentSearches] = useState<{ id: number, word: string }[]>([]) // 최근 검색어
@@ -130,7 +131,8 @@ export default function SearchBar({ searchWord, onSearchChange, onSearch }: Sear
             </div>
 
             {/* Recent searches section */}
-            <div>
+            {isLogin &&
+              <div>
               <h3 className="text-lg font-bold mb-2">최근 검색어</h3>
               <div className="flex flex-col">
                 {recentSearches.map(item => (
@@ -156,6 +158,9 @@ export default function SearchBar({ searchWord, onSearchChange, onSearch }: Sear
                 ))}
               </div>
             </div>
+            }
+            
+            
           </div>
         </div>
       )}
