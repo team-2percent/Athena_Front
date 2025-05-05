@@ -48,6 +48,19 @@ export default function ReviewModal({ isOpen, onClose, reviewContent, reviewDate
     }
   }, [isOpen, onClose])
 
+  // 모달 뒷배경 스크롤 방지
+  useEffect(() => {
+    if (isOpen) {
+      // 모달이 열릴 때 body 스크롤 방지
+      document.body.style.overflow = "hidden"
+    }
+
+    return () => {
+      // 모달이 닫힐 때 body 스크롤 복원
+      document.body.style.overflow = ""
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
 
   return (
