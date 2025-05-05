@@ -2,8 +2,9 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { MessageCircle, X } from "lucide-react"
+import clsx from "clsx"
 
 interface LoginModalProps {
   isOpen: boolean
@@ -11,16 +12,40 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
-  const [userId, setUserId] = useState("")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-
+  const [disabled, setDisabled] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [focusedField, setFocusedField] = useState<string | null>(null)
+  const [isEmailValid, setIsEmailValid] = useState(true)
   if (!isOpen) return null
+
+  const checkEmail = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+
     // 로그인 로직 추후 구현
-    console.log("Login attempt with:", { userId, password })
+    if (false) {
+      console.log("Login attempt with:", { email, password })
+    } else {
+      setErrorMessage("이메일과 비밀번호를 확인해주세요.")
+    }
+    
   }
+
+  useEffect(() => {
+    setIsEmailValid(checkEmail() || email === "")
+  }, [email])
+
+  useEffect(() => {
+    if (email && password) {
+      setErrorMessage("")
+      setDisabled(false)
+    } else {
+      setDisabled(true)
+    }
+  }, [email, password])
 
   return (
     <>
@@ -43,33 +68,51 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
           <h2 className="text-2xl font-bold mb-8">로그인</h2>
 
-          <form onSubmit={handleSubmit}>
-            {/* ID Input */}
-            <div className="mb-4">
+          <form className="relative" onSubmit={handleSubmit}>
+            {/* Email Input */}
+            <div className="relative mb-4">
               <input
-                type="text"
-                placeholder="아이디 입력"
-                className="w-full p-3 border-b border-gray-300 focus:border-gray-500 outline-none text-lg"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
+                type="email"
+                placeholder="이메일 입력"
+                className={
+                  clsx("w-full p-3 border-b focus:outline-none text-lg",
+                    focusedField === "email" ?
+                    (isEmailValid ? "border-pink-500" : "border-red-500") : "border-gray-300")
+                }
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onFocus={() => setFocusedField("email")}
+                onBlur={() => setFocusedField(null)}
               />
+              {/* 이메일 확인 문구 */}
+              {!isEmailValid && <p className="absolute bottom-0 translate-y-full text-red-500 text-xs pt-1">이메일 형식이 아닙니다.</p>}
             </div>
 
             {/* Password Input */}
-            <div className="mb-8">
+            <div className="relative mb-8">
               <input
                 type="password"
                 placeholder="비밀번호 입력"
-                className="w-full p-3 border-b border-gray-300 focus:border-gray-500 outline-none text-lg"
+                className={
+                  clsx("w-full p-3 border-b focus:outline-none text-lg",
+                    focusedField === "password" ? "border-pink-500" : "border-gray-300")
+                }
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setFocusedField("password")}
+                onBlur={() => setFocusedField(null)}
               />
             </div>
 
             {/* Login Button */}
-            <button type="submit" className="w-full py-4 bg-pink-200 text-pink-900 rounded-xl font-medium text-lg mb-8">
+            <button
+              type="submit"
+              disabled={disabled}
+              className={clsx("w-full py-4 rounded-xl font-medium text-lg mb-8", disabled ? "text-gray-400 bg-gray-200 cursor-not-allowed" : "bg-pink-200 text-pink-900")}
+            >
               로그인
             </button>
+            <span className="absolute bottom-2 left-0 w-full text-center text-red-500 text-sm">{errorMessage}</span>
           </form>
 
           {/* Divider */}

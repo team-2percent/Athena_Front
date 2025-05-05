@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { X, CheckSquare, Square } from 'lucide-react'
+import clsx from "clsx"
 
 interface SignupModalProps {
   isOpen: boolean
@@ -17,13 +18,15 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [agreeToMarketing, setAgreeToMarketing] = useState(false)
   const [focusedField, setFocusedField] = useState<string | null>(null)
+  const [isEmailValid, setIsEmailValid] = useState(true)
   const [isPasswordMatch, setIsPasswordMatch] = useState(true)
   const [isPasswordValid, setIsPasswordValid] = useState(true)
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [disabled, setDisabled] = useState(true);
 
-  // 이메일 유효성 검사
-  const checkEmail = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+   // 이메일 유효성 검사
+   const checkEmail = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
   // 비밀번호 유효성 검사
   const checkPassword = () => {
@@ -50,41 +53,23 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
     return true;
   }
 
-  // 전체 폼 유효성 검사
-  const checkValidation = () => {
-    if (name === "") {
-      setErrorMessage("이름을 입력해주세요.");
-      return false;
-    }
-
-    if (!checkEmail()) {
-      setErrorMessage("이메일 형식이 올바르지 않습니다.")
-      return false;
-    }
-
-    if (!checkPassword()) {
-      setErrorMessage("비밀번호를 확인해주세요.")
-      return false;
-    }
-
-    if (!isPasswordMatch) {
-      setErrorMessage("비밀번호가 일치하지 않습니다.")
-      return false; 
-    }
-
-    return true;
-  }
-
   // 회원가입 로직
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (checkValidation()) {
+    if (false) {
       // 회원가입 로직 추후 구현
       console.log("Signup attempt with:", { name, email, password, confirmPassword, agreeToMarketing })
     } else {
       setIsError(true)
+      setErrorMessage("이미 존재하는 이메일입니다.")
+      // 외 다른 메세지는 백엔드와 협의
     }
   }
+
+  // 이메일 양식 확인
+  useEffect(() => {
+    setIsEmailValid(checkEmail() || email === "")
+  }, [email])
 
   // 비밀번호 양식 확인
   useEffect(() => {
@@ -98,6 +83,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
 
   useEffect(() => {
     setIsError(false)
+    setDisabled(email === "" || password === "" || confirmPassword === "" || name === "" || password !== confirmPassword);
   }, [name, email, confirmPassword, password])
 
   if (!isOpen) return null;
@@ -146,7 +132,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             </div>
 
             {/* Email Input */}
-            <div className="mb-6">
+            <div className="relative mb-6">
               <label
                 htmlFor="email"
                 className={`text-sm ${focusedField === "email" ? "text-pink-500" : "text-gray-500"}`}
@@ -156,14 +142,18 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
               <input
                 id="email"
                 type="email"
-                className={`w-full p-2 border-b ${
-                  focusedField === "email" ? "border-pink-500" : "border-gray-300"
-                } focus:outline-none text-lg`}
+                className={
+                  clsx("w-full p-2 border-b focus:outline-none text-lg",
+                    focusedField === "email" ?
+                    (isEmailValid ? "border-pink-500" : "border-red-500") : "border-gray-300")
+                }
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onFocus={() => setFocusedField("email")}
                 onBlur={() => setFocusedField(null)}
               />
+              {/* 이메일 확인 문구 */}
+              {!isEmailValid && <p className="absolute bottom-0 translate-y-full text-red-500 text-xs pt-1">이메일 형식이 아닙니다.</p>}
             </div>
 
             {/* Password Input */}
@@ -177,9 +167,11 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
               <input
                 id="password"
                 type="password"
-                className={`w-full p-2 border-b ${
-                  focusedField === "password" ? "border-pink-500" : "border-gray-300"
-                } focus:outline-none text-lg`}
+                className={
+                  clsx("w-full p-2 border-b focus:outline-none text-lg",
+                    focusedField === "password" ?
+                    (isPasswordValid ? "border-pink-500" : "border-red-500") : "border-gray-300")
+                }
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onFocus={() => setFocusedField("password")}
@@ -200,9 +192,11 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
               <input
                 id="confirmPassword"
                 type="password"
-                className={`w-full p-2 border-b ${
-                  focusedField === "confirmPassword" ? "border-pink-500" : "border-gray-300"
-                } focus:outline-none text-lg`}
+                className={
+                  clsx("w-full p-2 border-b focus:outline-none text-lg",
+                    focusedField === "confirmPassword" ?
+                    (isPasswordMatch ? "border-pink-500" : "border-red-500") : "border-gray-300")
+                }
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 onFocus={() => setFocusedField("confirmPassword")}
@@ -231,11 +225,11 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             {/* Signup Button */}
             <button
               type="submit"
-              className="w-full py-4 bg-pink-200 text-pink-900 rounded-xl font-medium text-lg"
+              className={clsx("relative w-full py-4 rounded-xl font-medium text-lg mb-1", disabled ? "text-gray-400 bg-gray-200 cursor-not-allowed" : "bg-pink-200 text-pink-900")}
             >
               가입하기
             </button>
-            {isError && <p className="text-red-500 text-sm pt-1 w-full text-center">{errorMessage}</p>}
+            {isError && <p className="absolute bottom-3 left-0 text-red-500 text-sm pt-1 w-full text-center">{errorMessage}</p>}
           </form>
         </div>
       </div>
