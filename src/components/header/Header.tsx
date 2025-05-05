@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Percent, Heart, Bell, X, Trash2 } from "lucide-react"
@@ -14,8 +14,8 @@ import SignupModal from "../login/SignUpModal"
 
 const Header = () => {
   const [isLogin, setIsLogin] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
   const [activeTab, setActiveTab] = useState("전체")
   const [showNotifications, setShowNotifications] = useState(false)
   const [showCouponModal, setShowCouponModal] = useState(false)
@@ -24,20 +24,20 @@ const Header = () => {
 
   // 로그인 모달 열기 / 닫기
   const openLoginModal = () => {
-    setIsLoginModalOpen(true)
+    setShowLoginModal(true)
   }
 
   const closeLoginModal = () => {
-    setIsLoginModalOpen(false)
+    setShowLoginModal(false)
   }
 
   // 회원가입 모달 열기 / 닫기
   const openSignupModal = () => {
-    setIsSignupModalOpen(true)
+    setShowSignupModal(true)
   }
 
   const closeSignupModal = () => {
-    setIsSignupModalOpen(false)
+    setShowSignupModal(false)
   }
 
   const handleSearchChange = (word: string) => {
@@ -84,11 +84,24 @@ const Header = () => {
     },
   ]
 
+  // 모달 뒷배경 스크롤 방지
+  useEffect(() => {
+    if (showLoginModal || showSignupModal || showCouponModal) {
+      // 모달이 열릴 때 body 스크롤 방지
+      document.body.style.overflow = "hidden"
+    }
+
+    return () => {
+      // 모달이 닫힐 때 body 스크롤 복원
+      document.body.style.overflow = ""
+    }
+  }, [showLoginModal, showSignupModal, showCouponModal])
+
   return (
     <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)]">
       {showCouponModal && <CouponModal isOpen={showCouponModal} onClose={() => setShowCouponModal(false)} />}
-      {isLoginModalOpen && <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />}
-      {isSignupModalOpen && <SignupModal isOpen={isSignupModalOpen} onClose={closeSignupModal} />}
+      {showLoginModal && <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} />}
+      {showSignupModal && <SignupModal isOpen={showSignupModal} onClose={closeSignupModal} />}
       <div className="container mx-auto px-4 py-4">
         {/* 상단 헤더 영역 */}
         <div className="flex items-center justify-between">
