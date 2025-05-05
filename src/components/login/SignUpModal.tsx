@@ -102,12 +102,13 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             maxWidth: "450px",
           }}
         >
-          {/* Close button */}
-          <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-            <X size={24} />
-          </button>
-
-          <h2 className="text-2xl font-bold mb-8">회원가입</h2>
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-bold">회원가입</h2>
+            {/* Close button */}
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+              <X size={24} />
+            </button>
+          </div>
 
           <form onSubmit={handleSubmit}>
             {/* Name Input */}

@@ -3,8 +3,9 @@
 import type React from "react"
 
 import { useEffect, useState } from "react"
-import { MessageCircle, X } from "lucide-react"
+import { X } from "lucide-react"
 import clsx from "clsx"
+import KakaoIcon from "../../../public/kakao.svg"
 
 interface LoginModalProps {
   isOpen: boolean
@@ -61,12 +62,13 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             maxWidth: "450px",
           }}
         >
-          {/* Close button */}
-          <button type="button" onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-            <X size={24} />
-          </button>
-
-          <h2 className="text-2xl font-bold mb-8">로그인</h2>
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-bold">로그인</h2>
+            {/* Close button */}
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+              <X size={24} />
+            </button>
+          </div>
 
           <form className="relative" onSubmit={handleSubmit}>
             {/* Email Input */}
@@ -125,9 +127,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           {/* Kakao Login Button */}
           <button
             type="button"
-            className="w-full py-4 bg-yellow-400 text-black rounded-xl font-medium text-lg mb-4 flex items-center justify-center"
+            className="w-full py-4 bg-[#FEE500] text-[rgba(0, 0, 0, 0.85)] rounded-xl font-medium text-lg mb-4 flex items-center justify-center"
           >
-            <MessageCircle className="mr-2" size={20} />
+            <img src="/kakao.svg" width={24} height={24} alt="카카오 로그인" className="mr-2" />
             카카오 로그인
           </button>
 
