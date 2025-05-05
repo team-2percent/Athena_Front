@@ -27,6 +27,7 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
       achievementRate: 10,
       daysLeft: 1,
       isCompleted: false,
+      productId: 201,
     },
     {
       id: 2,
@@ -38,6 +39,7 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
       achievementRate: 10000,
       daysLeft: 20,
       isCompleted: false,
+      productId: 202,
     },
     {
       id: 3,
@@ -49,6 +51,7 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
       achievementRate: 10000,
       daysLeft: null,
       isCompleted: true,
+      productId: 203,
     },
     {
       id: 4,
@@ -60,17 +63,12 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
       achievementRate: 10000,
       daysLeft: null,
       isCompleted: true,
+      productId: 204,
     },
   ]
 
   // 팔로우/팔로잉 데이터 (실제로는 API에서 가져올 데이터)
   const followData = [
-    {
-      id: 1,
-      username: "팔로워 이름",
-      purchaseCount: 255,
-      profileImage: "/abstract-profile.png",
-    },
     {
       id: 2,
       username: "팔로워 이름",
@@ -97,6 +95,12 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
     },
     {
       id: 6,
+      username: "팔로워 이름",
+      purchaseCount: 255,
+      profileImage: "/abstract-profile.png",
+    },
+    {
+      id: 7,
       username: "팔로워 이름",
       purchaseCount: 255,
       profileImage: "/abstract-profile.png",
@@ -105,37 +109,37 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
 
   const followingData = [
     {
-      id: 1,
+      id: 12,
       username: "팔로워 이름",
       purchaseCount: 3000,
       profileImage: "/abstract-profile.png",
     },
     {
-      id: 2,
+      id: 13,
       username: "팔로워 이름",
       purchaseCount: 3000,
       profileImage: "/abstract-profile.png",
     },
     {
-      id: 3,
+      id: 14,
       username: "팔로워 이름",
       purchaseCount: 3000,
       profileImage: "/abstract-profile.png",
     },
     {
-      id: 4,
+      id: 15,
       username: "팔로워 이름",
       purchaseCount: 3000,
       profileImage: "/abstract-profile.png",
     },
     {
-      id: 5,
+      id: 16,
       username: "팔로워 이름",
       purchaseCount: 3000,
       profileImage: "/abstract-profile.png",
     },
     {
-      id: 6,
+      id: 17,
       username: "팔로워 이름",
       purchaseCount: 3000,
       profileImage: "/abstract-profile.png",
@@ -152,6 +156,7 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
       reviewContent: "스마케어 맨날 이딴 거나 팔아재끼지말고\n게임이나 똑바로 만들어라 ㅡㅡ",
       productImage: "/tteokbokki/tteokbokki.jpg",
       likes: 358,
+      productId: 101,
     },
     {
       id: 2,
@@ -162,6 +167,7 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
         "//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////",
       productImage: "/tteokbokki/tteokbokki.jpg",
       likes: 358,
+      productId: 102,
     },
   ]
 
@@ -211,6 +217,7 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
                 achievementRate={product.achievementRate}
                 daysLeft={product.daysLeft}
                 isCompleted={product.isCompleted}
+                productId={product.productId}
               />
             ))}
           </div>
@@ -228,6 +235,7 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
                 reviewContent={review.reviewContent}
                 productImage={review.productImage}
                 likes={review.likes}
+                productId={review.productId}
               />
             ))}
           </div>

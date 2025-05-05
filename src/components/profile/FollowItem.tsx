@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 
 interface FollowItemProps {
   id: number
@@ -11,9 +12,16 @@ interface FollowItemProps {
 }
 
 export default function FollowItem({ id, username, purchaseCount, profileImage, onFollow }: FollowItemProps) {
+  const router = useRouter()
+    
+  const handleProductClick = () => {
+    router.push(`/profile/${id}`)
+  }
+
   return (
     <div className="pb-6 mx-8">
-      <div className="flex items-center justify-between">
+      {/* 팔로워 정보 */}
+      <div className="flex items-center justify-between cursor-pointer" onClick={handleProductClick}>
         {/* 프로필 이미지 */}
         <div className="flex items-center">
           <div className="w-20 h-20 rounded-full bg-gray-200 overflow-hidden mr-6">

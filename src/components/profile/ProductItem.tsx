@@ -1,5 +1,6 @@
 import Image from "next/image"
 import { Heart, Check } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface ProductItemProps {
   id: number
@@ -10,6 +11,7 @@ interface ProductItemProps {
   achievementRate: number
   daysLeft: number | null // null인 경우 판매 종료
   isCompleted: boolean
+  productId: number
 }
 
 export default function ProductItem({
@@ -20,21 +22,30 @@ export default function ProductItem({
   achievementRate,
   daysLeft,
   isCompleted,
+  productId,
 }: ProductItemProps) {
   // 달성률이 100%를 초과하더라도 게이지 바는 100%까지만 표시
   const progressWidth = Math.min(achievementRate, 100)
+  const router = useRouter()
+  
+  const handleProductClick = () => {
+    router.push(`/product/${productId}`)
+  }
 
   return (
     <div className="flex gap-6 mb-8 relative">
       {/* 상품 이미지 */}
       <div className="relative w-64 h-48 flex-shrink-0">
-        <Image
-          src={imageUrl || "/placeholder.svg"}
-          alt={productName}
-          width={256}
-          height={192}
-          className={`w-full h-full object-cover rounded-lg ${isCompleted ? "brightness-50" : ""}`}
-        />
+        {/* 상품 이미지 클릭 시 상품 상세 페이지로 이동 */}
+        <div className="w-full h-full cursor-pointer" onClick={handleProductClick}>
+          <Image
+            src={imageUrl || "/placeholder.svg"}
+            alt={productName}
+            width={256}
+            height={192}
+            className={`w-full h-full object-cover rounded-lg ${isCompleted ? "brightness-50" : ""}`}
+          />
+        </div>
 
         {/* 하트 아이콘 */}
         <button
@@ -47,7 +58,7 @@ export default function ProductItem({
 
         {/* 판매 완료 오버레이 */}
         {isCompleted && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-white cursor-pointer" onClick={handleProductClick}>
             <div className="bg-white rounded-full p-2 mb-2">
               <Check className="h-8 w-8 text-gray-600" />
             </div>
