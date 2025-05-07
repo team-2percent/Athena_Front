@@ -112,12 +112,12 @@ export default function ProductItem({
       {/* 수정 및 삭제 버튼 */}
       <div>
         {isMy && (
-          <div className="flex gap-2">
-            <button className="text-gray-600" onClick={handleEditClick}>
-              <Pencil className="h-5 w-5" />
+          <div className="flex gap-4 mt-2">
+            <button className="text-[#B3B3B3]" onClick={handleEditClick}>
+              <Pencil className="h-8 w-8" />
             </button>
-            <button className="text-gray-600" onClick={(e) => onClickDelete?.(e, productId)}>
-              <Trash className="h-5 w-5" />
+            <button className="text-[#B3B3B3]" onClick={(e) => onClickDelete?.(e, productId)}>
+              <Trash className="h-8 w-8" />
             </button>
           </div>
         )}
