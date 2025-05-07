@@ -11,17 +11,23 @@ import { useRouter } from 'next/navigation';
 import LoginModal from "../login/LoginModal"
 import SignupModal from "../login/SignUpModal"
 import useAuthStore from "@/stores/auth"
+import { usePathname } from 'next/navigation';
 
-
+const uris: Record<string, string> = {
+  "전체": "",
+  "카테고리": "category",
+  "신규": "new",
+  "마감임박": "deadline",
+}
 const Header = () => {
   const isLoggedIn = useAuthStore((state: { isLoggedIn: boolean }) => state.isLoggedIn);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
-  const [activeTab, setActiveTab] = useState("전체")
   const [showNotifications, setShowNotifications] = useState(false)
   const [showCouponModal, setShowCouponModal] = useState(false)
   const [searchWord, setSearchWord] = useState("");
   const router = useRouter();
+  const pathname = usePathname().split("/")[1];
 
   // 로그인 모달 열기 / 닫기
   const openLoginModal = () => {
@@ -49,12 +55,9 @@ const Header = () => {
     if (word) {
       router.push(`/search?query=${word}`);
     }
-    setActiveTab("search");
   }
 
   const handleTabClick = (tab: string) => {
-    setActiveTab(tab)
-
     if (tab === "전체") router.push("/")
     else if (tab === "카테고리") router.push(`/category`)
     else if (tab === "신규") router.push("/new")
@@ -186,12 +189,12 @@ const Header = () => {
                 type="button"
                 key={tab}
                 className={`relative pb-1 text-base font-medium ${
-                  activeTab === tab ? "text-pink-500" : "text-gray-800"
+                  pathname === uris[tab] ? "text-pink-500" : "text-gray-800"
                 }`}
                 onClick={() => handleTabClick(tab)}
               >
                 {tab}
-                {activeTab === tab && <span className="absolute bottom-0 left-0 h-0.5 w-full bg-pink-500" />}
+                {pathname === uris[tab] && <span className="absolute bottom-0 left-0 h-0.5 w-full bg-pink-500" />}
               </button>
             ))}
           </nav>
