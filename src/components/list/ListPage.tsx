@@ -24,23 +24,31 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
     const loader = useRef(null);
     const [sort, setSort] = useState(type === "new" ? null : sorts[type][0]);
 
-    const loadUrl = `backendURL/${type}${type === "category" ? `/${categoryId}` : type === "search" ? `?query=${searchWord}` : ""}` // 추후 수정
+    const loadUrl = `backendURL/${type}${type === "category" ? `/${categoryId}` : type === "search" ? `?query=${searchWord}&page=${currentPage}` : `?page=${currentPage}`}` // 추후 수정
 
-    const [products, setProducts] = useState(Array(20).fill({}).map((_, index) => (
-        {
-            id: index + 1,
-            image: "/product-test.png",
-            sellerName: "John Doe",
-            productName: "Product 1",
-            achievementRate: 50,
-            description: "This is a description of the productThis is a description of the productThis is a description of the product",
-            liked: false,
-            daysLeft: 10
-        }
-    )
-    ))
+    interface Product {
+        id: number;
+        image: string;
+        sellerName: string;
+        productName: string;
+        achievementRate: number;
+        description: string;
+        liked: boolean;
+        daysLeft: number;
+    }
 
-    const loadMoreProducts = () => {
+    const [products, setProducts] = useState<Product[]>([]);
+
+    const loadProducts = async () => {
+        const response = await fetch(loadUrl);
+        const data = await response.json();
+        setProducts(data.products);
+        setTotalCount(data.totalCount);
+    }
+
+    const loadMoreProducts = async () => {
+        // await loadProducts(currentPage + 1);
+        setCurrentPage(prevPage => prevPage + 1);
         setProducts(prevProducts => [...prevProducts, ...Array(20).fill({}).map((_, index) => (
             {
                 id: index * 2 + 1,
@@ -60,10 +68,6 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
     const handleSortClick = (sort: "new" | "deadline" | "recommend" | "view" | "achievement") => {
         setSort(sort);
     }
-
-    useEffect(() => {
-        setTotalCount(999999);
-    }, [products])
     // 옵저버로 loading bar 나오면 loadMore 동작
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -84,9 +88,18 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
 
 
   useEffect(() => {
+    loadProducts();
+    setTotalCount(999999);
     // 페이지 불러오기 로직
     // currentPage 변경, morePage 변경
-  }, [products]);
+  }, []);
+
+  useEffect(() => {
+    setCurrentPage(0);
+    loadProducts();
+    setTotalCount(999999);
+    // 새 정렬로 페이지 불러오기 로직
+  }, [sort])
 
   return (
     <div>
