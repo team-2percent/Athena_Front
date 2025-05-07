@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils"
 import Image from "next/image"
 
 interface ProfileHeaderProps {
@@ -5,11 +6,12 @@ interface ProfileHeaderProps {
   following: string
   purchases: string
   profileImage: string
+  buttons?: React.ReactNode
 }
 
-export default function ProfileHeader({ nickname, following, purchases, profileImage }: ProfileHeaderProps) {
+export default function ProfileHeader({ nickname, following, purchases, profileImage, buttons }: ProfileHeaderProps) {
   return (
-    <div className="flex justify-between items-start mx-auto max-w-6xl mb-12">
+    <div className="flex justify-between items-start mx-auto max-w-6xl mb-12 h-36">
       <div className="flex">
         {/* 프로필 이미지 */}
         <div className="w-36 h-36 rounded-full bg-gray-200 overflow-hidden mr-8 flex-shrink-0">
@@ -40,10 +42,10 @@ export default function ProfileHeader({ nickname, following, purchases, profileI
         </div>
       </div>
 
-      {/* 팔로우 버튼 */}
-      <button type="button" className="mt-4 px-8 py-3 bg-pink-300 text-white rounded-lg flex items-center font-medium">
-        팔로우 +
-      </button>
+      {/* 팔로우 / 프로필 편집 + 거래 내역 보기 버튼 */}
+      <div className="flex flex-col justify-center items-center h-full">
+        {buttons}
+      </div>
     </div>
   )
 }

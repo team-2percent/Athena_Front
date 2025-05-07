@@ -10,10 +10,11 @@ import SearchBar from "./SearchBar"
 import { useRouter } from 'next/navigation';
 import LoginModal from "../login/LoginModal"
 import SignupModal from "../login/SignUpModal"
+import useAuthStore from "@/stores/auth"
 
 
 const Header = () => {
-  const [isLogin, setIsLogin] = useState(false);
+  const isLoggedIn = useAuthStore((state: { isLoggedIn: boolean }) => state.isLoggedIn);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [activeTab, setActiveTab] = useState("전체")
@@ -70,6 +71,10 @@ const Header = () => {
     setShowCouponModal(!showCouponModal)
   }
 
+  const handleProfileClick = () => {
+    router.push("/my")
+  }
+
   const notifications = [
     {
       id: 1,
@@ -122,14 +127,14 @@ const Header = () => {
           {/* 검색창 및 우측 아이콘 및 프로필 */}
           <div className="flex items-center space-x-6">
             <SearchBar
-              isLogin={isLogin}
+              isLogin={isLoggedIn}
               searchWord={searchWord}
               onSearchChange={handleSearchChange}
               onSearch={moveToSearchPage}
             />
             
             {
-              isLogin ? 
+              isLoggedIn ? 
               <>
                 <button
                 type="button" 
@@ -146,7 +151,7 @@ const Header = () => {
               </button>
               <div className="flex items-center space-x-3">
                 <span className="text-sm font-medium whitespace-nowrap">대충사는사람</span>
-                <div className="h-10 w-10 overflow-hidden rounded-full">
+                <button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick}>
                   <Image
                     src="/abstract-profile.png"
                     alt="프로필 이미지"
@@ -154,7 +159,7 @@ const Header = () => {
                     height={40}
                     className="h-full w-full object-cover"
                   />
-                </div>
+                </button>
               </div>
               </>
               :
