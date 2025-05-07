@@ -1,10 +1,10 @@
-import { createStore } from "zustand";
+import { create } from "zustand";
 
 interface AuthStore {
     isLoggedIn: boolean;
 }
 
-const useAuthStore = createStore<AuthStore>((set) => ({
+const useAuthStore = create<AuthStore>((set) => ({
     isLoggedIn: false,
     login: () => set({ isLoggedIn: true }),
     logout: () => set({ isLoggedIn: false }),
