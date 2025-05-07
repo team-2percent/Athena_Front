@@ -25,6 +25,11 @@ export default function ProfilePage() {
           following={profileData.following}
           purchases={profileData.purchases}
           profileImage={profileData.profileImage}
+          buttons={
+            <button type="button" className="px-8 py-3 bg-pink-300 text-white rounded-lg flex items-center font-medium">
+              팔로우 +
+            </button>
+          }
         />
 
         {/* 프로필 콘텐츠 영역 */}

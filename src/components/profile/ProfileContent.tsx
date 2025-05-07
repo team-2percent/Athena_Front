@@ -6,13 +6,16 @@ import ProfileTabs from "./ProfileTabs"
 import ProductItem from "./ProductItem"
 import FollowItem from "./FollowItem"
 import ReviewItem from "./ReviewItem"
+import { Percent } from "lucide-react"
+import MyProductList from "./MyProductList"
 
 interface ProfileContentProps {
   introduction: string
   links: string[]
+  isMy?: boolean
 }
 
-export default function ProfileContent({ introduction, links }: ProfileContentProps) {
+export default function ProfileContent({ introduction, links, isMy }: ProfileContentProps) {
   const [activeTab, setActiveTab] = useState("소개")
 
   // 상품 데이터 (실제로는 API에서 가져올 데이터)
@@ -171,16 +174,58 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
     },
   ]
 
+  // mock data: 쿠폰 데이터 추후 삭제
+  const coupons = [
+    {
+      id: 1,
+      amount: "1000000원",
+      title: "~~~~ 쿠폰",
+      description:
+        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
+      validUntil: "2023-5-12까지 사용가능",
+    },
+    {
+      id: 2,
+      amount: "1000000원",
+      title: "~~~~ 쿠폰",
+      description:
+        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
+      validUntil: "2023-5-12까지 사용가능",
+    },
+    {
+      id: 3,
+      amount: "1000000원",
+      title: "~~~~ 쿠폰",
+      description:
+        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
+      validUntil: "2023-5-12까지 사용가능",
+    },
+    {
+      id: 4,
+      amount: "1000000원",
+      title: "~~~~ 쿠폰",
+      description:
+        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
+      validUntil: "2023-5-12까지 사용가능",
+    },
+  ]
+
   // 팔로우 버튼 클릭 핸들러
   const handleFollow = (userId: number) => {
     console.log(`사용자 ${userId}를 팔로우합니다.`)
     // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
   }
 
+  const deleteProduct = (id: number) => {
+    console.log(`상품 ${id}를 삭제합니다.`)
+    // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
+    // 삭제 후 다시 조회하여 setProducts 호출
+  }
+
   return (
     <div className="mt-12">
       {/* 탭 메뉴 */}
-      <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} isMy={isMy} />
 
       {/* 탭 내용 */}
       <div className="mx-auto max-w-6xl mt-8">
@@ -204,7 +249,9 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
           </div>
         )}
 
-        {activeTab === "판매 상품" && (
+        {activeTab === "판매 상품" && (isMy ? (
+          <MyProductList products={products} deleteProduct={deleteProduct} />
+        ) : (
           <div>
             {products.map((product) => (
               <ProductItem
@@ -221,9 +268,9 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
               />
             ))}
           </div>
-        )}
+        ))}
 
-        {activeTab === "후기" && (
+        {activeTab === "후기" || activeTab === "내가 쓴 후기" && (
           <div>
             {reviews.map((review) => (
               <ReviewItem
@@ -270,6 +317,35 @@ export default function ProfileContent({ introduction, links }: ProfileContentPr
             ))}
           </div>
         )}
+
+        {activeTab === "쿠폰" && <div className="flex flex-col gap-4">
+          {coupons.map((coupon) => (
+          <div className="rounded-2xl border border-gray-200 flex overflow-hidden" key={coupon.id}>
+            {/* 왼쪽: 퍼센트 아이콘 */}
+            <div className="relative min-w-[70px] h-[100px] bg-[#FF0040] flex items-center justify-center">
+              <div className="absolute top-0 right-0 w-4 h-4 bg-white rounded-full translate-x-1/2 translate-y-[-50%]"></div>
+              <div className="absolute bottom-0 right-0 w-4 h-4 bg-white rounded-full translate-x-1/2 translate-y-[50%]"></div>
+              <Percent className="h-8 w-8 text-white" />
+            </div>
+      
+            {/* 중앙: 쿠폰 제목 및 설명 */}
+            <div className="flex-1 p-4 flex flex-col justify-center">
+              <h3 className="text-lg font-bold">{coupon.title}</h3>
+              <p className="text-sm text-gray-600 mt-1">{coupon.description}</p>
+            </div>
+      
+            {/* 구분선 */}
+            <div className="w-0 border-l border-dashed border-gray-300 my-4"></div>
+      
+            {/* 오른쪽: 금액 및 유효기간 */}
+            <div className="p-4 flex flex-col justify-center items-end min-w-[140px]">
+              <p className="text-xl font-bold text-[#FF0040]">{coupon.amount}</p>
+              <p className="text-xs text-gray-500 mt-1">{coupon.validUntil}까지 사용가능</p>
+            </div>
+          </div>
+        ))}
+        </div>
+        }
       </div>
     </div>
   )

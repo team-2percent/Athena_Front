@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { Heart, Check } from "lucide-react"
+import { Heart, Check, Pencil, Trash } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 interface ProductItemProps {
@@ -12,6 +12,8 @@ interface ProductItemProps {
   daysLeft: number | null // null인 경우 판매 종료
   isCompleted: boolean
   productId: number
+  isMy?: boolean
+  onClickDelete?: (e: React.MouseEvent<HTMLButtonElement>, id: number) => void
 }
 
 export default function ProductItem({
@@ -23,6 +25,8 @@ export default function ProductItem({
   daysLeft,
   isCompleted,
   productId,
+  isMy,
+  onClickDelete,
 }: ProductItemProps) {
   // 달성률이 100%를 초과하더라도 게이지 바는 100%까지만 표시
   const progressWidth = Math.min(achievementRate, 100)
@@ -32,8 +36,14 @@ export default function ProductItem({
     router.push(`/product/${productId}`)
   }
 
+  const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    router.push(`/my/product/${productId}/edit`) // 특정 상품 수정 페이지로 이동
+  }
+
   return (
     <div className="flex gap-6 mb-8 relative">
+      
       {/* 상품 이미지 */}
       <div className="relative w-64 h-48 flex-shrink-0">
         {/* 상품 이미지 클릭 시 상품 상세 페이지로 이동 */}
@@ -97,6 +107,20 @@ export default function ProductItem({
             )}
           </div>
         </div>
+      </div>
+
+      {/* 수정 및 삭제 버튼 */}
+      <div>
+        {isMy && (
+          <div className="flex gap-2">
+            <button className="text-gray-600" onClick={handleEditClick}>
+              <Pencil className="h-5 w-5" />
+            </button>
+            <button className="text-gray-600" onClick={(e) => onClickDelete?.(e, productId)}>
+              <Trash className="h-5 w-5" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
