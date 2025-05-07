@@ -24,7 +24,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
     const loader = useRef(null);
     const [sort, setSort] = useState(type === "new" ? null : sorts[type][0]);
 
-    const loadUrl = `backendURL/${type}${type === "category" ? `/${categoryId}` : type === "search" ? `?query=${searchWord}&page=${currentPage}` : `?page=${currentPage}`}` // 추후 수정
+    const loadUrl = `backendURL/${type}${type === "category" && categoryId ? `/${categoryId}` : type === "search" ? `?query=${searchWord}&page=${currentPage}` : `?page=${currentPage}`}` // 추후 수정
 
     interface Product {
         id: number;

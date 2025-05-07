@@ -53,6 +53,11 @@ const Header = () => {
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab)
+
+    if (tab === "전체") router.push("/")
+    else if (tab === "카테고리") router.push(`/category`)
+    else if (tab === "신규") router.push("/new")
+    else if (tab === "마감임박") router.push("/deadline")
   }
 
   const toggleNotifications = () => {

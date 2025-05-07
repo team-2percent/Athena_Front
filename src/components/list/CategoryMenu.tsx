@@ -11,6 +11,7 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
         // 카테고리 불러오기 로직
         setCategories(
             [
+                { id: 0, name: "전체", image: "/abstract-profile.png" },
                 { id: 1, name: "카테고리 1", image: "/abstract-profile.png" },
                 { id: 2, name: "카테고리 2", image: "/abstract-profile.png" },
                 { id: 3, name: "카테고리 3", image: "/abstract-profile.png" },
@@ -30,7 +31,8 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
     }, []);
 
     const handleCategoryClick = (id: number) => {
-        router.push(`/category/${id}`)
+        if (id === 0) router.push("/category")
+        else router.push(`/category/${id}`)
     }
     return (
         <div className="max-w-7xl mx-auto py-4 px-4">
