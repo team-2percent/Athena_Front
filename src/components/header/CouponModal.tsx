@@ -1,4 +1,5 @@
 "use client"
+import clsx from "clsx"
 import { Percent } from "lucide-react"
 
 interface CouponProps {
@@ -18,6 +19,7 @@ export default function CouponModal({ isOpen, onClose }: CouponProps) {
       description:
         "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
       validUntil: "2023-5-12까지 사용가능",
+      received: false,
     },
     {
       id: 2,
@@ -26,6 +28,7 @@ export default function CouponModal({ isOpen, onClose }: CouponProps) {
       description:
         "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
       validUntil: "2023-5-12까지 사용가능",
+      received: false,
     },
     {
       id: 3,
@@ -34,6 +37,7 @@ export default function CouponModal({ isOpen, onClose }: CouponProps) {
       description:
         "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
       validUntil: "2023-5-12까지 사용가능",
+      received: true,
     },
     {
       id: 4,
@@ -42,6 +46,7 @@ export default function CouponModal({ isOpen, onClose }: CouponProps) {
       description:
         "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
       validUntil: "2023-5-12까지 사용가능",
+      received: true,
     },
   ]
 
@@ -64,20 +69,20 @@ export default function CouponModal({ isOpen, onClose }: CouponProps) {
             <div key={coupon.id} className="rounded-xl border p-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[#FF0040] text-white">
+                  <div className={clsx("flex h-10 w-10 items-center justify-center rounded-md text-white", coupon.received ? "bg-[#B3B3B3]" : "bg-[#FF0040]")}>
                     <Percent className="h-5 w-5" />
                   </div>
                   <div>
-                    <div className="text-lg font-bold text-[#FF0040]">{coupon.amount}</div>
+                    <div className={clsx("text-lg font-bold", coupon.received ? "text-[#B3B3B3]" : "text-[#FF0040]")}>{coupon.amount}</div>
                     <div className="text-sm font-medium">{coupon.title}</div>
                   </div>
                 </div>
                 <button
                     type="button"
-                    className="rounded-full bg-[#FF0040] px-4 py-1.5 text-sm font-medium text-white"
+                    className={clsx("rounded-full px-4 py-1.5 text-sm font-medium", coupon.received ? "bg-[#B3B3B3]" : "bg-[#FF0040] text-white")}
                     onClick={() => handleGetCoupon(coupon.id)}
                 >
-                  발급받기
+                  {coupon.received ? "발급완료" : "발급받기"}
                 </button>
               </div>
               <p className="mt-1 text-xs text-gray-600">{coupon.description}</p>
