@@ -111,7 +111,7 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute w-full mt-2 bg-white rounded-3xl border border-gray-300 shadow-lg z-20">
+        <div className="absolute w-full mt-2 bg-white rounded-3xl border border-gray-300 shadow-lg z-30">
           <div className="p-4">
             {/* Auto-complete section */}
             <div className="mb-4">
