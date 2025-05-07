@@ -45,10 +45,10 @@ const Header = () => {
   }
 
   const moveToSearchPage = (word: string) => {
-    console.log(searchWord)
     if (word) {
       router.push(`/search?query=${word}`);
     }
+    setActiveTab("search");
   }
 
   const handleTabClick = (tab: string) => {
