@@ -182,7 +182,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
       title: "~~~~ 쿠폰",
       description:
         "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12까지 사용가능",
+      validUntil: "2023-5-12",
     },
     {
       id: 2,
@@ -190,7 +190,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
       title: "~~~~ 쿠폰",
       description:
         "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12까지 사용가능",
+      validUntil: "2023-5-12",
     },
     {
       id: 3,
@@ -198,7 +198,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
       title: "~~~~ 쿠폰",
       description:
         "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12까지 사용가능",
+      validUntil: "2023-5-12",
     },
     {
       id: 4,
@@ -206,7 +206,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
       title: "~~~~ 쿠폰",
       description:
         "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12까지 사용가능",
+      validUntil: "2023-5-12",
     },
   ]
 
