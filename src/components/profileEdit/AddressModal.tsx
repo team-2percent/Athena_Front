@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DaumPostcode from "react-daum-postcode";
 
 interface AddressModalProps {
@@ -24,6 +24,19 @@ export default function AddressModal({ isOpen, onClose, onAdd }: AddressModalPro
     }
 
     const isSaveDisabled = name.length === 0 ||address.length === 0 || detailAddress.length === 0;
+
+    // 모달 뒷배경 스크롤 방지
+    useEffect(() => {
+        if (isOpen) {
+        // 모달이 열릴 때 body 스크롤 방지
+        document.body.style.overflow = "hidden"
+        }
+
+        return () => {
+        // 모달이 닫힐 때 body 스크롤 복원
+        document.body.style.overflow = ""
+        }
+    }, [isOpen])
     
     return (
         <>
