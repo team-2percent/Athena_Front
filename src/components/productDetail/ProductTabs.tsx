@@ -5,8 +5,10 @@ import type React from "react"
 import { useState } from "react"
 import Image from "next/image"
 import { ThumbsUp, ThumbsDown } from "lucide-react"
+import useAuthStore from "@/stores/auth"
 
 const ProductTabs = () => {
+  const isLoggedIn = useAuthStore((state: { isLoggedIn: boolean }) => state.isLoggedIn);
   const [activeTab, setActiveTab] = useState("소개")
   const [commentText, setCommentText] = useState("")
 
@@ -175,6 +177,7 @@ const ProductTabs = () => {
         {activeTab === "후기" && (
           <div className="space-y-6">
             {/* 댓글 입력 영역 */}
+            { isLoggedIn &&
             <form onSubmit={handleCommentSubmit} className="flex items-center space-x-4">
               <div className="flex-1">
                 <input
@@ -192,6 +195,7 @@ const ProductTabs = () => {
                 댓글 달기
               </button>
             </form>
+            }
 
             {/* 댓글 목록 */}
             <div className="space-y-4">
