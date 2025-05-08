@@ -8,6 +8,7 @@ import FollowItem from "./FollowItem"
 import ReviewItem from "./ReviewItem"
 import { Percent } from "lucide-react"
 import MyProductList from "./MyProductList"
+import clsx from "clsx"
 
 interface ProfileContentProps {
   introduction: string
@@ -183,6 +184,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
       description:
         "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
       validUntil: "2023-5-12",
+      state: "UNUSED"
     },
     {
       id: 2,
@@ -191,6 +193,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
       description:
         "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
       validUntil: "2023-5-12",
+      state: "USED"
     },
     {
       id: 3,
@@ -199,6 +202,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
       description:
         "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
       validUntil: "2023-5-12",
+      state: "EXPIRED"
     },
     {
       id: 4,
@@ -207,8 +211,19 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
       description:
         "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
       validUntil: "2023-5-12",
+      state: "EXPIRED"
     },
   ]
+
+  const couponStateMessage = (state: string, expiredDate: string) => {
+    if (state === "UNUSED") {
+      return `${expiredDate}까지 사용가능`
+    } else if (state === "USED") {
+      return "사용완료"
+    } else if (state === "EXPIRED") {
+      return `${expiredDate} 만료`
+    }
+  }
 
   // 팔로우 버튼 클릭 핸들러
   const handleFollow = (userId: number) => {
@@ -322,7 +337,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
           {coupons.map((coupon) => (
           <div className="rounded-2xl border border-gray-200 flex overflow-hidden" key={coupon.id}>
             {/* 왼쪽: 퍼센트 아이콘 */}
-            <div className="relative min-w-[70px] h-[100px] bg-[#FF0040] flex items-center justify-center">
+            <div className={clsx("relative min-w-[70px] h-[100px] flex items-center justify-center", coupon.state === "UNUSED" ? "bg-[#FF0040]" : "bg-[#B3B3B3]")}>
               <div className="absolute top-0 right-0 w-4 h-4 bg-white rounded-full translate-x-1/2 translate-y-[-50%]"></div>
               <div className="absolute bottom-0 right-0 w-4 h-4 bg-white rounded-full translate-x-1/2 translate-y-[50%]"></div>
               <Percent className="h-8 w-8 text-white" />
@@ -339,8 +354,10 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
       
             {/* 오른쪽: 금액 및 유효기간 */}
             <div className="p-4 flex flex-col justify-center items-end min-w-[140px]">
-              <p className="text-xl font-bold text-[#FF0040]">{coupon.amount}</p>
-              <p className="text-xs text-gray-500 mt-1">{coupon.validUntil}까지 사용가능</p>
+              <p className={clsx("text-xl font-bold", coupon.state === "UNUSED" ? "text-[#FF0040]" : "text-[#B3B3B3]")}>{coupon.amount}</p>
+              <p className="text-xs text-gray-500 mt-1">
+                {couponStateMessage(coupon.state, coupon.validUntil)}
+              </p>
             </div>
           </div>
         ))}

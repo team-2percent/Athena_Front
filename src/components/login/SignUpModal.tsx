@@ -91,7 +91,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   return (
     <>
       {/* Black overlay */}
-      <div className="fixed inset-0 bg-black/60 z-40" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/60 z-50" onClick={onClose} />
 
       {/* Modal */}
       <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
