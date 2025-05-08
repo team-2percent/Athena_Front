@@ -72,6 +72,27 @@ export default function MarkdownEditor({ value, onChange }: MarkdownEditorProps)
           >
             <span className="underline">U</span>
           </button>
+          {/* 취소선 버튼 추가 */}
+          <button
+            className="p-1 hover:bg-gray-200 rounded"
+            onClick={() => {
+              const textarea = document.querySelector("textarea") as HTMLTextAreaElement
+              const start = textarea.selectionStart
+              const end = textarea.selectionEnd
+              const text = textarea.value
+              const before = text.substring(0, start)
+              const selection = text.substring(start, end)
+              const after = text.substring(end)
+              const newText = before + "~~" + (selection || "취소선 텍스트") + "~~" + after
+              onChange(newText)
+              setTimeout(() => {
+                textarea.focus()
+                textarea.setSelectionRange(start + 2, start + 2 + (selection || "취소선 텍스트").length)
+              }, 0)
+            }}
+          >
+            <span className="line-through">S</span>
+          </button>
           <div className="h-6 w-px bg-gray-300 mx-1"></div>
           <button
             className="p-1 hover:bg-gray-200 rounded"

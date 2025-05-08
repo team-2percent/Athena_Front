@@ -146,6 +146,76 @@ const CompositionDialog = ({ isOpen, onClose, composition, onSave }: Composition
   )
 }
 
+// 일정 내용 다이얼로그 컴포넌트
+interface ScheduleDetailsDialogProps {
+  isOpen: boolean
+  onClose: () => void
+  details: string
+  onSave: (details: string) => void
+  scheduleIndex: number
+}
+
+const ScheduleDetailsDialog = ({ isOpen, onClose, details, onSave, scheduleIndex }: ScheduleDetailsDialogProps) => {
+  const [content, setContent] = useState(details || "")
+  const [focusedField, setFocusedField] = useState<boolean>(false)
+
+  if (!isOpen) return null
+
+  const handleSave = () => {
+    onSave(content)
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* 오버레이 */}
+      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+
+      {/* 다이얼로그 */}
+      <div className="relative z-10 w-full max-w-2xl rounded-3xl bg-white p-6 shadow-lg">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold">일정 {scheduleIndex + 1} 상세 내용</h2>
+          <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <X size={24} />
+          </button>
+        </div>
+
+        <div className="mb-6">
+          <label
+            htmlFor="schedule-details"
+            className={`block text-sm mb-2 ${focusedField ? "text-pink-500" : "text-pink-400"}`}
+          >
+            일정 상세 내용
+          </label>
+          <input
+            id="schedule-details"
+            type="text"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="이 일정에 대한 상세 내용을 입력하세요"
+            className={`w-full p-4 border rounded-xl ${
+              focusedField ? "border-pink-500" : "border-gray-300"
+            } focus:outline-none`}
+            onFocus={() => setFocusedField(true)}
+            onBlur={() => setFocusedField(false)}
+          />
+          <p className="text-sm text-gray-500 mt-2">* 간단하게 입력해주세요. 줄바꿈은 불가능합니다.</p>
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={handleSave}
+            className="bg-pink-300 text-[#8B1D3F] font-bold py-2 px-6 rounded-full"
+          >
+            저장
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // 날짜를 YYYY. MM. DD. 형식으로 포맷팅
 const formatDate = (date: Date): string => {
   const year = date.getFullYear()
@@ -174,6 +244,8 @@ export default function StepTwoForm({ targetAmount = "" }: { targetAmount?: stri
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [compositionDialogOpen, setCompositionDialogOpen] = useState(false)
   const [currentOptionId, setCurrentOptionId] = useState<number | null>(null)
+  const [scheduleDetailsDialogOpen, setScheduleDetailsDialogOpen] = useState(false)
+  const [currentScheduleId, setCurrentScheduleId] = useState<number | null>(null)
 
   // Add useEffect to update totalBudget when targetAmount changes
   useEffect(() => {
@@ -204,6 +276,21 @@ export default function StepTwoForm({ targetAmount = "" }: { targetAmount?: stri
   // 일정 삭제
   const removeSchedule = (id: number) => {
     setSchedules(schedules.filter((schedule) => schedule.id !== id))
+  }
+
+  // 일정 내용 편집 다이얼로그 열기
+  const openScheduleDetailsDialog = (id: number) => {
+    setCurrentScheduleId(id)
+    setScheduleDetailsDialogOpen(true)
+  }
+
+  // 일정 내용 저장
+  const saveScheduleDetails = (details: string) => {
+    if (currentScheduleId !== null) {
+      setSchedules(
+        schedules.map((schedule) => (schedule.id === currentScheduleId ? { ...schedule, details } : schedule)),
+      )
+    }
   }
 
   // 후원 옵션 추가
@@ -289,17 +376,19 @@ export default function StepTwoForm({ targetAmount = "" }: { targetAmount?: stri
     setSchedules(schedules.map((schedule) => (schedule.id === id ? { ...schedule, endDate } : schedule)))
   }
 
-  // 폼 데이터를 마크다운으로 변환
+  // 입력된 데이터를 마크다운으로 변환
   const generateMarkdown = () => {
     let result = ""
 
     // 프로젝트 일정 마크다운 생성 - "자동 채우기 사용" 옵션일 때만 추가
     if (scheduleInputMethod === "form") {
       result += "## 프로젝트 일정\n\n"
-      result += "| 단계 | 시작일 | 종료일 |\n"
-      result += "|------|--------|--------|\n"
-      schedules.forEach((schedule, index) => {
-        result += `| ${index + 1} | ${formatDate(schedule.startDate)} | ${formatDate(schedule.endDate)} |\n`
+      result += "| 시작일 | 종료일 | 상세 내용 |\n"
+      result += "|--------|--------|----------|\n"
+      schedules.forEach((schedule) => {
+        result += `| ${formatDate(schedule.startDate)} | ${formatDate(schedule.endDate)} | ${
+          schedule.details || "-"
+        } |\n`
       })
       result += "\n"
     }
@@ -567,7 +656,11 @@ export default function StepTwoForm({ targetAmount = "" }: { targetAmount?: stri
 
                   <span className="mx-2">까지</span>
 
-                  <button type="button" className="ml-4 text-pink-500 hover:text-pink-700">
+                  <button
+                    type="button"
+                    className="ml-4 text-pink-500 hover:text-pink-700"
+                    onClick={() => openScheduleDetailsDialog(schedule.id)}
+                  >
                     내용 작성(편집) &gt;
                   </button>
 
@@ -781,6 +874,17 @@ export default function StepTwoForm({ targetAmount = "" }: { targetAmount?: stri
               : []
           }
           onSave={saveComposition}
+        />
+      )}
+
+      {/* 일정 내용 다이얼로그 */}
+      {scheduleDetailsDialogOpen && currentScheduleId !== null && (
+        <ScheduleDetailsDialog
+          isOpen={scheduleDetailsDialogOpen}
+          onClose={() => setScheduleDetailsDialogOpen(false)}
+          details={schedules.find((schedule) => schedule.id === currentScheduleId)?.details || ""}
+          onSave={saveScheduleDetails}
+          scheduleIndex={schedules.findIndex((schedule) => schedule.id === currentScheduleId)}
         />
       )}
     </div>

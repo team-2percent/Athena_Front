@@ -19,6 +19,7 @@ export default function StepOneForm({ formData, onUpdateFormData }: StepOneFormP
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [targetAmount, setTargetAmount] = useState(formData.targetAmount || "")
+  const [targetAmountError, setTargetAmountError] = useState("")
   const [startDate, setStartDate] = useState(new Date())
   const [endDate, setEndDate] = useState(new Date(new Date().setDate(new Date().getDate() + 21))) // 기본값: 오늘로부터 21일 후
   const [deliveryDate, setDeliveryDate] = useState(() => {
@@ -44,8 +45,19 @@ export default function StepOneForm({ formData, onUpdateFormData }: StepOneFormP
   // 숫자만 입력 가능하도록 처리
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, "")
-    setTargetAmount(value)
-    onUpdateFormData({ targetAmount: value })
+
+    // 100억 제한 검사
+    const numericValue = Number(value)
+    if (numericValue > 10000000000) {
+      setTargetAmountError("목표 금액은 최대 100억원까지 설정 가능합니다.")
+      // 100억으로 제한
+      setTargetAmount("10000000000")
+      onUpdateFormData({ targetAmount: "10000000000" })
+    } else {
+      setTargetAmountError("")
+      setTargetAmount(value)
+      onUpdateFormData({ targetAmount: value })
+    }
   }
 
   // 천 단위 콤마 포맷팅
@@ -180,9 +192,11 @@ export default function StepOneForm({ formData, onUpdateFormData }: StepOneFormP
 
       {/* 목표 금액 - 세로 배치로 변경 */}
       <div className="flex flex-col">
-        <label htmlFor="targetAmount" className="text-xl font-bold mb-4">
-          목표 금액
-        </label>
+        <div className="flex items-center mb-4">
+          <h3 className="text-xl font-bold">목표 금액</h3>
+          <span className="text-sm text-gray-500 ml-4">* 최대 100억원까지 입력 가능합니다.</span>
+        </div>
+        
         <div className="w-full max-w-md flex items-center">
           <input
             id="targetAmount"
@@ -204,19 +218,19 @@ export default function StepOneForm({ formData, onUpdateFormData }: StepOneFormP
         <div className="flex items-center gap-4">
           <DatePicker selectedDate={startDate} onChange={setStartDate} position="top" />
           <span>부터</span>
-          <DatePicker selectedDate={endDate} onChange={setEndDate} position="top" />
+          <DatePicker selectedDate={endDate} onChange={setEndDate} position="top" minDate={startDate} />
           <span>까지</span>
         </div>
       </div>
 
       {/* 배송 예정일 - 새로 추가 */}
       <div className="flex flex-col">
-        <label htmlFor="deliveryDate" className="text-xl font-bold mb-4">
-          배송 예정일
-        </label>
+        <div className="flex items-center mb-4">
+          <h3 className="text-xl font-bold">배송 예정일</h3>
+          <span className="text-sm text-gray-500 ml-4">* 펀딩 종료일의 7일째 되는 날부터 선택 가능합니다.</span>
+        </div>
         <div className="flex items-center gap-4">
           <DatePicker selectedDate={deliveryDate} onChange={setDeliveryDate} position="top" minDate={minDeliveryDate} />
-          <span className="text-gray-500 text-sm">* 펀딩 종료일의 7일째 되는 날부터 선택 가능합니다.</span>
         </div>
       </div>
     </div>

@@ -4,9 +4,10 @@
 @custom-variant dark (&:is(.dark *));
 
 /* iOS Safari에서의 글꼴이 비정상적으로 굵어지는 문제 해결 */
-body {
+/* 근데 이걸 적용하면 프리텐다드 기준 기울임꼴이 안 되는 현상이 있음;;*/
+/* body {
   font-synthesis: none;
-}
+} */
 
 @theme inline {
   --color-background: var(--background);

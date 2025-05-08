@@ -243,7 +243,7 @@ export default function StepThreeForm() {
             type="text"
             value={teamName}
             onChange={(e) => setTeamName(e.target.value)}
-            placeholder="그저그렇게살아나가는팀"
+            placeholder="본인(팀) 이름을 입력해 주세요."
             className="w-full rounded-full border border-gray-300 px-4 py-3 focus:border-pink-400 focus:outline-none"
           />
         </div>
@@ -295,15 +295,18 @@ export default function StepThreeForm() {
             id="teamIntro"
             value={teamIntro}
             onChange={(e) => setTeamIntro(e.target.value)}
-            placeholder="간단하게 작성해 주세요"
+            placeholder="간단하게 작성해 주세요."
             className="w-full rounded-3xl border border-gray-300 px-4 py-3 min-h-[200px] focus:border-pink-400 focus:outline-none"
           />
         </div>
       </div>
 
-      {/* 후원 받을 계좌 정보 - 개선된 버전 */}
+      {/* 후원 받을 계좌 정보 */}
       <div className="flex flex-col">
-        <h3 className="text-xl font-bold mb-4">후원 받을 계좌 정보</h3>
+        <div className="flex items-center mb-4">
+          <h3 className="text-xl font-bold">후원 받을 계좌 정보</h3>
+          <span className="text-sm text-gray-500 ml-4">* 매달 1일에 정산됩니다.</span>
+        </div>
 
         {/* 계좌 목록 */}
         <div className="space-y-3 mb-4">

@@ -27,7 +27,7 @@ const Heading3: React.FC<ComponentProps> = ({ children }) => (
   <h3 className="text-2xl font-semibold mb-4">{children}</h3>
 )
 
-const Paragraph: React.FC<ComponentProps> = ({ children }) => <p className="mb-5 leading-relaxed">{children}</p>
+const Paragraph: React.FC<ComponentProps> = ({ children }) => <p className="mb-6 leading-relaxed">{children}</p>
 
 const UnorderedList: React.FC<ComponentProps> = ({ children }) => <ul className="mb-5 pl-8 list-disc">{children}</ul>
 
@@ -35,22 +35,22 @@ const OrderedList: React.FC<ComponentProps> = ({ children }) => <ol className="m
 
 const ListItem: React.FC<ComponentProps> = ({ children }) => <li className="mb-2">{children}</li>
 
-// const Blockquote: React.FC<ComponentProps> = ({ children }) => (
-//   <blockquote className="border-l-4 border-gray-400 pl-6 pr-2 py-4 italic text-gray-600 my-4 bg-gray-50">{children}</blockquote>
-// )
 const Blockquote: React.FC<ComponentProps> = ({ children }) => (
-  <blockquote className="border-l-4 border-gray-400 pl-6 pr-2 pt-4 italic text-gray-600 my-4 bg-gray-50 content-start">
+  <blockquote className="border-l-4 border-gray-400 pl-6 pr-2 pt-5 text-gray-600 my-4 bg-gray-50 flex items-center min-h-[60px]">
     {children}
   </blockquote>
 )
 
 // 기울임꼴 컴포넌트 수정 - transform 사용
 const Emphasis: React.FC<ComponentProps> = ({ children }) => (
-  <span style={{ display: "inline-block", transform: "skewX(-10deg)" }}>{children}</span>
+  <em className="italic">{children}</em>
 )
 
 // 굵은 텍스트 컴포넌트 추가
 const Strong: React.FC<ComponentProps> = ({ children }) => <strong className="font-bold">{children}</strong>
+
+// 취소선 컴포넌트 추가
+const Delete: React.FC<ComponentProps> = ({ children }) => <del className="line-through">{children}</del>
 
 // 링크 컴포넌트 - href prop 추가
 interface LinkProps extends ComponentProps {
@@ -98,6 +98,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
           blockquote: ({ node, ...props }) => <Blockquote {...props} />,
           em: ({ node, ...props }) => <Emphasis {...props} />, // 기울임꼴 추가
           strong: ({ node, ...props }) => <Strong {...props} />, // 굵은 텍스트 추가
+          del: ({ node, ...props }) => <Delete {...props} />, // 취소선 추가
           a: ({ node, ...props }) => <Link {...props} />,
           table: ({ node, ...props }) => <Table {...props} />,
           thead: ({ node, ...props }) => <TableHead {...props} />,
