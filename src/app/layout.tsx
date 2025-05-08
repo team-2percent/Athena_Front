@@ -5,7 +5,10 @@ import Header from "@/components/header/Header";
 
 // Pretendard 폰트를 사용하기 위해 불러옴
 const pretendard = localFont({
-  src: "../../public/fonts/PretendardVariable.woff2"
+  src: "../../public/fonts/PretendardVariable.woff2",
+  display: 'swap',
+  weight: '45 920',
+  variable: '--font-pretendard',
 });
 
 export const metadata: Metadata = {
@@ -19,9 +22,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body
-        className={`${pretendard.className}`} // Pretendard 사용
+        className={`${pretendard.variable} font-pretendard`} // Pretendard 사용
       >
         <Header />
         <main className="min-h-screen bg-white mt-1">
