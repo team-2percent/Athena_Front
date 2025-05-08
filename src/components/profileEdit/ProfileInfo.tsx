@@ -18,7 +18,7 @@ interface Intro {
 
 export default function ProfileInfo() {
     // 비밀번호 수정 모드
-    const [editingPassword, setEditingPassword] = useState(true);
+    const [editingPassword, setEditingPassword] = useState(false);
 
     const [addingUrl, setAddingUrl] = useState(false)
     // 불러온 프로필
