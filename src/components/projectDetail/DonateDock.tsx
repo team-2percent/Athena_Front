@@ -2,8 +2,8 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
-import { ChevronUp, ChevronDown, Plus } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { ChevronUp, ChevronDown, Plus, Check, ChevronRight, X } from "lucide-react"
 import AddressModal from "../profileEdit/AddressModal"
 
 interface AddressInfo {
@@ -20,26 +20,45 @@ interface ProjectOption {
   title: string
   description: string
   price: string
-  remaining: number // 문자열에서 숫자로 변경
+  remaining: number
   isSelected?: boolean
   details?: string[]
   color?: string
+}
+
+// 선택된 상품 정보 인터페이스 추가
+interface SelectedProduct {
+  quantity: number
 }
 
 const DonateDock = () => {
   // 현재 단계 (1: 상품 선택, 2: 결제 및 배송지 정보)
   const [step, setStep] = useState(1)
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedOption, setSelectedOption] = useState<string | null>("option2")
+
+  // 단일 선택에서 복수 선택으로 변경
+  const [selectedOptions, setSelectedOptions] = useState<string[]>(["option2"])
+
+  // 상품별 수량 관리를 위한 객체 맵으로 변경
+  const [quantities, setQuantities] = useState<Record<string, SelectedProduct>>({
+    option2: { quantity: 1 },
+  })
+
+  // 현재 펼쳐진 상품 ID 추적을 위한 상태 추가
+  const [expandedProductId, setExpandedProductId] = useState<string | null>(null)
+
   const [selectedPay, setSelectedPay] = useState<string | null>(null)
   const [selectedAddress, setSelectedAddress] = useState<string | null>("1")
-  const [quantity, setQuantity] = useState(1)
 
   // 배송지 검색 모달 상태
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
 
   // 상태 관리 부분에 팝오버 관련 상태 추가
   const [showAddressPopover, setShowAddressPopover] = useState(false)
+
+  // 주문 요약 더보기 팝오버 상태 추가
+  const [showOrderSummaryPopover, setShowOrderSummaryPopover] = useState(false)
+  const [orderSummaryPopoverPosition, setOrderSummaryPopoverPosition] = useState({ top: 0, left: 0 })
 
   // 팝오버 위치 계산을 위한 상태
   const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 })
@@ -187,6 +206,9 @@ const DonateDock = () => {
     },
   ])
 
+  // 주문 요약 더보기 버튼 참조
+  const orderSummaryMoreRef = useRef<HTMLButtonElement>(null)
+
   // useEffect 훅에서 스크롤 방지 로직 추가
   useEffect(() => {
     // 후원하기 버튼 클릭 이벤트 리스너 등록
@@ -227,18 +249,24 @@ const DonateDock = () => {
           setShowAddressPopover(false)
         }
       }
+
+      if (showOrderSummaryPopover) {
+        const popoverElement = document.getElementById("order-summary-popover")
+        if (popoverElement && !popoverElement.contains(event.target as Node)) {
+          setShowOrderSummaryPopover(false)
+        }
+      }
     }
 
     document.addEventListener("mousedown", handleClickOutside)
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [showAddressPopover])
+  }, [showAddressPopover, showOrderSummaryPopover])
 
   // 선택된 상품의 남은 수량 가져오기
-  const getSelectedProjectRemaining = (): number => {
-    if (!selectedOption) return 0
-    const option = projectOptions.find((opt) => opt.id === selectedOption)
+  const getProductRemaining = (optionId: string): number => {
+    const option = projectOptions.find((opt) => opt.id === optionId)
     return option ? option.remaining : 0
   }
 
@@ -257,12 +285,47 @@ const DonateDock = () => {
     }
   }
 
+  // 상품 선택 핸들러 수정 - 토글 방식으로 변경
   const handleOptionSelect = (optionId: string) => {
-    // 선택된 옵션이 변경되면 수량을 1로 초기화
-    if (selectedOption !== optionId) {
-      setQuantity(1)
+    // 이미 선택된 상품인지 확인
+    const isSelected = selectedOptions.includes(optionId)
+
+    if (isSelected) {
+      // 이미 선택된 상품이면 선택 해제
+      setSelectedOptions(selectedOptions.filter((id) => id !== optionId))
+
+      // 수량 정보에서도 제거
+      const newQuantities = { ...quantities }
+      delete newQuantities[optionId]
+      setQuantities(newQuantities)
+
+      // 펼쳐진 상품이 선택 해제되면 펼쳐진 상태도 초기화
+      if (expandedProductId === optionId) {
+        setExpandedProductId(null)
+      }
+    } else {
+      // 선택되지 않은 상품이면 선택 추가
+      setSelectedOptions([...selectedOptions, optionId])
+
+      // 수량 정보에 추가 (기본값 1)
+      setQuantities({
+        ...quantities,
+        [optionId]: { quantity: 1 },
+      })
     }
-    setSelectedOption(optionId)
+  }
+
+  // 상품 펼침/접힘 토글 핸들러 추가
+  const toggleProductExpand = (optionId: string, e: React.MouseEvent) => {
+    e.stopPropagation() // 이벤트 버블링 방지
+
+    if (expandedProductId === optionId) {
+      // 이미 펼쳐진 상품이면 접기
+      setExpandedProductId(null)
+    } else {
+      // 다른 상품이면 해당 상품만 펼치기
+      setExpandedProductId(optionId)
+    }
   }
 
   const handlePaySelect = (pay: string) => {
@@ -306,6 +369,27 @@ const DonateDock = () => {
     })
   }
 
+  // 주문 요약 더보기 팝오버 표시 핸들러
+  const toggleOrderSummaryPopover = () => {
+    if (showOrderSummaryPopover) {
+      setShowOrderSummaryPopover(false)
+      return
+    }
+
+    if (orderSummaryMoreRef.current) {
+      const buttonRect = orderSummaryMoreRef.current.getBoundingClientRect()
+      const offset = selectedOptions.length * 44 > 320 ? 320 : selectedOptions.length * 44
+
+      // 팝오버 위치 계산 (버튼 오른쪽 위에 위치하도록 변경)
+      setOrderSummaryPopoverPosition({
+        top: buttonRect.top - offset - 80, // 버튼보다 위에 위치
+        left: buttonRect.right + 10, // 버튼 오른쪽에 여백을 두고 위치
+      })
+
+      setShowOrderSummaryPopover(true)
+    }
+  }
+
   const handleComplete = (data: any) => {
     setNewAddress({
       ...newAddress,
@@ -345,6 +429,11 @@ const DonateDock = () => {
   }
 
   const goToNextStep = () => {
+    // 선택된 상품이 없으면 다음 단계로 진행하지 않음
+    if (selectedOptions.length === 0) {
+      alert("최소 1개 이상의 상품을 선택해주세요.")
+      return
+    }
     setStep(2)
   }
 
@@ -352,40 +441,60 @@ const DonateDock = () => {
     setStep(1)
   }
 
-  // 수량 증가 함수 - 남은 수량을 초과하지 않도록 수정
-  const increaseQuantity = () => {
-    const remaining = getSelectedProjectRemaining()
-    if (quantity < remaining) {
-      setQuantity((prev) => prev + 1)
+  // 수량 증가 함수 수정 - 특정 상품의 수량만 변경
+  const increaseQuantity = (optionId: string) => {
+    const remaining = getProductRemaining(optionId)
+    const currentQuantity = quantities[optionId]?.quantity || 0
+
+    if (currentQuantity < remaining) {
+      setQuantities({
+        ...quantities,
+        [optionId]: { quantity: currentQuantity + 1 },
+      })
     }
   }
 
-  const decreaseQuantity = () => {
-    if (quantity > 1) {
-      setQuantity((prev) => prev - 1)
+  // 수량 감소 함수 수정 - 특정 상품의 수량만 변경
+  const decreaseQuantity = (optionId: string) => {
+    const currentQuantity = quantities[optionId]?.quantity || 0
+
+    if (currentQuantity > 1) {
+      setQuantities({
+        ...quantities,
+        [optionId]: { quantity: currentQuantity - 1 },
+      })
     }
   }
 
-  // 선택된 상품 정보 가져오기
-  const selectedProjectOption = projectOptions.find((option) => option.id === selectedOption) || projectOptions[0]
-
-  // 총 가격 계산
+  // 총 가격 계산 함수 수정 - 모든 선택된 상품의 가격 합산
   const getTotalPrice = () => {
-    if (!selectedOption) return "0"
-    const option = projectOptions.find((opt) => opt.id === selectedOption)
-    if (!option) return "0"
+    if (selectedOptions.length === 0) return "0"
 
-    // 콤마 제거 후 숫자로 변환
-    const price = Number.parseInt(option.price.replace(/,/g, ""), 10)
-    const total = price * quantity
+    let total = 0
+
+    selectedOptions.forEach((optionId) => {
+      const option = projectOptions.find((opt) => opt.id === optionId)
+      if (option) {
+        const price = Number.parseInt(option.price.replace(/,/g, ""), 10)
+        const quantity = quantities[optionId]?.quantity || 0
+        total += price * quantity
+      }
+    })
 
     // 천 단위 콤마 추가
     return total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
   }
 
-  // 독 외부 영역 클릭 시 닫기 함수 추가
-  const handleOverlayClick = () => {
+  // 독 외부 영역 클릭 시 닫기 함수 수정
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    // 독 자체를 클릭했을 때 닫히도록 함
     setIsOpen(false)
+  }
+
+  // 독 내용물 클릭 시 이벤트 전파 중단 함수 추가
+  const handleContentClick = (e: React.MouseEvent) => {
+    // 내용물 클릭 시 이벤트 전파를 중단하여 독이 닫히지 않도록 함
+    e.stopPropagation()
   }
 
   return (
@@ -405,15 +514,16 @@ const DonateDock = () => {
       </div>
 
       {/* 독이 열려있을 때만 오버레이 표시 */}
-      {isOpen && <div className="fixed inset-0 z-25 bg-black/30" onClick={handleOverlayClick} aria-hidden="true" />}
+      {isOpen && <div className="fixed inset-0 z-25" onClick={handleOverlayClick} aria-hidden="true" />}
 
       {/* 후원하기 Dock */}
       <div
         className={`fixed bottom-0 left-0 z-30 w-full transform transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-y-0" : "translate-y-full"
         }`}
+        onClick={handleOverlayClick}
       >
-        <div className="mx-auto max-w-6xl px-4">
+        <div className="mx-auto max-w-6xl px-4" onClick={handleContentClick}>
           <div className="rounded-t-3xl border border-gray-200 bg-white p-6 pb-0 shadow-lg">
             {/* Dock 헤더 - 항상 동일한 레이아웃 */}
             <div className="mb-6 flex items-center justify-between">
@@ -427,96 +537,149 @@ const DonateDock = () => {
             {step === 1 ? (
               // 1단계: 상품 선택
               <div className="space-y-6">
-                <h3 className="mb-2 text-lg font-medium">상품 선택</h3>
+                <h3 className="mb-2 text-lg font-medium">상품 선택 (복수 선택 가능)</h3>
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                   {/* 왼쪽 영역: 상품 카드 목록 (1/3 너비) - 스크롤 가능하도록 수정 */}
                   <div className="md:col-span-1">
                     <div className="h-[500px] overflow-y-auto pr-2 pt-4 space-y-6">
-                      {projectOptions.map((option) => (
-                        <div
-                          key={option.id}
-                          className={`relative flex cursor-pointer items-center rounded-xl border p-4 transition-all ${
-                            selectedOption === option.id
-                              ? "border-2 border-pink-400"
-                              : "border-gray-200 hover:border-pink-200"
-                          }`}
-                          onClick={() => handleOptionSelect(option.id)}
-                        >
-                          <div className="absolute -right-2 -top-4">
-                            <div className="rounded-full border-2 border-pink-400 bg-white px-3 py-1 text-sm text-pink-500 shadow-sm">
-                              <span>{formatRemaining(option.remaining)}</span>
+                      {projectOptions.map((option) => {
+                        const isSelected = selectedOptions.includes(option.id)
+                        return (
+                          <div
+                            key={option.id}
+                            className={`relative flex cursor-pointer items-center rounded-xl border p-4 transition-all ${
+                              isSelected ? "border-2 border-pink-400" : "border-gray-200 hover:border-pink-200"
+                            }`}
+                            onClick={() => handleOptionSelect(option.id)}
+                          >
+                            <div className="absolute -right-2 -top-4">
+                              <div className="rounded-full border-2 border-pink-400 bg-white px-3 py-1 text-sm text-pink-500 shadow-sm">
+                                <span>{formatRemaining(option.remaining)}</span>
+                              </div>
+                            </div>
+
+                            <div className="flex-1">
+                              <div className="flex items-center">
+                                <div
+                                  className={`mr-2 h-5 w-5 rounded-md flex items-center justify-center ${isSelected ? "bg-pink-500" : "border border-gray-300"}`}
+                                >
+                                  {isSelected && <Check className="h-4 w-4 text-white" />}
+                                </div>
+                                <h4 className={`text-lg font-bold ${isSelected ? "text-pink-500" : ""}`}>
+                                  {option.title}
+                                </h4>
+                              </div>
+
+                              {isSelected && (
+                                <div className="mt-2 flex items-center">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      decreaseQuantity(option.id)
+                                    }}
+                                    className="h-8 w-8 pb-1 rounded-full bg-gray-200 flex items-center justify-center text-gray-700"
+                                  >
+                                    -
+                                  </button>
+                                  <span className="mx-4 text-lg">{quantities[option.id]?.quantity || 0}</span>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      increaseQuantity(option.id)
+                                    }}
+                                    className="h-8 w-8 pb-1 rounded-full bg-gray-200 flex items-center justify-center text-gray-700"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className={`text-xl font-medium ${isSelected ? "text-pink-500" : ""}`}>
+                              {option.price}원
                             </div>
                           </div>
-
-                          <div className="flex-1">
-                            <h4 className={`text-lg font-bold ${selectedOption === option.id ? "text-pink-500" : ""}`}>
-                              {option.title}
-                            </h4>
-
-                            {selectedOption === option.id && (
-                              <div className="mt-2 flex items-center">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    decreaseQuantity()
-                                  }}
-                                  className="h-8 w-8 pb-1 rounded-full bg-gray-200 flex items-center justify-center text-gray-700"
-                                >
-                                  -
-                                </button>
-                                <span className="mx-4 text-lg">{quantity}</span>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    increaseQuantity()
-                                  }}
-                                  className="h-8 w-8 pb-1 rounded-full bg-gray-200 flex items-center justify-center text-gray-700"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className={`text-xl font-medium ${selectedOption === option.id ? "text-pink-500" : ""}`}>
-                            {option.price}원
-                          </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   </div>
 
                   {/* 오른쪽 영역: 선택된 상품 세부 정보 (2/3 너비) */}
-                  <div className="md:col-span-2 rounded-xl border border-gray-200 mt-4 p-4">
-                    <h4 className="mb-4 text-lg font-bold">상품 상세 정보</h4>
+                  <div className="md:col-span-2 rounded-xl border border-gray-200 mt-4 flex flex-col h-[484px]">
+                    {/* 스크롤 영역 - 선택된 상품 목록만 포함 */}
+                    <div className="h-[430px] overflow-y-auto p-4 flex-grow">
+                      {selectedOptions.length > 0 ? (
+                        <>
+                          <h4 className="mb-4 text-lg font-bold">선택된 상품 ({selectedOptions.length}개)</h4>
 
-                    {/* 상세 설명 */}
-                    <div className="mb-6">
-                      <p className="text-gray-700">
-                        {selectedProjectOption.description || "선택한 상품에 대한 상세 설명이 없습니다."}
-                      </p>
+                          <div className="space-y-4">
+                            {selectedOptions.map((optionId) => {
+                              const option = projectOptions.find((opt) => opt.id === optionId)
+                              if (!option) return null
+
+                              const quantity = quantities[optionId]?.quantity || 0
+                              const price = Number.parseInt(option.price.replace(/,/g, ""), 10)
+                              const itemTotal = price * quantity
+                              const isExpanded = expandedProductId === optionId
+
+                              return (
+                                <div key={optionId} className="border border-gray-200 rounded-lg overflow-hidden">
+                                  {/* 상품 헤더 - 클릭 시 펼침/접힘 */}
+                                  <div
+                                    className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50"
+                                    onClick={(e) => toggleProductExpand(optionId, e)}
+                                  >
+                                    <div className="flex items-center">
+                                      <ChevronRight
+                                        className={`h-5 w-5 mr-2 text-gray-500 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+                                      />
+                                      <h5 className="font-medium">{option.title}</h5>
+                                    </div>
+                                    <span>
+                                      {quantity}개 × {option.price}원 = {itemTotal.toLocaleString()}원
+                                    </span>
+                                  </div>
+
+                                  {/* 펼쳐진 상태일 때만 구성 정보 표시 */}
+                                  {isExpanded && (
+                                    <div className="bg-gray-50 p-4 border-t border-gray-200">
+                                      <div className="mb-4">
+                                        <p className="text-gray-700">{option.description}</p>
+                                      </div>
+
+                                      <h6 className="mb-2 font-medium">구성</h6>
+                                      {option.details && option.details.length > 0 ? (
+                                        <ul className="space-y-2">
+                                          {option.details.map((detail, index) => (
+                                            <li key={index} className="flex items-start">
+                                              <span className="mr-2 text-pink-500">•</span>
+                                              <span>{detail}</span>
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      ) : (
+                                        <p className="text-gray-500">구성 정보가 없습니다.</p>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-full py-12">
+                          <p className="text-gray-500 text-lg">상품을 선택해주세요</p>
+                        </div>
+                      )}
                     </div>
 
-                    {/* 구성 */}
-                    <h5 className="mb-2 font-medium">구성</h5>
-                    {selectedProjectOption.details && selectedProjectOption.details.length > 0 ? (
-                      <ul className="space-y-2">
-                        {selectedProjectOption.details.map((detail, index) => (
-                          <li key={index} className="flex items-start">
-                            <span className="mr-2 text-pink-500">•</span>
-                            <span>{detail}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-gray-500">선택한 상품에 대한 구성 정보가 없습니다.</p>
-                    )}
-
-                    <div className="mt-8 border-t border-gray-200 pt-4">
-                      <div className="flex justify-between">
-                        <span className="font-medium">총 금액:</span>
-                        <span className="text-xl font-bold">{getTotalPrice()}원</span>
+                    {/* 총 금액 영역 - 하단에 고정 */}
+                    <div className="border-t border-gray-200 p-4">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">합계</span>
+                        <span className="text-xl font-bold text-pink-500">{getTotalPrice()}원</span>
                       </div>
                     </div>
                   </div>
@@ -526,8 +689,13 @@ const DonateDock = () => {
                 <div className="mt-8 bg-white pb-8">
                   <div className="flex justify-end">
                     <button
-                      className="rounded-xl bg-pink-200 px-8 py-3 font-medium text-pink-800 hover:bg-pink-300"
+                      className={`rounded-xl px-8 py-3 font-medium ${
+                        selectedOptions.length > 0
+                          ? "bg-pink-200 text-pink-800 hover:bg-pink-300"
+                          : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                      }`}
                       onClick={goToNextStep}
+                      disabled={selectedOptions.length === 0}
                     >
                       다음 단계
                     </button>
@@ -603,16 +771,22 @@ const DonateDock = () => {
                 <div className="rounded-xl border border-gray-200 p-4">
                   <h3 className="mb-4 text-lg font-medium">주문 요약</h3>
 
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>{selectedProjectOption.title}</span>
-                      <span>{quantity}개</span>
+                  <div className="space-y-4">
+                    {/* 총 선택 상품 개수만 표시 */}
+                    <div className="flex mb-0 justify-between items-center">
+                      <button
+                        ref={orderSummaryMoreRef}
+                        onClick={toggleOrderSummaryPopover}
+                        className="text-pink-500 hover:text-pink-600 font-medium flex items-center"
+                      >
+                        선택한 상품 {selectedOptions.length}개 보기
+                        <ChevronRight
+                          className={`ml-1 h-4 w-4 transition-transform ${showOrderSummaryPopover ? "rotate-180" : ""}`}
+                        />
+                      </button>
                     </div>
-                    <div className="flex justify-between font-medium">
-                      <span>상품 금액</span>
-                      <span>{selectedProjectOption.price}원</span>
-                    </div>
-                    <div className="flex justify-between text-gray-600">
+
+                    <div className="pt-2 flex justify-between text-gray-600">
                       <span>배송비</span>
                       <span>무료</span>
                     </div>
@@ -649,7 +823,8 @@ const DonateDock = () => {
           </div>
         </div>
       </div>
-      {/* 배송지 추가 팝오버 - 컴포넌트 최상위 레벨로 이동 */}
+
+      {/* 배송지 추가 팝오버 */}
       {showAddressPopover && (
         <div
           id="address-popover"
@@ -723,6 +898,56 @@ const DonateDock = () => {
           </div>
         </div>
       )}
+
+      {/* 주문 요약 더보기 팝오버 */}
+      {showOrderSummaryPopover && (
+        <div
+          id="order-summary-popover"
+          className="fixed bg-white rounded-xl border border-gray-200 p-4 shadow-lg z-40 w-80"
+          style={{
+            top: `${orderSummaryPopoverPosition.top}px`,
+            left: `${orderSummaryPopoverPosition.left}px`,
+          }}
+        >
+          <div className="flex justify-between items-center mb-3">
+            <h4 className="text-lg font-medium">전체 주문 항목</h4>
+            <button onClick={() => setShowOrderSummaryPopover(false)} className="text-gray-500 hover:text-gray-700">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <div className="max-h-[300px] overflow-y-auto">
+            <div className="space-y-1">
+              {selectedOptions.map((optionId) => {
+                const option = projectOptions.find((opt) => opt.id === optionId)
+                if (!option) return null
+
+                const quantity = quantities[optionId]?.quantity || 0
+                const price = Number.parseInt(option.price.replace(/,/g, ""), 10)
+                const itemTotal = price * quantity
+
+                return (
+                  <div key={optionId} className="flex justify-between items-center py-2">
+                    <div>
+                      <span className="font-medium">{option.title}</span>
+                      <span className="text-gray-500 ml-2">{quantity}개</span>
+                    </div>
+                    <span>{itemTotal.toLocaleString()}원</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <div className="flex justify-between items-center">
+              <span className="font-medium">합계</span>
+              <span className="text-lg font-bold text-pink-500">{getTotalPrice()}원</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 배송지 주소 모달 */}
       {isAddressModalOpen && (
         <AddressModal
