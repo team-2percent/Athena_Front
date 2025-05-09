@@ -3,6 +3,7 @@
 import { Plus, Search, Trash2 } from "lucide-react"
 import { useState } from "react"
 import AddressModal from "./AddressModal"
+import clsx from "clsx"
 
 interface AddressInfo {
     id: string
@@ -43,7 +44,10 @@ export default function AddressInfo() {
         zipCode: "",
     })
 
-    const isSaveDisabled = newAddress.name.length === 0 || newAddress.address.length === 0 || newAddress.detailAddress.length === 0;
+    // 저장 가능 여부
+    const [saveable, setSaveable] = useState(false)
+
+    const addDisabled = newAddress.name.length === 0 || newAddress.address.length === 0 || newAddress.detailAddress.length === 0;
 
     // 배송지 추가 모달 열기 핸들러
     const handleOpenAddressModal = () => {
@@ -60,6 +64,7 @@ export default function AddressInfo() {
         }
 
         setAddresses(updatedAddresses)
+        setSaveable(true);
     }
 
     // 기본 배송지 설정 핸들러
@@ -70,6 +75,7 @@ export default function AddressInfo() {
             isDefault: address.id === id,
         })),
         )
+        setSaveable(true);
     }
 
     // 주소 추가 핸들러
@@ -84,7 +90,6 @@ export default function AddressInfo() {
                 isDefault: addresses.length === 0,
                 }
         ])
-        setIsAddressModalOpen(false)
     }
 
     const handleComplete = (data: any) => {
@@ -92,7 +97,14 @@ export default function AddressInfo() {
             ...newAddress,
             address: data.address,
             zipCode: data.zonecode,
+            detailAddress: "",
         })
+        setIsAddressModalOpen(false)
+    }
+
+    const handleSave = () => {
+        // 저장 api 호출
+        setSaveable(false);
     }
 
     return (
@@ -144,7 +156,7 @@ export default function AddressInfo() {
                         <div className="mt-4 flex justify-end">
                             <button
                                 type="button"
-                                disabled={isSaveDisabled}
+                                disabled={addDisabled}
                                 onClick={handleAddAddress}
                                 className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 text-sm flex items-center"
                             >
@@ -154,52 +166,62 @@ export default function AddressInfo() {
                     </div>
             </div>
 
-            <div className="flex-1 bg-white rounded-lg shadow py-6 px-10">
-                
-
+            <div className="flex flex-col flex-1 bg-white rounded-lg shadow py-6 px-10">
                 {/* 배송지 목록 */}
                 <h3 className="text-lg font-medium mb-6">등록된 배송지 목록</h3>
-                {addresses.length === 0 ? 
-                    <p className="text-gray-500 text-center py-4">등록된 배송지가 없습니다.</p>
-                : 
-                    <div className="space-y-4 mt-2">
-                        {addresses.map(address => (
-                            <div key={address.id} className="border rounded-md p-4 relative">
-                                <div className="flex justify-between items-start">
-                                    <div className="flex items-start">
-                                        <input
-                                            type="radio"
-                                            id={`default-address-${address.id}`}
-                                            name="default-address"
-                                            checked={address.isDefault}
-                                            onChange={() => handleSetDefaultAddress(address.id)}
-                                            className="w-4 h-4 text-pink-500 border-gray-300 focus:ring-pink-300 mt-1 mr-3"
-                                        />
-                                        <div>
-                                            <div className="flex items-center">
-                                                <p className="font-medium">{address.name}</p>
-                                            {address.isDefault && 
-                                                <span className="ml-2 px-2 py-0.5 bg-pink-100 text-pink-600 text-xs rounded-full">기본</span>
-                                            }
+                <div className="flex-1 flex flex-col gap-4">
+                    {addresses.length === 0 ? 
+                        <p className="text-gray-500 text-center py-4">등록된 배송지가 없습니다.</p>
+                    : 
+                        <div className="space-y-4 mt-2">
+                            {addresses.map(address => (
+                                <div key={address.id} className="border rounded-md p-4 relative">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex items-start">
+                                            <input
+                                                type="radio"
+                                                id={`default-address-${address.id}`}
+                                                name="default-address"
+                                                checked={address.isDefault}
+                                                onChange={() => handleSetDefaultAddress(address.id)}
+                                                className="w-4 h-4 text-pink-500 border-gray-300 focus:ring-pink-300 mt-1 mr-3"
+                                            />
+                                            <div>
+                                                <div className="flex items-center">
+                                                    <p className="font-medium">{address.name}</p>
+                                                {address.isDefault && 
+                                                    <span className="ml-2 px-2 py-0.5 bg-pink-100 text-pink-600 text-xs rounded-full">기본</span>
+                                                }
+                                                </div>
+                                                <p className="text-sm text-gray-500 mt-1">
+                                                [{address.zipCode}] {address.address}
+                                                </p>
+                                                {address.detailAddress && <p className="text-sm text-gray-500">{address.detailAddress}</p>}
                                             </div>
-                                            <p className="text-sm text-gray-500 mt-1">
-                                            [{address.zipCode}] {address.address}
-                                            </p>
-                                            {address.detailAddress && <p className="text-sm text-gray-500">{address.detailAddress}</p>}
                                         </div>
+                                        <button
+                                        type="button"
+                                            onClick={() => handleRemoveAddress(address.id)}
+                                            className="text-gray-400 hover:text-red-500"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
                                     </div>
-                                    <button
-                                    type="button"
-                                        onClick={() => handleRemoveAddress(address.id)}
-                                        className="text-gray-400 hover:text-red-500"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                }
+                            ))}
+                        </div>
+                    }
+                </div>
+                <div className="flex gap-2 justify-end items-end flex-wrap mt-4">
+                    <p className="text-sm font-medium text-gray-400">※ 저장하지 않고 페이지를 나갈 시 변경사항이 저장되지 않습니다.</p>
+                    <button
+                        disabled={!saveable}
+                        className={clsx("text-white rounded-md text-sm px-4 py-2", saveable ? "bg-pink-500 hover:bg-pink-600": "bg-gray-300")}
+                        onClick={handleSave}
+                    >
+                        저장
+                    </button>
+                </div>
             </div>
             {/* 배송지 주소 모달 */}
             {isAddressModalOpen && 
