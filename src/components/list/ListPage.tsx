@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import ListHeader from "./ListHeader";
-import ProductsList from "./ProductsList";
+import ProjectsList from "./ProjectsList";
 
 interface ListPageProps {
     type: "new" | "deadline" | "category" | "search"
@@ -26,37 +26,37 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
 
     const loadUrl = `backendURL/${type}${type === "category" && categoryId ? `/${categoryId}` : type === "search" ? `?query=${searchWord}&page=${currentPage}` : `?page=${currentPage}`}` // 추후 수정
 
-    interface Product {
+    interface Project {
         id: number;
         image: string;
         sellerName: string;
-        productName: string;
+        projectName: string;
         achievementRate: number;
         description: string;
         liked: boolean;
         daysLeft: number;
     }
 
-    const [products, setProducts] = useState<Product[]>([]);
+    const [projects, setProjects] = useState<Project[]>([]);
 
-    const loadProducts = async () => {
+    const loadProjects = async () => {
         const response = await fetch(loadUrl);
         const data = await response.json();
-        setProducts(data.products);
+        setProjects(data.projects);
         setTotalCount(data.totalCount);
     }
 
-    const loadMoreProducts = async () => {
-        // await loadProducts(currentPage + 1);
+    const loadMoreProjects = async () => {
+        // await loadProjects(currentPage + 1);
         setCurrentPage(prevPage => prevPage + 1);
-        setProducts(prevProducts => [...prevProducts, ...Array(20).fill({}).map((_, index) => (
+        setProjects(prevProjects => [...prevProjects, ...Array(20).fill({}).map((_, index) => (
             {
                 id: index * 2 + 1,
-                image: "/product-test.png",
+                image: "/project-test.png",
                 sellerName: "John Doe",
-                productName: "Product 1",
+                projectName: "Project 1",
                 achievementRate: 50,
-                description: "This is a description of the productThis is a description of the productThis is a description of the product",
+                description: "This is a description of the projectThis is a description of the projectThis is a description of the project",
                 liked: false,
                 daysLeft: 10
             }
@@ -74,7 +74,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
       (entries) => {
         if (entries[0].isIntersecting && !isLoading && morePage) {
           setIsLoading(true);
-          loadMoreProducts();
+          loadMoreProjects();
         }
       },
       { threshold: 0.8 }
@@ -88,7 +88,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
 
 
   useEffect(() => {
-    loadProducts();
+    loadProjects();
     setTotalCount(999999);
     // 페이지 불러오기 로직
     // currentPage 변경, morePage 변경
@@ -96,7 +96,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
 
   useEffect(() => {
     setCurrentPage(0);
-    loadProducts();
+    loadProjects();
     setTotalCount(999999);
     // 새 정렬로 페이지 불러오기 로직
   }, [sort])
@@ -110,7 +110,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
             sort={sort as "new" | "deadline" | "recommend" | "view" | "achievement" | null}
             onClickSort={handleSortClick}
         /> 
-        <ProductsList products={products} />
+        <ProjectsList projects={projects} />
         { 
             morePage && 
             <div className="w-full py-20 flex justify-center items-center" ref={loader}>

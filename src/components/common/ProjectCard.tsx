@@ -6,11 +6,11 @@ import { Check, Heart } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 
-interface ProductCardProps {
+interface ProjectCardProps {
   id: number
   image: string
   sellerName: string
-  productName: string
+  projectName: string
   achievementRate: number
   size?: number
   liked: boolean
@@ -21,11 +21,11 @@ interface ProductCardProps {
   className?: string
 }
 
-export default function ProductCard({
+export default function ProjectCard({
   id,
   image,
   sellerName,
-  productName,
+  projectName,
   achievementRate,
   size = 220,
   liked,
@@ -34,7 +34,7 @@ export default function ProductCard({
   daysLeft,
   description,
   className,
-}: ProductCardProps) {
+}: ProjectCardProps) {
   const isDeadlineSoon = daysLeft !== undefined && daysLeft <= 3 && daysLeft > 0; // 마감 임박 여부 확인 추후 수정
   const [likedCheck, setLikedCheck] = useState(liked);
   const router = useRouter();
@@ -47,7 +47,7 @@ export default function ProductCard({
   }
 
   const handleCardClick = () => {
-    router.push(`/product/${id}`);
+    router.push(`/project/${id}`);
   }
 
   return (
@@ -74,7 +74,7 @@ export default function ProductCard({
               <p className="text-sm">감사합니다.</p>
             </div>
           )}
-          <Image src={image || "/placeholder.svg"} alt={productName} fill className="rounded-lg object-cover" />
+          <Image src={image || "/placeholder.svg"} alt={projectName} fill className="rounded-lg object-cover" />
           <button
             type="button"
             onClick={handleLikedClick}
@@ -90,7 +90,7 @@ export default function ProductCard({
 
         <div className="p-1 pt-2" style={{ width: size }}>
           <p className="text-sm text-[#545454]">{sellerName}</p>
-          <p className="text-sm font-medium">{productName}</p>
+          <p className="text-sm font-medium">{projectName}</p>
           {description && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{description}</p>}
           <p
             className={cn("text-sm font-bold", isSoldOut ? "text-[#808080]" : "text-[#ff8fab]", showProgressBar ? "mt-8" : "mt-0")}

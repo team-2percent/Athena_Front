@@ -3,9 +3,9 @@
 import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { Heart, Share2, ChevronLeft, ChevronRight } from "lucide-react"
-import ProductTabs from "./ProductTabs"
+import ProjectTabs from "./ProjectTabs"
 
-const ProductDetail = () => {
+const ProjectDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isLiked, setIsLiked] = useState(false)
   const [visibleImages, setVisibleImages] = useState<number[]>([])
@@ -214,9 +214,9 @@ const ProductDetail = () => {
       </div>
 
       {/* 탭 메뉴 및 소개 영역 추가 */}
-      <ProductTabs />
+      <ProjectTabs />
     </div>
   )
 }
 
-export default ProductDetail
+export default ProjectDetail

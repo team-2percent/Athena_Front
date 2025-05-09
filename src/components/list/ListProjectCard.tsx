@@ -1,24 +1,24 @@
-import Product from "../common/Product"
+import ProjectCard from "../common/ProjectCard"
 
 
-interface ListProductProps {
+interface ListProjectProps {
     id: number
     image: string
     sellerName: string
-    productName: string
+    projectName: string
     achievementRate: number
     description: string
     liked: boolean
     daysLeft: number
 }
 
-export default function ListProduct({ id, image, sellerName, productName, achievementRate, description, liked, daysLeft }: ListProductProps) {
+export default function ListProject({ id, image, sellerName, projectName, achievementRate, description, liked, daysLeft }: ListProjectProps) {
   return (
-    <Product
+    <ProjectCard
       id={id}
       image={image}
       sellerName={sellerName}
-      productName={productName}
+      projectName={projectName}
       achievementRate={achievementRate}
       description={description}
       liked={liked}

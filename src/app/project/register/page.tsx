@@ -1,14 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import RegisterHeader from "@/components/productRegister/RegisterHeader"
-import StepButtons from "@/components/productRegister/StepButtons"
-import StepOneForm from "@/components/productRegister/StepOneForm"
-import StepTwoForm from "@/components/productRegister/StepTwoForm"
-import StepThreeForm from "@/components/productRegister/StepThreeForm"
+import RegisterHeader from "@/components/projectRegister/RegisterHeader"
+import StepButtons from "@/components/projectRegister/StepButtons"
+import StepOneForm from "@/components/projectRegister/StepOneForm"
+import StepTwoForm from "@/components/projectRegister/StepTwoForm"
+import StepThreeForm from "@/components/projectRegister/StepThreeForm"
 import { useRouter } from "next/navigation"
 
-export default function ProductRegister() {
+export default function ProjectRegister() {
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
     targetAmount: "",
