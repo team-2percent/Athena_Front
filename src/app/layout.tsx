@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local"; // 지정한 폰트를 사용하기 위해 불러옴
 import "./globals.css";
-import Header from "@/components/header/Header";
+import HeaderLoader from "@/components/HeaderLoader";
 
 // Pretendard 폰트를 사용하기 위해 불러옴
 const pretendard = localFont({
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
@@ -26,7 +26,7 @@ export default function RootLayout({
       <body
         className={`${pretendard.variable} font-pretendard`} // Pretendard 사용
       >
-        <Header />
+        <HeaderLoader />
         <main className="flex-1 bg-white mt-1">
           <div className="container mx-auto px-4 py-8">
             {children}
