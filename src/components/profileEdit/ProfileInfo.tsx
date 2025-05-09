@@ -1,9 +1,10 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { Camera, Check, Pencil, Plus, X } from "lucide-react"
 import PasswordInput from "../common/PasswordInput"
+import clsx from "clsx"
 
 interface Profile {
     name: string
@@ -46,7 +47,7 @@ export default function ProfileInfo() {
     const [passwordConfirmError, setPasswordConfirmError] = useState(false);
     const [newPassword, setNewPassword] = useState("")
     const [newPasswordConfirm, setNewPasswordConfirm] = useState("")
-
+    const [passwordConfirmNeedError, setPasswordConfirmNeedError] = useState(false);
     const isMatchNewPassword = newPassword === newPasswordConfirm
 
     // 소개 관련 상태
@@ -55,6 +56,9 @@ export default function ProfileInfo() {
     // 링크 관련 상태
     const [newUrls, setNewUrls] = useState<string[]>(intro.urls)
     const [newUrl, setNewUrl] = useState("");
+
+    // 저장 가능 여부
+    const [saveable, setSaveable] = useState(false) 
     
     // 프로필 이미지 업로드 핸들러
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,6 +98,13 @@ export default function ProfileInfo() {
     const handleUrlRemove = (index: number) => {
         setNewUrls(newUrls.filter((_, i) => i !== index))
     }
+    
+    // 전체 저장 핸들러
+    const handleSave = () => {
+        // 저장 api 호출
+        console.log("save")
+        setSaveable(false) // 저장 성공 후 저장 가능 여부 초기화
+    }
 
     // 비밀번호 입력 핸들러
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,22 +136,25 @@ export default function ProfileInfo() {
 
     // 새 비밀번호 적용 핸들러
     const handleNewPasswordApply = () => {
+        //비밀번호 확인 여부 체크
+        if (!passwordConfirmed) {
+            setPasswordConfirmNeedError(true)
+            return
+        }
         // 백엔드 요청 추가
         console.log("new password applied")
     }
+
+    // 저장 가능 여부 확인 -> 변화가 있을 때만 저장 가능
+    useEffect(() => {
+        setSaveable(newName !== profile.name || profileImage !== profile.image || newIntroduction !== intro.intro || newUrls.join(",") !== intro.urls.join(","))
+    }, [newName, profileImage, newIntroduction, newUrls])
 
     return (
         <>
             {!editingPassword ? (
                 <div className="flex flex-col gap-4">
-                    <div className="flex gap-2 justify-end">
-                        <button
-                            className="bg-pink-500 text-white rounded-md hover:bg-pink-600 text-sm px-4 py-2"
-                        >
-                            저장
-                        </button>
-                    </div>
-                    <div className="flex gap-5">
+                    <div className="flex gap-5 flex-wrap justify-center">
                         {/* 프로필 이미지 섹션 */}
                         <div className="flex flex-col items-center bg-white rounded-lg shadow py-6 px-10 space-y-4">
                             <h3 className="text-lg font-medium">프로필 이미지</h3>
@@ -216,53 +230,47 @@ export default function ProfileInfo() {
                             onChange={(e) => setNewIntroduction(e.target.value)}
                         />
                         {/* 링크란 */}
-                        <div className="flex gap-4 items-center">
-                        <div className="flex gap-4 items-center">
-                                <button onClick={toggleAddingUrl}>
-                                    <Plus className="w-4 h-4" />
-                                </button>
-                                {
-                                    addingUrl &&
-                                    <form className="flex gap-2 items-center">
-                                        <input type="url" className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300 text-sm" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} />
-                                        <button onSubmit={handleUrlAdd}>
-                                            <Check className="w-4 h-4" />
+                        <div className="flex gap-4 items-center flex-wrap">
+                            <button onClick={toggleAddingUrl}>
+                                <Plus className="w-4 h-4" />
+                            </button>
+                            {
+                                addingUrl &&
+                                <form className="flex gap-2 items-center">
+                                    <input type="url" className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300 text-sm" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} />
+                                    <button onSubmit={handleUrlAdd}>
+                                        <Check className="w-4 h-4" />
+                                    </button>
+                                </form>
+                            }
+                            {newUrls.map((url, index) => {
+                                return (
+                                    <div key={index} className="flex gap-2 items-center rounded-full bg-gray-100 px-4 py-1">
+                                        <span>{url}</span>
+                                        <button 
+                                            onClick={() => handleUrlRemove(index)}
+                                            className="text-gray-400 rounded-md hover:bg-gray-200 text-sm"
+                                        >
+                                            <X className="w-4 h-4" />
                                         </button>
-                                    </form>
-                                }
-                                {newUrls.map((url, index) => {
-                                    return (
-                                        <div key={index} className="flex gap-2 items-center rounded-full bg-gray-100 px-4 py-1">
-                                            <span>{url}</span>
-                                            <button 
-                                                onClick={() => handleUrlRemove(index)}
-                                                className="text-gray-400 rounded-md hover:bg-gray-200 text-sm"
-                                            >
-                                                <X className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    )
-                                })}
-                            </div>
+                                    </div>
+                                )
+                            })}
                         </div>
-                    </div>   
+                    </div> 
+                    <div className="flex gap-2 justify-end items-end flex-wrap">
+                        <p className="text-sm font-medium text-gray-400">※ 저장하지 않고 페이지를 나갈 시 변경사항이 저장되지 않습니다.</p>
+                        <button
+                            disabled={!saveable}
+                            className={clsx("text-white rounded-md text-sm px-4 py-2", saveable ? "bg-pink-500 hover:bg-pink-600": "bg-gray-300")}
+                            onClick={handleSave}
+                        >
+                            저장
+                        </button>
+                    </div>  
                 </div>
             ) : (
                 <div className="flex flex-col gap-4">
-                <div className="flex gap-2 justify-end">
-                            <button
-                                className="w-fit bg-pink-500 text-white rounded-md hover:bg-pink-600 text-sm px-3 py-2"
-                                onClick={handleNewPasswordApply}
-                            >
-                                저장
-                            </button>
-                            <button
-                                className="w-fit bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm px-3 py-2"
-                                onClick={() => setEditingPassword(false)}
-                            >
-                                취소
-                            </button>
-                        </div>
                 <div
                     className="flex flex-col gap-6 bg-white rounded-lg shadow p-6"
                 >
@@ -288,6 +296,7 @@ export default function ProfileInfo() {
                                             className="w-fit bg-pink-500 text-white rounded-md hover:bg-pink-600 text-sm px-3 py-2"
                                         >확인</button>
                                         {passwordConfirmError && <p className="text-red-500 text-sm">비밀번호가 일치하지 않습니다.</p>}
+                                        {passwordConfirmNeedError && <p className="text-red-500 text-sm">비밀번호 확인이 필요합니다.</p>}
                                     </div>
                                 }
                             </div>
@@ -317,6 +326,20 @@ export default function ProfileInfo() {
                                 <p className="text-red-500 text-sm">새 비밀번호가 일치하지 않습니다.</p>
                             </div>}
                         </div>
+                    </div>
+                    <div className="flex gap-2 justify-end">
+                        <button
+                            className="w-fit bg-pink-500 text-white rounded-md hover:bg-pink-600 text-sm px-3 py-2"
+                            onClick={handleNewPasswordApply}
+                        >
+                            저장
+                        </button>
+                        <button
+                            className="w-fit bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm px-3 py-2"
+                            onClick={() => setEditingPassword(false)}
+                        >
+                            취소
+                        </button>
                     </div>
                 </div>
                 </div>
