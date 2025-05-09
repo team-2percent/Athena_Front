@@ -5,9 +5,15 @@
 
 /* iOS Safari에서의 글꼴이 비정상적으로 굵어지는 문제 해결 */
 /* 근데 이걸 적용하면 프리텐다드 기준 기울임꼴이 안 되는 현상이 있음;;*/
+
 /* body {
   font-synthesis: none;
 } */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
 @theme inline {
   --color-background: var(--background);
@@ -125,4 +131,16 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
