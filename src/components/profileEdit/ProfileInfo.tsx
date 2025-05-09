@@ -26,7 +26,7 @@ export default function ProfileInfo() {
     const [profile, setProfile] = useState<Profile>({
         name: "홍길동",
         email: "hong@gmail.com",
-        image: "/product-test.png",
+        image: "/project-test.png",
     })
     // 불러온 소개
     const [intro, setIntro] = useState<Intro>({

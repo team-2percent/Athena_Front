@@ -13,19 +13,19 @@ export default function CardCarousel() {
   const carouselCards = [
     {
       id: 1,
-      image: "/product-test.png",
+      image: "/project-test.png",
       title: "마녀로 마법사로\n변신한 고양이",
       description: "고양이 일러스트 PVC 스티커",
     },
     {
       id: 2,
-      image: "/product-test2.png",
+      image: "/project-test2.png",
       title: "마법의 세계로\n떠나는 여행",
       description: "판타지 일러스트 컬렉션",
     },
     {
       id: 3,
-      image: "/product-test3.png",
+      image: "/project-test3.png",
       title: "신비로운 숲속의\n마법 생물들",
       description: "환상적인 생물 스티커 세트",
     },
@@ -48,7 +48,7 @@ export default function CardCarousel() {
 
   // 캐러셀 상품 클릭 시 상품 페이지로 이동
   const handleCardClick = () => {
-    router.push(`/product/${carouselCards[currentIndex].id}`);
+    router.push(`/project/${carouselCards[currentIndex].id}`);
   }
 
   const currentCard = carouselCards[currentIndex];

@@ -3,11 +3,11 @@
 import { useState } from "react"
 import Link from "next/link"
 import ProfileTabs from "./ProfileTabs"
-import ProductItem from "./ProductItem"
+import ProjectItem from "./ProjectItem"
 import FollowItem from "./FollowItem"
 import ReviewItem from "./ReviewItem"
 import { Percent } from "lucide-react"
-import MyProductList from "./MyProductList"
+import MyProjectList from "./MyProjectList"
 import clsx from "clsx"
 
 interface ProfileContentProps {
@@ -20,54 +20,54 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
   const [activeTab, setActiveTab] = useState("소개")
 
   // 상품 데이터 (실제로는 API에서 가져올 데이터)
-  const products = [
+  const projects = [
     {
       id: 1,
       sellerName: "판매자 이름",
-      productName: "상품 이름",
+      projectName: "상품 이름",
       description:
         "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개...",
       imageUrl: "/tteokbokki/tteokbokki.jpg",
       achievementRate: 10,
       daysLeft: 1,
       isCompleted: false,
-      productId: 201,
+      projectId: 201,
     },
     {
       id: 2,
       sellerName: "판매자 이름",
-      productName: "상품 이름",
+      projectName: "상품 이름",
       description:
         "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개...",
       imageUrl: "/tteokbokki/tteokbokki.jpg",
       achievementRate: 10000,
       daysLeft: 20,
       isCompleted: false,
-      productId: 202,
+      projectId: 202,
     },
     {
       id: 3,
       sellerName: "판매자 이름",
-      productName: "상품 이름",
+      projectName: "상품 이름",
       description:
         "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개...",
       imageUrl: "/tteokbokki/tteokbokki.jpg",
       achievementRate: 10000,
       daysLeft: null,
       isCompleted: true,
-      productId: 203,
+      projectId: 203,
     },
     {
       id: 4,
       sellerName: "판매자 이름",
-      productName: "상품 이름",
+      projectName: "상품 이름",
       description:
         "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개...",
       imageUrl: "/tteokbokki/tteokbokki.jpg",
       achievementRate: 10000,
       daysLeft: null,
       isCompleted: true,
-      productId: 204,
+      projectId: 204,
     },
   ]
 
@@ -155,23 +155,23 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
     {
       id: 1,
       sellerName: "판매자 이름",
-      productName: "상품 이름",
+      projectName: "상품 이름",
       reviewDate: "2025. 04. 23.",
       reviewContent: "스마케어 맨날 이딴 거나 팔아재끼지말고\n게임이나 똑바로 만들어라 ㅡㅡ",
-      productImage: "/tteokbokki/tteokbokki.jpg",
+      projectImage: "/tteokbokki/tteokbokki.jpg",
       likes: 358,
-      productId: 101,
+      projectId: 101,
     },
     {
       id: 2,
       sellerName: "판매자 이름",
-      productName: "상품 이름",
+      projectName: "상품 이름",
       reviewDate: "2025. 04. 23.",
       reviewContent:
         "//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////",
-      productImage: "/tteokbokki/tteokbokki.jpg",
+      projectImage: "/tteokbokki/tteokbokki.jpg",
       likes: 358,
-      productId: 102,
+      projectId: 102,
     },
   ]
 
@@ -231,10 +231,10 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
     // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
   }
 
-  const deleteProduct = (id: number) => {
+  const deleteProject = (id: number) => {
     console.log(`상품 ${id}를 삭제합니다.`)
     // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
-    // 삭제 후 다시 조회하여 setProducts 호출
+    // 삭제 후 다시 조회하여 setProjects 호출
   }
 
   return (
@@ -265,21 +265,21 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
         )}
 
         {activeTab === "판매 상품" && (isMy ? (
-          <MyProductList products={products} deleteProduct={deleteProduct} />
+          <MyProjectList projects={projects} deleteProject={deleteProject} />
         ) : (
           <div>
-            {products.map((product) => (
-              <ProductItem
-                key={product.id}
-                id={product.id}
-                sellerName={product.sellerName}
-                productName={product.productName}
-                description={product.description}
-                imageUrl={product.imageUrl}
-                achievementRate={product.achievementRate}
-                daysLeft={product.daysLeft}
-                isCompleted={product.isCompleted}
-                productId={product.productId}
+            {projects.map((project) => (
+              <ProjectItem
+                key={project.id}
+                id={project.id}
+                sellerName={project.sellerName}
+                projectName={project.projectName}
+                description={project.description}
+                imageUrl={project.imageUrl}
+                achievementRate={project.achievementRate}
+                daysLeft={project.daysLeft}
+                isCompleted={project.isCompleted}
+                projectId={project.projectId}
               />
             ))}
           </div>
@@ -292,12 +292,12 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
                 key={review.id}
                 id={review.id}
                 sellerName={review.sellerName}
-                productName={review.productName}
+                projectName={review.projectName}
                 reviewDate={review.reviewDate}
                 reviewContent={review.reviewContent}
-                productImage={review.productImage}
+                projectImage={review.projectImage}
                 likes={review.likes}
-                productId={review.productId}
+                projectId={review.projectId}
               />
             ))}
           </div>

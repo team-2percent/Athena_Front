@@ -15,7 +15,7 @@ interface AddressInfo {
   isDefault: boolean
 }
 
-interface ProductOption {
+interface ProjectOption {
   id: string
   title: string
   description: string
@@ -53,7 +53,7 @@ const DonateDock = () => {
   })
 
   // 상품 옵션 데이터 - remaining을 숫자로 변경
-  const productOptions: ProductOption[] = [
+  const projectOptions: ProjectOption[] = [
     {
       id: "option1",
       title: "마음만 받을게요",
@@ -236,9 +236,9 @@ const DonateDock = () => {
   }, [showAddressPopover])
 
   // 선택된 상품의 남은 수량 가져오기
-  const getSelectedProductRemaining = (): number => {
+  const getSelectedProjectRemaining = (): number => {
     if (!selectedOption) return 0
-    const option = productOptions.find((opt) => opt.id === selectedOption)
+    const option = projectOptions.find((opt) => opt.id === selectedOption)
     return option ? option.remaining : 0
   }
 
@@ -354,7 +354,7 @@ const DonateDock = () => {
 
   // 수량 증가 함수 - 남은 수량을 초과하지 않도록 수정
   const increaseQuantity = () => {
-    const remaining = getSelectedProductRemaining()
+    const remaining = getSelectedProjectRemaining()
     if (quantity < remaining) {
       setQuantity((prev) => prev + 1)
     }
@@ -367,12 +367,12 @@ const DonateDock = () => {
   }
 
   // 선택된 상품 정보 가져오기
-  const selectedProductOption = productOptions.find((option) => option.id === selectedOption) || productOptions[0]
+  const selectedProjectOption = projectOptions.find((option) => option.id === selectedOption) || projectOptions[0]
 
   // 총 가격 계산
   const getTotalPrice = () => {
     if (!selectedOption) return "0"
-    const option = productOptions.find((opt) => opt.id === selectedOption)
+    const option = projectOptions.find((opt) => opt.id === selectedOption)
     if (!option) return "0"
 
     // 콤마 제거 후 숫자로 변환
@@ -433,7 +433,7 @@ const DonateDock = () => {
                   {/* 왼쪽 영역: 상품 카드 목록 (1/3 너비) - 스크롤 가능하도록 수정 */}
                   <div className="md:col-span-1">
                     <div className="h-[500px] overflow-y-auto pr-2 pt-4 space-y-6">
-                      {productOptions.map((option) => (
+                      {projectOptions.map((option) => (
                         <div
                           key={option.id}
                           className={`relative flex cursor-pointer items-center rounded-xl border p-4 transition-all ${
@@ -494,15 +494,15 @@ const DonateDock = () => {
                     {/* 상세 설명 */}
                     <div className="mb-6">
                       <p className="text-gray-700">
-                        {selectedProductOption.description || "선택한 상품에 대한 상세 설명이 없습니다."}
+                        {selectedProjectOption.description || "선택한 상품에 대한 상세 설명이 없습니다."}
                       </p>
                     </div>
 
                     {/* 구성 */}
                     <h5 className="mb-2 font-medium">구성</h5>
-                    {selectedProductOption.details && selectedProductOption.details.length > 0 ? (
+                    {selectedProjectOption.details && selectedProjectOption.details.length > 0 ? (
                       <ul className="space-y-2">
-                        {selectedProductOption.details.map((detail, index) => (
+                        {selectedProjectOption.details.map((detail, index) => (
                           <li key={index} className="flex items-start">
                             <span className="mr-2 text-pink-500">•</span>
                             <span>{detail}</span>
@@ -605,12 +605,12 @@ const DonateDock = () => {
 
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span>{selectedProductOption.title}</span>
+                      <span>{selectedProjectOption.title}</span>
                       <span>{quantity}개</span>
                     </div>
                     <div className="flex justify-between font-medium">
                       <span>상품 금액</span>
-                      <span>{selectedProductOption.price}원</span>
+                      <span>{selectedProjectOption.price}원</span>
                     </div>
                     <div className="flex justify-between text-gray-600">
                       <span>배송비</span>

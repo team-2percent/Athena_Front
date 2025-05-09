@@ -9,29 +9,29 @@ import ReviewModal from "./ReviewModal"
 interface ReviewItemProps {
   id: number
   sellerName: string
-  productName: string
+  projectName: string
   reviewDate: string
   reviewContent: string
-  productImage: string
+  projectImage: string
   likes: number
-  productId: number
+  projectId: number
 }
 
 export default function ReviewItem({
   id,
   sellerName,
-  productName,
+  projectName,
   reviewDate,
   reviewContent,
-  productImage,
+  projectImage,
   likes,
-  productId,
+  projectId,
 }: ReviewItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const router = useRouter()
 
-  const handleProductClick = () => {
-    router.push(`/product/${productId}`)
+  const handleProjectClick = () => {
+    router.push(`/project/${projectId}`)
   }
 
   return (
@@ -40,10 +40,10 @@ export default function ReviewItem({
         {/* 영역 1: 상품 이미지 */}
         <div className="relative w-64 h-48 flex-shrink-0">
           {/* 상품 이미지 클릭 시 상품 상세 페이지로 이동 */}
-          <div className="w-full h-full cursor-pointer" onClick={handleProductClick}>
+          <div className="w-full h-full cursor-pointer" onClick={handleProjectClick}>
             <Image
-              src={productImage || "/placeholder.svg"}
-              alt={productName}
+              src={projectImage || "/placeholder.svg"}
+              alt={projectName}
               width={256}
               height={192}
               className="w-full h-full object-cover rounded-lg"
@@ -62,7 +62,7 @@ export default function ReviewItem({
           <div className="mb-3">
             {/* 판매자 및 상품 정보 */}
             <div className="mb-3">
-              <span className="font-medium">{productName}</span>
+              <span className="font-medium">{projectName}</span>
               <span> / </span>
               <span className="text-gray-600">{sellerName}</span>
             </div>

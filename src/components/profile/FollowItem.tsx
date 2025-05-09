@@ -14,14 +14,14 @@ interface FollowItemProps {
 export default function FollowItem({ id, username, purchaseCount, profileImage, onFollow }: FollowItemProps) {
   const router = useRouter()
     
-  const handleProductClick = () => {
+  const handleProjectClick = () => {
     router.push(`/profile/${id}`)
   }
 
   return (
     <div className="pb-6 mx-8">
       {/* 팔로워 정보 */}
-      <div className="flex items-center justify-between cursor-pointer" onClick={handleProductClick}>
+      <div className="flex items-center justify-between cursor-pointer" onClick={handleProjectClick}>
         {/* 프로필 이미지 */}
         <div className="flex items-center">
           <div className="w-20 h-20 rounded-full bg-gray-200 overflow-hidden mr-6">

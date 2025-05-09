@@ -1,11 +1,11 @@
 import type { ReactNode } from "react"
-import Product from "../common/Product"
+import ProjectCard from "../common/ProjectCard"
 
-interface RankProductProps {
+interface RankProjectProps {
     id: number
     image: string
     sellerName: string
-    productName: string
+    projectName: string
     achievementRate: number
     liked: boolean
     size: number
@@ -13,13 +13,13 @@ interface RankProductProps {
     rankElement?: ReactNode
 }
 
-const RankProduct = ({ id, image, sellerName, productName, achievementRate, liked, size, daysLeft, rankElement }: RankProductProps) => {
+const RankProject = ({ id, image, sellerName, projectName, achievementRate, liked, size, daysLeft, rankElement }: RankProjectProps) => {
     return (
-        <Product 
+        <ProjectCard 
             id={id}
             image={image}
             sellerName={sellerName}
-            productName={productName}
+            projectName={projectName}
             achievementRate={achievementRate}
             liked={liked}
             size={size}
@@ -29,4 +29,4 @@ const RankProduct = ({ id, image, sellerName, productName, achievementRate, like
     )
 }
 
-export default RankProduct
+export default RankProject

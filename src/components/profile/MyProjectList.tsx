@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react";
-import ProductItem from "./ProductItem";
+import ProjectItem from "./ProjectItem";
 import DeleteModal from "./DeleteModal";
 
-export default function MyProductList({ products, deleteProduct }: { products: any[], deleteProduct: (id: number) => void }) {
+export default function MyProjectList({ projects, deleteProject }: { projects: any[], deleteProject: (id: number) => void }) {
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
     const [deleteError, setDeleteError] = useState(false);
     const [deleteSuccess, setDeleteSuccess] = useState(false);
@@ -24,7 +24,7 @@ export default function MyProductList({ products, deleteProduct }: { products: a
     
       const handleConfirmDelete = () => {
         if (deleteId !== null) {
-        deleteProduct(deleteId);
+        deleteProject(deleteId);
         if (false) { // 삭제 조건
           setDeleteSuccess(true)
         } else {
@@ -41,18 +41,18 @@ export default function MyProductList({ products, deleteProduct }: { products: a
                 onClose={handleCloseDeleteModal}
                 onConfirm={handleConfirmDelete}
                 deleteError={deleteError} deleteSuccess={deleteSuccess}      />}
-            {products.map((product) => (
-              <ProductItem
-                key={product.id}
-                id={product.id}
-                sellerName={product.sellerName}
-                productName={product.productName}
-                description={product.description}
-                imageUrl={product.imageUrl}
-                achievementRate={product.achievementRate}
-                daysLeft={product.daysLeft}
-                isCompleted={product.isCompleted}
-                productId={product.productId}
+            {projects.map((project) => (
+              <ProjectItem
+                key={project.id}
+                id={project.id}
+                sellerName={project.sellerName}
+                projectName={project.projectName}
+                description={project.description}
+                imageUrl={project.imageUrl}
+                achievementRate={project.achievementRate}
+                daysLeft={project.daysLeft}
+                isCompleted={project.isCompleted}
+                projectId={project.projectId}
                 onClickDelete={handleDeleteClick}
                 isMy={true}
               />

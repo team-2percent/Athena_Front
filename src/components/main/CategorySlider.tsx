@@ -6,14 +6,14 @@ import { useState, useRef } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react"
 import { cn } from "@/lib/utils"
-import CategoryProduct from "./CategoryProduct"
+import CategoryProject from "./CategoryProject"
 import { useRouter } from "next/navigation"
 
-interface Product {
+interface Project {
   id: number
   image: string
   sellerName: string
-  productName: string
+  projectName: string
   achievementRate: number
   liked: boolean
   daysLeft: number
@@ -21,17 +21,17 @@ interface Product {
 
 interface CategorySliderProps {
   category: { id: number, name: string, image: string}
-  products: Product[]
+  projects: Project[]
   className?: string
 }
 
-export default function CategorySlider({ category, products, className }: CategorySliderProps) {
+export default function CategorySlider({ category, projects, className }: CategorySliderProps) {
   const logoSize = 100; // 카테고리 로고 이미지 사이즈
   const viewSize = 4; // 한 번에 보여줄 상품 수
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [currentStartIndex, setCurrentStartIndex] = useState(0); // 현재 보여지는 상품의 시작 인덱스
   const disableLeft = currentStartIndex === 0; // 이동 버튼 diabled 여부
-  const disableRight = currentStartIndex + viewSize >= products.length - 1;
+  const disableRight = currentStartIndex + viewSize >= projects.length - 1;
   const router = useRouter();
 
   // 슬라이드 이동
@@ -76,7 +76,7 @@ export default function CategorySlider({ category, products, className }: Catego
       </div>
       
 
-      {/* Products slider */}
+      {/* Projects slider */}
       <div className="flex justify-center gap-6 w-fit items-center" >
         {/* Navigation buttons */}
         <button
@@ -88,10 +88,10 @@ export default function CategorySlider({ category, products, className }: Catego
           <ChevronLeft className={cn("w-5 h-5", disableLeft && "text-gray-400")} />
         </button>
         <div ref={scrollContainerRef} className="flex gap-4 hide-scrollbar pb-4">
-          {products.slice(currentStartIndex, currentStartIndex + 4).map(product => (
-              <CategoryProduct
-                key={product.id}
-                {...product}               
+          {projects.slice(currentStartIndex, currentStartIndex + 4).map(project => (
+              <CategoryProject
+                key={project.id}
+                {...project}               
               />
           ))}
         </div>

@@ -1,23 +1,23 @@
 import type { ReactNode } from "react"
-import Product from "../common/Product"
+import ProjectCard from "../common/ProjectCard"
 
-interface CategoryProductProps {
+interface CategoryProjectProps {
     id: number
     image: string
     sellerName: string
-    productName: string
+    projectName: string
     achievementRate: number
     liked: boolean
     daysLeft: number
 }
 
-const CategoryProduct = ({ id, image, sellerName, productName, achievementRate, liked, daysLeft }: CategoryProductProps) => {
+const CategoryProject = ({ id, image, sellerName, projectName, achievementRate, liked, daysLeft }: CategoryProjectProps) => {
     return (
-        <Product 
+        <ProjectCard 
             id={id}
             image={image}
             sellerName={sellerName}
-            productName={productName}
+            projectName={projectName}
             achievementRate={achievementRate}
             liked={liked}
             size={180}
@@ -27,4 +27,4 @@ const CategoryProduct = ({ id, image, sellerName, productName, achievementRate, 
     )
 }
 
-export default CategoryProduct
+export default CategoryProject
