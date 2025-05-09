@@ -47,8 +47,6 @@ export default function AddressInfo() {
     // 저장 가능 여부
     const [saveable, setSaveable] = useState(false)
 
-    const addDisabled = newAddress.name.length === 0 || newAddress.address.length === 0 || newAddress.detailAddress.length === 0;
-
     // 배송지 추가 모달 열기 핸들러
     const handleOpenAddressModal = () => {
         setIsAddressModalOpen(true)
@@ -80,6 +78,10 @@ export default function AddressInfo() {
 
     // 주소 추가 핸들러
     const handleAddAddress = () => {
+        if (!newAddress.name || !newAddress.address || !newAddress.detailAddress) {
+            alert("배송지명, 주소, 상세주소를 모두 입력해주세요.")
+            return
+        }
         setAddresses([...addresses, 
             {
                 id: Date.now().toString(),
@@ -156,7 +158,6 @@ export default function AddressInfo() {
                         <div className="mt-4 flex justify-end">
                             <button
                                 type="button"
-                                disabled={addDisabled}
                                 onClick={handleAddAddress}
                                 className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 text-sm flex items-center"
                             >
