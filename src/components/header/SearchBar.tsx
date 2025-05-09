@@ -88,8 +88,8 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
   }
 
   return (
-    <div ref={searchRef} className="w-80 max-w-xl relative">
-      <div className="flex gap-2 rounded-full border border-gray-300 px-4 py-3">
+    <div ref={searchRef} className="w-80 max-w-xl relative h-10">
+      <div className="flex gap-2 rounded-full border border-gray-300 px-4 py-3 h-full">
         <input
           type="text"
           placeholder="제목, 작가로 검색"
@@ -97,7 +97,7 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
           onChange={(e) => onSearchChange(e.target.value)}
           onFocus={() => setIsOpen(true)}
           onKeyDown={(e) => activeEnter(e)}
-          className="w-full focus:outline-none"
+          className="w-full h-full focus:outline-none text-sm"
           maxLength={maxLength}
         />
         <button
@@ -105,7 +105,7 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
           className=""
           onClick={search}
         >
-          <Search className="h-6 w-6 text-gray-500" />
+          <Search className="h-4 w-4 text-gray-500" />
         </button>
       </div>
 
