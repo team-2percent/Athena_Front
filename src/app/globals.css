@@ -4,8 +4,13 @@
 @custom-variant dark (&:is(.dark *));
 
 /* iOS Safari에서의 글꼴이 비정상적으로 굵어지는 문제 해결 */
-body {
+/* body {
   font-synthesis: none;
+} */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 @theme inline {
