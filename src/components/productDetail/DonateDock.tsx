@@ -20,7 +20,7 @@ interface ProductOption {
   title: string
   description: string
   price: string
-  remaining: string
+  remaining: number // 문자열에서 숫자로 변경
   isSelected?: boolean
   details?: string[]
   color?: string
@@ -52,14 +52,14 @@ const DonateDock = () => {
     zipCode: "",
   })
 
-  // 상품 옵션 데이터 - 더 많은 데이터 추가
+  // 상품 옵션 데이터 - remaining을 숫자로 변경
   const productOptions: ProductOption[] = [
     {
       id: "option1",
       title: "마음만 받을게요",
       description: "돈통 ㄱㅅ",
       price: "1,000",
-      remaining: "2억 개 남음",
+      remaining: 999999, // 무제한에 가까운 큰 숫자
       details: [],
     },
     {
@@ -67,7 +67,7 @@ const DonateDock = () => {
       title: "피자 아닌 떡볶이",
       description: "떡볶이 하나 (색상 선택 가능)\n맵기 정도 (순한, 조금매운, 매운 선택 가능)",
       price: "5,000",
-      remaining: "2억 개 남음",
+      remaining: 200000000, // 2억
       color: "pink",
       details: [
         "떡볶이 하나 (색상 선택 가능)",
@@ -81,7 +81,7 @@ const DonateDock = () => {
       title: "비밀스런 피자",
       description: "강 잡숴보셈 ㄹㅇ",
       price: "100,000",
-      remaining: "2억 개 남음",
+      remaining: 200000000, // 2억
       details: ["피자 1판", "비밀 소스 포함", "배송비 무료", "예상 배송일: 2025년 6월 13일"],
     },
     {
@@ -89,7 +89,7 @@ const DonateDock = () => {
       title: "프리미엄 세트",
       description: "떡볶이와 피자를 한번에 즐길 수 있는 프리미엄 세트",
       price: "150,000",
-      remaining: "100개 남음",
+      remaining: 100, // 100개
       details: ["떡볶이 1인분", "피자 1판", "특별 소스 세트", "배송비 무료", "예상 배송일: 2025년 6월 10일"],
     },
     {
@@ -97,7 +97,7 @@ const DonateDock = () => {
       title: "한정판 굿즈",
       description: "게살피자 캐릭터 피규어와 스티커 세트",
       price: "30,000",
-      remaining: "50개 남음",
+      remaining: 50, // 50개
       details: ["캐릭터 피규어 1개", "스티커 세트 1개", "배송비 무료", "예상 배송일: 2025년 6월 20일"],
     },
     {
@@ -105,7 +105,7 @@ const DonateDock = () => {
       title: "디지털 아트북",
       description: "게살피자 제작 과정을 담은 디지털 아트북",
       price: "15,000",
-      remaining: "무제한",
+      remaining: 999999, // 무제한에 가까운 큰 숫자
       details: ["디지털 아트북 PDF", "메이킹 영상 포함", "즉시 이메일 발송"],
     },
     {
@@ -113,7 +113,7 @@ const DonateDock = () => {
       title: "VIP 패키지",
       description: "모든 혜택을 한번에 누릴 수 있는 VIP 패키지",
       price: "300,000",
-      remaining: "10개 남음",
+      remaining: 10, // 10개
       color: "pink",
       details: [
         "떡볶이 세트",
@@ -130,7 +130,7 @@ const DonateDock = () => {
       title: "응원 메시지",
       description: "개발자에게 응원 메시지를 보낼 수 있습니다",
       price: "3,000",
-      remaining: "무제한",
+      remaining: 999999, // 무제한에 가까운 큰 숫자
       details: ["응원 메시지 전달", "감사 이메일 회신"],
     },
   ]
@@ -187,6 +187,7 @@ const DonateDock = () => {
     },
   ])
 
+  // useEffect 훅에서 스크롤 방지 로직 추가
   useEffect(() => {
     // 후원하기 버튼 클릭 이벤트 리스너 등록
     const handleToggleDock = () => {
@@ -200,6 +201,22 @@ const DonateDock = () => {
       window.removeEventListener("toggleDonateDock", handleToggleDock)
     }
   }, [])
+
+  // 독이 열리거나 닫힐 때 스크롤 제어를 위한 useEffect 추가
+  useEffect(() => {
+    if (isOpen) {
+      // 독이 열릴 때 body 스크롤 방지
+      document.body.style.overflow = "hidden"
+    } else {
+      // 독이 닫힐 때 body 스크롤 복원
+      document.body.style.overflow = ""
+    }
+
+    return () => {
+      // 컴포넌트 언마운트 시 body 스크롤 복원
+      document.body.style.overflow = ""
+    }
+  }, [isOpen])
 
   // 팝오버 외부 클릭 시 닫기
   useEffect(() => {
@@ -217,6 +234,21 @@ const DonateDock = () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [showAddressPopover])
+
+  // 선택된 상품의 남은 수량 가져오기
+  const getSelectedProductRemaining = (): number => {
+    if (!selectedOption) return 0
+    const option = productOptions.find((opt) => opt.id === selectedOption)
+    return option ? option.remaining : 0
+  }
+
+  // 남은 수량 표시 형식 포맷팅 함수
+  const formatRemaining = (remaining: number): string => {
+    if (remaining >= 1000) {
+      return "999+개 남음"
+    }
+    return `${remaining}개 남음`
+  }
 
   const toggleDock = () => {
     setIsOpen(!isOpen)
@@ -320,8 +352,12 @@ const DonateDock = () => {
     setStep(1)
   }
 
+  // 수량 증가 함수 - 남은 수량을 초과하지 않도록 수정
   const increaseQuantity = () => {
-    setQuantity((prev) => prev + 1)
+    const remaining = getSelectedProductRemaining()
+    if (quantity < remaining) {
+      setQuantity((prev) => prev + 1)
+    }
   }
 
   const decreaseQuantity = () => {
@@ -347,6 +383,11 @@ const DonateDock = () => {
     return total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
   }
 
+  // 독 외부 영역 클릭 시 닫기 함수 추가
+  const handleOverlayClick = () => {
+    setIsOpen(false)
+  }
+
   return (
     <>
       {/* 고정된 후원하기 버튼 */}
@@ -362,6 +403,9 @@ const DonateDock = () => {
           </button>
         </div>
       </div>
+
+      {/* 독이 열려있을 때만 오버레이 표시 */}
+      {isOpen && <div className="fixed inset-0 z-25 bg-black/30" onClick={handleOverlayClick} aria-hidden="true" />}
 
       {/* 후원하기 Dock */}
       <div
@@ -401,7 +445,7 @@ const DonateDock = () => {
                         >
                           <div className="absolute -right-2 -top-4">
                             <div className="rounded-full border-2 border-pink-400 bg-white px-3 py-1 text-sm text-pink-500 shadow-sm">
-                              <span>{option.remaining}</span>
+                              <span>{formatRemaining(option.remaining)}</span>
                             </div>
                           </div>
 
@@ -522,8 +566,8 @@ const DonateDock = () => {
                           }`}
                           onClick={() => handleAddressSelect(address.id)}
                         >
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-bold">{address.name}</h4>
+                          <div className="flex items-center justify-between mb-2 overflow-hidden">
+                            <h4 className="font-bold line-clamp-1 whitespace-pre-wrap break-words">{address.name}</h4>
                             {address.isDefault && (
                               <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
                                 기본 배송지
@@ -531,7 +575,9 @@ const DonateDock = () => {
                             )}
                           </div>
                           <div className="overflow-hidden">
-                            <p className="line-clamp-2 text-gray-600 whitespace-pre-wrap break-words">[{address.zipCode}] {address.address} {address.detailAddress}</p>
+                            <p className="line-clamp-2 text-gray-600 whitespace-pre-wrap break-words">
+                              [{address.zipCode}] {address.address} {address.detailAddress}
+                            </p>
                           </div>
                         </div>
                       ))}
