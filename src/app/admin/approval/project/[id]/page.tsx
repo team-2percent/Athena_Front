@@ -103,17 +103,18 @@ export default function ProjectApprovalDetailPage() {
                 </div>
 
                 <textarea
-                    disabled={approvalStatus === "approve"}
+                    disabled={approvalStatus !== "reject"}
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    placeholder={approvalStatus === "approve" ? "" : "반려 코멘트를 입력하세요"}
-                    className={clsx("w-full h-32 p-3 border rounded-md resize-none", approvalStatus === "approve" && "bg-gray-100 text-gray-600 pointer-events-none")}
+                    placeholder={approvalStatus === "reject" ? "반려 코멘트를 입력하세요" : ""}
+                    className={clsx("w-full h-32 p-3 border rounded-md resize-none", approvalStatus !== "reject" && "bg-gray-100 text-gray-600 pointer-events-none")}
                 />
 
                 <div className="flex justify-end space-x-4">
                     <button
-                        disabled={approvalStatus === "approve"}
+                        disabled={approvalStatus !== "reject"}
                         className="px-8 py-2 rounded-md bg-pink-100 text-pink-600"
+                        onClick={() => setIsModalOpen(true)}
                     >저장</button>
                 </div>
             </div>
