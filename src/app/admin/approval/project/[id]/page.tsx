@@ -5,11 +5,12 @@ import Image from "next/image"
 import clsx from "clsx"
 import ConfirmModal from "@/components/common/ConfirmModal"
 import { useRouter } from "next/navigation";
+import { ArrowLeftIcon } from "lucide-react"
 export default function ProjectApprovalDetailPage() {
     const router = useRouter();
     const [comment, setComment] = useState("")
     const [approvalStatus, setApprovalStatus] = useState<"approve" | "reject" | null>(null)
-    const [isModalOpen, setIsModalOpen] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleConfirm = () => {
         // 요청 로직
@@ -19,7 +20,13 @@ export default function ProjectApprovalDetailPage() {
     }
 
     return (
-        <div className="flex flex-col mx-auto w-full p-8 gap-10">
+        <div className="flex flex-col mx-auto w-full p-8 gap-6">
+            <div className="flex w-full">
+            <button className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.back()}>
+                <ArrowLeftIcon className="w-4 h-4" />
+                목록으로
+            </button>
+            </div>
             {/* 프로젝트 기본 정보 */}
             <div className="flex flex-col gap-4">
                 <h2 className="text-2xl font-medium border-b pb-2">프로젝트 기본 정보</h2>

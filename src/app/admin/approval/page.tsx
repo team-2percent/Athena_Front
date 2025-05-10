@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Project {
     id: number;
@@ -10,6 +11,7 @@ interface Project {
 }
 
 export default function ApprovalPage() {
+    const router = useRouter();
     const [projects, setProjects] = useState<Project[]>([]);
     const [pageSize, setPageSize] = useState(10);
     const [sort, setSort] = useState<"오래된순" | "최신순">("오래된순");
@@ -104,6 +106,9 @@ export default function ApprovalPage() {
         console.log(search + " 검색");
     }
 
+    const handleProjectClick = (id: number) => {
+        router.push(`/admin/approval/project/${id}`);
+    }
 
     useEffect(() => {
         fetchProjects();
@@ -149,7 +154,7 @@ export default function ApprovalPage() {
                 </thead>
                 <tbody>
                     {projects.map((project, index) => (
-                        <tr key={project.id} className="border-b hover:bg-gray-50">
+                        <tr key={project.id} className="border-b hover:bg-gray-50" onClick={() => handleProjectClick(project.id)}>
                             <td className="text-center p-4 whitespace-nowrap">{index + 1}</td>
                             <td className="text-center p-4 truncate max-w-0">{project.name}</td>
                             <td className="text-center p-4 whitespace-nowrap">{project.enrollDate}</td>
