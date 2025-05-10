@@ -15,6 +15,8 @@ export default function ApprovalPage() {
     const [sort, setSort] = useState<"오래된순" | "최신순">("오래된순");
     const [currentPage, setCurrentPage] = useState(1);
 
+    const [search, setSearch] = useState("");
+
     const fetchProjects = async () => {
         setProjects([
             {
@@ -93,6 +95,15 @@ export default function ApprovalPage() {
         setCurrentPage(page);
     }
 
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearch(e.target.value);
+    }
+
+    const handleSearchClick = () => {
+        // api 요청
+        console.log(search + " 검색");
+    }
+
 
     useEffect(() => {
         fetchProjects();
@@ -101,15 +112,27 @@ export default function ApprovalPage() {
 
     return (
         <div className="flex flex-col mx-auto max-w-6xl w-full p-8">
-            <div className="flex justify-between items-center mb-8">
-                <h3 className="text-xl font-medium">확인해야할 상품이 {projects.length}건 있습니다.</h3>
+            <h3 className="text-xl font-medium mb-8">확인해야할 상품이 {projects.length}건 있습니다.</h3>
+            <div className="flex items-center mb-8 gap-4">
+                <div className="flex flex-1 gap-2">
+                    <input
+                        type="text"
+                        placeholder="상품명으로 검색"
+                        className="border flex-1 p-2 border rounded text-center text-gray-400 min-w-[350px] h-10"
+                        onChange={handleSearchChange}
+                    />
+                    <button
+                        onClick={handleSearchClick}
+                        className="border bg-pink-500 text-white px-4 py-2 rounded h-10"
+                    >검색</button>
+                </div>
                 <div className="flex gap-4">
-                    <select className="border rounded px-4 py-2" onChange={handlePageSizeChange}>
+                    <select className="border rounded px-4 py-2 h-10" onChange={handlePageSizeChange}>
                         <option selected>10개씩</option>
                         <option>20개씩</option>
                         <option>50개씩</option>
                     </select>
-                    <select className="border rounded px-4 py-2" onChange={handleSortChange}>
+                    <select className="border rounded px-4 py-2 h-10" onChange={handleSortChange}>
                         <option selected>오래된순</option>
                         <option>최신순</option>
                     </select>
