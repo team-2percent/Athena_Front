@@ -1,8 +1,9 @@
 "use client"
 
 import DatePicker from "@/components/projectRegister/DatePicker"
-import clsx from "clsx"
 import { useEffect, useState } from "react"
+import CouponTag from "@/components/admin/CouponTag"
+import { useRouter } from "next/navigation"
 
 interface Coupon {
     id: number
@@ -18,6 +19,7 @@ interface Coupon {
 }
 
 export default function CouponPage() {
+    const router = useRouter()
     const [status, getStatus] = useState<"all" | "previous" | "inprogress" | "completed" | "ended">("all")
     const [pageSize, getPageSize] = useState<number>(10)
     const [currentPage, getCurrentPage] = useState<number>(1)
@@ -56,11 +58,11 @@ export default function CouponPage() {
                 name: "신규 가입 할인 쿠폰",
                 description: "신규 회원 전용 할인 쿠폰입니다신규 회원 전용 할인 쿠폰입니다신규 회원 전용 할인 쿠폰입니다신규 회원 전용 할인 쿠폰입니다신규 회원 전용 할인 쿠폰입니다신규 회원 전용 할인 쿠폰입니다신규 회원 전용 할인 쿠폰입니다신규 회원 전용 할인 쿠폰입니다신규 회원 전용 할인 쿠폰입니다신규 회원 전용 할인 쿠폰입니다신규 회원 전용 할인 쿠폰입니다신규 회원 전용 할인 쿠폰입니다신규 회원 전용 할인 쿠폰입니다신규 회원 전용 할인 쿠폰입니다",
                 price: 3000,
-                startDate: "2025-01-01",
+                startDate: "2025-06-01",
                 endDate: "2025-12-31", 
                 expireDate: "2025-12-31",
                 stock: 1000,
-                status: "inprogress"
+                status: "previous"
             },
             {
                 id: 2,
@@ -174,7 +176,7 @@ export default function CouponPage() {
     }, [])
 
     return (
-        <div className="flex flex-col mx-auto max-w-6xl w-full p-8">
+        <div className="flex flex-col mx-auto w-full p-8">
             <div>
                 <div className="flex justify-between items-center mb-8">
                     <h3 className="text-xl font-medium">쿠폰 등록</h3>
@@ -251,17 +253,18 @@ export default function CouponPage() {
                             <option>50개씩</option>
                         </select>
                         <select className="border rounded px-4 p-4">
-                            <option selected>
-                                <CouponTag status="previous" />
+                            <option value="all">전체</option>
+                            <option selected value="previous">
+                                발급 전
                             </option>
-                            <option>
-                                <CouponTag status="inprogress" />
+                            <option value="inprogress">
+                                발급 중
                             </option>
-                            <option>
-                                <CouponTag status="completed" />
+                            <option value="completed">
+                                발급 완료
                             </option>
-                            <option>
-                                <CouponTag status="ended" />
+                            <option value="ended">
+                                종료
                             </option>
                         </select>
                     </div>
@@ -279,7 +282,11 @@ export default function CouponPage() {
                   </thead>
                   <tbody>
                     {couponList.map((coupon) => (
-                      <tr key={coupon.id} className="border-b hover:bg-gray-50">
+                      <tr
+                        key={coupon.id} 
+                        className="border-b hover:bg-gray-50"
+                        onClick={() => router.push(`/admin/coupon/${coupon.id}`)}
+                      >
                         <td className="p-4">{coupon.name}</td>
                         <td className="p-4">{coupon.startDate} ~ {coupon.endDate}</td>
                         <td className="p-4">{coupon.expireDate}</td>
@@ -298,23 +305,4 @@ export default function CouponPage() {
             </div>
         </div>
     )
-}
-
-const CouponTag = ({ status }: { status: "previous" | "inprogress" | "completed" | "ended" }) => {
-    const design = {
-        previous: "bg-yellow-500",
-        inprogress: "bg-green-500",
-        completed: "bg-blue-500",
-        ended: "bg-gray-500",
-    }
-
-    const message = {
-        previous: "발급 전",
-        inprogress: "발급 중",
-        completed: "발급 완료",
-        ended: "종료",
-    }
-    return <div className={clsx("px-2 py-1 text-sm text-white rounded-full w-18 text-center", design[status])}>
-        <span>{message[status]}</span>
-    </div>
 }
