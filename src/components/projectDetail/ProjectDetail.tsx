@@ -155,7 +155,7 @@ const ProjectDetail = () => {
         <div ref={metadataContainerRef} className="flex flex-col justify-center">
           <div>
             <h1 className="mb-2 text-3xl font-bold">게살피자</h1>
-            <h2 className="mb-6 text-2xl text-red-800">Smilegate Megaport</h2>
+            <h2 className="mb-6 text-2xl text-sub-gray">Smilegate Megaport</h2>
 
             <div className="mb-4">
               <p className="mb-3 text-gray-700">달성 금액</p>

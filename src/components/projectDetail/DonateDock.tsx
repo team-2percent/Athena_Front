@@ -889,7 +889,7 @@ const DonateDock = () => {
               </button>
               <button
                 type="button"
-                className="px-4 py-2 bg-pink-200 text-pink-800 rounded-lg text-sm"
+                className="px-4 py-2 bg-main-color text-white rounded-lg text-sm"
                 onClick={saveNewAddress}
               >
                 저장
