@@ -35,29 +35,34 @@ export default function CouponRegisterPage() {
         setIsModalOpen(true)
     }
 
-    const handleCouponPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setCouponPriceError(false)
+    const convertInputToNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.value.startsWith("0")) {
             e.target.value = e.target.value.replace("0", "")
         }
-        if (Number(e.target.value) > couponPriceLimit) {
+        const value = e.target.value.replace(/[^0-9]/g, "")
+        e.target.value = value
+        return Number(e.target.value)
+    }
+
+    const handleCouponPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCouponPriceError(false)
+        const value = convertInputToNumber(e)
+        if (Number(value) > couponPriceLimit) {
             setCouponPriceError(true)
             setCouponPrice(couponPriceLimit)
         } else {
-            setCouponPrice(Number(e.target.value))
+            setCouponPrice(Number(value))
         }
     }
 
     const handleCouponStockChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCouponStockError(false)
-        if (e.target.value.startsWith("0")) {
-            e.target.value = e.target.value.replace("0", "")
-        }
-        if (Number(e.target.value) > couponStockLimit) {
+        const value = convertInputToNumber(e)
+        if (Number(value) > couponStockLimit) {
             setCouponStock(couponStockLimit)
             setCouponStockError(true)
         } else {
-            setCouponStock(Number(e.target.value))
+            setCouponStock(Number(value))
         }
     }
 
@@ -99,7 +104,7 @@ export default function CouponRegisterPage() {
                         <label className="text-sm text-gray-600">가격</label>
                         <div className="flex gap-4 items-center">
                             <input 
-                                type="number"
+                                type="text"
                                 placeholder="가격을 입력하세요"
                                 className="p-3 border rounded-md"
                                 value={couponPrice}
@@ -112,22 +117,22 @@ export default function CouponRegisterPage() {
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-gray-600">발급 기간</label>
                         <div className="flex gap-4 items-center">
-                            <DatePicker selectedDate={couponStartDate} onChange={(date) => setCouponStartDate(date)} />
+                            <DatePicker selectedDate={couponStartDate} onChange={(date) => setCouponStartDate(date)}/>
                             <span>~</span>
-                            <DatePicker selectedDate={couponEndDate} onChange={(date) => setCouponEndDate(date)} />
+                            <DatePicker selectedDate={couponEndDate} onChange={(date) => setCouponEndDate(date)}  minDate={couponStartDate}/>
                         </div>
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-gray-600">만료 기간</label>
                         <div className="flex gap-4 items-center">
-                            <DatePicker selectedDate={couponExpireDate} onChange={(date) => setCouponExpireDate(date)} />
+                            <DatePicker selectedDate={couponExpireDate} onChange={(date) => setCouponExpireDate(date)} minDate={couponEndDate}/>
                         </div>
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-gray-600">수량</label>
                         <div className="flex gap-4 items-center">
                             <input 
-                                type="number"
+                                type="text"
                                 className="p-3 border rounded-md"
                                 value={couponStock}
                                 onClick={handleClick}
