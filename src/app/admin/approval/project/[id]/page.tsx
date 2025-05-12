@@ -51,6 +51,11 @@ export default function ProjectApprovalDetailPage() {
                     <span>2025. 04. 13</span>
                 </div>
                 </div>
+                
+                
+            </div>
+            <div className="flex flex-col gap-4 mt-6">
+                <h2 className="text-2xl font-medium border-b pb-2">상세 소개</h2>
                 <MarkdownRenderer content={markdown} />
             </div>
             {/* 판매자 정보 */}
