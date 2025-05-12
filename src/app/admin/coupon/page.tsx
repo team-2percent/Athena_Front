@@ -25,31 +25,6 @@ export default function CouponPage() {
     const [currentPage, getCurrentPage] = useState<number>(1)
     const [couponList, setCouponList] = useState<Coupon[]>([])
 
-    // 쿠폰 추가
-    const [couponName, setCouponName] = useState<string>("")
-    const [couponDescription, setCouponDescription] = useState<string>("")
-    const [couponPrice, setCouponPrice] = useState<number>(0)
-    const [couponStartDate, setCouponStartDate] = useState<Date>(new Date())
-    const [couponEndDate, setCouponEndDate] = useState<Date>(new Date())
-    const [couponExpireDate, setCouponExpireDate] = useState<Date>(new Date())
-    const [couponStock, setCouponStock] = useState<number>(0)
-
-    const handleAddCoupon = () => {
-        // 쿠폰 등록 추가
-        resetForm()
-        // 쿠폰 다시 불러오기
-    }
-    // 폼 초기화 함수
-    const resetForm = () => {
-        setCouponName("")
-        setCouponDescription("")
-        setCouponPrice(0)
-        setCouponStartDate(new Date())
-        setCouponEndDate(new Date()) 
-        setCouponExpireDate(new Date())
-        setCouponStock(0)
-    }
-
     useEffect(() => {
         setCouponList([
             {
@@ -177,132 +152,75 @@ export default function CouponPage() {
 
     return (
         <div className="flex flex-col mx-auto w-full p-8">
-            <div>
-                <div className="flex justify-between items-center mb-8">
-                    <h3 className="text-xl font-medium">쿠폰 등록</h3>
-                </div>
-                <div className="flex flex-col gap-6">
-                    <div className="flex flex-col gap-2">
-                        <label className="text-sm text-gray-600">쿠폰명</label>
-                        <input 
-                            type="text"
-                            placeholder="쿠폰명을 입력하세요"
-                            className="w-full p-3 border rounded-md"
-                            value={couponName}
-                            onChange={(e) => setCouponName(e.target.value)}
-                        />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label className="text-sm text-gray-600">쿠폰 설명</label>
-                        <textarea 
-                            placeholder="쿠폰명을 입력하세요"
-                            className="w-full p-3 border rounded-md resize-none"
-                            value={couponDescription}
-                            onChange={(e) => setCouponDescription(e.target.value)}
-                        />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label className="text-sm text-gray-600">가격</label>
-                        <input 
-                            type="text"
-                            placeholder="가격을 입력하세요"
-                            className="w-full p-3 border rounded-md"
-                            value={couponPrice}
-                            onChange={(e) => setCouponPrice(Number(e.target.value))}
-                        />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label className="text-sm text-gray-600">발급 기간</label>
-                        <div className="flex gap-4 items-center">
-                            <DatePicker selectedDate={couponStartDate} onChange={(date) => setCouponStartDate(date)} />
-                            <span>~</span>
-                            <DatePicker selectedDate={couponEndDate} onChange={(date) => setCouponEndDate(date)} />
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label className="text-sm text-gray-600">만료 기간</label>
-                        <div className="flex gap-4 items-center">
-                            <DatePicker selectedDate={couponExpireDate} onChange={(date) => setCouponExpireDate(date)} />
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label className="text-sm text-gray-600">수량</label>
-                        <div className="flex gap-4 items-center">
-                            <input 
-                                type="number"
-                                className="p-3 border rounded-md"
-                                value={couponStock}
-                                onChange={(e) => setCouponStock(Number(e.target.value))}
-                            />
-                        </div>
-                    </div>
-                    <div className="flex justify-end">
-                        <button className="px-8 p-4 rounded-md bg-pink-100 text-pink-600">
-                            등록
-                        </button>
-                    </div>
+            <div className="flex justify-between items-center mb-8 border-b pb-2">
+                <h2 className="text-2xl font-medium">쿠폰 목록</h2>
+                <div className="flex gap-4">
+                    <select className="border rounded px-4 py-2">
+                    <option value="10">10개씩</option>
+                        <option value="20">20개씩</option>
+                        <option value="50">50개씩</option>
+                    </select>
+                    <select className="border rounded px-4 py-2">
+                        <option value="all">전체</option>
+                        <option value="previous">
+                            발급 전
+                        </option>
+                        <option value="inprogress">
+                            발급 중
+                        </option>
+                        <option value="completed">
+                            발급 완료
+                        </option>
+                        <option value="ended">
+                            종료
+                        </option>
+                    </select>
                 </div>
             </div>
-            <div className="mt-16">
-                <div className="flex justify-between items-center mb-8">
-                    <h3 className="text-xl font-medium">쿠폰 목록</h3>
-                    <div className="flex gap-4">
-                        <select className="border rounded px-4 p-4">
-                            <option selected>10개씩</option>
-                            <option>20개씩</option>
-                            <option>50개씩</option>
-                        </select>
-                        <select className="border rounded px-4 p-4">
-                            <option value="all">전체</option>
-                            <option selected value="previous">
-                                발급 전
-                            </option>
-                            <option value="inprogress">
-                                발급 중
-                            </option>
-                            <option value="completed">
-                                발급 완료
-                            </option>
-                            <option value="ended">
-                                종료
-                            </option>
-                        </select>
-                    </div>
-                </div>
 
-                <table className="w-full text-center">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="p-4 truncate max-w-0">이름</th>
-                      <th className="p-4 w-[25%]">발급 기간</th>
-                      <th className="p-4 w-[15%]">만료일</th>
-                      <th className="p-4 w-[10%]">수량</th>
-                      <th className="p-4 w-[10%]">상태</th>
+            <div className="flex justify-end mb-6">
+                <button
+                    className="px-4 py-2 rounded-md text-pink-600"
+                    onClick={() => router.push("/admin/coupon/register")}
+                >
+                    + 쿠폰 등록
+                </button>
+            </div>
+
+            <table className="w-full text-center">
+                <thead>
+                <tr className="border-b">
+                    <th className="p-4 truncate max-w-0">이름</th>
+                    <th className="p-4 w-[25%]">발급 기간</th>
+                    <th className="p-4 w-[15%]">만료일</th>
+                    <th className="p-4 w-[10%]">수량</th>
+                    <th className="p-4 w-[10%]">상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                {couponList.map((coupon) => (
+                    <tr
+                    key={coupon.id} 
+                    className="border-b hover:bg-gray-50"
+                    onClick={() => router.push(`/admin/coupon/${coupon.id}`)}
+                    >
+                    <td className="p-4">{coupon.name}</td>
+                    <td className="p-4">{coupon.startDate} ~ {coupon.endDate}</td>
+                    <td className="p-4">{coupon.expireDate}</td>
+                    <td className="p-4">{coupon.stock}</td>
+                    <td className="p-4 flex justify-center"><CouponTag status={coupon.status} /></td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {couponList.map((coupon) => (
-                      <tr
-                        key={coupon.id} 
-                        className="border-b hover:bg-gray-50"
-                        onClick={() => router.push(`/admin/coupon/${coupon.id}`)}
-                      >
-                        <td className="p-4">{coupon.name}</td>
-                        <td className="p-4">{coupon.startDate} ~ {coupon.endDate}</td>
-                        <td className="p-4">{coupon.expireDate}</td>
-                        <td className="p-4">{coupon.stock}</td>
-                        <td className="p-4 flex justify-center"><CouponTag status={coupon.status} /></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                ))}
+                </tbody>
+            </table>
 
-                <div className="flex justify-center gap-2 mt-8">
-                    <button className="px-3 p-4">◀</button>
-                    <button className="px-3 p-4 text-pink-500">1</button>
-                    <button className="px-3 p-4">▶</button>
-                </div>
+            <div className="flex justify-center gap-2 mt-8">
+                <button className="px-3 p-4">◀</button>
+                <button className="px-3 p-4 text-pink-500">1</button>
+                <button className="px-3 p-4">▶</button>
             </div>
+
+            
         </div>
     )
 }
