@@ -190,10 +190,10 @@ export default function CouponPage() {
             <table className="w-full text-center">
                 <thead>
                 <tr className="border-b">
-                    <th className="p-4 truncate max-w-0">이름</th>
-                    <th className="p-4 w-[25%]">발급 기간</th>
-                    <th className="p-4 w-[15%]">만료일</th>
-                    <th className="p-4 w-[10%]">수량</th>
+                    <th className="p-4 truncate max-w-0 text-left">이름</th>
+                    <th className="p-4 w-[20%]">발급 기간</th>
+                    <th className="p-4 w-[10%]">만료일</th>
+                    <th className="p-4 w-[7%]">수량</th>
                     <th className="p-4 w-[10%]">상태</th>
                 </tr>
                 </thead>
@@ -204,7 +204,7 @@ export default function CouponPage() {
                     className="border-b hover:bg-gray-50"
                     onClick={() => router.push(`/admin/coupon/${coupon.id}`)}
                     >
-                    <td className="p-4">{coupon.name}</td>
+                    <td className="p-4 text-left">{coupon.name}</td>
                     <td className="p-4">{coupon.startDate} ~ {coupon.endDate}</td>
                     <td className="p-4">{coupon.expireDate}</td>
                     <td className="p-4">{coupon.stock}</td>

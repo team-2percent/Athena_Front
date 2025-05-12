@@ -24,13 +24,13 @@ export default function ProjectApprovalDetailPage() {
     return (
         <div className="flex flex-col mx-auto w-full p-8 gap-6">
             <div className="flex w-full">
-            <button className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.back()}>
+            <button className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.push("/admin/coupon")}>
                 <ArrowLeftIcon className="w-4 h-4" />
                 목록으로
             </button>
             </div>
             <div className="flex flex-col gap-6 mb-8">
-                <h3 className="text-xl font-medium">쿠폰 정보</h3>
+            <h2 className="text-2xl font-medium border-b pb-2">쿠폰 정보</h2>
                 <table>
                     <tbody>
                         <tr className="border-b">
