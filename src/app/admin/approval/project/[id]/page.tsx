@@ -112,7 +112,7 @@ export default function ProjectApprovalDetailPage() {
 
                 <div className="flex justify-end space-x-4">
                     <button
-                        disabled={approvalStatus !== "reject"}
+                        disabled={approvalStatus === null}
                         className="px-8 py-2 rounded-md bg-pink-100 text-pink-600"
                         onClick={() => setIsModalOpen(true)}
                     >저장</button>
