@@ -896,6 +896,14 @@ const DonateDock = () => {
               </button>
             </div>
           </div>
+          {/* 배송지 주소 모달 */}
+          {isAddressModalOpen && (
+            <AddressModal
+              isOpen={isAddressModalOpen}
+              onClose={() => setIsAddressModalOpen(false)}
+              onComplete={handleComplete}
+            />
+          )}
         </div>
       )}
 
@@ -946,15 +954,6 @@ const DonateDock = () => {
             </div>
           </div>
         </div>
-      )}
-
-      {/* 배송지 주소 모달 */}
-      {isAddressModalOpen && (
-        <AddressModal
-          isOpen={isAddressModalOpen}
-          onClose={() => setIsAddressModalOpen(false)}
-          onComplete={handleComplete}
-        />
       )}
     </>
   )
