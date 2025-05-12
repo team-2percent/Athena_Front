@@ -6,6 +6,8 @@ import clsx from "clsx"
 import ConfirmModal from "@/components/common/ConfirmModal"
 import { useRouter } from "next/navigation";
 import { ArrowLeftIcon } from "lucide-react"
+import MarkdownRenderer from "@/components/projectRegister/MarkdownRenderer"
+
 export default function ProjectApprovalDetailPage() {
     const router = useRouter();
     const [comment, setComment] = useState("")
@@ -18,6 +20,8 @@ export default function ProjectApprovalDetailPage() {
         setIsModalOpen(false);
         router.back();
     }
+
+    const markdown = `# 프로젝트 기본 정보\n**안됨**\n## 프로젝트 기본 정보\n**안됨**\n## 프로젝트 기본 정보\n**안됨**\n## 프로젝트 기본 정보\n**안됨**`
 
     return (
         <div className="flex flex-col mx-auto w-full p-8 gap-6">
@@ -47,6 +51,7 @@ export default function ProjectApprovalDetailPage() {
                     <span>2025. 04. 13</span>
                 </div>
                 </div>
+                <MarkdownRenderer content={markdown} />
             </div>
             {/* 판매자 정보 */}
             <div className="flex flex-col gap-4">
