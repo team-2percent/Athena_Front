@@ -96,7 +96,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 placeholder="비밀번호 입력"
                 className={
                   clsx("w-full p-3 border-b focus:outline-none text-lg",
-                    focusedField === "password" ? "border-pink-500" : "border-gray-300")
+                    focusedField === "password" ? "border-main-color" : "border-gray-300")
                 }
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -109,7 +109,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             <button
               type="submit"
               disabled={disabled}
-              className={clsx("w-full py-4 rounded-xl font-medium text-lg mb-8", disabled ? "text-gray-400 bg-gray-200 cursor-not-allowed" : "bg-pink-200 text-pink-900")}
+              className={clsx("w-full py-4 rounded-xl font-medium text-lg mb-8", disabled ? "text-gray-400 bg-gray-200 cursor-not-allowed" : "bg-main-color text-white")}
             >
               로그인
             </button>
