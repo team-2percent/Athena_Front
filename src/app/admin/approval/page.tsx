@@ -123,7 +123,7 @@ export default function ApprovalPage() {
                     <input
                         type="text"
                         placeholder="상품명으로 검색"
-                        className="border flex-1 p-2 border rounded text-center text-gray-400 min-w-[350px] h-10"
+                        className="border flex-1 p-2 border rounded text-left text-gray-400 min-w-[350px] h-10"
                         onChange={handleSearchChange}
                     />
                     <button
