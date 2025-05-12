@@ -16,11 +16,18 @@ export default function CouponRegisterPage() {
     const [couponExpireDate, setCouponExpireDate] = useState<Date>(new Date())
     const [couponStock, setCouponStock] = useState<number>(0)
 
+    const couponPriceLimit = 10000000000
+    const couponStockLimit = 10000000000
+
+    const [couponPriceError, setCouponPriceError] = useState<boolean>(false);
+    const [couponStockError, setCouponStockError] = useState<boolean>(false);
+
     const disabled = couponName === "" || couponDescription === "" || couponPrice === 0 || couponStartDate === null || couponEndDate === null || couponExpireDate === null || couponStock === 0
 
     const handleAddCoupon = () => {
         // 쿠폰 등록 추가
     }
+
     // 폼 초기화 함수
     const resetForm = () => {
         setCouponName("")
@@ -31,6 +38,36 @@ export default function CouponRegisterPage() {
         setCouponExpireDate(new Date())
         setCouponStock(0)
     }
+
+    const handleCouponPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCouponPriceError(false)
+        if (e.target.value.startsWith("0")) {
+            e.target.value = e.target.value.replace("0", "")
+        }
+        if (Number(e.target.value) > couponPriceLimit) {
+            setCouponPriceError(true)
+            setCouponPrice(couponPriceLimit)
+        } else {
+            setCouponPrice(Number(e.target.value))
+        }
+    }
+
+    const handleCouponStockChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCouponStockError(false)
+        if (e.target.value.startsWith("0")) {
+            e.target.value = e.target.value.replace("0", "")
+        }
+        if (Number(e.target.value) > couponStockLimit) {
+            setCouponStock(couponStockLimit)
+            setCouponStockError(true)
+        } else {
+            setCouponStock(Number(e.target.value))
+        }
+    }
+
+    const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
+        e.currentTarget.select();
+      };
 
     return (
         <div className="flex flex-col mx-auto w-full p-8 gap-6">
@@ -55,7 +92,7 @@ export default function CouponRegisterPage() {
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-gray-600">쿠폰 설명</label>
                         <textarea 
-                            placeholder="쿠폰명을 입력하세요"
+                            placeholder="쿠폰 설명을 입력하세요"
                             className="w-full p-3 border rounded-md resize-none"
                             value={couponDescription}
                             onChange={(e) => setCouponDescription(e.target.value)}
@@ -63,13 +100,17 @@ export default function CouponRegisterPage() {
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-gray-600">가격</label>
-                        <input 
-                            type="text"
-                            placeholder="가격을 입력하세요"
-                            className="w-full p-3 border rounded-md"
-                            value={couponPrice}
-                            onChange={(e) => setCouponPrice(Number(e.target.value))}
-                        />
+                        <div className="flex gap-4 items-center">
+                            <input 
+                                type="number"
+                                placeholder="가격을 입력하세요"
+                                className="p-3 border rounded-md"
+                                value={couponPrice}
+                                onClick={handleClick}
+                                onChange={handleCouponPriceChange}
+                            />
+                            {couponPriceError && <p className="text-red-500 text-sm">가격은 최대 100억원까지 설정 가능합니다.</p>}
+                        </div>
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-gray-600">발급 기간</label>
@@ -92,8 +133,10 @@ export default function CouponRegisterPage() {
                                 type="number"
                                 className="p-3 border rounded-md"
                                 value={couponStock}
-                                onChange={(e) => setCouponStock(Number(e.target.value))}
+                                onClick={handleClick}
+                                onChange={handleCouponStockChange}
                             />
+                            {couponStockError && <p className="text-red-500 text-sm">수량은 최대 100억개까지 설정 가능합니다.</p>}
                         </div>
                     </div>
                     <div className="flex justify-end">
