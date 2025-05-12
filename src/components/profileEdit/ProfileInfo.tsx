@@ -225,7 +225,7 @@ export default function ProfileInfo() {
                         <h3 className="text-lg font-medium">소개</h3>  
                         {/* 소개란 */}
                         <textarea
-                            className="w-full h-[150px] px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color text-sm resize-none"
+                            className="w-full h-[150px] px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:border-2 focus:border-main-color text-sm resize-none"
                             value={newIntroduction}
                             onChange={(e) => setNewIntroduction(e.target.value)}
                         />

@@ -507,7 +507,7 @@ const DonateDock = () => {
             className="mx-auto flex w-40 items-center justify-center rounded-t-xl bg-white py-3 shadow-lg"
             aria-label="후원하기"
           >
-            <ChevronUp className="mr-2 h-6 w-6 text-gray-700" />
+            <ChevronUp className="mr-2 h-6 w-6 text-sub-gray" />
             <span className="text-lg font-medium text-gray-800">후원하기</span>
           </button>
         </div>
@@ -524,7 +524,7 @@ const DonateDock = () => {
         onClick={handleOverlayClick}
       >
         <div className="mx-auto max-w-6xl px-4" onClick={handleContentClick}>
-          <div className="rounded-t-3xl border border-gray-200 bg-white p-6 pb-0 shadow-lg">
+          <div className="rounded-t-3xl border border-gray-border bg-white p-6 pb-0 shadow-lg">
             {/* Dock 헤더 - 항상 동일한 레이아웃 */}
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-2xl font-bold">후원하기</h2>
@@ -549,12 +549,12 @@ const DonateDock = () => {
                           <div
                             key={option.id}
                             className={`relative flex cursor-pointer items-center rounded-xl border p-4 transition-all ${
-                              isSelected ? "border-2 border-main-color" : "border-gray-200 hover:border-pink-200"
+                              isSelected ? "border-2 border-main-color" : "border-gray-border hover:border-secondary-color-dark"
                             }`}
                             onClick={() => handleOptionSelect(option.id)}
                           >
                             <div className="absolute -right-2 -top-4">
-                              <div className="rounded-full border-2 border-main-color bg-white px-3 py-1 text-sm text-pink-500 shadow-sm">
+                              <div className="rounded-full border-2 border-main-color bg-white px-3 py-1 text-sm text-main-color shadow-sm">
                                 <span>{formatRemaining(option.remaining)}</span>
                               </div>
                             </div>
@@ -562,11 +562,11 @@ const DonateDock = () => {
                             <div className="flex-1">
                               <div className="flex items-center">
                                 <div
-                                  className={`mr-2 h-5 w-5 rounded-md flex items-center justify-center ${isSelected ? "bg-pink-500" : "border border-gray-300"}`}
+                                  className={`mr-2 h-5 w-5 rounded-md flex items-center justify-center ${isSelected ? "bg-main-color" : "border border-gray-border"}`}
                                 >
                                   {isSelected && <Check className="h-4 w-4 text-white" />}
                                 </div>
-                                <h4 className={`text-lg font-bold ${isSelected ? "text-pink-500" : ""}`}>
+                                <h4 className={`text-lg font-bold ${isSelected ? "text-main-color" : ""}`}>
                                   {option.title}
                                 </h4>
                               </div>
@@ -578,7 +578,7 @@ const DonateDock = () => {
                                       e.stopPropagation()
                                       decreaseQuantity(option.id)
                                     }}
-                                    className="h-8 w-8 pb-1 rounded-full bg-gray-200 flex items-center justify-center text-gray-700"
+                                    className="h-8 w-8 pb-1 rounded-full bg-gray-border flex items-center justify-center text-sub-gray"
                                   >
                                     -
                                   </button>
@@ -588,7 +588,7 @@ const DonateDock = () => {
                                       e.stopPropagation()
                                       increaseQuantity(option.id)
                                     }}
-                                    className="h-8 w-8 pb-1 rounded-full bg-gray-200 flex items-center justify-center text-gray-700"
+                                    className="h-8 w-8 pb-1 rounded-full bg-gray-border flex items-center justify-center text-sub-gray"
                                   >
                                     +
                                   </button>
@@ -596,7 +596,7 @@ const DonateDock = () => {
                               )}
                             </div>
 
-                            <div className={`text-xl font-medium ${isSelected ? "text-pink-500" : ""}`}>
+                            <div className={`text-xl font-medium ${isSelected ? "text-main-color" : ""}`}>
                               {option.price}원
                             </div>
                           </div>
@@ -606,7 +606,7 @@ const DonateDock = () => {
                   </div>
 
                   {/* 오른쪽 영역: 선택된 상품 세부 정보 (2/3 너비) */}
-                  <div className="md:col-span-2 rounded-xl border border-gray-200 mt-4 flex flex-col h-[484px]">
+                  <div className="md:col-span-2 rounded-xl border border-gray-border mt-4 flex flex-col h-[484px]">
                     {/* 스크롤 영역 - 선택된 상품 목록만 포함 */}
                     <div className="h-[430px] overflow-y-auto p-4 flex-grow">
                       {selectedOptions.length > 0 ? (
@@ -624,7 +624,7 @@ const DonateDock = () => {
                               const isExpanded = expandedProductId === optionId
 
                               return (
-                                <div key={optionId} className="border border-gray-200 rounded-lg overflow-hidden">
+                                <div key={optionId} className="border border-gray-border rounded-lg overflow-hidden">
                                   {/* 상품 헤더 - 클릭 시 펼침/접힘 */}
                                   <div
                                     className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50"
@@ -632,7 +632,7 @@ const DonateDock = () => {
                                   >
                                     <div className="flex items-center">
                                       <ChevronRight
-                                        className={`h-5 w-5 mr-2 text-gray-500 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+                                        className={`h-5 w-5 mr-2 text-sub-gray transition-transform ${isExpanded ? "rotate-90" : ""}`}
                                       />
                                       <h5 className="font-medium">{option.title}</h5>
                                     </div>
@@ -643,9 +643,9 @@ const DonateDock = () => {
 
                                   {/* 펼쳐진 상태일 때만 구성 정보 표시 */}
                                   {isExpanded && (
-                                    <div className="bg-gray-50 p-4 border-t border-gray-200">
+                                    <div className="bg-gray-50 p-4 border-t border-gray-border">
                                       <div className="mb-4">
-                                        <p className="text-gray-700">{option.description}</p>
+                                        <p className="text-sub-gray">{option.description}</p>
                                       </div>
 
                                       <h6 className="mb-2 font-medium">구성</h6>
@@ -653,13 +653,13 @@ const DonateDock = () => {
                                         <ul className="space-y-2">
                                           {option.details.map((detail, index) => (
                                             <li key={index} className="flex items-start">
-                                              <span className="mr-2 text-pink-500">•</span>
+                                              <span className="mr-2 text-main-color">•</span>
                                               <span>{detail}</span>
                                             </li>
                                           ))}
                                         </ul>
                                       ) : (
-                                        <p className="text-gray-500">구성 정보가 없습니다.</p>
+                                        <p className="text-sub-gray">구성 정보가 없습니다.</p>
                                       )}
                                     </div>
                                   )}
@@ -670,16 +670,16 @@ const DonateDock = () => {
                         </>
                       ) : (
                         <div className="flex flex-col items-center justify-center h-full py-12">
-                          <p className="text-gray-500 text-lg">상품을 선택해주세요</p>
+                          <p className="text-sub-gray text-lg">상품을 선택해주세요</p>
                         </div>
                       )}
                     </div>
 
                     {/* 총 금액 영역 - 하단에 고정 */}
-                    <div className="border-t border-gray-200 p-4">
+                    <div className="border-t border-gray-border p-4">
                       <div className="flex justify-between items-center">
                         <span className="font-medium">합계</span>
-                        <span className="text-xl font-bold text-pink-500">{getTotalPrice()}원</span>
+                        <span className="text-xl font-bold text-main-color">{getTotalPrice()}원</span>
                       </div>
                     </div>
                   </div>
@@ -691,8 +691,8 @@ const DonateDock = () => {
                     <button
                       className={`rounded-xl px-8 py-3 font-medium ${
                         selectedOptions.length > 0
-                          ? "bg-pink-200 text-pink-800 hover:bg-main-color"
-                          : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                          ? "bg-main-color text-white hover:bg-secondary-color-dark"
+                          : "bg-gray-border text-sub-gray cursor-not-allowed"
                       }`}
                       onClick={goToNextStep}
                       disabled={selectedOptions.length === 0}
@@ -710,7 +710,7 @@ const DonateDock = () => {
                   <h3 className="mb-4 text-lg font-medium">결제 수단</h3>
                   <div
                     className={`inline-block cursor-pointer rounded-xl border px-16 p-4 transition-all ${
-                      selectedPay === "kakaopay" ? "border-2 border-main-color" : "border-gray-200 hover:border-pink-200"
+                      selectedPay === "kakaopay" ? "border-2 border-main-color" : "border-gray-border hover:border-main-color"
                     }`}
                     onClick={() => handlePaySelect("kakaopay")}
                   >
@@ -730,7 +730,7 @@ const DonateDock = () => {
                           className={`flex-shrink-0 w-60 cursor-pointer rounded-xl border p-4 transition-all ${
                             selectedAddress === address.id
                               ? "border-2 border-main-color"
-                              : "border-gray-200 hover:border-pink-200"
+                              : "border-gray-border hover:border-main-color"
                           }`}
                           onClick={() => handleAddressSelect(address.id)}
                         >
@@ -752,13 +752,13 @@ const DonateDock = () => {
 
                       {/* 배송지 추가 버튼 */}
                       <div
-                        className="flex-shrink-0 w-60 border border-dashed border-gray-300 rounded-xl p-4 flex items-center justify-center cursor-pointer hover:bg-gray-50 relative"
+                        className="flex-shrink-0 w-60 border border-dashed border-gray-border rounded-xl p-4 flex items-center justify-center cursor-pointer hover:bg-gray-50 relative"
                         onClick={(e) => {
                           e.stopPropagation()
                           addNewAddress(e)
                         }}
                       >
-                        <div className="flex flex-col items-center text-gray-500">
+                        <div className="flex flex-col items-center text-sub-gray">
                           <Plus className="w-10 h-10 mb-2" />
                           <span className="text-sm font-medium">배송지 추가</span>
                         </div>
@@ -768,7 +768,7 @@ const DonateDock = () => {
                 </div>
 
                 {/* 주문 요약 */}
-                <div className="rounded-xl border border-gray-200 p-4">
+                <div className="rounded-xl border border-gray-border p-4">
                   <h3 className="mb-4 text-lg font-medium">주문 요약</h3>
 
                   <div className="space-y-4">
@@ -777,7 +777,7 @@ const DonateDock = () => {
                       <button
                         ref={orderSummaryMoreRef}
                         onClick={toggleOrderSummaryPopover}
-                        className="text-pink-500 hover:text-pink-600 font-medium flex items-center"
+                        className="text-main-color hover:text-main-color font-medium flex items-center"
                       >
                         선택한 상품 {selectedOptions.length}개 보기
                         <ChevronRight
@@ -792,7 +792,7 @@ const DonateDock = () => {
                     </div>
                   </div>
 
-                  <div className="mt-4 border-t border-gray-200 pt-4">
+                  <div className="mt-4 border-t border-gray-border pt-4">
                     <div className="flex justify-between">
                       <span className="font-medium">총 결제 금액</span>
                       <span className="text-xl font-bold">{getTotalPrice()}원</span>
@@ -805,13 +805,13 @@ const DonateDock = () => {
                   {/* 버튼 영역 */}
                   <div className="flex justify-end space-x-4">
                     <button
-                      className="rounded-xl bg-pink-200 px-8 py-3 font-medium text-pink-800 hover:bg-main-color"
+                      className="rounded-xl bg-main-color px-8 py-3 font-medium text-white hover:bg-secondary-color-dark"
                       onClick={toggleDock}
                     >
                       후원하기
                     </button>
                     <button
-                      className="rounded-xl bg-gray-200 px-8 py-3 font-medium text-gray-800 hover:bg-gray-300"
+                      className="rounded-xl bg-cancel-background px-8 py-3 font-medium text-white hover:bg-cancel-background-dark"
                       onClick={goToPreviousStep}
                     >
                       이전
@@ -828,7 +828,7 @@ const DonateDock = () => {
       {showAddressPopover && (
         <div
           id="address-popover"
-          className="fixed bg-white rounded-xl border border-gray-200 p-4 shadow-lg z-40 w-80"
+          className="fixed bg-white rounded-xl border border-gray-border p-4 shadow-lg z-40 w-80"
           style={{
             top: `${popoverPosition.top}px`,
             left: `${popoverPosition.left}px`,
@@ -838,10 +838,10 @@ const DonateDock = () => {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">배송지명</label>
+              <label className="block text-sm font-medium text-sub-gray mb-1">배송지명</label>
               <input
                 type="text"
-                className="w-full p-2 border border-gray-300 rounded-lg"
+                className="w-full p-2 border border-gray-border rounded-lg"
                 placeholder="배송지명 입력"
                 value={newAddress.name}
                 onChange={(e) => handleInputChange(e, "name")}
@@ -849,18 +849,18 @@ const DonateDock = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">주소</label>
+              <label className="block text-sm font-medium text-sub-gray mb-1">주소</label>
               <div className="flex space-x-2">
                 <input
                   type="text"
-                  className="flex-1 p-2 border border-gray-300 rounded-lg"
+                  className="flex-1 p-2 border border-gray-border rounded-lg"
                   placeholder="'찾기'를 눌러서 주소 입력"
                   value={newAddress.address}
                   readOnly
                 />
                 <button
                   type="button"
-                  className="px-3 py-2 bg-gray-200 rounded-lg text-sm"
+                  className="px-3 py-2 bg-gray-border rounded-lg text-sm"
                   onClick={() => setIsAddressModalOpen(true)}
                 >
                   찾기
@@ -869,10 +869,10 @@ const DonateDock = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">상세 주소</label>
+              <label className="block text-sm font-medium text-sub-gray mb-1">상세 주소</label>
               <input
                 type="text"
-                className="w-full p-2 border border-gray-300 rounded-lg"
+                className="w-full p-2 border border-gray-border rounded-lg"
                 placeholder="상세 주소 입력"
                 value={newAddress.detailAddress}
                 onChange={(e) => handleInputChange(e, "detailAddress")}
@@ -882,7 +882,7 @@ const DonateDock = () => {
             <div className="flex justify-end space-x-2 pt-2">
               <button
                 type="button"
-                className="px-4 py-2 bg-gray-200 rounded-lg text-sm"
+                className="px-4 py-2 bg-gray-border rounded-lg text-sm"
                 onClick={() => setShowAddressPopover(false)}
               >
                 취소
@@ -911,7 +911,7 @@ const DonateDock = () => {
       {showOrderSummaryPopover && (
         <div
           id="order-summary-popover"
-          className="fixed bg-white rounded-xl border border-gray-200 p-4 shadow-lg z-40 w-80"
+          className="fixed bg-white rounded-xl border border-gray-border p-4 shadow-lg z-40 w-80"
           style={{
             top: `${orderSummaryPopoverPosition.top}px`,
             left: `${orderSummaryPopoverPosition.left}px`,
@@ -919,7 +919,7 @@ const DonateDock = () => {
         >
           <div className="flex justify-between items-center mb-3">
             <h4 className="text-lg font-medium">전체 주문 항목</h4>
-            <button onClick={() => setShowOrderSummaryPopover(false)} className="text-gray-500 hover:text-gray-700">
+            <button onClick={() => setShowOrderSummaryPopover(false)} className="text-sub-gray hover:text-sub-gray">
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -938,7 +938,7 @@ const DonateDock = () => {
                   <div key={optionId} className="flex justify-between items-center py-2">
                     <div>
                       <span className="font-medium">{option.title}</span>
-                      <span className="text-gray-500 ml-2">{quantity}개</span>
+                      <span className="text-sub-gray ml-2">{quantity}개</span>
                     </div>
                     <span>{itemTotal.toLocaleString()}원</span>
                   </div>
@@ -947,10 +947,10 @@ const DonateDock = () => {
             </div>
           </div>
 
-          <div className="mt-3 pt-3 border-t border-gray-200">
+          <div className="mt-3 pt-3 border-t border-gray-border">
             <div className="flex justify-between items-center">
               <span className="font-medium">합계</span>
-              <span className="text-lg font-bold text-pink-500">{getTotalPrice()}원</span>
+              <span className="text-lg font-bold text-main-color">{getTotalPrice()}원</span>
             </div>
           </div>
         </div>

@@ -93,7 +93,7 @@ export default function ProjectItem({
 
           <div className={`w-full h-2 rounded-full ${isCompleted ? "bg-sub-gray" : "bg-secondary-color"}`}>
             <div
-              className={`h-full rounded-full bg-main-color ${isCompleted ? "bg-sub-gray" : "bg-secondary-color"}`}
+              className={`h-full rounded-full bg-main-color ${isCompleted ? "bg-sub-gray" : "bg-main-color"}`}
               style={{ width: `${progressWidth}%` }}
             ></div>
           </div>

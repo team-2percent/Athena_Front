@@ -161,8 +161,7 @@ const ProductTabs = () => {
               username={seller.username}
               oneLinear={seller.oneLinear}
               profileImage={seller.profileImage}
-              onFollow={handleFollow}
-            />
+              onFollow={handleFollow} isFollowing={false}            />
           </div>
         )}
 
