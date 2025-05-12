@@ -26,17 +26,7 @@ export default function CouponRegisterPage() {
 
     const handleAddCoupon = () => {
         // 쿠폰 등록 추가
-    }
-
-    // 폼 초기화 함수
-    const resetForm = () => {
-        setCouponName("")
-        setCouponDescription("")
-        setCouponPrice(0)
-        setCouponStartDate(new Date())
-        setCouponEndDate(new Date()) 
-        setCouponExpireDate(new Date())
-        setCouponStock(0)
+        router.push('/admin/coupon')
     }
 
     const handleCouponPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
