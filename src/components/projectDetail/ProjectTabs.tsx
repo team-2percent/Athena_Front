@@ -9,7 +9,7 @@ import useAuthStore from "@/stores/auth"
 import FollowItem from "../profile/FollowItem"
 
 
-const ProductTabs = () => {
+const ProjectTabs = () => {
   const isLoggedIn = useAuthStore((state: { isLoggedIn: boolean }) => state.isLoggedIn)
   const [activeTab, setActiveTab] = useState("소개")
   const [commentText, setCommentText] = useState("")
@@ -231,4 +231,4 @@ const ProductTabs = () => {
   )
 }
 
-export default ProductTabs
+export default ProjectTabs
