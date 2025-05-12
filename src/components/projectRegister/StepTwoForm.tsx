@@ -229,10 +229,19 @@ const formatNumber = (value: string) => {
   return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
+interface StepTwoFormProps {
+  targetAmount?: string
+  initialData?: {
+    markdown?: string
+    supportOptions?: SupportOption[]
+  }
+}
+
 // Add a prop to receive the target amount from step 1
-export default function StepTwoForm({ targetAmount = "" }: { targetAmount?: string }) {
+export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoFormProps) {
   const [markdown, setMarkdown] = useState(
-    "# 상품 상세 설명\n\n상품에 대한 자세한 설명을 작성해주세요.\n\n## 특징\n\n- 첫 번째 특징\n- 두 번째 특징\n- 세 번째 특징\n\n## 사용 방법\n\n1. 첫 번째 단계\n2. 두 번째 단계\n3. 세 번째 단계\n\n> 참고: 마크다운 문법을 사용하여 작성할 수 있습니다.",
+    initialData?.markdown ||
+      "# 상품 상세 설명\n\n상품에 대한 자세한 설명을 작성해주세요.\n\n## 특징\n\n- 첫 번째 특징\n- 두 번째 특징\n- 세 번째 특징\n\n## 사용 방법\n\n1. 첫 번째 단계\n2. 두 번째 단계\n3. 세 번째 단계\n\n> 참고: 마크다운 문법을 사용하여 작성할 수 있습니다.",
   )
   // Use the targetAmount from props
   const [totalBudget, setTotalBudget] = useState(targetAmount || "0")
@@ -240,7 +249,7 @@ export default function StepTwoForm({ targetAmount = "" }: { targetAmount?: stri
   const [schedules, setSchedules] = useState<ProjectSchedule[]>([])
   const [budgetInputMethod, setBudgetInputMethod] = useState<"form" | "direct">("form")
   const [scheduleInputMethod, setScheduleInputMethod] = useState<"form" | "direct">("form")
-  const [supportOptions, setSupportOptions] = useState<SupportOption[]>([])
+  const [supportOptions, setSupportOptions] = useState<SupportOption[]>(initialData?.supportOptions || [])
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [compositionDialogOpen, setCompositionDialogOpen] = useState(false)
   const [currentOptionId, setCurrentOptionId] = useState<number | null>(null)
@@ -813,7 +822,7 @@ export default function StepTwoForm({ targetAmount = "" }: { targetAmount?: stri
                     <input
                       id={`option-price-${option.id}`}
                       type="text"
-                      value={option.price}
+                      value={formatNumber(option.price)}
                       onChange={(e) => handlePriceChange(option.id, e.target.value)}
                       placeholder="0"
                       className="w-full p-1 focus:outline-none text-base text-right"
@@ -836,7 +845,7 @@ export default function StepTwoForm({ targetAmount = "" }: { targetAmount?: stri
                     <input
                       id={`option-stock-${option.id}`}
                       type="text"
-                      value={option.stock}
+                      value={formatNumber(option.stock)}
                       onChange={(e) => handleStockChange(option.id, e.target.value)}
                       placeholder="0"
                       className="w-full p-1 focus:outline-none text-base text-right"
