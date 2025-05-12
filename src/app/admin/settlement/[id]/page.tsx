@@ -66,6 +66,7 @@ export default function SettlementDetailPage() {
     const handleConfirmSettlement = () => {
         // api 요청
         setIsModalOpen(false)
+        router.push("/admin/settlement")
     }
 
     return (

@@ -110,7 +110,7 @@ export default function SettlementPage() {
                     </thead>
                     <tbody>
                         {settlementList.map((settlement) => (
-                            <tr className="text-sm" onClick={() => router.push(`/admin/settlement/${settlement.id}`)}>
+                            <tr key={settlement.id}className="text-sm" onClick={() => router.push(`/admin/settlement/${settlement.id}`)}>
                                 <td className="border-b p-4 text-left">{settlement.projectName}</td>
                                 <td className="border-b p-4">{settlement.totalAmount}</td>
                                 <td className="border-b p-4">{settlement.fee}</td>
