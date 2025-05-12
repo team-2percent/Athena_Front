@@ -64,7 +64,7 @@ export default function ReviewItem({
             <div className="mb-3">
               <span className="font-medium">{projectName}</span>
               <span> / </span>
-              <span className="text-gray-600">{sellerName}</span>
+              <span className="text-sub-gray">{sellerName}</span>
             </div>
 
             <div className="flex items-center gap-4">

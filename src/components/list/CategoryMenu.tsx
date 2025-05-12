@@ -53,7 +53,7 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
                     className="w-full h-full object-cover"
                 />
                 </div>
-                <span className="text-sm text-center text-gray-600">
+                <span className="text-sm text-center text-sub-gray">
                 {category.name}
                 </span>
             </div>

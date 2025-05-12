@@ -180,7 +180,7 @@ export default function CouponPage() {
 
             <div className="flex justify-end mb-6">
                 <button
-                    className="px-4 py-2 rounded-md text-pink-600"
+                    className="px-4 py-2 rounded-md text-main-color"
                     onClick={() => router.push("/admin/coupon/register")}
                 >
                     + 쿠폰 등록
@@ -216,7 +216,7 @@ export default function CouponPage() {
 
             <div className="flex justify-center gap-2 mt-8">
                 <button className="px-3 p-4">◀</button>
-                <button className="px-3 p-4 text-pink-500">1</button>
+                <button className="px-3 p-4 text-main-color">1</button>
                 <button className="px-3 p-4">▶</button>
             </div>
 

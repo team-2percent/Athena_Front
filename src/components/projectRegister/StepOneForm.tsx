@@ -224,7 +224,7 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
                     onClick={() => handleCategorySelect(option)}
                   >
                     <span>{option}</span>
-                    {category === option && <Check className="h-5 w-5 text-pink-500" />}
+                    {category === option && <Check className="h-5 w-5 text-main-color" />}
                   </div>
                 ))}
               </div>
@@ -245,7 +245,7 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="상품명을 입력해 주세요."
-            className="w-full rounded-full border border-gray-300 px-4 py-3 focus:border-pink-400 focus:outline-none"
+            className="w-full rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none"
           />
         </div>
       </div>
@@ -261,7 +261,7 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="상품에 대한 간략한 설명을 입력하세요"
-            className="w-full rounded-3xl border border-gray-300 px-4 py-3 min-h-[150px] focus:border-pink-400 focus:outline-none"
+            className="w-full rounded-3xl border border-gray-300 px-4 py-3 min-h-[150px] focus:border-main-color focus:outline-none"
           />
         </div>
       </div>
@@ -276,7 +276,7 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
             {/* 드래그 앤 드롭 영역 */}
             <div
               className={`border-2 border-dashed rounded-lg p-4 transition-colors relative ${
-                isDragging ? "border-pink-400 bg-pink-50" : "border-gray-300"
+                isDragging ? "border-main-color bg-secondary-color" : "border-gray-300"
               }`}
               onDragEnter={handleDragEnter}
               onDragOver={handleDragOver}
@@ -285,8 +285,8 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
             >
               {/* 드래그 중일 때 오버레이 */}
               {isDragging && images.length < 5 && (
-                <div className="absolute inset-0 bg-pink-50 bg-opacity-80 flex items-center justify-center z-10 rounded-lg">
-                  <p className="text-xl font-medium text-pink-600">여기에 이미지를 놓으세요</p>
+                <div className="absolute inset-0 bg-secondary-color bg-opacity-80 flex items-center justify-center z-10 rounded-lg">
+                  <p className="text-xl font-medium text-secondary-color-dark">여기에 이미지를 놓으세요</p>
                 </div>
               )}
 
@@ -388,7 +388,7 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
             value={formatAmount(targetAmount)}
             onChange={handleAmountChange}
             placeholder="0"
-            className="w-full rounded-full border border-gray-300 px-4 py-3 focus:border-pink-400 focus:outline-none text-right"
+            className="w-full rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none text-right"
           />
           <span className="ml-2 text-lg">원</span>
         </div>

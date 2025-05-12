@@ -2,8 +2,8 @@
 
 import type React from "react"
 
-import { useState, useRef, useEffect } from "react"
-import { Upload, Plus, Check, X, Trash2 } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Plus, Check, X, Trash2 } from "lucide-react"
 
 // 계좌 정보 타입 정의
 interface BankAccount {
@@ -93,7 +93,7 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
           <div>
             <label
               htmlFor="accountHolder"
-              className={`text-sm ${focusedField === "accountHolder" ? "text-pink-500" : "text-pink-400"}`}
+              className={`text-sm ${focusedField === "accountHolder" ? "text-secondary-color-dark" : "text-main-color"}`}
             >
               예금주
             </label>
@@ -104,7 +104,7 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
               onChange={(e) => setAccountHolder(e.target.value)}
               placeholder="예금주 이름을 입력하세요"
               className={`w-full p-2 border-b ${
-                focusedField === "accountHolder" ? "border-pink-500" : "border-gray-300"
+                focusedField === "accountHolder" ? "border-secondary-color-dark" : "border-gray-300"
               } ${errors.accountHolder ? "border-red-500" : ""} focus:outline-none text-lg`}
               onFocus={() => setFocusedField("accountHolder")}
               onBlur={() => setFocusedField(null)}
@@ -116,7 +116,7 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
           <div>
             <label
               htmlFor="bankName"
-              className={`text-sm ${focusedField === "bankName" ? "text-pink-500" : "text-pink-400"}`}
+              className={`text-sm ${focusedField === "bankName" ? "text-secondary-color-dark" : "text-main-color"}`}
             >
               은행명
             </label>
@@ -127,7 +127,7 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
               onChange={(e) => setBankName(e.target.value)}
               placeholder="은행명을 입력하세요"
               className={`w-full p-2 border-b ${
-                focusedField === "bankName" ? "border-pink-500" : "border-gray-300"
+                focusedField === "bankName" ? "border-secondary-color-dark" : "border-gray-300"
               } ${errors.bankName ? "border-red-500" : ""} focus:outline-none text-lg`}
               onFocus={() => setFocusedField("bankName")}
               onBlur={() => setFocusedField(null)}
@@ -139,7 +139,7 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
           <div>
             <label
               htmlFor="accountNumber"
-              className={`text-sm ${focusedField === "accountNumber" ? "text-pink-500" : "text-pink-400"}`}
+              className={`text-sm ${focusedField === "accountNumber" ? "text-secondary-color-dark" : "text-main-color"}`}
             >
               계좌번호
             </label>
@@ -150,7 +150,7 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
               onChange={handleAccountNumberChange}
               placeholder="계좌번호를 입력하세요 ('-' 없이 숫자만)"
               className={`w-full p-2 border-b ${
-                focusedField === "accountNumber" ? "border-pink-500" : "border-gray-300"
+                focusedField === "accountNumber" ? "border-secondary-color-dark" : "border-gray-300"
               } ${errors.accountNumber ? "border-red-500" : ""} focus:outline-none text-lg`}
               onFocus={() => setFocusedField("accountNumber")}
               onBlur={() => setFocusedField(null)}
@@ -163,7 +163,7 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
           <button
             type="button"
             onClick={handleSubmit}
-            className="bg-pink-300 text-[#8B1D3F] font-bold py-2 px-6 rounded-full"
+            className="bg-main-color hover:bg-secondary-color-dark text-white font-bold py-2 px-6 rounded-full"
           >
             추가하기
           </button>
@@ -173,25 +173,147 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
   )
 }
 
+// 인터페이스 수정
 interface StepThreeFormProps {
   initialData?: {
-    teamName?: string
-    teamIntro?: string
-    teamImagePreview?: string | null
+    supportOptions?: SupportOption[]
   }
 }
 
-export default function StepThreeForm({ initialData }: StepThreeFormProps) {
-  const [teamName, setTeamName] = useState(initialData?.teamName || "")
-  const [teamIntro, setTeamIntro] = useState(initialData?.teamIntro || "")
-  const [teamImage, setTeamImage] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(initialData?.teamImagePreview || null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+// 구성 항목 타입
+interface CompositionItem {
+  id: number
+  content: string
+}
 
+// 후원 옵션 타입
+interface SupportOption {
+  id: number
+  name: string
+  price: string
+  description: string
+  stock: string
+  composition?: CompositionItem[]
+}
+
+// 구성 다이얼로그 컴포넌트
+interface CompositionDialogProps {
+  isOpen: boolean
+  onClose: () => void
+  composition: CompositionItem[]
+  onSave: (composition: CompositionItem[]) => void
+}
+
+const CompositionDialog = ({ isOpen, onClose, composition, onSave }: CompositionDialogProps) => {
+  const [items, setItems] = useState<CompositionItem[]>(composition || [])
+  const [focusedField, setFocusedField] = useState<string | null>(null)
+
+  if (!isOpen) return null
+
+  const addItem = () => {
+    const newId = items.length > 0 ? Math.max(...items.map((item) => item.id)) + 1 : 1
+    setItems([...items, { id: newId, content: "" }])
+  }
+
+  const removeItem = (id: number) => {
+    setItems(items.filter((item) => item.id !== id))
+  }
+
+  const updateItem = (id: number, content: string) => {
+    setItems(items.map((item) => (item.id === id ? { ...item, content } : item)))
+  }
+
+  const handleSave = () => {
+    onSave(items)
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* 오버레이 */}
+      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+
+      {/* 다이얼로그 */}
+      <div className="relative z-10 w-full max-w-2xl rounded-3xl bg-white p-6 shadow-lg">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold">구성 항목 설정</h2>
+          <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <X size={24} />
+          </button>
+        </div>
+
+        <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+          {items.map((item) => (
+            <div key={item.id} className="flex items-end gap-4">
+              <div className="flex-1">
+                <label
+                  htmlFor={`item-content-${item.id}`}
+                  className={`text-sm ${focusedField === `item-content-${item.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
+                >
+                  구성 세부 내용
+                </label>
+                <input
+                  id={`item-content-${item.id}`}
+                  type="text"
+                  value={item.content}
+                  onChange={(e) => updateItem(item.id, e.target.value)}
+                  placeholder="���성 세부 내용을 입력하세요"
+                  className={`w-full p-2 border-b ${
+                    focusedField === `item-content-${item.id}` ? "border-secondary-color-dark" : "border-gray-300"
+                  } focus:outline-none text-lg`}
+                  onFocus={() => setFocusedField(`item-content-${item.id}`)}
+                  onBlur={() => setFocusedField(null)}
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => removeItem(item.id)}
+                className="p-2 text-gray-400 hover:text-red-500 transition-colors mb-2"
+                aria-label="항목 삭제"
+              >
+                <Trash2 className="h-5 w-5" />
+              </button>
+            </div>
+          ))}
+
+          {/* 항목 추가 버튼 */}
+          <div
+            className="border border-dashed border-gray-300 rounded-xl p-3 flex items-center justify-center cursor-pointer hover:bg-gray-50 h-14"
+            onClick={addItem}
+          >
+            <div className="flex items-center text-gray-500">
+              <Plus className="w-5 h-5 mr-2" />
+              <span className="text-sm font-medium">구성 항목 추가</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-end">
+          <button
+            type="button"
+            onClick={handleSave}
+            className="bg-main-color text-white font-bold py-2 px-6 rounded-full"
+          >
+            저장
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function StepThreeForm({ initialData }: StepThreeFormProps) {
   // 계좌 관련 상태
   const [selectedAccountId, setSelectedAccountId] = useState<number | null>(null)
   const [useAccountNextTime, setUseAccountNextTime] = useState(false)
   const [isAddAccountModalOpen, setIsAddAccountModalOpen] = useState(false)
+
+  // 후원 상품 관련 상태 (2단계에서 가져옴)
+  const [supportOptions, setSupportOptions] = useState<SupportOption[]>(initialData?.supportOptions || [])
+  const [focusedField, setFocusedField] = useState<string | null>(null)
+  const [compositionDialogOpen, setCompositionDialogOpen] = useState(false)
+  const [currentOptionId, setCurrentOptionId] = useState<number | null>(null)
 
   // 샘플 계좌 목록 (실제로는 API에서 가져올 데이터)
   const [accounts, setAccounts] = useState<BankAccount[]>([
@@ -240,7 +362,7 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
     setSelectedAccountId(id)
   }
 
-  // 계좌 삭제 처리 (StepThreeForm 컴포넌트 내부)
+  // 계좌 삭제 처리
   const handleDeleteAccount = (id: number, e: React.MouseEvent) => {
     e.stopPropagation() // 이벤트 버블링 방지
 
@@ -253,137 +375,209 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
     setAccounts(accounts.filter((account) => account.id !== id))
   }
 
-  // 파일 선택 버튼 클릭 핸들러
-  const handleUploadClick = () => {
-    fileInputRef.current?.click()
+  // 후원 옵션 추가 (2단계에서 가져옴)
+  const addSupportOption = () => {
+    const newId = supportOptions.length > 0 ? Math.max(...supportOptions.map((option) => option.id)) + 1 : 1
+    setSupportOptions([...supportOptions, { id: newId, name: "", price: "", description: "", stock: "" }])
   }
 
-  // 파일 입력 변경 핸들러
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files || files.length === 0) return
-
-    const file = files[0]
-    if (!file.type.startsWith("image/")) return
-
-    setTeamImage(file)
-    setImagePreview(URL.createObjectURL(file))
+  // 후원 옵션 필드 업데이트 (2단계에서 가져옴)
+  const updateSupportOption = (id: number, field: keyof SupportOption, value: string) => {
+    setSupportOptions(supportOptions.map((option) => (option.id === id ? { ...option, [field]: value } : option)))
   }
 
-  // 이미지 삭제 핸들러
-  const handleRemoveImage = () => {
-    if (imagePreview && !initialData?.teamImagePreview) {
-      URL.revokeObjectURL(imagePreview)
+  // 구성 다이얼로그 열기 (2단계에서 가져옴)
+  const openCompositionDialog = (optionId: number) => {
+    setCurrentOptionId(optionId)
+    setCompositionDialogOpen(true)
+  }
+
+  // 구성 저장 (2단계에서 가져옴)
+  const saveComposition = (composition: CompositionItem[]) => {
+    if (currentOptionId !== null) {
+      setSupportOptions(
+        supportOptions.map((option) => (option.id === currentOptionId ? { ...option, composition } : option)),
+      )
     }
-    setTeamImage(null)
-    setImagePreview(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
+  }
+
+  // 가격 입력 처리 (천 단위 콤마 포맷팅) (2단계에서 가져옴)
+  const handlePriceChange = (id: number, value: string) => {
+    const numericValue = value.replace(/[^0-9]/g, "")
+    const formattedValue = numericValue ? formatNumber(numericValue) : ""
+    updateSupportOption(id, "price", formattedValue)
+  }
+
+  // 재고 입력 처리 (천 단위 콤마 포맷팅) (2단계에서 가져옴)
+  const handleStockChange = (id: number, value: string) => {
+    const numericValue = value.replace(/[^0-9]/g, "")
+    const formattedValue = numericValue ? formatNumber(numericValue) : ""
+    updateSupportOption(id, "stock", formattedValue)
+  }
+
+  // 천 단위 콤마 포맷팅 (2단계에서 가져옴)
+  const formatNumber = (value: string) => {
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
   }
 
   return (
     <div className="space-y-8">
-      {/* 본인(팀) 이름 - 세로 배치로 변경 */}
+      {/* 후원 상품 설정 (2단계에서 가져옴) */}
       <div className="flex flex-col">
-        <label htmlFor="teamName" className="text-xl font-bold mb-4">
-          본인(팀) 이름
-        </label>
-        <div className="w-full">
-          <input
-            id="teamName"
-            type="text"
-            value={teamName}
-            onChange={(e) => setTeamName(e.target.value)}
-            placeholder="본인(팀) 이름을 입력해 주세요."
-            className="w-full rounded-full border border-gray-300 px-4 py-3 focus:border-pink-400 focus:outline-none"
-          />
+        <div className="mb-4">
+          <h2 className="text-xl font-bold">후원 상품 설정</h2>
         </div>
-      </div>
 
-      {/* 본인(팀) 소개 이미지 - 세로 배치로 변경 */}
-      <div className="flex flex-col">
-        <label htmlFor="teamImage" className="text-xl font-bold mb-4">
-          본인(팀) 소개 이미지
-        </label>
-        <div className="w-full">
-          <div className="rounded-3xl border border-gray-300 p-6">
-            <div className="flex flex-col md:flex-row">
-              {/* 이미지 미리보기 영역 */}
-              <div className="h-60 w-full md:w-60 bg-gray-200 rounded-lg flex items-center justify-center mb-4 md:mb-0 md:mr-6 relative">
-                {imagePreview ? (
-                  <>
-                    <img
-                      src={imagePreview || "/placeholder.svg"}
-                      alt="팀 소개 이미지"
-                      className="h-full w-full object-cover rounded-lg"
-                    />
+        {/* 후원 옵션 카드 목록 - 각 옵션이 별도의 카드로 표시됨 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {supportOptions.map((option) => (
+            <div
+              key={option.id}
+              className="border border-gray-300 rounded-3xl p-4 h-80 flex flex-col justify-between relative"
+            >
+              {/* 삭제 버튼 추가 */}
+              <button
+                type="button"
+                onClick={() => {
+                  setSupportOptions(supportOptions.filter((o) => o.id !== option.id))
+                }}
+                className="absolute right-4 top-4 p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-gray-100"
+                aria-label="옵션 삭제"
+              >
+                <Trash2 className="h-5 w-5" />
+              </button>
+
+              <div className="flex flex-col space-y-4">
+                {/* 옵션 이름 */}
+                <div>
+                  <label
+                    htmlFor={`option-name-${option.id}`}
+                    className={`text-sm ${focusedField === `option-name-${option.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
+                  >
+                    상품 이름
+                  </label>
+                  <input
+                    id={`option-name-${option.id}`}
+                    type="text"
+                    value={option.name}
+                    onChange={(e) => updateSupportOption(option.id, "name", e.target.value)}
+                    placeholder="상품 이름을 지어주세요."
+                    className={`w-full p-1 border-b ${
+                      focusedField === `option-name-${option.id}` ? "border-secondary-color-dark" : "border-gray-300"
+                    } focus:outline-none text-base`}
+                    onFocus={() => setFocusedField(`option-name-${option.id}`)}
+                    onBlur={() => setFocusedField(null)}
+                  />
+                </div>
+
+                {/* 옵션 설명 */}
+                <div>
+                  <label
+                    htmlFor={`option-desc-${option.id}`}
+                    className={`text-sm ${focusedField === `option-desc-${option.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
+                  >
+                    상품 설명
+                  </label>
+                  <input
+                    id={`option-desc-${option.id}`}
+                    type="text"
+                    value={option.description}
+                    onChange={(e) => updateSupportOption(option.id, "description", e.target.value)}
+                    placeholder="해당 옵션을 자세히 설명해 주세요."
+                    className={`w-full p-1 border-b ${
+                      focusedField === `option-desc-${option.id}` ? "border-secondary-color-dark" : "border-gray-300"
+                    } focus:outline-none text-base`}
+                    onFocus={() => setFocusedField(`option-desc-${option.id}`)}
+                    onBlur={() => setFocusedField(null)}
+                  />
+                </div>
+
+                {/* 구성 */}
+                <div>
+                  <label className="text-sm text-main-color">구성</label>
+                  <div className="mt-0.5">
                     <button
                       type="button"
-                      onClick={handleRemoveImage}
-                      className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md"
+                      onClick={() => openCompositionDialog(option.id)}
+                      className="flex items-center text-main-color hover:text-secondary-color-dark"
                     >
-                      <Trash2 className="h-4 w-4 text-red-500" />
+                      <span>
+                        구성 항목 추가/편집...
+                        {option.composition && option.composition.length > 0 && (
+                          <span className="ml-1 text-gray-500">({option.composition.length}개 추가됨)</span>
+                        )}
+                      </span>
                     </button>
-                  </>
-                ) : (
-                  <div className="text-gray-400 text-center">
-                    <Upload className="h-10 w-10 mx-auto mb-2" />
-                    <p>이미지 없음</p>
                   </div>
-                )}
+                </div>
               </div>
 
-              {/* 업로드 버튼 및 안내 */}
-              <div className="flex-1">
-                <button
-                  type="button"
-                  onClick={handleUploadClick}
-                  className="flex items-center gap-2 rounded-full bg-gray-100 px-6 py-3 text-gray-800 mb-4"
-                  disabled={!!imagePreview}
-                >
-                  <Upload className="h-5 w-5" />
-                  {imagePreview ? "이미지 업로드 완료" : "업로드 하기"}
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleFileInputChange}
-                />
+              {/* 가격과 재고를 한 줄에 표시 */}
+              <div className="flex gap-4">
+                {/* 가격 */}
+                <div className="flex-1">
+                  <label
+                    htmlFor={`option-price-${option.id}`}
+                    className={`text-sm ${focusedField === `option-price-${option.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
+                  >
+                    가격
+                  </label>
+                  <div className="flex items-center border-b border-gray-300 focus-within:border-secondary-color-dark">
+                    <input
+                      id={`option-price-${option.id}`}
+                      type="text"
+                      value={formatNumber(option.price)}
+                      onChange={(e) => handlePriceChange(option.id, e.target.value)}
+                      placeholder="0"
+                      className="w-full p-1 focus:outline-none text-base text-right"
+                      onFocus={() => setFocusedField(`option-price-${option.id}`)}
+                      onBlur={() => setFocusedField(null)}
+                    />
+                    <span className="text-gray-500 ml-1">원</span>
+                  </div>
+                </div>
 
-                <ul className="list-disc pl-5 space-y-2 text-gray-700">
-                  <li>초상권, 저작권, 명예훼손 등의 우려가 있는 이미지는 사용을 삼가 주시기 바랍니다.</li>
-                  <li>외부 이미지를 사용하실 경우, 반드시 작품 소개란에 출처를 기재해 주시기 바랍니다.</li>
-                  <li>이미지 사용에 따른 법적 책임은 이용약관에 따라 작품 게시자 본인에게 있습니다.</li>
-                  <li>규정 위반 신고가 접수될 경우, 운영자가 검토 후 기본 표지로 변경될 수 있음을 안내드립니다.</li>
-                  <li>권장 이미지 사이즈는 720 × 1098 픽셀이며, jpg, jpeg, png 이미지 파일만 등록 가능합니다.</li>
-                </ul>
+                {/* 재고 */}
+                <div className="flex-1">
+                  <label
+                    htmlFor={`option-stock-${option.id}`}
+                    className={`text-sm ${focusedField === `option-stock-${option.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
+                  >
+                    수량
+                  </label>
+                  <div className="flex items-center border-b border-gray-300 focus-within:border-secondary-color-dark">
+                    <input
+                      id={`option-stock-${option.id}`}
+                      type="text"
+                      value={formatNumber(option.stock)}
+                      onChange={(e) => handleStockChange(option.id, e.target.value)}
+                      placeholder="0"
+                      className="w-full p-1 focus:outline-none text-base text-right"
+                      onFocus={() => setFocusedField(`option-stock-${option.id}`)}
+                      onBlur={() => setFocusedField(null)}
+                    />
+                    <span className="text-gray-500 ml-1">개</span>
+                  </div>
+                </div>
               </div>
+            </div>
+          ))}
+
+          {/* 옵션 추가 버튼을 카드 형태로 */}
+          <div
+            className="border border-dashed border-gray-300 rounded-3xl p-4 h-80 flex items-center justify-center cursor-pointer hover:bg-gray-50"
+            onClick={addSupportOption}
+          >
+            <div className="flex flex-col items-center text-gray-500">
+              <Plus className="w-10 h-10 mb-2" />
+              <span className="text-sm font-medium">상품 추가</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 본인(팀) 소개글 - 세로 배치로 변경 */}
-      <div className="flex flex-col">
-        <label htmlFor="teamIntro" className="text-xl font-bold mb-4">
-          본인(팀) 소개글
-        </label>
-        <div className="w-full">
-          <textarea
-            id="teamIntro"
-            value={teamIntro}
-            onChange={(e) => setTeamIntro(e.target.value)}
-            placeholder="간단하게 작성해 주세요."
-            className="w-full rounded-3xl border border-gray-300 px-4 py-3 min-h-[200px] focus:border-pink-400 focus:outline-none"
-          />
-        </div>
-      </div>
-
       {/* 후원 받을 계좌 정보 */}
-      <div className="flex flex-col">
+      <div className="flex flex-col mt-8">
         <div className="flex items-center mb-4">
           <h3 className="text-xl font-bold">후원 받을 계좌 정보</h3>
           <span className="text-sm text-gray-500 ml-4">* 매달 1일에 정산됩니다.</span>
@@ -396,7 +590,9 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
               key={account.id}
               onClick={() => handleSelectAccount(account.id)}
               className={`rounded-xl border p-4 cursor-pointer transition-colors ${
-                selectedAccountId === account.id ? "border-pink-400 bg-pink-50" : "border-gray-300 hover:bg-gray-50"
+                selectedAccountId === account.id
+                  ? "border-main-color bg-secondary-color"
+                  : "border-gray-300 hover:bg-gray-50"
               }`}
             >
               <div className="flex items-center justify-between">
@@ -405,10 +601,10 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
                   <div className="flex items-center justify-center">
                     <div
                       className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                        selectedAccountId === account.id ? "border-pink-400" : "border-gray-300"
+                        selectedAccountId === account.id ? "border-main-color" : "border-gray-300"
                       }`}
                     >
-                      {selectedAccountId === account.id && <div className="w-3 h-3 rounded-full bg-pink-400"></div>}
+                      {selectedAccountId === account.id && <div className="w-3 h-3 rounded-full bg-main-color"></div>}
                     </div>
                   </div>
                   <div>
@@ -452,7 +648,7 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
             >
               <div
                 className={`w-5 h-5 rounded-md border flex items-center justify-center mr-2 ${
-                  useAccountNextTime ? "bg-pink-400 border-pink-400" : "border-gray-300"
+                  useAccountNextTime ? "bg-main-color border-main-color" : "border-gray-300"
                 }`}
                 style={{ borderRadius: "6px" }}
               >
@@ -470,6 +666,20 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
         onClose={() => setIsAddAccountModalOpen(false)}
         onSave={handleAddAccount}
       />
+
+      {/* 구성 다이얼로그 */}
+      {compositionDialogOpen && (
+        <CompositionDialog
+          isOpen={compositionDialogOpen}
+          onClose={() => setCompositionDialogOpen(false)}
+          composition={
+            currentOptionId !== null
+              ? supportOptions.find((option) => option.id === currentOptionId)?.composition || []
+              : []
+          }
+          onSave={saveComposition}
+        />
+      )}
     </div>
   )
 }

@@ -8,10 +8,11 @@ interface FollowItemProps {
   username: string
   oneLinear?: string
   profileImage: string
+  isFollowing: boolean
   onFollow: (id: number) => void
 }
 
-export default function FollowItem({ id, username, oneLinear, profileImage, onFollow }: FollowItemProps) {
+export default function FollowItem({ id, username, oneLinear, profileImage, isFollowing = false, onFollow }: FollowItemProps) {
   const router = useRouter()
     
   const handleProjectClick = () => {
@@ -48,12 +49,12 @@ export default function FollowItem({ id, username, oneLinear, profileImage, onFo
             e.stopPropagation()
             onFollow(id)
           }}
-          className="px-6 py-3 bg-pink-300 text-white rounded-full font-medium hover:bg-pink-400 transition-colors"
+          className="px-6 py-3 bg-main-color text-white rounded-full font-medium hover:bg-secondary-color-dark transition-colors"
         >
-          팔로우 +
+          {isFollowing ? "팔로우 취소" : "팔로우 +"}
         </button>
       </div>
-      <div className="mt-6 border-b border-gray-200"></div>
+      <div className="mt-6 border-b border-gray-border"></div>
     </div>
   )
 }

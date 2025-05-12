@@ -114,7 +114,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
         { 
             morePage && 
             <div className="w-full py-20 flex justify-center items-center" ref={loader}>
-                <p className="text-2xl font-medium text-[#ff8fab]">Loading...</p>
+                <p className="text-2xl font-medium text-main-color">Loading...</p>
             </div>
         }
     </div>

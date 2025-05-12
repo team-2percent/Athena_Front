@@ -234,9 +234,7 @@ export default function ProductEdit() {
         {currentStep === 3 && (
           <StepThreeForm
             initialData={{
-              teamName: formData.teamName,
-              teamIntro: formData.teamIntro,
-              teamImagePreview: formData.teamImagePreview,
+              supportOptions: formData.supportOptions,
             }}
           />
         )}

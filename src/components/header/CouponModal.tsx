@@ -69,30 +69,30 @@ export default function CouponModal({ isOpen, onClose }: CouponProps) {
             <div key={coupon.id} className="rounded-xl border p-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={clsx("flex h-10 w-10 items-center justify-center rounded-md text-white", coupon.received ? "bg-[#B3B3B3]" : "bg-[#FF0040]")}>
+                  <div className={clsx("flex h-10 w-10 items-center justify-center rounded-md text-white", coupon.received ? "bg-disabled-background" : "bg-main-color")}>
                     <Percent className="h-5 w-5" />
                   </div>
                   <div>
-                    <div className={clsx("text-lg font-bold", coupon.received ? "text-[#B3B3B3]" : "text-[#FF0040]")}>{coupon.amount}</div>
+                    <div className={clsx("text-lg font-bold", coupon.received ? "text-disabled-color" : "text-main-color")}>{coupon.amount}</div>
                     <div className="text-sm font-medium">{coupon.title}</div>
                   </div>
                 </div>
                 <button
                     type="button"
-                    className={clsx("rounded-full px-4 py-1.5 text-sm font-medium", coupon.received ? "bg-[#B3B3B3]" : "bg-[#FF0040] text-white")}
+                    className={clsx("rounded-full px-4 py-1.5 text-sm font-medium", coupon.received ? "bg-disabled-background text-disabled-color" : "bg-main-color text-white")}
                     onClick={() => handleGetCoupon(coupon.id)}
                 >
                   {coupon.received ? "발급완료" : "발급받기"}
                 </button>
               </div>
-              <p className="mt-1 text-xs text-gray-600">{coupon.description}</p>
-              <p className="mt-0.5 text-xs text-gray-500">{coupon.validUntil}</p>
+              <p className="mt-1 text-xs text-sub-gray">{coupon.description}</p>
+              <p className="mt-0.5 text-xs text-sub-gray">{coupon.validUntil}</p>
             </div>
           ))}
         </div>
 
         <div className="mt-4 flex justify-end">
-          <button type="button" onClick={onClose} className="rounded-full bg-pink-200 px-6 py-2 text-sm font-medium text-pink-800">
+          <button type="button" onClick={onClose} className="rounded-full px-6 py-2 text-sm font-medium text-main-color border border-main-color hover:bg-secondary-color">
             닫기
           </button>
         </div>

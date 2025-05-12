@@ -37,17 +37,17 @@ export default function ProjectApprovalDetailPage() {
                 
                 <div className="space-y-4 mt-4">
                 <div className="flex">
-                    <span className="w-24 text-gray-600">프로젝트</span>
+                    <span className="w-24 text-sub-gray">프로젝트</span>
                     <span>TG5555555</span>
                 </div>
 
                 <div className="flex">
-                    <span className="w-24 text-gray-600">판매 기간</span>
+                    <span className="w-24 text-sub-gray">판매 기간</span>
                     <span>2025. 04. 25 ~ 2025. 05. 15 (19일)</span>
                 </div>
 
                 <div className="flex">
-                    <span className="w-24 text-gray-600">등록</span>
+                    <span className="w-24 text-sub-gray">등록</span>
                     <span>2025. 04. 13</span>
                 </div>
                 </div>
@@ -117,13 +117,13 @@ export default function ProjectApprovalDetailPage() {
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     placeholder={approvalStatus === "reject" ? "반려 코멘트를 입력하세요" : ""}
-                    className={clsx("w-full h-32 p-3 border rounded-md resize-none", approvalStatus !== "reject" && "bg-gray-100 text-gray-600 pointer-events-none")}
+                    className={clsx("w-full h-32 p-3 border rounded-md resize-none", approvalStatus !== "reject" && "bg-gray-100 text-sub-gray pointer-events-none")}
                 />
 
                 <div className="flex justify-end space-x-4">
                     <button
                         disabled={approvalStatus === null}
-                        className="px-8 py-2 rounded-md bg-pink-100 text-pink-600"
+                        className="px-8 py-2 rounded-md bg-main-color hover:bg-secondary-color-dark text-white"
                         onClick={() => setIsModalOpen(true)}
                     >저장</button>
                 </div>

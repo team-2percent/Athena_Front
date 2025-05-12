@@ -15,7 +15,7 @@ export default function StepButtons({ currentStep, onNext, onPrev, onCancel, onS
       <button
         type="button"
         onClick={currentStep === 3 ? onSubmit : onNext}
-        className="bg-pink-300 text-[#8B1D3F] font-bold py-4 px-12 rounded-full min-w-[200px]"
+        className="bg-main-color text-white font-bold py-4 px-12 rounded-full min-w-[200px]"
       >
         {currentStep === 3 ? "등록" : "다음 단계로"}
       </button>

@@ -82,7 +82,7 @@ export default function CouponRegisterPage() {
                 <h2 className="text-2xl font-medium border-b pb-2">쿠폰 등록</h2>
                 <div className="flex flex-col gap-6">
                     <div className="flex flex-col gap-2">
-                        <label className="text-sm text-gray-600">쿠폰명</label>
+                        <label className="text-sm text-sub-gray">쿠폰명</label>
                         <input 
                             type="text"
                             placeholder="쿠폰명을 입력하세요"
@@ -92,7 +92,7 @@ export default function CouponRegisterPage() {
                         />
                     </div>
                     <div className="flex flex-col gap-2">
-                        <label className="text-sm text-gray-600">쿠폰 설명</label>
+                        <label className="text-sm text-sub-gray">쿠폰 설명</label>
                         <textarea 
                             placeholder="쿠폰 설명을 입력하세요"
                             className="w-full p-3 border rounded-md resize-none"
@@ -101,7 +101,7 @@ export default function CouponRegisterPage() {
                         />
                     </div>
                     <div className="flex flex-col gap-2">
-                        <label className="text-sm text-gray-600">가격</label>
+                        <label className="text-sm text-sub-gray">가격</label>
                         <div className="flex gap-4 items-center">
                             <input 
                                 type="text"
@@ -115,7 +115,7 @@ export default function CouponRegisterPage() {
                         </div>
                     </div>
                     <div className="flex flex-col gap-2">
-                        <label className="text-sm text-gray-600">발급 기간</label>
+                        <label className="text-sm text-sub-gray">발급 기간</label>
                         <div className="flex gap-4 items-center">
                             <DatePicker selectedDate={couponStartDate} onChange={(date) => setCouponStartDate(date)}/>
                             <span>~</span>
@@ -123,13 +123,13 @@ export default function CouponRegisterPage() {
                         </div>
                     </div>
                     <div className="flex flex-col gap-2">
-                        <label className="text-sm text-gray-600">만료 기간</label>
+                        <label className="text-sm text-sub-gray">만료 기간</label>
                         <div className="flex gap-4 items-center">
                             <DatePicker selectedDate={couponExpireDate} onChange={(date) => setCouponExpireDate(date)} minDate={couponEndDate}/>
                         </div>
                     </div>
                     <div className="flex flex-col gap-2">
-                        <label className="text-sm text-gray-600">수량</label>
+                        <label className="text-sm text-sub-gray">수량</label>
                         <div className="flex gap-4 items-center">
                             <input 
                                 type="text"
@@ -143,7 +143,7 @@ export default function CouponRegisterPage() {
                     </div>
                     <div className="flex justify-end">
                         <button
-                            className={clsx("px-8 p-4 rounded-md", disabled ? "bg-gray-100 text-gray-600 cursor-not-allowed" : "bg-pink-100 text-pink-600")}
+                            className={clsx("px-8 p-4 rounded-md", disabled ? "bg-gray-100 text-sub-gray cursor-not-allowed" : "bg-main-color text-white hover:bg-secondary-color-dark")}
                             disabled={disabled}
                             onClick={handleModalOpen}
                         >

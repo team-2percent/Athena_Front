@@ -124,7 +124,7 @@ export default function AddressInfo() {
                                 ...newAddress,
                                 name: e.target.value,
                             })}
-                            className="w-full flex-1 px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300"
+                            className="w-full flex-1 px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
                         />
                     </div>
                     
@@ -136,7 +136,7 @@ export default function AddressInfo() {
                         <button
                             type="button"
                             onClick={handleOpenAddressModal}
-                            className="bg-pink-500 text-white px-2 py-2 rounded-md hover:bg-pink-600"
+                            className="bg-pink-500 text-white px-2 py-2 rounded-md hover:bg-secondary-color-dark"
                         >
                             <Search className="w-4 h-4" />
                         </button>
@@ -153,13 +153,13 @@ export default function AddressInfo() {
                                 ...newAddress,
                                 detailAddress: e.target.value,
                             })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
                         />
                         <div className="mt-4 flex justify-end">
                             <button
                                 type="button"
                                 onClick={handleAddAddress}
-                                className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 text-sm flex items-center"
+                                className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-secondary-color-dark text-sm flex items-center"
                             >
                                 <Plus className="w-4 h-4 mr-1" /> 배송지 추가
                             </button>
@@ -185,13 +185,13 @@ export default function AddressInfo() {
                                                 name="default-address"
                                                 checked={address.isDefault}
                                                 onChange={() => handleSetDefaultAddress(address.id)}
-                                                className="w-4 h-4 text-pink-500 border-gray-300 focus:ring-pink-300 mt-1 mr-3"
+                                                className="w-4 h-4 text-pink-500 border-gray-300 focus:ring-main-color mt-1 mr-3"
                                             />
                                             <div>
                                                 <div className="flex items-center">
                                                     <p className="font-medium">{address.name}</p>
                                                 {address.isDefault && 
-                                                    <span className="ml-2 px-2 py-0.5 bg-pink-100 text-pink-600 text-xs rounded-full">기본</span>
+                                                    <span className="ml-2 px-2 py-0.5 bg-pink-100 text-secondary-color-dark text-xs rounded-full">기본</span>
                                                 }
                                                 </div>
                                                 <p className="text-sm text-gray-500 mt-1">
@@ -217,7 +217,7 @@ export default function AddressInfo() {
                     <p className="text-sm font-medium text-gray-400">※ 저장하지 않고 페이지를 나갈 시 변경사항이 저장되지 않습니다.</p>
                     <button
                         disabled={!saveable}
-                        className={clsx("text-white rounded-md text-sm px-4 py-2", saveable ? "bg-pink-500 hover:bg-pink-600": "bg-gray-300")}
+                        className={clsx("text-white rounded-md text-sm px-4 py-2", saveable ? "bg-pink-500 hover:bg-secondary-color-dark": "bg-gray-300")}
                         onClick={handleSave}
                     >
                         저장

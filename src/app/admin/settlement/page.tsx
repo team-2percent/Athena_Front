@@ -126,7 +126,7 @@ export default function SettlementPage() {
 
             <div className="flex justify-center gap-2">
                 <button className="px-3 py-2">◀</button>
-                <button className="px-3 py-2 text-pink-600">1</button>
+                <button className="px-3 py-2 text-main-color">1</button>
                 <button className="px-3 py-2">▶</button>
             </div>
         </div>

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { Heart, Share2, ChevronLeft, ChevronRight } from "lucide-react"
 import ProjectTabs from "./ProjectTabs"
+import clsx from "clsx"
 
 const ProjectDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -99,14 +100,14 @@ const ProjectDetail = () => {
             {/* 캐러셀 좌우 버튼 */}
             <button
               onClick={prevImage}
-              className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-gray-800 shadow-md hover:bg-white"
+              className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-sub-gray shadow-md hover:bg-white"
               aria-label="이전 이미지"
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
             <button
               onClick={nextImage}
-              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-gray-800 shadow-md hover:bg-white"
+              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-sub-gray shadow-md hover:bg-white"
               aria-label="다음 이미지"
             >
               <ChevronRight className="h-6 w-6" />
@@ -116,7 +117,7 @@ const ProjectDetail = () => {
           {/* 이미지 목록 */}
           <div className="relative mt-4 flex items-center">
             {/* 왼쪽 버튼 */}
-            <button onClick={prevThumbnails} className="mr-2 text-gray-800" aria-label="이전 이미지 목록">
+            <button onClick={prevThumbnails} className="mr-2 text-sub-gray" aria-label="이전 이미지 목록">
               <ChevronLeft className="h-5 w-5" />
             </button>
 
@@ -126,8 +127,8 @@ const ProjectDetail = () => {
                   key={idx}
                   className={`cursor-pointer overflow-hidden rounded-xl transition-all duration-200 ${
                     currentImageIndex === idx
-                      ? "ring-4 ring-pink-500 ring-offset-2"
-                      : "hover:ring-2 hover:ring-pink-300"
+                      ? "ring-4 ring-main-color"
+                      : "hover:ring-2 hover:ring-main-color"
                   }`}
                   onClick={() => setCurrentImageIndex(idx)}
                 >
@@ -144,7 +145,7 @@ const ProjectDetail = () => {
             </div>
 
             {/* 오른쪽 버튼 */}
-            <button onClick={nextThumbnails} className="ml-2 text-gray-800" aria-label="다음 이미지 목록">
+            <button onClick={nextThumbnails} className="ml-2 text-sub-gray" aria-label="다음 이미지 목록">
               <ChevronRight className="h-5 w-5" />
             </button>
           </div>
@@ -154,25 +155,25 @@ const ProjectDetail = () => {
         <div ref={metadataContainerRef} className="flex flex-col justify-center">
           <div>
             <h1 className="mb-2 text-3xl font-bold">게살피자</h1>
-            <h2 className="mb-6 text-2xl text-red-800">Smilegate Megaport</h2>
+            <h2 className="mb-6 text-2xl text-sub-gray">Smilegate Megaport</h2>
 
             <div className="mb-4">
               <p className="mb-3 text-gray-700">달성 금액</p>
               <div className="flex items-baseline">
-                <span className="text-5xl font-bold text-pink-500">40,000,000</span>
-                <span className="ml-2 text-xl text-gray-600">/ 10,000,000 원</span>
+                <span className="text-5xl font-bold text-main-color">40,000,000</span>
+                <span className="ml-2 text-xl text-sub-gray">/ 10,000,000 원</span>
               </div>
             </div>
 
             <div className="mb-6">
-              <p className="text-lg font-medium text-pink-500">목표 금액의 400% 달성</p>
+              <p className="text-lg font-medium text-main-color">목표 금액의 400% 달성</p>
             </div>
 
             <div className="mb-8">
               <p className="mb-3 text-gray-700">펀딩 마감까지</p>
               <div className="flex items-baseline">
-                <span className="text-5xl font-bold text-pink-500">15일</span>
-                <span className="ml-2 text-xl text-gray-600">/ 2025. 05. 15</span>
+                <span className="text-5xl font-bold text-main-color">15일</span>
+                <span className="ml-2 text-xl text-sub-gray">/ 2025. 05. 15</span>
               </div>
             </div>
           </div>
@@ -181,19 +182,19 @@ const ProjectDetail = () => {
           <div className="mt-8 flex items-center justify-between">
             <div className="flex space-x-12">
               <button onClick={handleLikeClick} className="flex flex-col items-center">
-                <Heart className={`h-8 w-8 ${isLiked ? "fill-pink-500 text-pink-500" : "text-gray-800"}`} />
-                <span className="mt-2 text-lg font-medium text-red-900">867</span>
+                <Heart className={`h-8 w-8 ${isLiked ? "fill-point-color text-point-color" : "text-sub-gray"}`} />
+                <span className={clsx("mt-2 text-lg font-medium", isLiked ? "text-point-color" : "text-sub-gray")}>867</span>
               </button>
               <button className="flex flex-col items-center">
-                <Share2 className="h-8 w-8 text-gray-800" />
-                <span className="mt-2 text-lg font-medium text-red-900">238</span>
+                <Share2 className="h-8 w-8 text-sub-gray" />
+                <span className="mt-2 text-lg font-medium text-sub-gray">238</span>
               </button>
             </div>
 
             {/* 후원하기 버튼과 후원 중 표시 */}
             <div className="relative w-2/3">
               <button
-                className="w-full rounded-xl bg-pink-200 py-4 text-center text-xl font-bold text-pink-800 hover:bg-pink-300"
+                className="w-full rounded-xl bg-main-color py-4 text-center text-xl font-bold text-white hover:bg-secondary-color-dark"
                 onClick={() => {
                   // 이벤트 이름 변경
                   const event = new CustomEvent("toggleDonateDock")
@@ -204,7 +205,7 @@ const ProjectDetail = () => {
               </button>
               {/* 배지 형태로 표시. 위치는 후원하기 버튼에 의존함. */}
               <div className="absolute -right-3 -top-4">
-                <div className="rounded-full border-2 border-pink-400 bg-white px-6 py-1 text-pink-500 shadow-md">
+                <div className="rounded-full border-2 border-main-color bg-white px-6 py-1 text-main-color shadow-md">
                   <span className="text-lg">125명 후원 중!</span>
                 </div>
               </div>

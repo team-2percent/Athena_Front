@@ -26,7 +26,7 @@ export default function ProfilePage() {
           purchases={profileData.purchases}
           profileImage={profileData.profileImage}
           buttons={
-            <button type="button" className="px-8 py-3 bg-pink-300 text-white rounded-lg flex items-center font-medium">
+            <button type="button" className="px-8 py-3 bg-main-color text-white rounded-lg flex items-center font-medium">
               팔로우 +
             </button>
           }

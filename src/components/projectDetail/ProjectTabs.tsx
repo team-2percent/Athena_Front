@@ -69,16 +69,16 @@ const ProductTabs = () => {
   return (
     <div className="mt-12">
       {/* 탭 메뉴 */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-gray-border">
         <div className="flex space-x-8">
           {["소개", "프로젝트 정보", "후기"].map((tab) => (
             <button
               key={tab}
-              className={`relative pb-3 text-xl font-medium ${activeTab === tab ? "text-pink-500" : "text-gray-800"}`}
+              className={`relative pb-3 text-xl font-medium ${activeTab === tab ? "text-main-color" : "text-sub-gray"}`}
               onClick={() => handleTabClick(tab)}
             >
               {tab}
-              {activeTab === tab && <span className="absolute bottom-0 left-0 h-1 w-full bg-pink-500"></span>}
+              {activeTab === tab && <span className="absolute bottom-0 left-0 h-1 w-full bg-main-color"></span>}
             </button>
           ))}
         </div>
@@ -92,23 +92,23 @@ const ProductTabs = () => {
             <h2 className="text-2xl font-bold">레시피 대충 소개</h2>
 
             <div className="space-y-4">
-              <p className="text-gray-800">(일본요리) 제일 쉬운 떡볶이</p>
-              <p className="text-gray-500">----------------------------</p>
+              <p className="text-sub-gray">(일본요리) 제일 쉬운 떡볶이</p>
+              <p className="text-sub-gray">----------------------------</p>
 
-              <p className="text-gray-800">재료</p>
-              <p className="text-gray-500">----------------------------</p>
+              <p className="text-sub-gray">재료</p>
+              <p className="text-sub-gray">----------------------------</p>
 
               <div className="space-y-2">
-                <p className="text-gray-800">고추장 3숟</p>
-                <p className="text-gray-800">설탕 3숟</p>
-                <p className="text-gray-800">쇠고기 다시다 0.5숟</p>
-                <p className="text-gray-800">다진마늘 1숟</p>
-                <p className="text-gray-800">대파 1뿌리</p>
+                <p className="text-sub-gray">고추장 3숟</p>
+                <p className="text-sub-gray">설탕 3숟</p>
+                <p className="text-sub-gray">쇠고기 다시다 0.5숟</p>
+                <p className="text-sub-gray">다진마늘 1숟</p>
+                <p className="text-sub-gray">대파 1뿌리</p>
               </div>
 
               <div className="space-y-2 pt-4">
-                <p className="text-gray-800">밀떡 250~300g</p>
-                <p className="text-gray-800">물 300~350g</p>
+                <p className="text-sub-gray">밀떡 250~300g</p>
+                <p className="text-sub-gray">물 300~350g</p>
               </div>
 
               <div className="mt-6">
@@ -128,41 +128,40 @@ const ProductTabs = () => {
           // 프로젝트 기본 정보 영역
           <div>
             <h2 className="mb-6 text-3xl font-bold">프로젝트 기본 정보</h2>
-            <hr className="border-gray-200 mb-8" />
+            <hr className="border-gray-border mb-8" />
 
             <div className="space-y-6">
               <div className="flex">
-                <div className="w-1/4 font-medium text-gray-700">목표금액</div>
+                <div className="w-1/4 font-medium text-sub-gray">목표금액</div>
                 <div className="w-3/4 font-medium">10,000,000원</div>
               </div>
 
               <div className="flex">
-                <div className="w-1/4 font-medium text-gray-700">펀딩 기간</div>
+                <div className="w-1/4 font-medium text-sub-gray">펀딩 기간</div>
                 <div className="w-3/4 font-medium">2025. 04. 25 ~ 2025. 05. 15 (15일 남음)</div>
               </div>
 
               <div className="flex">
-                <div className="w-1/4 font-medium text-gray-700">결제</div>
+                <div className="w-1/4 font-medium text-sub-gray">결제</div>
                 <div className="w-3/4 font-medium">목표금액 달성 시 2025. 05. 15 결제 예정</div>
               </div>
 
               <div className="flex">
-                <div className="w-1/4 font-medium text-gray-700">예상 발송 시작일</div>
+                <div className="w-1/4 font-medium text-sub-gray">예상 발송 시작일</div>
                 <div className="w-3/4 font-medium">2025. 06. 13</div>
               </div>
             </div>
 
             {/* 판매자 정보 영역 */}
             <h2 className="mt-12 mb-6 text-3xl font-bold">판매자 정보</h2>
-            <hr className="border-gray-200 mb-6" />
+            <hr className="border-gray-border mb-6" />
 
             <FollowItem
               id={seller.id}
               username={seller.username}
               oneLinear={seller.oneLinear}
               profileImage={seller.profileImage}
-              onFollow={handleFollow}
-            />
+              onFollow={handleFollow} isFollowing={false}            />
           </div>
         )}
 
@@ -175,24 +174,23 @@ const ProductTabs = () => {
                   <input
                     type="text"
                     placeholder="뭐 말이라도 해보기..."
-                    className="w-full rounded-xl border border-gray-200 px-4 py-4 focus:border-pink-300 focus:outline-none"
+                    className="w-full rounded-xl border border-gray-border px-4 py-4 focus:border-main-color focus:outline-none"
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                   />
                 </div>
                 <button
                   type="submit"
-                  className="rounded-xl bg-pink-200 px-8 py-4 font-medium text-pink-800 hover:bg-pink-300"
+                  className="rounded-xl bg-main-color px-8 py-4 font-medium text-white hover:bg-secondary-color-dark"
                 >
                   댓글 달기
                 </button>
               </form>
             )}
-
             {/* 댓글 목록 */}
             <div className="space-y-4">
               {reviews.map((review) => (
-                <div key={review.id} className="rounded-3xl border border-gray-200 p-6 shadow-sm">
+                <div key={review.id} className="rounded-3xl border border-gray-border p-6 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div className="flex space-x-4">
                       {/* 댓글 단 유저의 프로필 사진 */}
@@ -209,7 +207,7 @@ const ProductTabs = () => {
                       {/* 댓글 단 유저의 이름, 게시 날짜, 내용 */}
                       <div>
                         <h3 className="text-xl font-bold">{review.user}</h3>
-                        <p className="text-gray-500">{review.date}</p>
+                        <p className="text-sub-gray">{review.date}</p>
                         <div className="mt-3 whitespace-pre-line">{review.content}</div>
                       </div>
                     </div>

@@ -123,12 +123,12 @@ export default function ApprovalPage() {
                     <input
                         type="text"
                         placeholder="상품명으로 검색"
-                        className="border flex-1 p-2 border rounded text-left text-gray-400 min-w-[350px] h-10"
+                        className="border flex-1 p-2 border rounded text-left text-sub-gray min-w-[350px] h-10"
                         onChange={handleSearchChange}
                     />
                     <button
                         onClick={handleSearchClick}
-                        className="border bg-pink-500 text-white px-4 py-2 rounded h-10"
+                        className="border bg-main-color text-white px-4 py-2 rounded h-10 hover:bg-secondary-color-dark"
                     >검색</button>
                 </div>
                 <div className="flex gap-4">
@@ -165,7 +165,7 @@ export default function ApprovalPage() {
             </table>
             <div className="flex justify-center gap-2 mt-8">
                 <button className="px-3 py-2">◀</button>
-                <button className="px-3 py-2 text-pink-500">1</button>
+                <button className="px-3 py-2 text-main-color">1</button>
                 <button className="px-3 py-2">▶</button>
             </div>
         </div>

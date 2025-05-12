@@ -115,7 +115,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             <div className="mb-6">
               <label
                 htmlFor="name"
-                className={`text-sm ${focusedField === "name" ? "text-pink-500" : "text-pink-400"}`}
+                className={`text-sm ${focusedField === "name" ? "text-main-color" : "text-main-color"}`}
               >
                 이름
               </label>
@@ -123,7 +123,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                 id="name"
                 type="text"
                 className={`w-full p-2 border-b ${
-                  focusedField === "name" ? "border-pink-500" : "border-gray-300"
+                  focusedField === "name" ? "border-main-color" : "border-gray-300"
                 } focus:outline-none text-lg`}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -136,7 +136,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             <div className="relative mb-6">
               <label
                 htmlFor="email"
-                className={`text-sm ${focusedField === "email" ? "text-pink-500" : "text-gray-500"}`}
+                className={`text-sm ${focusedField === "email" ? "text-main-color" : "text-gray-500"}`}
               >
                 이메일
               </label>
@@ -146,7 +146,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                 className={
                   clsx("w-full p-2 border-b focus:outline-none text-lg",
                     focusedField === "email" ?
-                    (isEmailValid ? "border-pink-500" : "border-red-500") : "border-gray-300")
+                    (isEmailValid ? "border-main-color" : "border-red-500") : "border-gray-300")
                 }
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -161,7 +161,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             <div className="relative mb-6">
               <label
                 htmlFor="password"
-                className={`text-sm ${focusedField === "password" ? "text-pink-500" : "text-gray-500"}`}
+                className={`text-sm ${focusedField === "password" ? "text-main-color" : "text-gray-500"}`}
               >
                 비밀번호
               </label>
@@ -171,7 +171,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                 className={
                   clsx("w-full p-2 border-b focus:outline-none text-lg",
                     focusedField === "password" ?
-                    (isPasswordValid ? "border-pink-500" : "border-red-500") : "border-gray-300")
+                    (isPasswordValid ? "border-main-color" : "border-red-500") : "border-gray-300")
                 }
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -186,7 +186,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             <div className="relative mb-10">
               <label
                 htmlFor="confirmPassword"
-                className={`text-sm ${focusedField === "confirmPassword" ? "text-pink-500" : "text-gray-500"}`}
+                className={`text-sm ${focusedField === "confirmPassword" ? "text-main-color" : "text-gray-500"}`}
               >
                 비밀번호 확인
               </label>
@@ -196,7 +196,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                 className={
                   clsx("w-full p-2 border-b focus:outline-none text-lg",
                     focusedField === "confirmPassword" ?
-                    (isPasswordMatch ? "border-pink-500" : "border-red-500") : "border-gray-300")
+                    (isPasswordMatch ? "border-main-color" : "border-red-500") : "border-gray-300")
                 }
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -226,7 +226,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             {/* Signup Button */}
             <button
               type="submit"
-              className={clsx("relative w-full py-4 rounded-xl font-medium text-lg mb-1", disabled ? "text-gray-400 bg-gray-200 cursor-not-allowed" : "bg-pink-200 text-pink-900")}
+              className={clsx("relative w-full py-4 rounded-xl font-medium text-lg mb-1", disabled ? "text-gray-400 bg-gray-200 cursor-not-allowed" : "bg-main-color text-white")}
             >
               가입하기
             </button>

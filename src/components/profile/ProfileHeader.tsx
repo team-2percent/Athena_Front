@@ -30,12 +30,12 @@ export default function ProfileHeader({ nickname, following, purchases, profileI
 
           <div className="flex space-x-16">
             <div>
-              <div className="text-gray-600 mb-2">팔로잉</div>
+              <div className="text-sub-gray mb-2">팔로잉</div>
               <div className="text-xl font-medium">{following}</div>
             </div>
 
             <div>
-              <div className="text-gray-600 mb-2">구매 횟수</div>
+              <div className="text-sub-gray mb-2">구매 횟수</div>
               <div className="text-xl font-medium">{purchases}</div>
             </div>
           </div>

@@ -2,7 +2,7 @@ import clsx from "clsx"
 
 export default function SettlementTag({ status }: { status: "pending" | "completed" | "failed" }) {
     const design = {
-        pending: "bg-pink-500",
+        pending: "bg-yellow-500",
         completed: "bg-gray-500",
         failed: "bg-red-500",
     }
