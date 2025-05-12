@@ -7,7 +7,7 @@ interface ProfileTabsProps {
 }
 
 export default function ProfileTabs({ activeTab, onTabChange, isMy }: ProfileTabsProps) {
-  const tabs = isMy ?["소개", "쿠폰", "판매 상품", "내가 쓴 후기", "팔로우", "팔로잉"] : ["소개", "판매 상품", "후기", "팔로우", "팔로잉"]
+  const tabs = isMy ?["소개", "쿠폰", "판매 상품", "내가 쓴 후기", "팔로워", "팔로잉"] : ["소개", "판매 상품", "후기", "팔로워", "팔로잉"]
 
   return (
     <div className="border-b mx-auto max-w-6xl border-gray-border">

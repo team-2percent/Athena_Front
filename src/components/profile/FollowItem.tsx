@@ -6,13 +6,13 @@ import { useRouter } from "next/navigation"
 interface FollowItemProps {
   id: number
   username: string
-  purchaseCount: number
+  oneLinear?: string
   profileImage: string
   isFollowing: boolean
   onFollow: (id: number) => void
 }
 
-export default function FollowItem({ id, username, purchaseCount, profileImage, isFollowing = false, onFollow }: FollowItemProps) {
+export default function FollowItem({ id, username, oneLinear, profileImage, isFollowing = false, onFollow }: FollowItemProps) {
   const router = useRouter()
     
   const handleProjectClick = () => {
@@ -20,7 +20,7 @@ export default function FollowItem({ id, username, purchaseCount, profileImage, 
   }
 
   return (
-    <div className="pb-6 mx-8">
+    <div className="pb-6">
       {/* 팔로워 정보 */}
       <div className="flex items-center justify-between cursor-pointer" onClick={handleProjectClick}>
         {/* 프로필 이미지 */}
@@ -38,14 +38,17 @@ export default function FollowItem({ id, username, purchaseCount, profileImage, 
           {/* 사용자 정보 */}
           <div>
             <h3 className="text-xl font-medium mb-1">{username}</h3>
-            <p className="text-sub-gray">구매 횟수 {purchaseCount}회</p>
+            <p className="text-gray-600">{oneLinear}</p>
           </div>
         </div>
 
         {/* 팔로우 버튼 */}
         <button
           type="button"
-          onClick={() => onFollow(id)}
+          onClick={(e) => {
+            e.stopPropagation()
+            onFollow(id)
+          }}
           className="px-6 py-3 bg-main-color text-white rounded-full font-medium hover:bg-secondary-color-dark transition-colors"
         >
           {isFollowing ? "팔로우 취소" : "팔로우 +"}

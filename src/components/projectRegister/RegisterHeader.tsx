@@ -3,9 +3,14 @@
 interface RegisterHeaderProps {
   currentStep: number
   onStepChange?: (step: number) => void
+  title?: string
 }
 
-export default function RegisterHeader({ currentStep = 1, onStepChange }: RegisterHeaderProps) {
+export default function RegisterHeader({
+  currentStep = 1,
+  onStepChange,
+  title = "상품 입력하기",
+}: RegisterHeaderProps) {
   // 현재 단계에 따라 다른 제목 표시
   const getStepTitle = () => {
     switch (currentStep) {
@@ -32,7 +37,7 @@ export default function RegisterHeader({ currentStep = 1, onStepChange }: Regist
   return (
     <div className="w-full mb-8">
       {/* 제목 */}
-      <h1 className="text-4xl font-bold mb-8">상품 입력하기</h1>
+      <h1 className="text-4xl font-bold mb-8">{title}</h1>
 
       <div className="flex justify-between items-center">
         {/* 단계별 제목 버튼 */}

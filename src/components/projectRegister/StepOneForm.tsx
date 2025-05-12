@@ -2,38 +2,63 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
-import { Upload, ChevronDown, Check } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { Upload, ChevronDown, Check, Trash2 } from "lucide-react"
 import DatePicker from "./DatePicker"
+
+interface ImageFile {
+  id: string
+  file: File
+  preview: string
+}
 
 interface StepOneFormProps {
   formData: {
     targetAmount: string
   }
   onUpdateFormData: (data: Partial<{ targetAmount: string }>) => void
+  initialData?: {
+    category?: string
+    title?: string
+    description?: string
+    targetAmount?: string
+    startDate?: Date
+    endDate?: Date
+    deliveryDate?: Date
+    images?: ImageFile[]
+  }
 }
 
-export default function StepOneForm({ formData, onUpdateFormData }: StepOneFormProps) {
-  const [category, setCategory] = useState("책")
+export default function StepOneForm({ formData, onUpdateFormData, initialData }: StepOneFormProps) {
+  const [category, setCategory] = useState(initialData?.category || "책")
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false)
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [targetAmount, setTargetAmount] = useState(formData.targetAmount || "")
+  const [title, setTitle] = useState(initialData?.title || "")
+  const [description, setDescription] = useState(initialData?.description || "")
+  const [targetAmount, setTargetAmount] = useState(formData.targetAmount || initialData?.targetAmount || "")
   const [targetAmountError, setTargetAmountError] = useState("")
-  const [startDate, setStartDate] = useState(new Date())
-  const [endDate, setEndDate] = useState(new Date(new Date().setDate(new Date().getDate() + 21))) // 기본값: 오늘로부터 21일 후
-  const [deliveryDate, setDeliveryDate] = useState(() => {
-    // 기본값: 펀딩 종료일 + 7일
-    const date = new Date(endDate)
-    date.setDate(date.getDate() + 7)
-    return date
-  })
+  const [startDate, setStartDate] = useState(initialData?.startDate || new Date())
+  const [endDate, setEndDate] = useState(
+    initialData?.endDate || new Date(new Date().setDate(new Date().getDate() + 21)),
+  ) // 기본값: 오늘로부터 21일 후
+  const [deliveryDate, setDeliveryDate] = useState(
+    initialData?.deliveryDate ||
+      (() => {
+        // 기본값: 펀딩 종료일 + 7일
+        const date = new Date(endDate)
+        date.setDate(date.getDate() + 7)
+        return date
+      }),
+  )
   const [minDeliveryDate, setMinDeliveryDate] = useState(() => {
     // 최소 배송일: 펀딩 종료일 + 7일
     const date = new Date(endDate)
     date.setDate(date.getDate() + 7)
     return date
   })
+  const [images, setImages] = useState<ImageFile[]>(initialData?.images || [])
+  const [isDragging, setIsDragging] = useState(false)
+  const dragCounter = useRef(0)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const categoryOptions = ["책", "예술", "음악", "공예", "디자인"]
 
@@ -84,6 +109,94 @@ export default function StepOneForm({ formData, onUpdateFormData }: StepOneFormP
       setTargetAmount(formData.targetAmount)
     }
   }, [formData])
+
+  // 이미지 미리보기 URL 정리
+  useEffect(() => {
+    return () => {
+      // 컴포넌트 언마운트 시 미리보기 URL 해제
+      images.forEach((image) => URL.revokeObjectURL(image.preview))
+    }
+  }, [images])
+
+  // 파일 처리 함수
+  const handleFiles = (files: FileList | null) => {
+    if (!files) return
+
+    const newImages: ImageFile[] = []
+
+    // 최대 5개까지만 처리
+    const remainingSlots = 5 - images.length
+    const filesToProcess = Math.min(remainingSlots, files.length)
+
+    for (let i = 0; i < filesToProcess; i++) {
+      const file = files[i]
+
+      // 이미지 파일인지 확인
+      if (!file.type.startsWith("image/")) continue
+
+      const id = `img-${Date.now()}-${i}`
+      const preview = URL.createObjectURL(file)
+
+      newImages.push({ id, file, preview })
+    }
+
+    setImages((prev) => [...prev, ...newImages])
+  }
+
+  // 드래그 앤 드롭 이벤트 핸들러
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounter.current += 1
+    if (dragCounter.current === 1) {
+      setIsDragging(true)
+    }
+  }
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounter.current -= 1
+    if (dragCounter.current === 0) {
+      setIsDragging(false)
+    }
+  }
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+    dragCounter.current = 0
+
+    const { files } = e.dataTransfer
+    handleFiles(files)
+  }
+
+  // 파일 선택 버튼 클릭 핸들러
+  const handleUploadClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  // 파일 입력 변경 핸들러
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleFiles(e.target.files)
+  }
+
+  // 이미지 삭제 핸들러
+  const handleRemoveImage = (id: string) => {
+    setImages((prev) => {
+      const imageToRemove = prev.find((img) => img.id === id)
+      if (imageToRemove) {
+        URL.revokeObjectURL(imageToRemove.preview)
+      }
+      return prev.filter((img) => img.id !== id)
+    })
+  }
 
   return (
     <div className="space-y-8">
@@ -156,35 +269,106 @@ export default function StepOneForm({ formData, onUpdateFormData }: StepOneFormP
       {/* 대표 이미지 - 세로 배치로 변경 */}
       <div className="flex flex-col">
         <label htmlFor="image" className="text-xl font-bold mb-4">
-          대표 이미지
+          대표 이미지 <span className="text-sm text-gray-500 font-normal">(최대 5개까지 업로드 가능)</span>
         </label>
         <div className="w-full">
           <div className="rounded-3xl border border-gray-300 p-6">
-            <div className="flex flex-col md:flex-row">
-              {/* 이미지 미리보기 영역 */}
-              <div className="h-60 w-full md:w-60 bg-gray-200 rounded-lg flex items-center justify-center mb-4 md:mb-0 md:mr-6">
-                {/* 실제 이미지 업로드 기능은 아직 구현하지 않음 */}
-              </div>
+            {/* 드래그 앤 드롭 영역 */}
+            <div
+              className={`border-2 border-dashed rounded-lg p-4 transition-colors relative ${
+                isDragging ? "border-pink-400 bg-pink-50" : "border-gray-300"
+              }`}
+              onDragEnter={handleDragEnter}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              {/* 드래그 중일 때 오버레이 */}
+              {isDragging && images.length < 5 && (
+                <div className="absolute inset-0 bg-pink-50 bg-opacity-80 flex items-center justify-center z-10 rounded-lg">
+                  <p className="text-xl font-medium text-pink-600">여기에 이미지를 놓으세요</p>
+                </div>
+              )}
 
-              {/* 업로드 버튼 및 안내 */}
-              <div className="flex-1">
-                <button
-                  type="button"
-                  className="flex items-center gap-2 rounded-full bg-gray-100 px-6 py-3 text-gray-800 mb-4"
-                >
-                  <Upload className="h-5 w-5" />
-                  업로드 하기
-                </button>
+              {images.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Upload className="h-12 w-12 text-gray-400 mb-2" />
+                  <p className="text-gray-600 mb-1">이미지를 여기에 드래그하거나</p>
+                  <button
+                    type="button"
+                    onClick={handleUploadClick}
+                    className="flex items-center gap-2 rounded-full bg-gray-100 px-6 py-3 text-gray-800 mt-2 hover:bg-gray-200"
+                  >
+                    <Upload className="h-5 w-5" />
+                    파일 선택하기
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={handleFileInputChange}
+                  />
+                </div>
+              ) : (
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium">업로드된 이미지 ({images.length}/5)</h3>
+                    {images.length < 5 && (
+                      <button
+                        type="button"
+                        onClick={handleUploadClick}
+                        className="flex items-center gap-2 rounded-full bg-gray-100 px-4 py-2 text-gray-800 text-sm hover:bg-gray-200"
+                      >
+                        <Upload className="h-4 w-4" />
+                        추가 업로드
+                      </button>
+                    )}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={handleFileInputChange}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {images.map((image) => (
+                      <div key={image.id} className="relative group" onDragEnter={(e) => e.stopPropagation()}>
+                        <div className="h-40 w-full rounded-lg overflow-hidden bg-gray-100">
+                          <img
+                            src={image.preview || "/placeholder.svg"}
+                            alt={`업로드 이미지 ${image.id}`}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(image.id)}
+                          className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md opacity-70 hover:opacity-100"
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </button>
+                        <p className="text-xs text-gray-500 mt-1 truncate">{image.file.name}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
-                <ul className="list-disc pl-5 space-y-2 text-gray-700">
-                  <li>최대 20000개까지 업로드 가능합니다.</li>
-                  <li>초상권, 저작권, 명예훼손 등의 우려가 있는 이미지는 사용을 삼가 주시기 바랍니다.</li>
-                  <li>외부 이미지를 사용하실 경우, 반드시 작품 소개란에 출처를 기재해 주시기 바랍니다.</li>
-                  <li>이미지 사용에 따른 법적 책임은 이용약관에 따라 작품 게시자 본인에게 있습니다.</li>
-                  <li>규정 위반 신고가 접수될 경우, 운영자가 검토 후 기본 표지로 변경될 수 있음을 안내드립니다.</li>
-                  <li>권장 이미지 사이즈는 720 × 1098 픽셀이며, jpg, jpeg, png 이미지 파일만 등록 가능합니다.</li>
-                </ul>
-              </div>
+            {/* 안내 텍스트 */}
+            <div className="mt-4">
+              <ul className="list-disc pl-5 space-y-2 text-gray-700">
+                <li>최대 5개까지 업로드 가능합니다.</li>
+                <li>초상권, 저작권, 명예훼손 등의 우려가 있는 이미지는 사용을 삼가 주시기 바랍니다.</li>
+                <li>외부 이미지를 사용하실 경우, 반드시 작품 소개란에 출처를 기재해 주시기 바랍니다.</li>
+                <li>이미지 사용에 따른 법적 책임은 이용약관에 따라 작품 게시자 본인에게 있습니다.</li>
+                <li>규정 위반 신고가 접수될 경우, 운영자가 검토 후 기본 표지로 변경될 수 있음을 안내드립니다.</li>
+                <li>권장 이미지 사이즈는 720 × 1098 픽셀이며, jpg, jpeg, png 이미지 파일만 등록 가능합니다.</li>
+              </ul>
             </div>
           </div>
         </div>
@@ -196,7 +380,7 @@ export default function StepOneForm({ formData, onUpdateFormData }: StepOneFormP
           <h3 className="text-xl font-bold">목표 금액</h3>
           <span className="text-sm text-gray-500 ml-4">* 최대 100억원까지 입력 가능합니다.</span>
         </div>
-        
+
         <div className="w-full max-w-md flex items-center">
           <input
             id="targetAmount"

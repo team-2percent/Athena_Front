@@ -6,14 +6,28 @@ import { useState } from "react"
 import Image from "next/image"
 import { ThumbsUp, ThumbsDown } from "lucide-react"
 import useAuthStore from "@/stores/auth"
+import FollowItem from "../profile/FollowItem"
 
-const ProjectTabs = () => {
-  const isLoggedIn = useAuthStore((state: { isLoggedIn: boolean }) => state.isLoggedIn);
+
+const ProductTabs = () => {
+  const isLoggedIn = useAuthStore((state: { isLoggedIn: boolean }) => state.isLoggedIn)
   const [activeTab, setActiveTab] = useState("소개")
   const [commentText, setCommentText] = useState("")
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab)
+  }
+      
+  const seller = {
+    id: 101,
+    username: "가작가",
+    oneLinear: "어? 왜 지가 화를 내지?",
+    profileImage: "/abstract-profile.png",
+  }
+
+  const handleFollow = (id: number) => {
+    // 팔로우 로직 구현 예정
+    console.log(`판매자 ${id} 팔로우`)
   }
 
   // API 호출에 따른 업데이트 예정
@@ -98,14 +112,19 @@ const ProjectTabs = () => {
               </div>
 
               <div className="mt-6">
-                <Image src="/tteokbokki/tteokbokki.jpg" alt="떡볶이 이미지" width={600} height={600} className="rounded-lg" />
+                <Image
+                  src="/tteokbokki/tteokbokki.jpg"
+                  alt="떡볶이 이미지"
+                  width={600}
+                  height={600}
+                  className="rounded-lg"
+                />
               </div>
             </div>
           </div>
         )}
 
         {activeTab === "프로젝트 정보" && (
-
           // 프로젝트 기본 정보 영역
           <div>
             <h2 className="mb-6 text-3xl font-bold">프로젝트 기본 정보</h2>
@@ -135,75 +154,46 @@ const ProjectTabs = () => {
 
             {/* 판매자 정보 영역 */}
             <h2 className="mt-12 mb-6 text-3xl font-bold">판매자 정보</h2>
-            <hr className="border-gray-border mb-8" />
+            <hr className="border-gray-border mb-6" />
 
-            <div className="rounded-3xl border border-gray-border p-8">
-              <div className="flex items-center justify-between">
-
-                {/* 카드 좌측 부분: 프로필 사진, 이름, 소개 */}
-                <div className="flex items-center space-x-4">
-                  <div className="h-20 w-20 overflow-hidden rounded-full">
-                    <Image
-                      src="/abstract-profile.png"
-                      alt="판매자 프로필"
-                      width={80}
-                      height={80}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold">가작가</h3>
-                    <p className="text-sub-gray">오? 왜 지가 화를 내지?</p>
-                  </div>
-                </div>
-
-                {/* 카드 우측 부분: 팔로우 수와 버튼들 */}
-                <div className="flex flex-col items-end justify-center space-y-2">
-                  <span className="text-xl text-sub-gray">3.4k 팔로우</span>
-                  <div className="flex space-x-4">
-                    <button className="rounded-xl bg-gray-border px-8 py-3 font-medium text-sub-gray hover:bg-gray-300">
-                      프로필 보기
-                    </button>
-                    <button className="rounded-xl bg-pink-200 px-8 py-3 font-medium text-pink-800 hover:bg-main-color">
-                      팔로우하기
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <FollowItem
+              id={seller.id}
+              username={seller.username}
+              oneLinear={seller.oneLinear}
+              profileImage={seller.profileImage}
+              onFollow={handleFollow}
+            />
           </div>
         )}
 
         {activeTab === "후기" && (
           <div className="space-y-6">
             {/* 댓글 입력 영역 */}
-            { isLoggedIn &&
-            <form onSubmit={handleCommentSubmit} className="flex items-center space-x-4">
-              <div className="flex-1">
-                <input
-                  type="text"
-                  placeholder="뭐 말이라도 해보기..."
-                  className="w-full rounded-xl border border-gray-border px-4 py-4 focus:border-main-color focus:outline-none"
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                />
-              </div>
-              <button
-                type="submit"
-                className="rounded-xl bg-main-color px-8 py-4 font-medium text-white hover:bg-secondary-color-dark"
-              >
-                댓글 달기
-              </button>
-            </form>
-            }
-
+            {isLoggedIn && (
+              <form onSubmit={handleCommentSubmit} className="flex items-center space-x-4">
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    placeholder="뭐 말이라도 해보기..."
+                    className="w-full rounded-xl border border-gray-border px-4 py-4 focus:border-main-color focus:outline-none"
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="rounded-xl bg-main-color px-8 py-4 font-medium text-white hover:bg-secondary-color-dark"
+                >
+                  댓글 달기
+                </button>
+              </form>
+            )}
             {/* 댓글 목록 */}
             <div className="space-y-4">
               {reviews.map((review) => (
                 <div key={review.id} className="rounded-3xl border border-gray-border p-6 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div className="flex space-x-4">
-
                       {/* 댓글 단 유저의 프로필 사진 */}
                       <div className="h-16 w-16 overflow-hidden rounded-full">
                         <Image
@@ -242,4 +232,4 @@ const ProjectTabs = () => {
   )
 }
 
-export default ProjectTabs
+export default ProductTabs

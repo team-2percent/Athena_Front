@@ -2,8 +2,8 @@
 
 import type React from "react"
 
-import { useState } from "react"
-import { Upload, Plus, Check, X } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import { Upload, Plus, Check, X, Trash2 } from "lucide-react"
 
 // 계좌 정보 타입 정의
 interface BankAccount {
@@ -173,9 +173,20 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
   )
 }
 
-export default function StepThreeForm() {
-  const [teamName, setTeamName] = useState("")
-  const [teamIntro, setTeamIntro] = useState("")
+interface StepThreeFormProps {
+  initialData?: {
+    teamName?: string
+    teamIntro?: string
+    teamImagePreview?: string | null
+  }
+}
+
+export default function StepThreeForm({ initialData }: StepThreeFormProps) {
+  const [teamName, setTeamName] = useState(initialData?.teamName || "")
+  const [teamIntro, setTeamIntro] = useState(initialData?.teamIntro || "")
+  const [teamImage, setTeamImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(initialData?.teamImagePreview || null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 계좌 관련 상태
   const [selectedAccountId, setSelectedAccountId] = useState<number | null>(null)
@@ -199,6 +210,18 @@ export default function StepThreeForm() {
       isDefault: false,
     },
   ])
+
+  // 초기 계좌 선택
+  useEffect(() => {
+    // 기본 계좌가 있으면 선택
+    const defaultAccount = accounts.find((account) => account.isDefault)
+    if (defaultAccount) {
+      setSelectedAccountId(defaultAccount.id)
+    } else if (accounts.length > 0) {
+      // 기본 계좌가 없으면 첫 번째 계좌 선택
+      setSelectedAccountId(accounts[0].id)
+    }
+  }, [])
 
   // 계좌 추가 처리
   const handleAddAccount = (account: Omit<BankAccount, "id" | "isDefault">) => {
@@ -230,6 +253,35 @@ export default function StepThreeForm() {
     setAccounts(accounts.filter((account) => account.id !== id))
   }
 
+  // 파일 선택 버튼 클릭 핸들러
+  const handleUploadClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  // 파일 입력 변경 핸들러
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    const file = files[0]
+    if (!file.type.startsWith("image/")) return
+
+    setTeamImage(file)
+    setImagePreview(URL.createObjectURL(file))
+  }
+
+  // 이미지 삭제 핸들러
+  const handleRemoveImage = () => {
+    if (imagePreview && !initialData?.teamImagePreview) {
+      URL.revokeObjectURL(imagePreview)
+    }
+    setTeamImage(null)
+    setImagePreview(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
+  }
+
   return (
     <div className="space-y-8">
       {/* 본인(팀) 이름 - 세로 배치로 변경 */}
@@ -258,19 +310,48 @@ export default function StepThreeForm() {
           <div className="rounded-3xl border border-gray-300 p-6">
             <div className="flex flex-col md:flex-row">
               {/* 이미지 미리보기 영역 */}
-              <div className="h-60 w-full md:w-60 bg-gray-300 rounded-lg flex items-center justify-center mb-4 md:mb-0 md:mr-6">
-                {/* 실제 이미지 업로드 기능은 아직 구현하지 않음 */}
+              <div className="h-60 w-full md:w-60 bg-gray-200 rounded-lg flex items-center justify-center mb-4 md:mb-0 md:mr-6 relative">
+                {imagePreview ? (
+                  <>
+                    <img
+                      src={imagePreview || "/placeholder.svg"}
+                      alt="팀 소개 이미지"
+                      className="h-full w-full object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md"
+                    >
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </button>
+                  </>
+                ) : (
+                  <div className="text-gray-400 text-center">
+                    <Upload className="h-10 w-10 mx-auto mb-2" />
+                    <p>이미지 없음</p>
+                  </div>
+                )}
               </div>
 
               {/* 업로드 버튼 및 안내 */}
               <div className="flex-1">
                 <button
                   type="button"
+                  onClick={handleUploadClick}
                   className="flex items-center gap-2 rounded-full bg-gray-100 px-6 py-3 text-gray-800 mb-4"
+                  disabled={!!imagePreview}
                 >
                   <Upload className="h-5 w-5" />
-                  업로드 하기
+                  {imagePreview ? "이미지 업로드 완료" : "업로드 하기"}
                 </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileInputChange}
+                />
 
                 <ul className="list-disc pl-5 space-y-2 text-gray-700">
                   <li>초상권, 저작권, 명예훼손 등의 우려가 있는 이미지는 사용을 삼가 주시기 바랍니다.</li>
