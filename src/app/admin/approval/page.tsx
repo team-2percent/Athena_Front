@@ -13,8 +13,8 @@ interface Project {
 export default function ApprovalPage() {
     const router = useRouter();
     const [projects, setProjects] = useState<Project[]>([]);
-    const [pageSize, setPageSize] = useState(10);
-    const [sort, setSort] = useState<"오래된순" | "최신순">("오래된순");
+    const [pageSize, setPageSize] = useState<10 | 20 | 50>(10);
+    const [sort, setSort] = useState<"old" | "new">("old");
     const [currentPage, setCurrentPage] = useState(1);
 
     const [search, setSearch] = useState("");
@@ -86,11 +86,11 @@ export default function ApprovalPage() {
     }
 
     const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setPageSize(parseInt(e.target.value));
+        setPageSize(parseInt(e.target.value) as 10 | 20 | 50);
     }
 
     const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSort(e.target.value as "오래된순" | "최신순");
+        setSort(e.target.value as "old" | "new");
     }
 
     const handlePageChange = (page: number) => {
@@ -133,13 +133,13 @@ export default function ApprovalPage() {
                 </div>
                 <div className="flex gap-4">
                     <select className="border rounded px-4 py-2 h-10" onChange={handlePageSizeChange}>
-                        <option selected>10개씩</option>
-                        <option>20개씩</option>
-                        <option>50개씩</option>
+                        <option value="10">10개씩</option>
+                        <option value="20">20개씩</option>
+                        <option value="50">50개씩</option>
                     </select>
                     <select className="border rounded px-4 py-2 h-10" onChange={handleSortChange}>
-                        <option selected>오래된순</option>
-                        <option>최신순</option>
+                        <option value="old">오래된순</option>
+                        <option value="new">최신순</option>
                     </select>
                 </div>
             </div>
