@@ -4,16 +4,18 @@ import { useState, useRef, useEffect } from "react"
 import { Search, X } from "lucide-react"
 
 interface SearchBarProps {
+  isLogin: boolean
   searchWord: string
   onSearchChange: (word: string) => void
   onSearch: (word: string) => void
 }
 
-export default function SearchBar({ searchWord, onSearchChange, onSearch }: SearchBarProps) {
+export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearch }: SearchBarProps) {
   const [isOpen, setIsOpen] = useState(false) // 드롭다운 열림 여부
   const [autoCompletes, setAutoCompletes] = useState<string[]>([]) // 자동완성 단어
   const [recentSearches, setRecentSearches] = useState<{ id: number, word: string }[]>([]) // 최근 검색어
   const searchRef = useRef<HTMLDivElement>(null)
+  const maxLength = 30;
 
   // mock data. 로직 구현 후 삭제
   const autoCompleteItems = ["타로 버블티", "타로 버블티 품추가", "타로 버블티 버블 추가"]
@@ -86,8 +88,8 @@ export default function SearchBar({ searchWord, onSearchChange, onSearch }: Sear
   }
 
   return (
-    <div ref={searchRef} className="w-80 max-w-xl relative">
-      <div className="relative">
+    <div ref={searchRef} className="w-80 max-w-xl relative h-10">
+      <div className="flex gap-2 rounded-full border border-gray-300 px-4 py-3 h-full">
         <input
           type="text"
           placeholder="제목, 작가로 검색"
@@ -95,20 +97,21 @@ export default function SearchBar({ searchWord, onSearchChange, onSearch }: Sear
           onChange={(e) => onSearchChange(e.target.value)}
           onFocus={() => setIsOpen(true)}
           onKeyDown={(e) => activeEnter(e)}
-          className="w-full px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200"
+          className="w-full h-full focus:outline-none text-sm"
+          maxLength={maxLength}
         />
         <button
           type="button"
-          className="absolute right-3 top-1/2 transform -translate-y-1/2"
+          className=""
           onClick={search}
         >
-          <Search className="h-6 w-6 text-gray-500" />
+          <Search className="h-4 w-4 text-gray-500" />
         </button>
       </div>
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute w-full mt-2 bg-white rounded-3xl border border-gray-300 shadow-lg z-10">
+        <div className="absolute w-full mt-2 bg-white rounded-3xl border border-gray-300 shadow-lg z-30">
           <div className="p-4">
             {/* Auto-complete section */}
             <div className="mb-4">
@@ -128,14 +131,15 @@ export default function SearchBar({ searchWord, onSearchChange, onSearch }: Sear
             </div>
 
             {/* Recent searches section */}
-            <div>
+            {isLogin &&
+              <div>
               <h3 className="text-lg font-bold mb-2">최근 검색어</h3>
               <div className="flex flex-col">
                 {recentSearches.map(item => (
-                  <div key={item.id} className="py-2 flex justify-between items-center">
+                  <div key={item.id} className="py-2 flex justify-between items-center hover:bg-gray-100">
                     <button
                       type="button"
-                      className="text-left flex-grow hover:bg-gray-100"
+                      className="text-left flex-grow"
                       onClick={() => handleSearchWordClick(item.word)}
                     >
                       {item.word}
@@ -154,6 +158,9 @@ export default function SearchBar({ searchWord, onSearchChange, onSearch }: Sear
                 ))}
               </div>
             </div>
+            }
+            
+            
           </div>
         </div>
       )}

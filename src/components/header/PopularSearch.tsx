@@ -69,9 +69,13 @@ export default function PopularSearch({ onSearchChange, onSearch }: PopularSearc
   }
 
   return (
-    <div className="w-[200px]">
+    <div
+      className="w-[200px]"
+      onMouseEnter={() => setIsDropdownOpen(true)}
+      onMouseLeave={() => setIsDropdownOpen(false)}
+    >
       <div className="flex items-center">
-        <div className="text-pink-400 font-medium mr-auto">인기 검색</div>
+        <div className="text-main-color font-medium mr-auto">인기 검색</div>
         <div className="relative flex items-center border-b border-gray-300 w-[120px]">
           <div className="relative overflow-hidden h-6 flex-grow">
             <div className="inner-wrapper relative w-full h-full">
@@ -83,7 +87,7 @@ export default function PopularSearch({ onSearchChange, onSearch }: PopularSearc
                 }`}
                 onClick={() => handleSearchClick(currentItem.term)}
               >
-                <span className="text-pink-400 font-bold mr-2">{currentItem.id}</span>
+                <span className="text-main-color font-bold mr-2">{currentItem.id}</span>
                 <span className="text-gray-800 truncate">{currentItem.term}</span>
               </button>
 
@@ -95,7 +99,7 @@ export default function PopularSearch({ onSearchChange, onSearch }: PopularSearc
                 }`}
                 onClick={() => handleSearchClick(nextItem.term)}
               >
-                <span className="text-pink-400 font-bold mr-2">{nextItem.id}</span>
+                <span className="text-main-color font-bold mr-2">{nextItem.id}</span>
                 <span className="text-gray-800 truncate">{nextItem.term}</span>
               </button>
             </div>
@@ -110,7 +114,7 @@ export default function PopularSearch({ onSearchChange, onSearch }: PopularSearc
           </button>
           {/* 드롭다운 메뉴 */}
             {isDropdownOpen && (
-            <div className="absolute top-full right-0 mt-1 w-[140px] bg-white border border-gray-200 rounded-xl shadow-lg z-10 h-fit">
+            <div className="absolute top-full right-0 mt-0 w-[140px] bg-white border border-gray-200 rounded-xl shadow-lg z-10 h-fit">
                 <div className="py-2">
                 {popularSearches.map(item => (
                     <button
@@ -119,7 +123,7 @@ export default function PopularSearch({ onSearchChange, onSearch }: PopularSearc
                     className="flex items-center w-full px-4 py-2 text-left hover:bg-gray-50"
                     onClick={() => handleDropdownItemClick(item.term)}
                     >
-                    <span className="text-pink-400 font-bold mr-4">{item.id}</span>
+                    <span className="text-main-color font-bold mr-4">{item.id}</span>
                     <span className="text-gray-800">{item.term}</span>
                     </button>
                 ))}

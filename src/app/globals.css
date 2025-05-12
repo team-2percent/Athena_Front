@@ -4,8 +4,28 @@
 @custom-variant dark (&:is(.dark *));
 
 /* iOS Safari에서의 글꼴이 비정상적으로 굵어지는 문제 해결 */
-body {
+/* 근데 이걸 적용하면 프리텐다드 기준 기울임꼴이 안 되는 현상이 있음;;*/
+
+/* body {
   font-synthesis: none;
+} */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+@theme {
+  --color-main-color: #F67E9C;
+  --color-secondary-color: oklch(97.1% 0.014 343.198);
+  --color-secondary-color-dark: #E14F73;
+  --color-point-color: #FF0000;
+  --color-sub-gray: oklch(55.1% 0.027 264.364);
+  --color-gray-border: oklch(92.8% 0.006 264.531);
+  --color-disabled-text: oklch(70.7% 0.022 261.325);
+  --color-disabled-background: oklch(87.2% 0.01 258.338);
+  --color-cancel-background: oklch(70.7% 0.022 261.325);
+  --color-cancel-background-dark: oklch(55.1% 0.027 264.364);
 }
 
 @theme inline {
@@ -124,4 +144,16 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
