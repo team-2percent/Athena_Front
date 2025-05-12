@@ -249,13 +249,13 @@ export default function SettlementDetailPage() {
                 </table>
                 <div className="flex justify-center gap-2">
                 <button className="px-3 py-2">◀</button>
-                <button className="px-3 py-2 text-pink-600">1</button>
+                <button className="px-3 py-2 text-secondary-color-dark">1</button>
                 <button className="px-3 py-2">▶</button>
             </div>
             </div>
             <div className="flex justify-end">
                 <button
-                    className="px-8 p-4 rounded-md bg-pink-100 text-pink-600"
+                    className="px-8 py-2 rounded-md bg-main-color hover:bg-secondary-color-dark text-white"
                     onClick={() => setIsModalOpen(true)}
                 >
                     정산 완료

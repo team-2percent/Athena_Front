@@ -137,7 +137,7 @@ export default function AccountInfo() {
               <button
                 type="button"
                 onClick={handleAddAccount}
-                className="px-4 py-2 bg-main-color text-white rounded-md hover:bg-pink-600 text-sm flex items-center appearance-none"
+                className="px-4 py-2 bg-main-color text-white rounded-md hover:bg-secondary-color-dark text-sm flex items-center appearance-none"
               >
                 <Plus className="w-4 h-4 mr-1" /> 계좌 추가
               </button>

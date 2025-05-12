@@ -143,7 +143,7 @@ export default function CouponRegisterPage() {
                     </div>
                     <div className="flex justify-end">
                         <button
-                            className={clsx("px-8 p-4 rounded-md", disabled ? "bg-gray-100 text-sub-gray cursor-not-allowed" : "bg-pink-100 text-pink-600")}
+                            className={clsx("px-8 p-4 rounded-md", disabled ? "bg-gray-100 text-sub-gray cursor-not-allowed" : "bg-main-color text-white hover:bg-secondary-color-dark")}
                             disabled={disabled}
                             onClick={handleModalOpen}
                         >

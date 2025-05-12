@@ -70,12 +70,12 @@ export default function AdminHeader() {
                             type="button"
                             key={tab}
                             className={`relative pb-1 text-base font-medium ${
-                                pathname === uris[tab] ? "text-pink-500" : "text-gray-800"
+                                pathname === uris[tab] ? "text-main-color" : "text-sub-grays"
                             }`}
                             onClick={() => handleTabClick(tab)}
                         >
                             {tab}
-                            {pathname === uris[tab] && <span className="absolute bottom-0 left-0 h-0.5 w-full bg-pink-500" />}
+                            {pathname === uris[tab] && <span className="absolute bottom-0 left-0 h-0.5 w-full bg-main-color" />}
                         </button>
                     )
                 }
