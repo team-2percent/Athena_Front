@@ -5,8 +5,10 @@ import DatePicker from "@/components/projectRegister/DatePicker"
 import clsx from "clsx"
 import { ArrowLeftIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
+import ConfirmModal from "@/components/common/ConfirmModal"
 export default function CouponRegisterPage() {
     const router = useRouter();
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     // 쿠폰 추가
     const [couponName, setCouponName] = useState<string>("")
     const [couponDescription, setCouponDescription] = useState<string>("")
@@ -27,6 +29,10 @@ export default function CouponRegisterPage() {
     const handleAddCoupon = () => {
         // 쿠폰 등록 추가
         router.push('/admin/coupon')
+    }
+
+    const handleModalOpen = () => {
+        setIsModalOpen(true)
     }
 
     const handleCouponPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,6 +67,7 @@ export default function CouponRegisterPage() {
 
     return (
         <div className="flex flex-col mx-auto w-full p-8 gap-6">
+            {}
                 <div className="flex w-full">
                 <button className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.push("/admin/coupon")}>
                     <ArrowLeftIcon className="w-4 h-4" />
@@ -133,12 +140,21 @@ export default function CouponRegisterPage() {
                         <button
                             className={clsx("px-8 p-4 rounded-md", disabled ? "bg-gray-100 text-gray-600 cursor-not-allowed" : "bg-pink-100 text-pink-600")}
                             disabled={disabled}
-                            onClick={handleAddCoupon}
+                            onClick={handleModalOpen}
                         >
                             등록
                         </button>
                     </div>
                 </div>
+                {
+                    isModalOpen &&
+                    <ConfirmModal
+                        isOpen={isModalOpen}
+                        message="쿠폰을 등록하시겠습니까?"
+                        onConfirm={handleAddCoupon}
+                        onClose={() => setIsModalOpen(false)}
+                    />
+                }
             </div>
     )
 }
