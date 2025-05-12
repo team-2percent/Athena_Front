@@ -6,41 +6,56 @@ import { useState, useEffect, useRef } from "react"
 import { Upload, ChevronDown, Check, Trash2 } from "lucide-react"
 import DatePicker from "./DatePicker"
 
-interface StepOneFormProps {
-  formData: {
-    targetAmount: string
-  }
-  onUpdateFormData: (data: Partial<{ targetAmount: string }>) => void
-}
-
 interface ImageFile {
   id: string
   file: File
   preview: string
 }
 
-export default function StepOneForm({ formData, onUpdateFormData }: StepOneFormProps) {
-  const [category, setCategory] = useState("책")
+interface StepOneFormProps {
+  formData: {
+    targetAmount: string
+  }
+  onUpdateFormData: (data: Partial<{ targetAmount: string }>) => void
+  initialData?: {
+    category?: string
+    title?: string
+    description?: string
+    targetAmount?: string
+    startDate?: Date
+    endDate?: Date
+    deliveryDate?: Date
+    images?: ImageFile[]
+  }
+}
+
+export default function StepOneForm({ formData, onUpdateFormData, initialData }: StepOneFormProps) {
+  const [category, setCategory] = useState(initialData?.category || "책")
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false)
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [targetAmount, setTargetAmount] = useState(formData.targetAmount || "")
+  const [title, setTitle] = useState(initialData?.title || "")
+  const [description, setDescription] = useState(initialData?.description || "")
+  const [targetAmount, setTargetAmount] = useState(formData.targetAmount || initialData?.targetAmount || "")
   const [targetAmountError, setTargetAmountError] = useState("")
-  const [startDate, setStartDate] = useState(new Date())
-  const [endDate, setEndDate] = useState(new Date(new Date().setDate(new Date().getDate() + 21))) // 기본값: 오늘로부터 21일 후
-  const [deliveryDate, setDeliveryDate] = useState(() => {
-    // 기본값: 펀딩 종료일 + 7일
-    const date = new Date(endDate)
-    date.setDate(date.getDate() + 7)
-    return date
-  })
+  const [startDate, setStartDate] = useState(initialData?.startDate || new Date())
+  const [endDate, setEndDate] = useState(
+    initialData?.endDate || new Date(new Date().setDate(new Date().getDate() + 21)),
+  ) // 기본값: 오늘로부터 21일 후
+  const [deliveryDate, setDeliveryDate] = useState(
+    initialData?.deliveryDate ||
+      (() => {
+        // 기본값: 펀딩 종료일 + 7일
+        const date = new Date(endDate)
+        date.setDate(date.getDate() + 7)
+        return date
+      }),
+  )
   const [minDeliveryDate, setMinDeliveryDate] = useState(() => {
     // 최소 배송일: 펀딩 종료일 + 7일
     const date = new Date(endDate)
     date.setDate(date.getDate() + 7)
     return date
   })
-  const [images, setImages] = useState<ImageFile[]>([])
+  const [images, setImages] = useState<ImageFile[]>(initialData?.images || [])
   const [isDragging, setIsDragging] = useState(false)
   const dragCounter = useRef(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -269,7 +284,7 @@ export default function StepOneForm({ formData, onUpdateFormData }: StepOneFormP
               onDrop={handleDrop}
             >
               {/* 드래그 중일 때 오버레이 */}
-              { (isDragging && images.length < 5) && (
+              {isDragging && images.length < 5 && (
                 <div className="absolute inset-0 bg-pink-50 bg-opacity-80 flex items-center justify-center z-10 rounded-lg">
                   <p className="text-xl font-medium text-pink-600">여기에 이미지를 놓으세요</p>
                 </div>
@@ -300,7 +315,7 @@ export default function StepOneForm({ formData, onUpdateFormData }: StepOneFormP
                 <div>
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-medium">업로드된 이미지 ({images.length}/5)</h3>
-                    { images.length < 5 && (
+                    {images.length < 5 && (
                       <button
                         type="button"
                         onClick={handleUploadClick}

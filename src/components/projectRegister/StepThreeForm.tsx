@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Upload, Plus, Check, X, Trash2 } from "lucide-react"
 
 // 계좌 정보 타입 정의
@@ -173,11 +173,19 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
   )
 }
 
-export default function StepThreeForm() {
-  const [teamName, setTeamName] = useState("")
-  const [teamIntro, setTeamIntro] = useState("")
+interface StepThreeFormProps {
+  initialData?: {
+    teamName?: string
+    teamIntro?: string
+    teamImagePreview?: string | null
+  }
+}
+
+export default function StepThreeForm({ initialData }: StepThreeFormProps) {
+  const [teamName, setTeamName] = useState(initialData?.teamName || "")
+  const [teamIntro, setTeamIntro] = useState(initialData?.teamIntro || "")
   const [teamImage, setTeamImage] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(initialData?.teamImagePreview || null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 계좌 관련 상태
@@ -202,6 +210,18 @@ export default function StepThreeForm() {
       isDefault: false,
     },
   ])
+
+  // 초기 계좌 선택
+  useEffect(() => {
+    // 기본 계좌가 있으면 선택
+    const defaultAccount = accounts.find((account) => account.isDefault)
+    if (defaultAccount) {
+      setSelectedAccountId(defaultAccount.id)
+    } else if (accounts.length > 0) {
+      // 기본 계좌가 없으면 첫 번째 계좌 선택
+      setSelectedAccountId(accounts[0].id)
+    }
+  }, [])
 
   // 계좌 추가 처리
   const handleAddAccount = (account: Omit<BankAccount, "id" | "isDefault">) => {
@@ -252,7 +272,7 @@ export default function StepThreeForm() {
 
   // 이미지 삭제 핸들러
   const handleRemoveImage = () => {
-    if (imagePreview) {
+    if (imagePreview && !initialData?.teamImagePreview) {
       URL.revokeObjectURL(imagePreview)
     }
     setTeamImage(null)
