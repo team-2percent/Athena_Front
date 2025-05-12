@@ -269,7 +269,7 @@ export default function StepOneForm({ formData, onUpdateFormData }: StepOneFormP
               onDrop={handleDrop}
             >
               {/* 드래그 중일 때 오버레이 */}
-              {isDragging && (
+              { (isDragging && images.length < 5) && (
                 <div className="absolute inset-0 bg-pink-50 bg-opacity-80 flex items-center justify-center z-10 rounded-lg">
                   <p className="text-xl font-medium text-pink-600">여기에 이미지를 놓으세요</p>
                 </div>
