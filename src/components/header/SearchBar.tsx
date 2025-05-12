@@ -136,10 +136,10 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
               <h3 className="text-lg font-bold mb-2">최근 검색어</h3>
               <div className="flex flex-col">
                 {recentSearches.map(item => (
-                  <div key={item.id} className="py-2 flex justify-between items-center">
+                  <div key={item.id} className="py-2 flex justify-between items-center hover:bg-gray-100">
                     <button
                       type="button"
-                      className="text-left flex-grow hover:bg-gray-100"
+                      className="text-left flex-grow"
                       onClick={() => handleSearchWordClick(item.word)}
                     >
                       {item.word}

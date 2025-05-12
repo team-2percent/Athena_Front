@@ -127,7 +127,7 @@ const ProjectDetail = () => {
                   key={idx}
                   className={`cursor-pointer overflow-hidden rounded-xl transition-all duration-200 ${
                     currentImageIndex === idx
-                      ? "ring-4 ring-main-color ring-offset-2"
+                      ? "ring-4 ring-main-color"
                       : "hover:ring-2 hover:ring-main-color"
                   }`}
                   onClick={() => setCurrentImageIndex(idx)}
