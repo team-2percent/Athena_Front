@@ -312,8 +312,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
                 username={user.username}
                 oneLinear={user.oneLinear}
                 profileImage={user.profileImage}
-                onFollow={handleFollow}
-              />
+                onFollow={handleFollow} isFollowing={false}              />
             ))}
           </div>
         )}
