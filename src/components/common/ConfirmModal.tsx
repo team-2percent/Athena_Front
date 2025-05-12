@@ -38,7 +38,7 @@ export default function ConfirmModal({ isOpen, message, onConfirm, onClose }: Co
                         <p className="text-xl font-medium">{message}</p>
                         <div className="flex gap-4">
                             <button className="px-4 py-2 rounded-md bg-pink-100 text-pink-600" onClick={onConfirm}>확인</button>
-                            <button className="px-4 py-2 rounded-md bg-gray-100 text-gray-600" onClick={onClose}>취소</button>
+                            <button className="px-4 py-2 rounded-md bg-gray-100 text-sub-gray" onClick={onClose}>취소</button>
                         </div>
                     </div>
                 </div>

@@ -17,7 +17,7 @@ export default function PasswordInput({ value, onChange }: PasswordInputProps) {
             type={showPassword ? "text" : "password"}
             value={value}
             onChange={onChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
             placeholder="비밀번호 확인"
             />
             <button

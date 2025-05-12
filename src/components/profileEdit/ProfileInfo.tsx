@@ -177,7 +177,7 @@ export default function ProfileInfo() {
                                 </>
                                 ) : (
                                 <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
-                                    <Camera className="w-10 h-10 text-gray-400" />
+                                    <Camera className="w-10 h-10 text-sub-gray" />
                                 </div>
                                 )}
                             </div>
@@ -189,7 +189,7 @@ export default function ProfileInfo() {
                                 className="hidden"
                                 id="profile-image"
                             />
-                            <label htmlFor="profile-image" className="cursor-pointer text-pink-500 font-medium hover:text-pink-600">
+                            <label htmlFor="profile-image" className="cursor-pointer text-main-color font-medium hover:text-secondary-color-dark">
                                 프로필 사진 {profileImage ? "변경" : "업로드"}
                             </label>
 
@@ -201,18 +201,18 @@ export default function ProfileInfo() {
                             <div className="flex justify-start w-full gap-8 items-center">
                             <div className="flex items-center gap-2">
                                 <input
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300 text-sm"
+                                    className="w-full px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color text-sm"
                                     value={newName}
                                     onChange={(e) => setNewName(e.target.value)}
                                 /> 
                             </div>
                             </div>
                             <div className="flex justify-start w-full gap-8 items-center">
-                                <span className="text-sm font-medium text-gray-500">이메일</span>
+                                <span className="text-sm font-medium text-sub-gray">이메일</span>
                                 <span className="text-sm font-medium">{profile.email}</span>
                             </div>
                             <button
-                                className="w-fit bg-pink-500 text-white rounded-md hover:bg-pink-600 text-sm px-3 py-2"
+                                className="w-fit bg-main-color text-white rounded-md hover:bg-secondary-color-dark text-sm px-3 py-2"
                                 onClick={() => setEditingPassword(true)}
                             >
                                 비밀번호 변경
@@ -225,7 +225,7 @@ export default function ProfileInfo() {
                         <h3 className="text-lg font-medium">소개</h3>  
                         {/* 소개란 */}
                         <textarea
-                            className="w-full h-[150px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300 text-sm resize-none"
+                            className="w-full h-[150px] px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color text-sm resize-none"
                             value={newIntroduction}
                             onChange={(e) => setNewIntroduction(e.target.value)}
                         />
@@ -237,7 +237,7 @@ export default function ProfileInfo() {
                             {
                                 addingUrl &&
                                 <form className="flex gap-2 items-center">
-                                    <input type="url" className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300 text-sm" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} />
+                                    <input type="url" className="w-full px-2 py-1 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color text-sm" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} />
                                     <button onSubmit={handleUrlAdd}>
                                         <Check className="w-4 h-4" />
                                     </button>
@@ -249,7 +249,7 @@ export default function ProfileInfo() {
                                         <span>{url}</span>
                                         <button 
                                             onClick={() => handleUrlRemove(index)}
-                                            className="text-gray-400 rounded-md hover:bg-gray-200 text-sm"
+                                            className="text-sub-gray rounded-md text-sm"
                                         >
                                             <X className="w-4 h-4" />
                                         </button>
@@ -259,10 +259,10 @@ export default function ProfileInfo() {
                         </div>
                     </div> 
                     <div className="flex gap-2 justify-end items-end flex-wrap">
-                        <p className="text-sm font-medium text-gray-400">※ 저장하지 않고 페이지를 나갈 시 변경사항이 저장되지 않습니다.</p>
+                        <p className="text-sm font-medium text-sub-gray">※ 저장하지 않고 페이지를 나갈 시 변경사항이 저장되지 않습니다.</p>
                         <button
                             disabled={!saveable}
-                            className={clsx("text-white rounded-md text-sm px-4 py-2", saveable ? "bg-pink-500 hover:bg-pink-600": "bg-gray-300")}
+                            className={clsx("text-white rounded-md text-sm px-4 py-2", saveable ? "bg-main-color hover:bg-secondary-color-dark": "bg-gray-border")}
                             onClick={handleSave}
                         >
                             저장
@@ -279,7 +279,7 @@ export default function ProfileInfo() {
                     {/* 비밀번호 확인란 */}
                     <div className="flex flex-col gap-6 w-full">
                         <div className="flex flex-col gap-2">
-                            <p className="text-sm font-medium text-gray-500">비밀번호 확인</p>
+                            <p className="text-sm font-medium text-sub-gray">비밀번호 확인</p>
                             <div className="flex gap-2">
                                 <PasswordInput
                                     value={password}
@@ -293,7 +293,7 @@ export default function ProfileInfo() {
                                         <button
                                             type="submit"
                                             onClick={handlePasswordConfirm}
-                                            className="w-fit bg-pink-500 text-white rounded-md hover:bg-pink-600 text-sm px-3 py-2"
+                                            className="w-fit bg-main-color text-white rounded-md hover:bg-secondary-color-dark text-sm px-3 py-2"
                                         >확인</button>
                                         {passwordConfirmError && <p className="text-red-500 text-sm">비밀번호가 일치하지 않습니다.</p>}
                                         {passwordConfirmNeedError && <p className="text-red-500 text-sm">비밀번호 확인이 필요합니다.</p>}
@@ -303,7 +303,7 @@ export default function ProfileInfo() {
                         </div>
                         
                         <div className="flex flex-col gap-2">
-                            <p className="text-sm font-medium text-gray-500">새 비밀번호 입력</p>
+                            <p className="text-sm font-medium text-sub-gray">새 비밀번호 입력</p>
                             <div className="flex gap-2">
                                 <PasswordInput
                                     value={newPassword}
@@ -313,7 +313,7 @@ export default function ProfileInfo() {
                         </div>
                         
                         <div className="flex flex-col gap-2">
-                            <p className="text-sm font-medium text-gray-500">새 비밀번호 확인</p>
+                            <p className="text-sm font-medium text-sub-gray">새 비밀번호 확인</p>
                             <div className="flex gap-2">
                                 <PasswordInput
                                     value={newPasswordConfirm}
@@ -329,13 +329,13 @@ export default function ProfileInfo() {
                     </div>
                     <div className="flex gap-2 justify-end">
                         <button
-                            className="w-fit bg-pink-500 text-white rounded-md hover:bg-pink-600 text-sm px-3 py-2"
+                            className="w-fit bg-main-color text-white rounded-md hover:bg-secondary-color-dark text-sm px-3 py-2"
                             onClick={handleNewPasswordApply}
                         >
                             저장
                         </button>
                         <button
-                            className="w-fit bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm px-3 py-2"
+                            className="w-fit bg-cancel-background text-white rounded-md hover:bg-cancel-background-dark text-sm px-3 py-2"
                             onClick={() => setEditingPassword(false)}
                         >
                             취소

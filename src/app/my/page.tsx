@@ -50,9 +50,9 @@ export default function ProfilePage() {
             <div  className="flex flex-col gap-2">
             <button
               className={cn(
-                "px-8 py-3 rounded-lg border-2 border-pink-300 text-pink-400 font-medium text-center transition-colors",
-                "hover:bg-pink-50 active:bg-pink-100",
-                "focus:outline-none focus:ring-2 focus:ring-pink-300 focus:ring-offset-2"
+                "px-8 py-3 rounded-lg border-2 border-main-color text-main-color font-medium text-center transition-colors",
+                "hover:bg-secondary-color active:bg-secondary-color",
+                "focus:outline-none focus:ring-2 focus:ring-main-color focus:ring-offset-2"
               )}
               onClick={handleClickEditProfile}
             >
@@ -60,9 +60,9 @@ export default function ProfilePage() {
             </button>
             <button
               className={cn(
-                "px-8 py-3 rounded-lg border-2 border-pink-300 text-pink-400 font-medium text-center transition-colors",
-                "hover:bg-pink-50 active:bg-pink-100",
-                "focus:outline-none focus:ring-2 focus:ring-pink-300 focus:ring-offset-2",
+                "px-8 py-3 rounded-lg border-2 border-main-color text-main-color font-medium text-center transition-colors",
+                "hover:bg-secondary-color active:bg-secondary-color",
+                "focus:outline-none focus:ring-2 focus:ring-main-color focus:ring-offset-2",
               )}
               onClick={handleClickViewTransaction}
             >

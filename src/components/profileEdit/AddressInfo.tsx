@@ -124,7 +124,7 @@ export default function AddressInfo() {
                                 ...newAddress,
                                 name: e.target.value,
                             })}
-                            className="w-full flex-1 px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300"
+                            className="w-full flex-1 px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
                         />
                     </div>
                     
@@ -153,7 +153,7 @@ export default function AddressInfo() {
                                 ...newAddress,
                                 detailAddress: e.target.value,
                             })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
                         />
                         <div className="mt-4 flex justify-end">
                             <button
@@ -185,7 +185,7 @@ export default function AddressInfo() {
                                                 name="default-address"
                                                 checked={address.isDefault}
                                                 onChange={() => handleSetDefaultAddress(address.id)}
-                                                className="w-4 h-4 text-pink-500 border-gray-300 focus:ring-pink-300 mt-1 mr-3"
+                                                className="w-4 h-4 text-pink-500 border-gray-300 focus:ring-main-color mt-1 mr-3"
                                             />
                                             <div>
                                                 <div className="flex items-center">

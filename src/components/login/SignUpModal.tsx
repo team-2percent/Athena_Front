@@ -115,7 +115,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             <div className="mb-6">
               <label
                 htmlFor="name"
-                className={`text-sm ${focusedField === "name" ? "text-pink-500" : "text-pink-400"}`}
+                className={`text-sm ${focusedField === "name" ? "text-pink-500" : "text-main-color"}`}
               >
                 이름
               </label>

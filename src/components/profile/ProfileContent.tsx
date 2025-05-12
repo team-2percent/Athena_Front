@@ -246,7 +246,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
       <div className="mx-auto max-w-6xl mt-8">
         {activeTab === "소개" && (
           <div className="mb-8">
-            <p className="text-gray-700 mb-8 whitespace-pre-wrap break-words">{introduction}</p>
+            <p className="text-sub-gray mb-8 whitespace-pre-wrap break-words">{introduction}</p>
 
             {/* 링크 목록 */}
             <div className="flex flex-wrap gap-4">
@@ -255,7 +255,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
                   key={index}
                   href={`https://${link}`}
                   target="_blank"
-                  className="px-6 py-3 bg-pink-50 text-pink-400 rounded-full hover:bg-pink-100 transition-colors"
+                  className="px-6 py-3 border border-main-color text-main-color rounded-full hover:bg-secondary-color transition-colors"
                 >
                   {link}
                 </Link>
@@ -328,6 +328,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
                 purchaseCount={user.purchaseCount}
                 profileImage={user.profileImage}
                 onFollow={handleFollow}
+                isFollowing={true}
               />
             ))}
           </div>
@@ -335,9 +336,9 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
 
         {activeTab === "쿠폰" && <div className="flex flex-col gap-4">
           {coupons.map((coupon) => (
-          <div className="rounded-2xl border border-gray-200 flex overflow-hidden" key={coupon.id}>
+          <div className="rounded-2xl border border-gray-border flex overflow-hidden" key={coupon.id}>
             {/* 왼쪽: 퍼센트 아이콘 */}
-            <div className={clsx("relative min-w-[70px] h-[100px] flex items-center justify-center", coupon.state === "UNUSED" ? "bg-[#FF0040]" : "bg-[#B3B3B3]")}>
+            <div className={clsx("relative min-w-[70px] h-[100px] flex items-center justify-center", coupon.state === "UNUSED" ? "bg-main-color" : "bg-disabled-background")}>
               <div className="absolute top-0 right-0 w-4 h-4 bg-white rounded-full translate-x-1/2 translate-y-[-50%]"></div>
               <div className="absolute bottom-0 right-0 w-4 h-4 bg-white rounded-full translate-x-1/2 translate-y-[50%]"></div>
               <Percent className="h-8 w-8 text-white" />
@@ -346,16 +347,16 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
             {/* 중앙: 쿠폰 제목 및 설명 */}
             <div className="flex-1 p-4 flex flex-col justify-center">
               <h3 className="text-lg font-bold">{coupon.title}</h3>
-              <p className="text-sm text-gray-600 mt-1">{coupon.description}</p>
+              <p className="text-sm text-sub-gray mt-1">{coupon.description}</p>
             </div>
       
             {/* 구분선 */}
-            <div className="w-0 border-l border-dashed border-gray-300 my-4"></div>
+            <div className="w-0 border-l border-dashed border-gray-border my-4"></div>
       
             {/* 오른쪽: 금액 및 유효기간 */}
             <div className="p-4 flex flex-col justify-center items-end min-w-[140px]">
-              <p className={clsx("text-xl font-bold", coupon.state === "UNUSED" ? "text-[#FF0040]" : "text-[#B3B3B3]")}>{coupon.amount}</p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className={clsx("text-xl font-bold", coupon.state === "UNUSED" ? "text-main-color" : "text-disabled-text")}>{coupon.amount}</p>
+              <p className="text-xs text-sub-gray mt-1">
                 {couponStateMessage(coupon.state, coupon.validUntil)}
               </p>
             </div>

@@ -144,13 +144,13 @@ const Header = () => {
                 aria-label="쿠폰"
                 onClick={handleCouponClick}
               >
-                <Percent className="h-6 w-6 text-gray-600" />
+                <Percent className="h-6 w-6 text-sub-gray" />
               </button>
                 <button type="button" aria-label="찜 목록">
-                <Heart className="h-6 w-6 text-gray-600" />
+                <Heart className="h-6 w-6 text-sub-gray" />
               </button>
               <button type="button" aria-label="알림" onClick={toggleNotifications}>
-                <Bell className="h-6 w-6 text-gray-600" />
+                <Bell className="h-6 w-6 text-sub-gray" />
               </button>
               <div className="flex items-center space-x-3">
                 <span className="text-sm font-medium whitespace-nowrap">대충사는사람</span>
@@ -166,7 +166,7 @@ const Header = () => {
               </div>
               </>
               :
-              <div className="text-pink-400 font-medium mr-auto flex items-center gap-2">
+              <div className="text-main-color font-medium mr-auto flex items-center gap-2">
                 <button type="button" aria-label="로그인" onClick={openLoginModal}>
                   로그인
                 </button>
@@ -232,7 +232,7 @@ const Header = () => {
                     <p className="mb-1">{notification.message}</p>
                     <p className="text-sm text-gray-500">{notification.date}</p>
                   </div>
-                  <button type="button" className="ml-2 text-gray-400 hover:text-gray-600">
+                  <button type="button" className="ml-2 text-gray-400 hover:text-sub-gray">
                     <Trash2 className="h-5 w-5" />
                   </button>
                 </div>

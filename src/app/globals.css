@@ -15,6 +15,19 @@ body {
   min-height: 100vh;
 }
 
+@theme {
+  --color-main-color: #F67E9C;
+  --color-secondary-color: oklch(97.1% 0.014 343.198);
+  --color-secondary-color-dark: #E14F73;
+  --color-point-color: #FF0000;
+  --color-sub-gray: oklch(55.1% 0.027 264.364);
+  --color-gray-border: oklch(92.8% 0.006 264.531);
+  --color-disabled-text: oklch(70.7% 0.022 261.325);
+  --color-disabled-background: oklch(87.2% 0.01 258.338);
+  --color-cancel-background: oklch(70.7% 0.022 261.325);
+  --color-cancel-background-dark: oklch(55.1% 0.027 264.364);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

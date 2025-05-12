@@ -549,12 +549,12 @@ const DonateDock = () => {
                           <div
                             key={option.id}
                             className={`relative flex cursor-pointer items-center rounded-xl border p-4 transition-all ${
-                              isSelected ? "border-2 border-pink-400" : "border-gray-200 hover:border-pink-200"
+                              isSelected ? "border-2 border-main-color" : "border-gray-200 hover:border-pink-200"
                             }`}
                             onClick={() => handleOptionSelect(option.id)}
                           >
                             <div className="absolute -right-2 -top-4">
-                              <div className="rounded-full border-2 border-pink-400 bg-white px-3 py-1 text-sm text-pink-500 shadow-sm">
+                              <div className="rounded-full border-2 border-main-color bg-white px-3 py-1 text-sm text-pink-500 shadow-sm">
                                 <span>{formatRemaining(option.remaining)}</span>
                               </div>
                             </div>
@@ -691,7 +691,7 @@ const DonateDock = () => {
                     <button
                       className={`rounded-xl px-8 py-3 font-medium ${
                         selectedOptions.length > 0
-                          ? "bg-pink-200 text-pink-800 hover:bg-pink-300"
+                          ? "bg-pink-200 text-pink-800 hover:bg-main-color"
                           : "bg-gray-200 text-gray-500 cursor-not-allowed"
                       }`}
                       onClick={goToNextStep}
@@ -710,7 +710,7 @@ const DonateDock = () => {
                   <h3 className="mb-4 text-lg font-medium">결제 수단</h3>
                   <div
                     className={`inline-block cursor-pointer rounded-xl border px-16 p-4 transition-all ${
-                      selectedPay === "kakaopay" ? "border-2 border-pink-400" : "border-gray-200 hover:border-pink-200"
+                      selectedPay === "kakaopay" ? "border-2 border-main-color" : "border-gray-200 hover:border-pink-200"
                     }`}
                     onClick={() => handlePaySelect("kakaopay")}
                   >
@@ -729,7 +729,7 @@ const DonateDock = () => {
                           key={address.id}
                           className={`flex-shrink-0 w-60 cursor-pointer rounded-xl border p-4 transition-all ${
                             selectedAddress === address.id
-                              ? "border-2 border-pink-400"
+                              ? "border-2 border-main-color"
                               : "border-gray-200 hover:border-pink-200"
                           }`}
                           onClick={() => handleAddressSelect(address.id)}
@@ -737,13 +737,13 @@ const DonateDock = () => {
                           <div className="flex items-center justify-between mb-2 overflow-hidden">
                             <h4 className="font-bold line-clamp-1 whitespace-pre-wrap break-words">{address.name}</h4>
                             {address.isDefault && (
-                              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                              <span className="text-xs bg-gray-100 text-sub-gray px-2 py-1 rounded-full">
                                 기본 배송지
                               </span>
                             )}
                           </div>
                           <div className="overflow-hidden">
-                            <p className="line-clamp-2 text-gray-600 whitespace-pre-wrap break-words">
+                            <p className="line-clamp-2 text-sub-gray whitespace-pre-wrap break-words">
                               [{address.zipCode}] {address.address} {address.detailAddress}
                             </p>
                           </div>
@@ -786,7 +786,7 @@ const DonateDock = () => {
                       </button>
                     </div>
 
-                    <div className="pt-2 flex justify-between text-gray-600">
+                    <div className="pt-2 flex justify-between text-sub-gray">
                       <span>배송비</span>
                       <span>무료</span>
                     </div>
@@ -805,7 +805,7 @@ const DonateDock = () => {
                   {/* 버튼 영역 */}
                   <div className="flex justify-end space-x-4">
                     <button
-                      className="rounded-xl bg-pink-200 px-8 py-3 font-medium text-pink-800 hover:bg-pink-300"
+                      className="rounded-xl bg-pink-200 px-8 py-3 font-medium text-pink-800 hover:bg-main-color"
                       onClick={toggleDock}
                     >
                       후원하기

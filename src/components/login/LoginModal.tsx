@@ -78,7 +78,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 className={
                   clsx("w-full p-3 border-b focus:outline-none text-lg",
                     focusedField === "email" ?
-                    (isEmailValid ? "border-pink-500" : "border-red-500") : "border-gray-300")
+                    (isEmailValid ? "border-main-color" : "border-red-500") : "border-gray-300")
                 }
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

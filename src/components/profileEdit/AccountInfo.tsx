@@ -100,35 +100,35 @@ export default function AccountInfo() {
             <h3 className="text-lg font-medium mb-6">새 계좌 추가</h3>
             <div className="flex gap-4 flex-col">
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
+                <label className="block text-sm font-medium text-sub-gray mb-1">이름</label>
                 <input
                   type="text"
                   name="name"
                   value={newAccount.name}
                   onChange={handleNewAccountChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300"
+                  className="w-full px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
                   placeholder="이름"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">은행명</label>
+                <label className="block text-sm font-medium text-sub-gray mb-1">은행명</label>
                 <input
                   type="text"
                   name="bankName"
                   value={newAccount.bankName}
                   onChange={handleNewAccountChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300"
+                  className="w-full px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
                   placeholder="은행명"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">계좌번호</label>
+                <label className="block text-sm font-medium text-sub-gray mb-1">계좌번호</label>
                 <input
                   type="number"
                   name="accountNumber"
                   value={newAccount.accountNumber}
                   onChange={handleNewAccountChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300"
+                  className="w-full px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
                   placeholder="계좌번호"
                 />
               </div>
@@ -137,7 +137,7 @@ export default function AccountInfo() {
               <button
                 type="button"
                 onClick={handleAddAccount}
-                className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 text-sm flex items-center appearance-none"
+                className="px-4 py-2 bg-main-color text-white rounded-md hover:bg-pink-600 text-sm flex items-center appearance-none"
               >
                 <Plus className="w-4 h-4 mr-1" /> 계좌 추가
               </button>
@@ -148,7 +148,7 @@ export default function AccountInfo() {
             <h3 className="text-lg font-medium mb-6">등록된 계좌 목록</h3>
             <div className="flex-1 flex flex-col gap-4">
             {accounts.length === 0 ? (
-                    <p className="text-gray-500 text-center py-4">등록된 계좌가 없습니다.</p>
+                    <p className="text-sub-gray text-center py-4">등록된 계좌가 없습니다.</p>
                 ) : (
                     <div className="space-y-3 mt-2">
                     {accounts.map((account) => (
@@ -160,20 +160,20 @@ export default function AccountInfo() {
                             name="default-account"
                             checked={account.isDefault}
                             onChange={() => handleSetDefaultAccount(account.id)}
-                            className="w-4 h-4 text-pink-500 border-gray-300 focus:ring-pink-300 mr-3"
+                            className="w-4 h-4 text-main-color border-gray-border focus:ring-main-color mr-3"
                             />
                             <div>
                             <p className="font-medium">{account.bankName}</p>
-                            <p className="text-sm text-gray-500">{account.accountNumber}</p>
+                            <p className="text-sm text-sub-gray">{account.accountNumber}</p>
                             </div>
                             {account.isDefault && (
-                            <span className="ml-2 px-2 py-0.5 bg-pink-100 text-pink-600 text-xs rounded-full">기본</span>
+                            <span className="ml-2 px-2 py-0.5 bg-secondary-color text-main-color text-xs rounded-full">기본</span>
                             )}
                         </div>
                         <button
                             type="button"
                             onClick={() => handleRemoveAccount(account.id)}
-                            className="text-gray-400 hover:text-red-500"
+                            className="text-sub-gray hover:text-red-500"
                         >
                             <Trash2 className="w-4 h-4" />
                         </button>
@@ -183,10 +183,10 @@ export default function AccountInfo() {
                 )}
             </div>
             <div className="flex gap-2 justify-end items-end flex-wrap mt-4">
-                <p className="text-sm font-medium text-gray-400">※ 저장하지 않고 페이지를 나갈 시 변경사항이 저장되지 않습니다.</p>
+                <p className="text-sm font-medium text-sub-gray">※ 저장하지 않고 페이지를 나갈 시 변경사항이 저장되지 않습니다.</p>
                 <button
                     disabled={!saveable}
-                    className={clsx("text-white rounded-md text-sm px-4 py-2", saveable ? "bg-pink-500 hover:bg-pink-600": "bg-gray-300")}
+                    className={clsx("text-white rounded-md text-sm px-4 py-2", saveable ? "bg-main-color hover:bg-secondary-color-dark": "bg-disabled-background")}
                     onClick={handleSave}
                 >
                     저장

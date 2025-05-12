@@ -103,9 +103,9 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
     <div className="flex justify-between items-center w-full max-w-7xl mx-auto py-3 border-b border-gray-100 mb-8">
         {/* 상품 개수 표시 */}
         <div className="flex text-gray-500 font-normal">
-                {type === "search" && searchWord && <p><span className="text-pink-400 font-normal">{searchWord}</span>와 연관된&nbsp;</p>}
+                {type === "search" && searchWord && <p><span className="text-main-color font-normal">{searchWord}</span>와 연관된&nbsp;</p>}
                 <p>
-                <span className="text-pink-400 font-normal">{count.toLocaleString()}</span>개의 상품이 있습니다.
+                <span className="text-main-color font-normal">{count.toLocaleString()}</span>개의 상품이 있습니다.
                 </p>
         </div>
 
@@ -114,7 +114,7 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
             <div className="relative">
             <button
                 ref={buttonRef}
-                className="flex items-center text-pink-400 font-normal"
+                className="flex items-center text-main-color font-normal"
                 onClick={() => setIsOpen(!isOpen)}
             >
                 {getSortText()} {isOpen ? <ChevronUp className="ml-1 h-5 w-5" /> : <ChevronDown className="ml-1 h-5 w-5" />}
@@ -133,7 +133,7 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
                 {getDropdownOptions().map((option) => (
                     <button
                     key={option.value}
-                    className={clsx("font-normal", sort === option.value ? "text-pink-400" : "text-gray-500")}
+                    className={clsx("font-normal", sort === option.value ? "text-main-color" : "text-gray-500")}
                     onClick={() => handleSortClick(option.value as "deadline" | "recommend" | "view" | "achievement")}
                     >
                     {option.label}
