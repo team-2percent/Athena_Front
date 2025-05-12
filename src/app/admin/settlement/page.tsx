@@ -32,7 +32,6 @@ export default function SettlementPage() {
             {
                 id: 1,
                 projectName: "프로젝트 1",
-                accountNumber: "1234567890",
                 totalAmount: 1000000,
                 fee: 10000,
                 status: "pending",
@@ -42,7 +41,6 @@ export default function SettlementPage() {
             {
                 id: 2,
                 projectName: "프로젝트 2",
-                accountNumber: "1234567890",
                 totalAmount: 1000000,
                 fee: 10000,
                 status: "pending",
@@ -52,7 +50,6 @@ export default function SettlementPage() {
             {
                 id: 3,
                 projectName: "프로젝트 3",
-                accountNumber: "1234567890",
                 totalAmount: 1000000,
                 fee: 10000,
                 status: "completed",
@@ -100,7 +97,6 @@ export default function SettlementPage() {
                     <thead>
                         <tr className="bg-gray-50 text-sm">
                             <th className="border-b p-4 text-left">프로젝트</th>
-                            <th className="border-b p-4 w-[10%]">입금 계좌</th>
                             <th className="border-b p-4 w-[10%]">총 금액</th>
                             <th className="border-b p-4 w-[10%]">수수료</th>
                             <th className="border-b p-4 w-[10%]">지급 금액</th>
@@ -113,7 +109,6 @@ export default function SettlementPage() {
                         {settlementList.map((settlement) => (
                             <tr className="text-sm">
                                 <td className="border-b p-4 text-left">{settlement.projectName}</td>
-                                <td className="border-b p-4">{settlement.accountNumber}</td>
                                 <td className="border-b p-4">{settlement.totalAmount}</td>
                                 <td className="border-b p-4">{settlement.fee}</td>
                                 <td className="border-b p-4">{settlement.totalAmount - settlement.fee}</td>
