@@ -76,37 +76,37 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
     {
       id: 2,
       username: "팔로워 이름",
-      purchaseCount: 255,
+      oneLinear: "여행하며 세상을 배우는 중임.",
       profileImage: "/abstract-profile.png",
     },
     {
       id: 3,
       username: "팔로워 이름",
-      purchaseCount: 255,
+      oneLinear: "요리로 행복 나누는 중",
       profileImage: "/abstract-profile.png",
     },
     {
       id: 4,
       username: "팔로워 이름",
-      purchaseCount: 255,
+      oneLinear: "책 읽는 거 좋아해요.",
       profileImage: "/abstract-profile.png",
     },
     {
       id: 5,
       username: "팔로워 이름",
-      purchaseCount: 255,
+      oneLinear: "음악으로 감정 표현함.",
       profileImage: "/abstract-profile.png",
     },
     {
       id: 6,
       username: "팔로워 이름",
-      purchaseCount: 255,
+      oneLinear: "운동 중. 에너지 충전 완료.",
       profileImage: "/abstract-profile.png",
     },
     {
       id: 7,
       username: "팔로워 이름",
-      purchaseCount: 255,
+      oneLinear: "사진 찍는 거 재밌어요.",
       profileImage: "/abstract-profile.png",
     },
   ]
@@ -114,38 +114,38 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
   const followingData = [
     {
       id: 12,
-      username: "팔로워 이름",
-      purchaseCount: 3000,
+      username: "팔로잉 이름",
+      oneLinear: "커피 한 잔으로 하루 시작함.",
       profileImage: "/abstract-profile.png",
     },
     {
       id: 13,
-      username: "팔로워 이름",
-      purchaseCount: 3000,
+      username: "팔로잉 이름",
+      oneLinear: "환경 보호 중이에요.",
       profileImage: "/abstract-profile.png",
     },
     {
       id: 14,
-      username: "팔로워 이름",
-      purchaseCount: 3000,
+      username: "팔로잉 이름",
+      oneLinear: "기술로 세상 바꾸고 싶음.",
       profileImage: "/abstract-profile.png",
     },
     {
       id: 15,
-      username: "팔로워 이름",
-      purchaseCount: 3000,
+      username: "팔로잉 이름",
+      oneLinear: "예술로 감동 주는 중",
       profileImage: "/abstract-profile.png",
     },
     {
       id: 16,
-      username: "팔로워 이름",
-      purchaseCount: 3000,
+      username: "팔로잉 이름",
+      oneLinear: "동물 좋아해요.",
       profileImage: "/abstract-profile.png",
     },
     {
       id: 17,
-      username: "팔로워 이름",
-      purchaseCount: 3000,
+      username: "팔로잉 이름",
+      oneLinear: "영화 보면서 꿈꾸는 중임.",
       profileImage: "/abstract-profile.png",
     },
   ]
@@ -285,7 +285,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
           </div>
         ))}
 
-        {activeTab === "후기" || activeTab === "내가 쓴 후기" && (
+        {(activeTab === "후기" || activeTab === "내가 쓴 후기") && (
           <div>
             {reviews.map((review) => (
               <ReviewItem
@@ -303,14 +303,14 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
           </div>
         )}
 
-        {activeTab === "팔로우" && (
+        {activeTab === "팔로워" && (
           <div>
             {followData.map((user) => (
               <FollowItem
                 key={user.id}
                 id={user.id}
                 username={user.username}
-                purchaseCount={user.purchaseCount}
+                oneLinear={user.oneLinear}
                 profileImage={user.profileImage}
                 onFollow={handleFollow}
               />
@@ -325,7 +325,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
                 key={user.id}
                 id={user.id}
                 username={user.username}
-                purchaseCount={user.purchaseCount}
+                oneLinear={user.oneLinear}
                 profileImage={user.profileImage}
                 onFollow={handleFollow}
               />
