@@ -189,12 +189,12 @@ const Header = () => {
                 type="button"
                 key={tab}
                 className={`relative pb-1 text-base font-medium ${
-                  pathname === uris[tab] ? "text-pink-500" : "text-gray-800"
+                  pathname === uris[tab] ? "text-main-color" : "text-sub-gray"
                 }`}
                 onClick={() => handleTabClick(tab)}
               >
                 {tab}
-                {pathname === uris[tab] && <span className="absolute bottom-0 left-0 h-0.5 w-full bg-pink-500" />}
+                {pathname === uris[tab] && <span className="absolute bottom-0 left-0 h-0.5 w-full bg-main-color" />}
               </button>
             ))}
           </nav>
@@ -204,11 +204,11 @@ const Header = () => {
 
       {/* 알림 패널 */}
       {showNotifications && (
-        <div className="absolute right-4 top-20 z-50 w-96 rounded-2xl border border-gray-200 bg-white p-6 shadow-lg">
+        <div className="absolute right-4 top-20 z-50 w-96 rounded-2xl border border-gray-border bg-white p-6 shadow-lg">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">알림</h2>
             <div className="flex items-center space-x-4">
-              <button type="button" className="text-sm text-gray-500 hover:text-gray-700">모두 지우기</button>
+              <button type="button" className="text-sm text-sub-gray">모두 지우기</button>
               <button type="button" onClick={toggleNotifications}>
                 <X className="h-6 w-6" />
               </button>
@@ -230,13 +230,13 @@ const Header = () => {
                   </div>
                   <div className="flex-1">
                     <p className="mb-1">{notification.message}</p>
-                    <p className="text-sm text-gray-500">{notification.date}</p>
+                    <p className="text-sm text-sub-gray">{notification.date}</p>
                   </div>
-                  <button type="button" className="ml-2 text-gray-400 hover:text-sub-gray">
+                  <button type="button" className="ml-2 text-sub-gray">
                     <Trash2 className="h-5 w-5" />
                   </button>
                 </div>
-                {index < notifications.length - 1 && <hr className="border-gray-200" />}
+                {index < notifications.length - 1 && <hr className="border-gray-border" />}
               </div>
             ))}
           </div>
