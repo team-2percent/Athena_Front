@@ -10,6 +10,7 @@ import ConfirmModal from "@/components/common/ConfirmModal"
 export default function SettlementDetailPage() {
     const router = useRouter()
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [currentPage, setCurrentPage] = useState(1);
     const [settlement, setSettlement] = useState<any>({
         id: 1,
         projectName: "프로젝트 1",
@@ -246,6 +247,11 @@ export default function SettlementDetailPage() {
                         ))}
                     </tbody>
                 </table>
+                <div className="flex justify-center gap-2">
+                <button className="px-3 py-2">◀</button>
+                <button className="px-3 py-2 text-pink-600">1</button>
+                <button className="px-3 py-2">▶</button>
+            </div>
             </div>
             <div className="flex justify-end">
                 <button
