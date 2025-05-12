@@ -93,7 +93,7 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
           <div>
             <label
               htmlFor="accountHolder"
-              className={`text-sm ${focusedField === "accountHolder" ? "text-pink-500" : "text-pink-400"}`}
+              className={`text-sm ${focusedField === "accountHolder" ? "text-secondary-color-dark" : "text-main-color"}`}
             >
               예금주
             </label>
@@ -104,7 +104,7 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
               onChange={(e) => setAccountHolder(e.target.value)}
               placeholder="예금주 이름을 입력하세요"
               className={`w-full p-2 border-b ${
-                focusedField === "accountHolder" ? "border-pink-500" : "border-gray-300"
+                focusedField === "accountHolder" ? "border-secondary-color-dark" : "border-gray-300"
               } ${errors.accountHolder ? "border-red-500" : ""} focus:outline-none text-lg`}
               onFocus={() => setFocusedField("accountHolder")}
               onBlur={() => setFocusedField(null)}
@@ -116,7 +116,7 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
           <div>
             <label
               htmlFor="bankName"
-              className={`text-sm ${focusedField === "bankName" ? "text-pink-500" : "text-pink-400"}`}
+              className={`text-sm ${focusedField === "bankName" ? "text-secondary-color-dark" : "text-main-color"}`}
             >
               은행명
             </label>
@@ -127,7 +127,7 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
               onChange={(e) => setBankName(e.target.value)}
               placeholder="은행명을 입력하세요"
               className={`w-full p-2 border-b ${
-                focusedField === "bankName" ? "border-pink-500" : "border-gray-300"
+                focusedField === "bankName" ? "border-secondary-color-dark" : "border-gray-300"
               } ${errors.bankName ? "border-red-500" : ""} focus:outline-none text-lg`}
               onFocus={() => setFocusedField("bankName")}
               onBlur={() => setFocusedField(null)}
@@ -139,7 +139,7 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
           <div>
             <label
               htmlFor="accountNumber"
-              className={`text-sm ${focusedField === "accountNumber" ? "text-pink-500" : "text-pink-400"}`}
+              className={`text-sm ${focusedField === "accountNumber" ? "text-secondary-color-dark" : "text-main-color"}`}
             >
               계좌번호
             </label>
@@ -150,7 +150,7 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
               onChange={handleAccountNumberChange}
               placeholder="계좌번호를 입력하세요 ('-' 없이 숫자만)"
               className={`w-full p-2 border-b ${
-                focusedField === "accountNumber" ? "border-pink-500" : "border-gray-300"
+                focusedField === "accountNumber" ? "border-secondary-color-dark" : "border-gray-300"
               } ${errors.accountNumber ? "border-red-500" : ""} focus:outline-none text-lg`}
               onFocus={() => setFocusedField("accountNumber")}
               onBlur={() => setFocusedField(null)}
@@ -163,7 +163,7 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
           <button
             type="button"
             onClick={handleSubmit}
-            className="bg-pink-300 text-[#8B1D3F] font-bold py-2 px-6 rounded-full"
+            className="bg-main-color hover:bg-secondary-color-dark text-white font-bold py-2 px-6 rounded-full"
           >
             추가하기
           </button>
@@ -296,7 +296,7 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
             value={teamName}
             onChange={(e) => setTeamName(e.target.value)}
             placeholder="본인(팀) 이름을 입력해 주세요."
-            className="w-full rounded-full border border-gray-300 px-4 py-3 focus:border-pink-400 focus:outline-none"
+            className="w-full rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none"
           />
         </div>
       </div>
@@ -377,7 +377,7 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
             value={teamIntro}
             onChange={(e) => setTeamIntro(e.target.value)}
             placeholder="간단하게 작성해 주세요."
-            className="w-full rounded-3xl border border-gray-300 px-4 py-3 min-h-[200px] focus:border-pink-400 focus:outline-none"
+            className="w-full rounded-3xl border border-gray-300 px-4 py-3 min-h-[200px] focus:border-main-color focus:outline-none"
           />
         </div>
       </div>
@@ -396,7 +396,7 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
               key={account.id}
               onClick={() => handleSelectAccount(account.id)}
               className={`rounded-xl border p-4 cursor-pointer transition-colors ${
-                selectedAccountId === account.id ? "border-pink-400 bg-pink-50" : "border-gray-300 hover:bg-gray-50"
+                selectedAccountId === account.id ? "border-main-color bg-secondary-color" : "border-gray-300 hover:bg-gray-50"
               }`}
             >
               <div className="flex items-center justify-between">
@@ -405,10 +405,10 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
                   <div className="flex items-center justify-center">
                     <div
                       className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                        selectedAccountId === account.id ? "border-pink-400" : "border-gray-300"
+                        selectedAccountId === account.id ? "border-main-color" : "border-gray-300"
                       }`}
                     >
-                      {selectedAccountId === account.id && <div className="w-3 h-3 rounded-full bg-pink-400"></div>}
+                      {selectedAccountId === account.id && <div className="w-3 h-3 rounded-full bg-main-color"></div>}
                     </div>
                   </div>
                   <div>
@@ -452,7 +452,7 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
             >
               <div
                 className={`w-5 h-5 rounded-md border flex items-center justify-center mr-2 ${
-                  useAccountNextTime ? "bg-pink-400 border-pink-400" : "border-gray-300"
+                  useAccountNextTime ? "bg-main-color border-main-color" : "border-gray-300"
                 }`}
                 style={{ borderRadius: "6px" }}
               >

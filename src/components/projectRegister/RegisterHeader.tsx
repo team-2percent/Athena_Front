@@ -42,7 +42,7 @@ export default function RegisterHeader({
       <div className="flex justify-between items-center">
         {/* 단계별 제목 버튼 */}
         <div className="flex">
-          <button className="bg-pink-300 text-white font-medium py-3 px-8 rounded-full">{getStepTitle()}</button>
+          <button className="bg-main-color text-white font-medium py-3 px-8 rounded-full">{getStepTitle()}</button>
         </div>
 
         {/* 단계 표시기 */}
@@ -52,14 +52,14 @@ export default function RegisterHeader({
               <div
                 onClick={() => handleStepClick(step)}
                 className={`flex items-center justify-center w-12 h-12 rounded-full text-xl font-bold ${
-                  step <= currentStep ? "bg-pink-400 text-white cursor-pointer" : "bg-gray-200 text-gray-500"
+                  step <= currentStep ? "bg-main-color text-white cursor-pointer" : "bg-gray-200 text-gray-500"
                 }`}
               >
                 {step}
               </div>
 
               {/* 연결선 (마지막 단계 제외) - 이전 단계와 현재 단계 사이의 연결선도 활성화 */}
-              {step < 3 && <div className={`w-12 h-1 ${step < currentStep ? "bg-pink-400" : "bg-gray-200"}`}></div>}
+              {step < 3 && <div className={`w-12 h-1 ${step < currentStep ? "bg-main-color" : "bg-gray-200"}`}></div>}
             </div>
           ))}
         </div>

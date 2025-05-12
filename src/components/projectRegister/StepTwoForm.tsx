@@ -91,7 +91,7 @@ const CompositionDialog = ({ isOpen, onClose, composition, onSave }: Composition
               <div className="flex-1">
                 <label
                   htmlFor={`item-content-${item.id}`}
-                  className={`text-sm ${focusedField === `item-content-${item.id}` ? "text-pink-500" : "text-pink-400"}`}
+                  className={`text-sm ${focusedField === `item-content-${item.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
                 >
                   구성 세부 내용
                 </label>
@@ -102,7 +102,7 @@ const CompositionDialog = ({ isOpen, onClose, composition, onSave }: Composition
                   onChange={(e) => updateItem(item.id, e.target.value)}
                   placeholder="구성 세부 내용을 입력하세요"
                   className={`w-full p-2 border-b ${
-                    focusedField === `item-content-${item.id}` ? "border-pink-500" : "border-gray-300"
+                    focusedField === `item-content-${item.id}` ? "border-secondary-color-dark" : "border-gray-300"
                   } focus:outline-none text-lg`}
                   onFocus={() => setFocusedField(`item-content-${item.id}`)}
                   onBlur={() => setFocusedField(null)}
@@ -136,7 +136,7 @@ const CompositionDialog = ({ isOpen, onClose, composition, onSave }: Composition
           <button
             type="button"
             onClick={handleSave}
-            className="bg-pink-300 text-[#8B1D3F] font-bold py-2 px-6 rounded-full"
+            className="bg-main-color text-white font-bold py-2 px-6 rounded-full"
           >
             저장
           </button>
@@ -183,7 +183,7 @@ const ScheduleDetailsDialog = ({ isOpen, onClose, details, onSave, scheduleIndex
         <div className="mb-6">
           <label
             htmlFor="schedule-details"
-            className={`block text-sm mb-2 ${focusedField ? "text-pink-500" : "text-pink-400"}`}
+            className={`block text-sm mb-2 ${focusedField ? "text-secondary-color-dark" : "text-main-color"}`}
           >
             일정 상세 내용
           </label>
@@ -194,7 +194,7 @@ const ScheduleDetailsDialog = ({ isOpen, onClose, details, onSave, scheduleIndex
             onChange={(e) => setContent(e.target.value)}
             placeholder="이 일정에 대한 상세 내용을 입력하세요"
             className={`w-full p-4 border rounded-xl ${
-              focusedField ? "border-pink-500" : "border-gray-300"
+              focusedField ? "border-secondary-color-dark" : "border-gray-300"
             } focus:outline-none`}
             onFocus={() => setFocusedField(true)}
             onBlur={() => setFocusedField(false)}
@@ -206,7 +206,7 @@ const ScheduleDetailsDialog = ({ isOpen, onClose, details, onSave, scheduleIndex
           <button
             type="button"
             onClick={handleSave}
-            className="bg-pink-300 text-[#8B1D3F] font-bold py-2 px-6 rounded-full"
+            className="bg-main-color text-white font-bold py-2 px-6 rounded-full"
           >
             저장
           </button>
@@ -460,7 +460,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
                 className="sr-only"
               />
               <span
-                className={`w-5 h-5 rounded-full flex items-center justify-center ${budgetInputMethod === "form" ? "bg-pink-400 text-white" : "border border-gray-300"}`}
+                className={`w-5 h-5 rounded-full flex items-center justify-center ${budgetInputMethod === "form" ? "bg-main-color text-white" : "border border-gray-300"}`}
               >
                 {budgetInputMethod === "form" && <span className="w-2 h-2 bg-white rounded-full"></span>}
               </span>
@@ -475,7 +475,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
                 className="sr-only"
               />
               <span
-                className={`w-5 h-5 rounded-full flex items-center justify-center ${budgetInputMethod === "direct" ? "bg-pink-400 text-white" : "border border-gray-300"}`}
+                className={`w-5 h-5 rounded-full flex items-center justify-center ${budgetInputMethod === "direct" ? "bg-main-color text-white" : "border border-gray-300"}`}
               >
                 {budgetInputMethod === "direct" && <span className="w-2 h-2 bg-white rounded-full"></span>}
               </span>
@@ -508,7 +508,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
                       value={item.name}
                       onChange={(e) => handleBudgetNameChange(item.id, e.target.value)}
                       placeholder="항목명"
-                      className="w-64 rounded-full border border-gray-300 px-4 py-3 focus:border-pink-400 focus:outline-none"
+                      className="w-64 rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none"
                     />
 
                     <div className="mx-4 h-6 w-px bg-gray-300"></div>
@@ -522,7 +522,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
                           className="sr-only"
                         />
                         <span
-                          className={`w-5 h-5 rounded-full flex items-center justify-center ${!item.isPercentage ? "bg-pink-400 text-white" : "border border-gray-300"}`}
+                          className={`w-5 h-5 rounded-full flex items-center justify-center ${!item.isPercentage ? "bg-main-color text-white" : "border border-gray-300"}`}
                         >
                           {!item.isPercentage && <span className="w-2 h-2 bg-white rounded-full"></span>}
                         </span>
@@ -537,7 +537,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
                           className="sr-only"
                         />
                         <span
-                          className={`w-5 h-5 rounded-full flex items-center justify-center ${item.isPercentage ? "bg-pink-400 text-white" : "border border-gray-300"}`}
+                          className={`w-5 h-5 rounded-full flex items-center justify-center ${item.isPercentage ? "bg-main-color text-white" : "border border-gray-300"}`}
                         >
                           {item.isPercentage && <span className="w-2 h-2 bg-white rounded-full"></span>}
                         </span>
@@ -553,7 +553,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
                             value={item.percentage?.replace("%", "") || ""}
                             onChange={(e) => handleBudgetPercentageChange(item.id, e.target.value)}
                             placeholder="0"
-                            className="w-24 rounded-full border border-gray-300 px-4 py-3 focus:border-pink-400 focus:outline-none text-right"
+                            className="w-24 rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none text-right"
                           />
                           <span className="ml-2">%</span>
                           <span className="ml-4 text-gray-500">({item.amount}원)</span>
@@ -565,7 +565,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
                             value={item.amount}
                             onChange={(e) => handleBudgetAmountChange(item.id, e.target.value)}
                             placeholder="0"
-                            className="w-40 rounded-full border border-gray-300 px-4 py-3 focus:border-pink-400 focus:outline-none text-right"
+                            className="w-40 rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none text-right"
                           />
                           <span className="ml-2">원</span>
                           <span className="ml-4 text-gray-500">(전체의 {item.percentage})</span>
@@ -615,7 +615,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
                 className="sr-only"
               />
               <span
-                className={`w-5 h-5 rounded-full flex items-center justify-center ${scheduleInputMethod === "form" ? "bg-pink-400 text-white" : "border border-gray-300"}`}
+                className={`w-5 h-5 rounded-full flex items-center justify-center ${scheduleInputMethod === "form" ? "bg-main-color text-white" : "border border-gray-300"}`}
               >
                 {scheduleInputMethod === "form" && <span className="w-2 h-2 bg-white rounded-full"></span>}
               </span>
@@ -630,7 +630,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
                 className="sr-only"
               />
               <span
-                className={`w-5 h-5 rounded-full flex items-center justify-center ${scheduleInputMethod === "direct" ? "bg-pink-400 text-white" : "border border-gray-300"}`}
+                className={`w-5 h-5 rounded-full flex items-center justify-center ${scheduleInputMethod === "direct" ? "bg-main-color text-white" : "border border-gray-300"}`}
               >
                 {scheduleInputMethod === "direct" && <span className="w-2 h-2 bg-white rounded-full"></span>}
               </span>
@@ -667,7 +667,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
 
                   <button
                     type="button"
-                    className="ml-4 text-pink-500 hover:text-pink-700"
+                    className="ml-4 text-main-color hover:text-secondary-color-dark"
                     onClick={() => openScheduleDetailsDialog(schedule.id)}
                   >
                     내용 작성(편집) &gt;
@@ -706,7 +706,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
         <button
           type="button"
           onClick={updateMarkdown}
-          className="bg-pink-300 text-[#8B1D3F] font-bold py-3 px-8 rounded-full"
+          className="bg-main-color hover:bg-secondary-color-dark text-white font-bold py-3 px-8 rounded-full"
         >
           선택 내용 자동 채우기
         </button>
@@ -748,7 +748,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
                 <div>
                   <label
                     htmlFor={`option-name-${option.id}`}
-                    className={`text-sm ${focusedField === `option-name-${option.id}` ? "text-pink-500" : "text-pink-400"}`}
+                    className={`text-sm ${focusedField === `option-name-${option.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
                   >
                     상품 이름
                   </label>
@@ -759,7 +759,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
                     onChange={(e) => updateSupportOption(option.id, "name", e.target.value)}
                     placeholder="상품 이름을 지어주세요."
                     className={`w-full p-1 border-b ${
-                      focusedField === `option-name-${option.id}` ? "border-pink-500" : "border-gray-300"
+                      focusedField === `option-name-${option.id}` ? "border-secondary-color-dark" : "border-gray-300"
                     } focus:outline-none text-base`}
                     onFocus={() => setFocusedField(`option-name-${option.id}`)}
                     onBlur={() => setFocusedField(null)}
@@ -770,7 +770,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
                 <div>
                   <label
                     htmlFor={`option-desc-${option.id}`}
-                    className={`text-sm ${focusedField === `option-desc-${option.id}` ? "text-pink-500" : "text-pink-400"}`}
+                    className={`text-sm ${focusedField === `option-desc-${option.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
                   >
                     상품 설명
                   </label>
@@ -781,7 +781,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
                     onChange={(e) => updateSupportOption(option.id, "description", e.target.value)}
                     placeholder="해당 옵션을 자세히 설명해 주세요."
                     className={`w-full p-1 border-b ${
-                      focusedField === `option-desc-${option.id}` ? "border-pink-500" : "border-gray-300"
+                      focusedField === `option-desc-${option.id}` ? "border-secondary-color-dark" : "border-gray-300"
                     } focus:outline-none text-base`}
                     onFocus={() => setFocusedField(`option-desc-${option.id}`)}
                     onBlur={() => setFocusedField(null)}
@@ -790,12 +790,12 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
 
                 {/* 구성 */}
                 <div>
-                  <label className="text-sm text-pink-400">구성</label>
+                  <label className="text-sm text-main-color">구성</label>
                   <div className="mt-0.5">
                     <button
                       type="button"
                       onClick={() => openCompositionDialog(option.id)}
-                      className="flex items-center text-pink-500 hover:text-pink-700"
+                      className="flex items-center text-main-color hover:text-secondary-color-dark"
                     >
                       <span>
                         구성 항목 추가/편집...
@@ -814,11 +814,11 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
                 <div className="flex-1">
                   <label
                     htmlFor={`option-price-${option.id}`}
-                    className={`text-sm ${focusedField === `option-price-${option.id}` ? "text-pink-500" : "text-pink-400"}`}
+                    className={`text-sm ${focusedField === `option-price-${option.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
                   >
                     가격
                   </label>
-                  <div className="flex items-center border-b border-gray-300 focus-within:border-pink-500">
+                  <div className="flex items-center border-b border-gray-300 focus-within:border-secondary-color-dark">
                     <input
                       id={`option-price-${option.id}`}
                       type="text"
@@ -837,11 +837,11 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
                 <div className="flex-1">
                   <label
                     htmlFor={`option-stock-${option.id}`}
-                    className={`text-sm ${focusedField === `option-stock-${option.id}` ? "text-pink-500" : "text-pink-400"}`}
+                    className={`text-sm ${focusedField === `option-stock-${option.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
                   >
                     수량
                   </label>
-                  <div className="flex items-center border-b border-gray-300 focus-within:border-pink-500">
+                  <div className="flex items-center border-b border-gray-300 focus-within:border-secondary-color-dark">
                     <input
                       id={`option-stock-${option.id}`}
                       type="text"

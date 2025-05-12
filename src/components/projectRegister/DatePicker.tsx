@@ -154,7 +154,7 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
           type="text"
           value={formatDate(selectedDate)}
           readOnly
-          className="w-44 rounded-full border border-gray-300 px-4 py-3 pr-10 focus:border-pink-400 focus:outline-none cursor-pointer"
+          className="w-44 rounded-full border border-gray-300 px-4 py-3 pr-10 focus:border-main-color focus:outline-none cursor-pointer"
           onClick={() => setIsOpen(!isOpen)}
         />
         <Calendar className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500 pointer-events-none" />
@@ -210,9 +210,9 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
                       !day.isCurrentMonth
                         ? "text-gray-400"
                         : isSelected(day.date)
-                          ? "bg-pink-400 text-white"
+                          ? "bg-main-color text-white"
                           : isToday(day.date)
-                            ? "border border-pink-400 text-pink-500"
+                            ? "border border-main-color text-main-color"
                             : isDisabled
                               ? "text-gray-300 cursor-not-allowed"
                               : "hover:bg-gray-100"
