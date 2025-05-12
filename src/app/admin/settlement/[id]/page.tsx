@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import SettlementTag from "@/components/admin/SettlementTag"
 import Image from "next/image"
+import ConfirmModal from "@/components/common/ConfirmModal"
 
 export default function SettlementDetailPage() {
     const router = useRouter()
+    const [isModalOpen, setIsModalOpen] = useState(false)
     const [settlement, setSettlement] = useState<any>({
         id: 1,
         projectName: "프로젝트 1",
@@ -52,13 +54,18 @@ export default function SettlementDetailPage() {
         ]
     })
 
-    interface Product {
+    interface Project {
         id: number;
         name: string;
         soldCount: number;
         totalAmount: number;
         fee: number;
         settlementAmount: number;
+    }
+
+    const handleConfirmSettlement = () => {
+        // api 요청
+        setIsModalOpen(false)
     }
 
     return (
@@ -168,12 +175,12 @@ export default function SettlementDetailPage() {
                         </tr>
                         <tr className="text-sm">
                             <td className="border-b p-4">전체</td>
-                            <td className="border-b p-4">{settlement.products.reduce((acc: number, cur: Product) => acc + cur.soldCount, 0).toLocaleString()}</td>
-                            <td className="border-b p-4">{settlement.products.reduce((acc: number, cur: Product) => acc + cur.totalAmount, 0).toLocaleString()}</td>
-                            <td className="border-b p-4">{settlement.products.reduce((acc: number, cur: Product) => acc + cur.settlementAmount, 0).toLocaleString()}</td>
-                            <td className="border-b p-4">{settlement.products.reduce((acc: number, cur: Product) => acc + cur.fee, 0).toLocaleString()}</td>
+                            <td className="border-b p-4">{settlement.products.reduce((acc: number, cur: Project) => acc + cur.soldCount, 0).toLocaleString()}</td>
+                            <td className="border-b p-4">{settlement.products.reduce((acc: number, cur: Project) => acc + cur.totalAmount, 0).toLocaleString()}</td>
+                            <td className="border-b p-4">{settlement.products.reduce((acc: number, cur: Project) => acc + cur.settlementAmount, 0).toLocaleString()}</td>
+                            <td className="border-b p-4">{settlement.products.reduce((acc: number, cur: Project) => acc + cur.fee, 0).toLocaleString()}</td>
                         </tr>
-                        {settlement.products.map((product: Product) => (
+                        {settlement.products.map((product: Project) => (
                             <tr key={product.id} className="text-sm">
                                 <td className="border-b p-4">{product.name}</td>
                                 <td className="border-b p-4">{product.soldCount.toLocaleString()}</td>
@@ -239,6 +246,23 @@ export default function SettlementDetailPage() {
                     </tbody>
                 </table>
             </div>
+            <div className="flex justify-end">
+                <button
+                    className="px-8 p-4 rounded-md bg-pink-100 text-pink-600"
+                    onClick={() => setIsModalOpen(true)}
+                >
+                    정산 완료
+                </button>
+            </div>
+            {
+                isModalOpen &&
+                <ConfirmModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    message="정산을 완료하시겠습니까?"
+                    onConfirm={handleConfirmSettlement}
+                />
+            }
         </div>
     )
 }

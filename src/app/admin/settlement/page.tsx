@@ -1,9 +1,12 @@
 "use client"
 
 import SettlementTag from "@/components/admin/SettlementTag"
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react"
 
 export default function SettlementPage() {
+
+    const router = useRouter();
 
     const [settlementList, setSettlementList] = useState<any[]>([])
     const [state, setState] = useState<"all" |"pending" | "completed" | "failed">("all")
@@ -107,7 +110,7 @@ export default function SettlementPage() {
                     </thead>
                     <tbody>
                         {settlementList.map((settlement) => (
-                            <tr className="text-sm">
+                            <tr className="text-sm" onClick={() => router.push(`/admin/settlement/${settlement.id}`)}>
                                 <td className="border-b p-4 text-left">{settlement.projectName}</td>
                                 <td className="border-b p-4">{settlement.totalAmount}</td>
                                 <td className="border-b p-4">{settlement.fee}</td>
