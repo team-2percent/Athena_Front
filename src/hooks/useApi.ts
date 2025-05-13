@@ -8,7 +8,7 @@ interface ApiResponse<T> {
   status: number;
 }
 
-const api_base = "http://localhost:8000";
+const api_base = "http://localhost:3000";
 
 export function useApi() {
   const { logout } = useAuth();
@@ -20,7 +20,7 @@ export function useApi() {
       throw new Error("No refresh token available");
     }
 
-    const response = await fetch(api_base + "/api/v1/accounts/token/refresh/", {
+    const response = await fetch(api_base + "/api/accounts/token/refresh/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

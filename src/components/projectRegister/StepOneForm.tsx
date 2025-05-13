@@ -6,56 +6,25 @@ import { useState, useEffect, useRef } from "react"
 import { Upload, ChevronDown, Check, Trash2 } from "lucide-react"
 import DatePicker from "./DatePicker"
 
-interface ImageFile {
-  id: string
-  file: File
-  preview: string
-}
+import { useProjectFormStore } from "@/stores/useProjectFormStore"
 
 interface StepOneFormProps {
-  formData: {
-    targetAmount: string
-  }
-  onUpdateFormData: (data: Partial<{ targetAmount: string }>) => void
-  initialData?: {
-    category?: string
-    title?: string
-    description?: string
-    targetAmount?: string
-    startDate?: Date
-    endDate?: Date
-    deliveryDate?: Date
-    images?: ImageFile[]
-  }
+  onUpdateFormData: (data: Partial<any>) => void
+  formData?: any
+  initialData?: any
 }
 
-export default function StepOneForm({ formData, onUpdateFormData, initialData }: StepOneFormProps) {
-  const [category, setCategory] = useState(initialData?.category || "책")
+export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
+  // Zustand 스토어에서 상태 가져오기
+  const { targetAmount, category, title, description, startDate, endDate, deliveryDate, images } = useProjectFormStore()
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false)
-  const [title, setTitle] = useState(initialData?.title || "")
-  const [description, setDescription] = useState(initialData?.description || "")
-  const [targetAmount, setTargetAmount] = useState(formData.targetAmount || initialData?.targetAmount || "")
   const [targetAmountError, setTargetAmountError] = useState("")
-  const [startDate, setStartDate] = useState(initialData?.startDate || new Date())
-  const [endDate, setEndDate] = useState(
-    initialData?.endDate || new Date(new Date().setDate(new Date().getDate() + 21)),
-  ) // 기본값: 오늘로부터 21일 후
-  const [deliveryDate, setDeliveryDate] = useState(
-    initialData?.deliveryDate ||
-      (() => {
-        // 기본값: 펀딩 종료일 + 7일
-        const date = new Date(endDate)
-        date.setDate(date.getDate() + 7)
-        return date
-      }),
-  )
   const [minDeliveryDate, setMinDeliveryDate] = useState(() => {
     // 최소 배송일: 펀딩 종료일 + 7일
     const date = new Date(endDate)
     date.setDate(date.getDate() + 7)
     return date
   })
-  const [images, setImages] = useState<ImageFile[]>(initialData?.images || [])
   const [isDragging, setIsDragging] = useState(false)
   const dragCounter = useRef(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -63,8 +32,8 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
   const categoryOptions = ["책", "예술", "음악", "공예", "디자인"]
 
   const handleCategorySelect = (selectedCategory: string) => {
-    setCategory(selectedCategory)
     setIsCategoryDropdownOpen(false)
+    onUpdateFormData({ category: selectedCategory })
   }
 
   // 숫자만 입력 가능하도록 처리
@@ -76,11 +45,9 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
     if (numericValue > 10000000000) {
       setTargetAmountError("목표 금액은 최대 100억원까지 설정 가능합니다.")
       // 100억으로 제한
-      setTargetAmount("10000000000")
       onUpdateFormData({ targetAmount: "10000000000" })
     } else {
       setTargetAmountError("")
-      setTargetAmount(value)
       onUpdateFormData({ targetAmount: value })
     }
   }
@@ -99,30 +66,15 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
 
     // 현재 배송일이 새로운 최소 배송일보다 이전이면 최소 배송일로 설정
     if (deliveryDate < newMinDeliveryDate) {
-      setDeliveryDate(newMinDeliveryDate)
+      onUpdateFormData({ deliveryDate: newMinDeliveryDate })
     }
-  }, [endDate, deliveryDate])
-
-  // Initialize form data from props
-  useEffect(() => {
-    if (formData.targetAmount && !targetAmount) {
-      setTargetAmount(formData.targetAmount)
-    }
-  }, [formData])
-
-  // 이미지 미리보기 URL 정리
-  useEffect(() => {
-    return () => {
-      // 컴포넌트 언마운트 시 미리보기 URL 해제
-      images.forEach((image) => URL.revokeObjectURL(image.preview))
-    }
-  }, [images])
+  }, [endDate, deliveryDate, onUpdateFormData])
 
   // 파일 처리 함수
   const handleFiles = (files: FileList | null) => {
     if (!files) return
 
-    const newImages: ImageFile[] = []
+    const newImages: any[] = []
 
     // 최대 5개까지만 처리
     const remainingSlots = 5 - images.length
@@ -140,7 +92,8 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
       newImages.push({ id, file, preview })
     }
 
-    setImages((prev) => [...prev, ...newImages])
+    const updatedImages = [...images, ...newImages]
+    onUpdateFormData({ images: updatedImages })
   }
 
   // 드래그 앤 드롭 이벤트 핸들러
@@ -189,13 +142,13 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
 
   // 이미지 삭제 핸들러
   const handleRemoveImage = (id: string) => {
-    setImages((prev) => {
-      const imageToRemove = prev.find((img) => img.id === id)
-      if (imageToRemove) {
-        URL.revokeObjectURL(imageToRemove.preview)
-      }
-      return prev.filter((img) => img.id !== id)
-    })
+    const updatedImages = images.filter((img) => img.id !== id)
+    onUpdateFormData({ images: updatedImages })
+
+    const imageToRemove = images.find((img) => img.id === id)
+    if (imageToRemove && imageToRemove.preview) {
+      URL.revokeObjectURL(imageToRemove.preview)
+    }
   }
 
   return (
@@ -243,7 +196,7 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
             id="title"
             type="text"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => onUpdateFormData({ title: e.target.value })}
             placeholder="상품명을 입력해 주세요."
             className="w-full rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none"
           />
@@ -259,7 +212,7 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
           <textarea
             id="description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => onUpdateFormData({ description: e.target.value })}
             placeholder="상품에 대한 간략한 설명을 입력하세요"
             className="w-full rounded-3xl border border-gray-300 px-4 py-3 min-h-[150px] focus:border-main-color focus:outline-none"
           />
@@ -351,7 +304,7 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
                         >
                           <Trash2 className="h-4 w-4 text-red-500" />
                         </button>
-                        <p className="text-xs text-gray-500 mt-1 truncate">{image.file.name}</p>
+                        <p className="text-xs text-gray-500 mt-1 truncate">{image.file ? image.file.name : "이미지"}</p>
                       </div>
                     ))}
                   </div>
@@ -377,7 +330,7 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
       {/* 목표 금액 - 세로 배치로 변경 */}
       <div className="flex flex-col">
         <div className="flex items-center mb-4">
-          <h3 className="text-xl font-bold">목표 금액</h3>
+          <h3 className="text-xl font-bold mr-8">목표 금액</h3>
           <span className="text-sm text-gray-500 ml-4">* 최대 100억원까지 입력 가능합니다.</span>
         </div>
 
@@ -392,6 +345,7 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
           />
           <span className="ml-2 text-lg">원</span>
         </div>
+        {targetAmountError && <p className="text-red-500 text-sm mt-1">{targetAmountError}</p>}
       </div>
 
       {/* 펀딩 일정 - 세로 배치로 변경 */}
@@ -400,9 +354,18 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
           펀딩 일정
         </label>
         <div className="flex items-center gap-4">
-          <DatePicker selectedDate={startDate} onChange={setStartDate} position="top" />
+          <DatePicker
+            selectedDate={startDate}
+            onChange={(date) => onUpdateFormData({ startDate: date })}
+            position="top"
+          />
           <span>부터</span>
-          <DatePicker selectedDate={endDate} onChange={setEndDate} position="top" minDate={startDate} />
+          <DatePicker
+            selectedDate={endDate}
+            onChange={(date) => onUpdateFormData({ endDate: date })}
+            position="top"
+            minDate={startDate}
+          />
           <span>까지</span>
         </div>
       </div>
@@ -414,7 +377,12 @@ export default function StepOneForm({ formData, onUpdateFormData, initialData }:
           <span className="text-sm text-gray-500 ml-4">* 펀딩 종료일의 7일째 되는 날부터 선택 가능합니다.</span>
         </div>
         <div className="flex items-center gap-4">
-          <DatePicker selectedDate={deliveryDate} onChange={setDeliveryDate} position="top" minDate={minDeliveryDate} />
+          <DatePicker
+            selectedDate={deliveryDate}
+            onChange={(date) => onUpdateFormData({ deliveryDate: date })}
+            position="top"
+            minDate={minDeliveryDate}
+          />
         </div>
       </div>
     </div>

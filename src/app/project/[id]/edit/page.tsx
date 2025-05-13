@@ -6,7 +6,9 @@ import StepOneForm from "@/components/projectRegister/StepOneForm"
 import StepTwoForm from "@/components/projectRegister/StepTwoForm"
 import StepThreeForm from "@/components/projectRegister/StepThreeForm"
 import { useRouter } from "next/navigation"
+import { useProjectFormStore } from "@/stores/useProjectFormStore"
 import Spinner from "@/components/common/Spinner"
+import { useApi } from "@/hooks/useApi"
 
 // 목 데이터: 실제로는 API에서 가져올 데이터
 const mockProductData = {
@@ -67,21 +69,12 @@ const mockProductData = {
 }
 
 export default function ProductEdit() {
-  const [currentStep, setCurrentStep] = useState(1)
-  const [formData, setFormData] = useState({
-    targetAmount: "",
-    category: "",
-    title: "",
-    description: "",
-    startDate: new Date(),
-    endDate: new Date(),
-    deliveryDate: new Date(),
-    images: [] as { id: string; file: File; preview: string }[],
-    markdown: "",
-    supportOptions: [] as any[],
-  })
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+  const { apiCall } = useApi()
+
+  // Zustand 스토어에서 상태와 액션 가져오기
+  const { currentStep, setCurrentStep, updateFormData, resetForm, setLoading } = useProjectFormStore()
 
   // 데이터 로드 (실제로는 API 호출)
   useEffect(() => {
@@ -99,9 +92,13 @@ export default function ProductEdit() {
           try {
             // 실제 구현에서는 URL에서 파일을 가져오는 로직 필요
             // 여기서는 간단히 처리
+            const response = await fetch(img.url)
+            const blob = await response.blob()
+            const file = new File([blob], img.name, { type: blob.type })
+
             return {
               id: img.id,
-              file: new File([], img.name, { type: "image/jpeg" }),
+              file: file,
               preview: img.url,
             }
           } catch (error) {
@@ -112,7 +109,7 @@ export default function ProductEdit() {
 
         const loadedImages = (await Promise.all(imagePromises)).filter(Boolean)
 
-        setFormData({
+        updateFormData({
           targetAmount: data.targetAmount,
           category: data.category,
           title: data.title,
@@ -133,17 +130,12 @@ export default function ProductEdit() {
     }
 
     loadProductData()
-  }, [])
+  }, [updateFormData])
 
   // 단계가 변경될 때 화면 맨 위로 스크롤
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }, [currentStep])
-
-  // Update form data
-  const updateFormData = (data: Partial<typeof formData>) => {
-    setFormData({ ...formData, ...data })
-  }
 
   // 다음 단계로 이동
   const handleNext = () => {
@@ -167,6 +159,7 @@ export default function ProductEdit() {
   const handleCancel = () => {
     // 취소 시 홈으로 이동하거나 다른 처리
     if (confirm("상품 수정을 취소하시겠습니까?")) {
+      resetForm()
       router.push("/my")
     }
   }
@@ -174,8 +167,9 @@ export default function ProductEdit() {
   // 수정 완료 처리
   const handleSubmit = () => {
     // 상품 수정 로직 구현 (실제로는 API 호출)
-    console.log("수정할 데이터:", formData)
+    console.log("수정할 데이터:", useProjectFormStore.getState())
     alert("상품이 수정되었습니다.")
+    resetForm()
     router.push("/my")
   }
 
@@ -193,37 +187,9 @@ export default function ProductEdit() {
 
       <div className="mt-8 mb-16">
         {/* 단계별 폼 컴포넌트 */}
-        {currentStep === 1 && (
-          <StepOneForm
-            onUpdateFormData={updateFormData}
-            formData={{ targetAmount: formData.targetAmount }}
-            initialData={{
-              category: formData.category,
-              title: formData.title,
-              description: formData.description,
-              targetAmount: formData.targetAmount,
-              startDate: formData.startDate,
-              endDate: formData.endDate,
-              deliveryDate: formData.deliveryDate,
-              images: formData.images,
-            }}
-          />
-        )}
-        {currentStep === 2 && (
-          <StepTwoForm
-            targetAmount={formData.targetAmount}
-            initialData={{
-              markdown: formData.markdown,
-            }}
-          />
-        )}
-        {currentStep === 3 && (
-          <StepThreeForm
-            initialData={{
-              supportOptions: formData.supportOptions,
-            }}
-          />
-        )}
+        {currentStep === 1 && <StepOneForm onUpdateFormData={updateFormData} />}
+        {currentStep === 2 && <StepTwoForm onUpdateMarkdown={(markdown) => updateFormData({ markdown })} />}
+        {currentStep === 3 && <StepThreeForm />}
       </div>
 
       {/* 단계별 버튼 */}
