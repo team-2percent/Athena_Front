@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local"; // 지정한 폰트를 사용하기 위해 불러옴
 import "./globals.css";
 import HeaderLoader from "@/components/HeaderLoader";
-import RegisterPageButton from "@/components/projectRegister/RegisterPageButton";
+import RegisterPageButtonLoader from "@/components/RegisterPageButtonLoader";
 
 // Pretendard 폰트를 사용하기 위해 불러옴
 const pretendard = localFont({
@@ -32,7 +32,7 @@ export default function RootLayout({
           <div className="container mx-auto px-4 py-8">
             {children}
           </div>
-          <RegisterPageButton />
+          <RegisterPageButtonLoader />
         </main>
       </body>
     </html>

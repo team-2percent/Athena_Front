@@ -34,21 +34,80 @@ export default function ProjectApprovalDetailPage() {
             {/* 프로젝트 기본 정보 */}
             <div className="flex flex-col gap-4">
                 <h2 className="text-2xl font-medium border-b pb-2">프로젝트 기본 정보</h2>
+                <div className="grid grid-cols-5 gap-4">
+                    <div className="aspect-square w-full relative">
+                        <Image
+                            src="/project-test.png"
+                            alt="프로젝트 이미지 1"
+                            fill
+                            className="object-cover rounded-lg"
+                        />
+                    </div>
+                    <div className="aspect-square w-full relative">
+                        <Image
+                            src="/project-test.png"
+                            alt="프로젝트 이미지 2"
+                            fill
+                            className="object-cover rounded-lg"
+                        />
+                    </div>
+                    <div className="aspect-square w-full relative">
+                        <Image
+                            src="/project-test.png"
+                            alt="프로젝트 이미지 3"
+                            fill
+                            className="object-cover rounded-lg"
+                        />
+                    </div>
+                    <div className="aspect-square w-full relative">
+                        <Image
+                            src="/project-test.png"
+                            alt="프로젝트 이미지 4"
+                            fill
+                            className="object-cover rounded-lg"
+                        />
+                    </div>
+                    <div className="aspect-square w-full relative">
+                        <Image
+                            src="/project-test.png"
+                            alt="프로젝트 이미지 5"
+                            fill
+                            className="object-cover rounded-lg"
+                        />
+                    </div>
+                </div>
                 
                 <div className="space-y-4 mt-4">
                 <div className="flex">
                     <span className="w-24 text-sub-gray">프로젝트</span>
-                    <span>TG5555555</span>
+                    <span className="flex-1">TG5555555</span>
+                </div>
+
+                <div className="flex">
+                    <span className="w-24 text-sub-gray">카테고리</span>
+                    <span className="flex-1">디자인 문구</span>
+                </div>
+
+                <div className="flex">
+                    <span className="w-24 text-sub-gray">설명</span>
+                    <span className="flex-1">
+                        이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.
+                    </span>
+                </div>
+
+                <div className="flex">
+                    <span className="w-24 text-sub-gray">목표 가격</span>
+                    <span className="flex-1">100000000 원</span>
                 </div>
 
                 <div className="flex">
                     <span className="w-24 text-sub-gray">판매 기간</span>
-                    <span>2025. 04. 25 ~ 2025. 05. 15 (19일)</span>
+                    <span className="flex-1">2025. 04. 25 ~ 2025. 05. 15 (19일)</span>
                 </div>
 
                 <div className="flex">
                     <span className="w-24 text-sub-gray">등록</span>
-                    <span>2025. 04. 13</span>
+                    <span className="flex-1">2025. 04. 13</span>
                 </div>
                 </div>
                 
@@ -74,7 +133,6 @@ export default function ProjectApprovalDetailPage() {
                         </button>
                         <div className="flex flex-col">
                             <span className="text-xl font-medium">기적가</span>
-                            <span className="text-sm text-gray-500">판매자 소개</span>
                         </div>
                     </div>
                     
