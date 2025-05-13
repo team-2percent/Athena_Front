@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import ListHeader from "./ListHeader";
 import ProjectsList from "./ProjectsList";
+import Spinner from "../common/Spinner";
 
 interface ListPageProps {
     type: "new" | "deadline" | "category" | "search"
@@ -17,7 +18,7 @@ const sorts = {
 }
 
 export default function ListPage({ type, categoryId, searchWord }: ListPageProps) {
-    const [isLoading, setIsLoading] = useState(false); // 로딩 상태
+    const [isLoading, setIsLoading] = useState(true); // 로딩 상태
     const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
     const [morePage, setMorePage] = useState(true); // 더 불러올 페이지가 있는지
     const [totalCount, setTotalCount] = useState(0);
@@ -40,10 +41,32 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
     const [projects, setProjects] = useState<Project[]>([]);
 
     const loadProjects = async () => {
-        const response = await fetch(loadUrl);
-        const data = await response.json();
-        setProjects(data.projects);
-        setTotalCount(data.totalCount);
+        setIsLoading(true);
+        // fetch(loadUrl).then(
+        //   response => response.json().then(
+        //     data => {
+        //       setProjects(data.projects);
+        //       setTotalCount(data.totalCount);
+        //       setIsLoading(false);
+        //       setMorePage(data.morePage);
+        //     }
+        //   )
+        // );
+        setProjects(Array(20).fill({}).map((_, index) => (
+          {
+              id: index * 2 + 1,
+              image: "/project-test.png",
+              sellerName: "John Doe",
+              projectName: "Project 1",
+              achievementRate: 50,
+              description: "This is a description of the projectThis is a description of the projectThis is a description of the project",
+              liked: false,
+              daysLeft: 10
+          }
+      )));
+        setTotalCount(999999);
+        setIsLoading(false);
+        setMorePage(true);
     }
 
     const loadMoreProjects = async () => {
@@ -110,11 +133,11 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
             sort={sort as "new" | "deadline" | "recommend" | "view" | "achievement" | null}
             onClickSort={handleSortClick}
         /> 
-        <ProjectsList projects={projects} />
+        <ProjectsList projects={projects} isLoading={isLoading} />
         { 
             morePage && 
             <div className="w-full py-20 flex justify-center items-center" ref={loader}>
-                <p className="text-2xl font-medium text-main-color">Loading...</p>
+                <Spinner message="더 불러오는 중입니다..." />
             </div>
         }
     </div>
