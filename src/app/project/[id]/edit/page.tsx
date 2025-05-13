@@ -79,10 +79,6 @@ export default function ProductEdit() {
     images: [] as { id: string; file: File; preview: string }[],
     markdown: "",
     supportOptions: [] as any[],
-    teamName: "",
-    teamIntro: "",
-    teamImage: null as File | null,
-    teamImagePreview: null as string | null,
   })
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
@@ -116,9 +112,6 @@ export default function ProductEdit() {
 
         const loadedImages = (await Promise.all(imagePromises)).filter(Boolean)
 
-        // 팀 이미지 처리 (실제 구현에서는 URL에서 파일 가져오기 필요)
-        // 여기서는 미리보기 URL만 설정
-
         setFormData({
           targetAmount: data.targetAmount,
           category: data.category,
@@ -130,10 +123,6 @@ export default function ProductEdit() {
           images: loadedImages as any[],
           markdown: data.markdown,
           supportOptions: data.supportOptions,
-          teamName: data.teamName,
-          teamIntro: data.teamIntro,
-          teamImage: null, // 실제 구현에서는 File 객체로 변환
-          teamImagePreview: data.teamImage,
         })
 
         setIsLoading(false)
@@ -225,7 +214,6 @@ export default function ProductEdit() {
             targetAmount={formData.targetAmount}
             initialData={{
               markdown: formData.markdown,
-              supportOptions: formData.supportOptions,
             }}
           />
         )}
