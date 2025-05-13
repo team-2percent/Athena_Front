@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import ProfileTabs from "./ProfileTabs"
 import ProjectItem from "./ProjectItem"
@@ -9,6 +9,8 @@ import ReviewItem from "./ReviewItem"
 import { Percent } from "lucide-react"
 import MyProjectList from "./MyProjectList"
 import clsx from "clsx"
+import { useApi } from "@/hooks/useApi"
+import { UserCoupon } from "@/lib/couponInterface"
 
 interface ProfileContentProps {
   introduction: string
@@ -17,6 +19,8 @@ interface ProfileContentProps {
 }
 
 export default function ProfileContent({ introduction, links, isMy }: ProfileContentProps) {
+  const { isLoading, apiCall } = useApi();
+  const [userCoupons, setUserCoupons] = useState<UserCoupon[]>([]);
   const [activeTab, setActiveTab] = useState("소개")
 
   // 상품 데이터 (실제로는 API에서 가져올 데이터)
@@ -175,53 +179,14 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
     },
   ]
 
-  // mock data: 쿠폰 데이터 추후 삭제
-  const coupons = [
-    {
-      id: 1,
-      amount: "1000000원",
-      title: "~~~~ 쿠폰",
-      description:
-        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12",
-      state: "UNUSED"
-    },
-    {
-      id: 2,
-      amount: "1000000원",
-      title: "~~~~ 쿠폰",
-      description:
-        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12",
-      state: "USED"
-    },
-    {
-      id: 3,
-      amount: "1000000원",
-      title: "~~~~ 쿠폰",
-      description:
-        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12",
-      state: "EXPIRED"
-    },
-    {
-      id: 4,
-      amount: "1000000원",
-      title: "~~~~ 쿠폰",
-      description:
-        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12",
-      state: "EXPIRED"
-    },
-  ]
-
   const couponStateMessage = (state: string, expiredDate: string) => {
+    const expiredDateString = new Date(expiredDate).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
     if (state === "UNUSED") {
-      return `${expiredDate}까지 사용가능`
+      return `${expiredDateString}까지 사용가능`
     } else if (state === "USED") {
       return "사용완료"
     } else if (state === "EXPIRED") {
-      return `${expiredDate} 만료`
+      return `${expiredDateString} 만료`
     }
   }
 
@@ -236,6 +201,14 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
     // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
     // 삭제 후 다시 조회하여 setProjects 호출
   }
+
+  const loadUserCoupon = () => {
+    apiCall("/api/userCoupon", "GET").then(({ data }) => setUserCoupons(data as UserCoupon[]))
+  }
+
+  useEffect(() => {
+    loadUserCoupon()
+  }, []);
 
   return (
     <div className="mt-12">
@@ -334,10 +307,10 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
         )}
 
         {activeTab === "쿠폰" && <div className="flex flex-col gap-4">
-          {coupons.map((coupon) => (
+          {userCoupons.map((coupon) => (
           <div className="rounded-2xl border border-gray-border flex overflow-hidden" key={coupon.id}>
             {/* 왼쪽: 퍼센트 아이콘 */}
-            <div className={clsx("relative min-w-[70px] h-[100px] flex items-center justify-center", coupon.state === "UNUSED" ? "bg-main-color" : "bg-disabled-background")}>
+            <div className={clsx("relative min-w-[70px] h-[100px] flex items-center justify-center", coupon.status === "UNUSED" ? "bg-main-color" : "bg-disabled-background")}>
               <div className="absolute top-0 right-0 w-4 h-4 bg-white rounded-full translate-x-1/2 translate-y-[-50%]"></div>
               <div className="absolute bottom-0 right-0 w-4 h-4 bg-white rounded-full translate-x-1/2 translate-y-[50%]"></div>
               <Percent className="h-8 w-8 text-white" />
@@ -346,17 +319,17 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
             {/* 중앙: 쿠폰 제목 및 설명 */}
             <div className="flex-1 p-4 flex flex-col justify-center">
               <h3 className="text-lg font-bold">{coupon.title}</h3>
-              <p className="text-sm text-sub-gray mt-1">{coupon.description}</p>
+              <p className="text-sm text-sub-gray mt-1">{coupon.content}</p>
             </div>
       
             {/* 구분선 */}
             <div className="w-0 border-l border-dashed border-gray-border my-4"></div>
       
             {/* 오른쪽: 금액 및 유효기간 */}
-            <div className="p-4 flex flex-col justify-center items-end min-w-[140px]">
-              <p className={clsx("text-xl font-bold", coupon.state === "UNUSED" ? "text-main-color" : "text-disabled-text")}>{coupon.amount}</p>
+            <div className="p-4 flex flex-col justify-center items-end w-60">
+              <p className={clsx("text-xl font-bold", coupon.status === "UNUSED" ? "text-main-color" : "text-disabled-text")}>{coupon.price} 원</p>
               <p className="text-xs text-sub-gray mt-1">
-                {couponStateMessage(coupon.state, coupon.validUntil)}
+                {couponStateMessage(coupon.status, coupon.expires)}
               </p>
             </div>
           </div>

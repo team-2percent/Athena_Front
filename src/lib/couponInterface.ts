@@ -5,8 +5,19 @@ interface CouponEvent {
     content: string;
     price: number;
     stock: number;
-    expireAt: string;
+    expires: string;
     userIssued: boolean;
 }
 
-export type { CouponEvent };
+interface UserCoupon {
+    id: number,
+    couponId: number,
+    title: string,
+    content: string,
+    price: number,
+    stock: number,
+    expires: string,
+    status: string,
+}
+
+export type { CouponEvent, UserCoupon };

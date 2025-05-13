@@ -51,7 +51,7 @@ export default function CouponModal({ isOpen, onClose }: CouponProps) {
               </div>
               </div>
               <p className="mt-1 text-xs text-sub-gray">{coupon.content}</p>
-              <p className="mt-0.5 text-xs text-sub-gray">{new Date(coupon.expireAt).toLocaleString('ko-KR', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'}).replace(/\//g, '.').replace(',', '') + ' 만료'}</p>
+              <p className="mt-0.5 text-xs text-sub-gray">{new Date(coupon.expires).toLocaleString('ko-KR', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'}).replace(/\//g, '.').replace(',', '') + ' 만료'}</p>
             </div>
             <div className="flex flex-col items-end">
               <button

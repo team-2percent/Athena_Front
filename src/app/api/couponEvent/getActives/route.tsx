@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
             "content": "string",
             "price": 1073741824,
             "stock": 1073741824,
-            "expireAt": "2025-05-13T05:16:33.825Z",
+            "expires": "2025-05-13T05:16:33.825Z",
             "userIssued": false
         },
         {
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
         "content": "string",
         "price": 1073741824,
         "stock": 1073741824,
-        "expireAt": "2025-05-13T05:16:33.825Z",
+        "expires": "2025-05-13T05:16:33.825Z",
         "userIssued": true
         },
     ]);
