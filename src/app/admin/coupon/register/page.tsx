@@ -8,9 +8,11 @@ import { useRouter } from "next/navigation"
 import ConfirmModal from "@/components/common/ConfirmModal"
 import { useApi } from "@/hooks/useApi"
 import TimePicker from "@/components/common/TimePicker"
+import OverlaySpinner from "@/components/common/OverlaySpinner"
 export default function CouponRegisterPage() {
     const router = useRouter();
     const { apiCall } = useApi();
+    const [isLoading, setIsLoading] = useState<boolean>(false) // 쿠폰 등록 중 로딩 상태
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     // 쿠폰 추가
     const [couponName, setCouponName] = useState<string>("")
@@ -26,13 +28,13 @@ export default function CouponRegisterPage() {
 
     const [couponPriceError, setCouponPriceError] = useState<boolean>(false);
     const [couponStockError, setCouponStockError] = useState<boolean>(false);
-
-    const isSameDate = couponStartDateTime.toDateString() === couponEndDateTime.toDateString()
     
     const disabled = couponName === "" || couponDescription === "" || couponPrice === 0 || couponStartDateTime === null || couponEndDateTime === null || couponExpireDateTime === null || couponStock === 0
 
     const handleAddCoupon = () => {
         // 쿠폰 등록 추가
+        setIsModalOpen(false);
+        setIsLoading(true)
         apiCall("/api/coupon/create", "POST", {
             title: couponName,
             content: couponDescription,
@@ -117,6 +119,9 @@ export default function CouponRegisterPage() {
 
     return (
         <div className="flex flex-col mx-auto w-full p-8 gap-6">
+            {
+                isLoading && <OverlaySpinner message="쿠폰 등록 중입니다." />
+            }
                 <div className="flex w-full">
                 <button className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.push("/admin/coupon")}>
                     <ArrowLeftIcon className="w-4 h-4" />
