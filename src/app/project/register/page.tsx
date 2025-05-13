@@ -12,6 +12,7 @@ export default function ProjectRegister() {
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
     targetAmount: "",
+    supportOptions: [] as any[],
   })
   const router = useRouter()
 
@@ -66,7 +67,7 @@ export default function ProjectRegister() {
         {/* 단계별 폼 컴포넌트 */}
         {currentStep === 1 && <StepOneForm onUpdateFormData={updateFormData} formData={formData} />}
         {currentStep === 2 && <StepTwoForm targetAmount={formData.targetAmount} />}
-        {currentStep === 3 && <StepThreeForm initialData={{ supportOptions: [] }} />}
+        {currentStep === 3 && <StepThreeForm initialData={{ supportOptions: formData.supportOptions }} />}
       </div>
 
       {/* 단계별 버튼 */}
