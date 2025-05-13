@@ -18,8 +18,17 @@ export default function CouponModal({ isOpen, onClose }: CouponProps) {
   const [coupons, setCoupons] = useState<CouponEvent[]>([]);
 
   const handleGetCoupon = (couponId: number) => {
-    // 쿠폰 발급 로직 추후 추가
-    console.log(`쿠폰 ${couponId} 발급됨`)
+    apiCall("/api/userCoupon", "POST", { couponId }).then(() => {
+      loadCoupons()
+    })
+  }
+
+  const loadCoupons = () => {
+    apiCall("/api/couponEvent/getActives", "GET").then(({ data }) => {
+      if (data) {
+        setCoupons(data as CouponEvent[])
+      }
+    });
   }
 
   const renderCoupons = () => {
@@ -57,17 +66,13 @@ export default function CouponModal({ isOpen, onClose }: CouponProps) {
               </div>
             </div>
           </div>
-          
         </div>
       ))
     }
   }
+
   useEffect(() => {
-    apiCall("/api/couponEvent/getActives", "GET").then(({ data }) => {
-      if (data) {
-        setCoupons(data as CouponEvent[])
-      }
-    });
+    loadCoupons();
   }, []);
 
   return (
