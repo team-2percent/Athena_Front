@@ -1,21 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import DatePicker from "@/components/projectRegister/DatePicker"
 import clsx from "clsx"
 import { ArrowLeftIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import ConfirmModal from "@/components/common/ConfirmModal"
+import { useApi } from "@/hooks/useApi"
+import TimePicker from "@/components/common/TimePicker"
 export default function CouponRegisterPage() {
     const router = useRouter();
+    const { apiCall } = useApi();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     // 쿠폰 추가
     const [couponName, setCouponName] = useState<string>("")
     const [couponDescription, setCouponDescription] = useState<string>("")
     const [couponPrice, setCouponPrice] = useState<number>(0)
-    const [couponStartDate, setCouponStartDate] = useState<Date>(new Date())
-    const [couponEndDate, setCouponEndDate] = useState<Date>(new Date())
-    const [couponExpireDate, setCouponExpireDate] = useState<Date>(new Date())
+    const [couponStartDateTime, setCouponStartDateTime] = useState<Date>(new Date())
+    const [couponEndDateTime, setCouponEndDateTime] = useState<Date>(new Date())
+    const [couponExpireDateTime, setCouponExpireDateTime] = useState<Date>(new Date())
     const [couponStock, setCouponStock] = useState<number>(0)
 
     const couponPriceLimit = 10000000000
@@ -24,11 +27,23 @@ export default function CouponRegisterPage() {
     const [couponPriceError, setCouponPriceError] = useState<boolean>(false);
     const [couponStockError, setCouponStockError] = useState<boolean>(false);
 
-    const disabled = couponName === "" || couponDescription === "" || couponPrice === 0 || couponStartDate === null || couponEndDate === null || couponExpireDate === null || couponStock === 0
+    const isSameDate = couponStartDateTime.toDateString() === couponEndDateTime.toDateString()
+    
+    const disabled = couponName === "" || couponDescription === "" || couponPrice === 0 || couponStartDateTime === null || couponEndDateTime === null || couponExpireDateTime === null || couponStock === 0
 
     const handleAddCoupon = () => {
         // 쿠폰 등록 추가
-        router.push('/admin/coupon')
+        apiCall("/api/coupon/create", "POST", {
+            title: couponName,
+            content: couponDescription,
+            price: couponPrice,
+            startAt: couponStartDateTime.toISOString(),
+            endAt: couponEndDateTime.toISOString(),
+            expiresAt: couponExpireDateTime.toISOString(),
+            stock: couponStock,
+        }).then(() => {
+            router.push('/admin/coupon')
+        })
     }
 
     const handleModalOpen = () => {
@@ -68,11 +83,40 @@ export default function CouponRegisterPage() {
 
     const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
         e.currentTarget.select();
-      };
+    };
+
+    const handleCouponStartDateTimeChange = (hour: number) => {
+        setCouponStartDateTime(new Date(couponStartDateTime.setHours(hour)))
+    }
+
+    const handleCouponEndDateTimeChange = (hour: number) => {
+        setCouponEndDateTime(new Date(couponEndDateTime.setHours(hour)))
+    }
+
+    const handleCouponExpireDateTimeChange = (hour: number) => {
+        setCouponExpireDateTime(new Date(couponExpireDateTime.setHours(hour)))
+    }
+
+    // 발급 기간 시작 시간이 발급 기간 종료 시간보다 크면 발급 기간 종료 시간을 1시간 증가
+    useEffect(() => {
+        if (couponStartDateTime >= couponEndDateTime) {
+            const newEndDate = new Date(couponStartDateTime)
+            newEndDate.setHours(couponStartDateTime.getHours() + 1)
+            setCouponEndDateTime(newEndDate)
+        }
+    }, [couponStartDateTime])
+
+    // 발급 기간 종료 시간이 만료 기간 시작 시간보다 크면 만료 기간 시작 시간을 1시간 증가
+    useEffect(() => {
+        if (couponEndDateTime >= couponExpireDateTime) {
+            const newExpireDate = new Date(couponEndDateTime)
+            newExpireDate.setHours(couponEndDateTime.getHours() + 1)
+            setCouponExpireDateTime(newExpireDate)
+        }
+    }, [couponEndDateTime])
 
     return (
         <div className="flex flex-col mx-auto w-full p-8 gap-6">
-            {}
                 <div className="flex w-full">
                 <button className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.push("/admin/coupon")}>
                     <ArrowLeftIcon className="w-4 h-4" />
@@ -117,15 +161,18 @@ export default function CouponRegisterPage() {
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">발급 기간</label>
                         <div className="flex gap-4 items-center">
-                            <DatePicker selectedDate={couponStartDate} onChange={(date) => setCouponStartDate(date)}/>
+                            <DatePicker selectedDate={couponStartDateTime} onChange={(date) => setCouponStartDateTime(date)}/>
+                            <TimePicker selectedDateTime={couponStartDateTime} onChange={handleCouponStartDateTimeChange}/>
                             <span>~</span>
-                            <DatePicker selectedDate={couponEndDate} onChange={(date) => setCouponEndDate(date)}  minDate={couponStartDate}/>
+                            <DatePicker selectedDate={couponEndDateTime} onChange={(date) => setCouponEndDateTime(date)}  minDate={couponStartDateTime}/>
+                            <TimePicker selectedDateTime={couponEndDateTime} onChange={handleCouponEndDateTimeChange} minDateTime={couponStartDateTime}/>
                         </div>
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">만료 기간</label>
                         <div className="flex gap-4 items-center">
-                            <DatePicker selectedDate={couponExpireDate} onChange={(date) => setCouponExpireDate(date)} minDate={couponEndDate}/>
+                            <DatePicker selectedDate={couponExpireDateTime} onChange={(date) => setCouponExpireDateTime(date)} minDate={couponEndDateTime}/>
+                            <TimePicker selectedDateTime={couponExpireDateTime} onChange={handleCouponExpireDateTimeChange} minDateTime={couponEndDateTime}/>
                         </div>
                     </div>
                     <div className="flex flex-col gap-2">
