@@ -6,6 +6,7 @@ import StepOneForm from "@/components/projectRegister/StepOneForm"
 import StepTwoForm from "@/components/projectRegister/StepTwoForm"
 import StepThreeForm from "@/components/projectRegister/StepThreeForm"
 import { useRouter } from "next/navigation"
+import Spinner from "@/components/common/Spinner"
 
 // 목 데이터: 실제로는 API에서 가져올 데이터
 const mockProductData = {
@@ -192,10 +193,7 @@ export default function ProductEdit() {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-[60vh]">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-pink-300 border-t-pink-500 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-lg text-gray-600">상품 정보를 불러오는 중입니다...</p>
-        </div>
+        <Spinner message="상품 정보를 불러오는 중입니다..." />
       </div>
     )
   }
