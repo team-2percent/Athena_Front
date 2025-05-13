@@ -177,7 +177,7 @@ export default function ProductEdit() {
   const handleCancel = () => {
     // 취소 시 홈으로 이동하거나 다른 처리
     if (confirm("상품 수정을 취소하시겠습니까?")) {
-      router.push("/")
+      router.push("/my")
     }
   }
 
@@ -186,7 +186,7 @@ export default function ProductEdit() {
     // 상품 수정 로직 구현 (실제로는 API 호출)
     console.log("수정할 데이터:", formData)
     alert("상품이 수정되었습니다.")
-    router.push("/")
+    router.push("/my")
   }
 
   if (isLoading) {
@@ -246,7 +246,7 @@ export default function ProductEdit() {
         <button
           type="button"
           onClick={currentStep === 3 ? handleSubmit : handleNext}
-          className="bg-pink-300 text-[#8B1D3F] font-bold py-4 px-12 rounded-full min-w-[200px]"
+          className="bg-main-color text-white font-bold py-4 px-12 rounded-full min-w-[200px]"
         >
           {currentStep === 3 ? "수정 완료" : "다음 단계로"}
         </button>
