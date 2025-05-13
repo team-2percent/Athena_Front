@@ -125,7 +125,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
   }, [sort])
 
   return (
-    <div>
+    <div className="w-full">
         <ListHeader
             type={type}
             count={totalCount}
