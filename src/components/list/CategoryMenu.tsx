@@ -3,9 +3,11 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import clsx from "clsx"
+import Spinner from "../common/Spinner"
 
 export default function CategoryMenu({ categoryId }: {categoryId : number}) {
     const [categories, setCategories] = useState<{id: number, name: string, image: string}[]>([])
+    const [isLoading, setIsLoading] = useState(true);
     const router = useRouter()
     useEffect(() => {
         // 카테고리 불러오기 로직
@@ -28,6 +30,7 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
                 { id: 14, name: "카테고리 14", image: "/abstract-profile.png" },
             ]
         )
+        setIsLoading(false);
     }, []);
 
     const handleCategoryClick = (id: number) => {
@@ -36,6 +39,7 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
     }
     return (
         <div className="max-w-7xl mx-auto py-4 px-4">
+        {isLoading && <Spinner message="카테고리를 불러오는 중입니다..." /> }
         {/* 카테고리 그리드 */}
         <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-4 justify-items-center">
             {categories.map((category) => (
