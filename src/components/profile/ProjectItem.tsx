@@ -38,7 +38,7 @@ export default function ProjectItem({
 
   const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
-    router.push(`/my/project/${projectId}/edit`) // 특정 상품 수정 페이지로 이동
+    router.push(`/project/${projectId}/edit`) // 특정 상품 수정 페이지로 이동
   }
 
   return (
