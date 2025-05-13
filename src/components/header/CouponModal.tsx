@@ -1,6 +1,9 @@
 "use client"
+import { useApi } from "@/hooks/useApi"
 import clsx from "clsx"
 import { Percent } from "lucide-react"
+import { useEffect, useState } from "react"
+import { CouponEvent } from "@/lib/couponInterface"
 
 interface CouponProps {
   isOpen: boolean
@@ -9,51 +12,20 @@ interface CouponProps {
 
 export default function CouponModal({ isOpen, onClose }: CouponProps) {
   if (!isOpen) return null
-
-  // mock data: 쿠폰 데이터 추후 삭제
-  const coupons = [
-    {
-      id: 1,
-      amount: "1000000원",
-      title: "~~~~ 쿠폰",
-      description:
-        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12까지 사용가능",
-      received: false,
-    },
-    {
-      id: 2,
-      amount: "1000000원",
-      title: "~~~~ 쿠폰",
-      description:
-        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12까지 사용가능",
-      received: false,
-    },
-    {
-      id: 3,
-      amount: "1000000원",
-      title: "~~~~ 쿠폰",
-      description:
-        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12까지 사용가능",
-      received: true,
-    },
-    {
-      id: 4,
-      amount: "1000000원",
-      title: "~~~~ 쿠폰",
-      description:
-        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12까지 사용가능",
-      received: true,
-    },
-  ]
+  const { apiCall } = useApi();
+  const [coupons, setCoupons] = useState<CouponEvent[]>([]);
 
   const handleGetCoupon = (couponId: number) => {
     // 쿠폰 발급 로직 추후 추가
     console.log(`쿠폰 ${couponId} 발급됨`)
   }
+  useEffect(() => {
+    apiCall("/api/couponEvent/getActives", "GET").then(({ data }) => {
+      if (data) {
+        setCoupons(data as CouponEvent[])
+      }
+    });
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -68,25 +40,33 @@ export default function CouponModal({ isOpen, onClose }: CouponProps) {
           {coupons.map((coupon) => (
             <div key={coupon.id} className="rounded-xl border p-3">
               <div className="flex items-center justify-between">
+                <div className="flex flex-col">
                 <div className="flex items-center gap-3">
-                  <div className={clsx("flex h-10 w-10 items-center justify-center rounded-md text-white", coupon.received ? "bg-disabled-background" : "bg-main-color")}>
+                  <div className={clsx("flex h-10 w-10 items-center justify-center rounded-md text-white", coupon.userIssued ? "bg-disabled-background" : "bg-main-color")}>
                     <Percent className="h-5 w-5" />
                   </div>
                   <div>
-                    <div className={clsx("text-lg font-bold", coupon.received ? "text-disabled-color" : "text-main-color")}>{coupon.amount}</div>
+                    <div className={clsx("text-lg font-bold", coupon.userIssued ? "text-disabled-color" : "text-main-color")}>{coupon.price} 원</div>
                     <div className="text-sm font-medium">{coupon.title}</div>
                   </div>
+                  </div>
+                  <p className="mt-1 text-xs text-sub-gray">{coupon.content}</p>
+                  <p className="mt-0.5 text-xs text-sub-gray">{new Date(coupon.expireAt).toLocaleString('ko-KR', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'}).replace(/\//g, '.').replace(',', '') + ' 만료'}</p>
                 </div>
-                <button
-                    type="button"
-                    className={clsx("rounded-full px-4 py-1.5 text-sm font-medium", coupon.received ? "bg-disabled-background text-disabled-color" : "bg-main-color text-white")}
-                    onClick={() => handleGetCoupon(coupon.id)}
-                >
-                  {coupon.received ? "발급완료" : "발급받기"}
-                </button>
+                <div className="flex flex-col items-end">
+                  <button
+                      type="button"
+                      className={clsx("rounded-full w-fit px-4 py-1.5 text-sm font-medium", coupon.userIssued ? "bg-disabled-background text-disabled-color" : "bg-main-color text-white")}
+                      onClick={() => handleGetCoupon(coupon.id)}
+                  >
+                    {coupon.userIssued ? "발급완료" : "발급받기"}
+                  </button>
+                  <div className="mt-1 text-xs text-sub-gray">
+                    {coupon.stock}개 남음
+                  </div>
+                </div>
               </div>
-              <p className="mt-1 text-xs text-sub-gray">{coupon.description}</p>
-              <p className="mt-0.5 text-xs text-sub-gray">{coupon.validUntil}</p>
+              
             </div>
           ))}
         </div>
