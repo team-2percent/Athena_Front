@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Percent, Heart, Bell, X, Trash2, LogOut, User } from "lucide-react"
+import { Percent, Heart, Bell, X, Trash2, LogOut, User, UserLock } from "lucide-react"
 import CouponModal from "./CouponModal"
 import PopularSearch from "./PopularSearch"
 import SearchBar from "./SearchBar"
@@ -21,6 +21,7 @@ const uris: Record<string, string> = {
 }
 const Header = () => {
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const isAdmin = useAuthStore((s) => s.role === "ADMIN");
   const { logout } = useAuthStore();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
@@ -188,6 +189,16 @@ const Header = () => {
                   {
                     showAuthMenu &&
                     <div className="absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 transition-all duration-200">
+                      {isAdmin &&
+                        <button
+                        type="button"
+                        onClick={() => router.push("/admin/approval")}
+                        className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
+                      >
+                        <UserLock className="h-4 w-4" />
+                        관리자페이지
+                      </button>
+                      }
                       <button
                         type="button"
                         onClick={() => router.push("/my")}

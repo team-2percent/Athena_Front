@@ -1,12 +1,12 @@
 "use client"
 
-import Link from "next/link"
 import Image from "next/image"
-import { LogOut, Menu } from "lucide-react"
+import { LogOut, Menu, House } from "lucide-react"
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
+import useAuthStore from "@/stores/auth";
 
 const uris: Record<string, string> = {
     "프로젝트 승인 관리": "approval",
@@ -16,8 +16,14 @@ const uris: Record<string, string> = {
 
 export default function AdminHeader() {
     const pathname = usePathname().split("/")[2];
+    const { logout } = useAuthStore();
     const router = useRouter();
     const [showAuthMenu, setShowAuthMenu] = useState(false);
+
+    const handleLogout = () => {
+        logout();
+        router.push("/");
+    }
 
     const handleTabClick = (tab: string) => {
         if (tab === "프로젝트 승인 관리") router.push("/admin/approval")
@@ -47,11 +53,19 @@ export default function AdminHeader() {
                             <Menu className="h-5 w-5" />
                         </button>
                         { showAuthMenu && 
-                        <div className="absolute right-0 top-8 bg-white shadow-md rounded-md px-6 py-4">
+                        <div className="absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 transition-all duration-200">
                             <button
                                 type="button"
                                 onClick={() => router.push("/")}
-                                className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2"
+                                className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
+                            >
+                                <House className="h-4 w-4" />
+                                사용자 페이지
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleLogout}
+                                className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
                             >
                                 <LogOut className="h-4 w-4" />
                                 로그아웃
