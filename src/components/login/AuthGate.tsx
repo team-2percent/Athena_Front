@@ -10,21 +10,19 @@ export function AuthGate() {
   const pathname = usePathname();
   const router = useRouter();
   const { checkAuth, role } = useAuth();
-  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
+    console.log(checkAuth())
     if (pathname.startsWith("/admin") && role !== "ADMIN") {
       router.replace("/");
     }
 
     if (!checkAuth() && (pathname.startsWith("/my") || pathname.startsWith("/project/register") || pathname.endsWith("/edit"))) {
+      console.log("redirecting to /")
       router.replace("/");
     }
 
-    setChecked(true);
   }, [pathname, role, router]);
-
-  if (!checked) return null;
 
   return null;
 }
