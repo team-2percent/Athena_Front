@@ -10,11 +10,41 @@ import clsx from "clsx";
 export default function CouponList() {
     const { apiCall, isLoading } = useApi();
     const [coupons, setCoupons] = useState<CouponEvent[]>([]);
-    const [serverError, setServerError] = useState<boolean>(false);
+    const [serverError, setServerError] = useState<null | {
+        message: string,
+        onRetry: (...args: any[]) => void
+    }>(null);
+
+    const ServerErrorType = {
+        GET_COUPON: {
+            message: "쿠폰을 발급하는데 실패했습니다.",
+            onRetry: (couponId: number) => handleGetCoupon(couponId)
+        },
+        GET_COUPON_LIST: {
+            message: "쿠폰 목록을 불러오는데 실패했습니다.",
+            onRetry: () => loadCoupons()
+        }
+    }
 
     const handleGetCoupon = (couponId: number) => {
-        apiCall("/api/userCoupon", "POST", { couponId }).then(() => {
-            loadCoupons()
+        apiCall("/api/userCoupon", "POST", { couponId }).then(({ error, status }) => {
+            if (error && status === 500) {
+                setServerError(ServerErrorType.GET_COUPON);
+            } else {
+                loadCoupons();
+                setServerError(null);
+            }
+        })
+    }
+
+    const loadCoupons = () => {
+        apiCall("/api/couponEvent/getActives", "GET").then(({ data, error, status }) => {
+            if (error && status === 500) {
+                setServerError(ServerErrorType.GET_COUPON_LIST);
+            } else if (data) {
+                setCoupons(data as CouponEvent[])
+                setServerError(null);
+            }
         })
     }
 
@@ -22,18 +52,8 @@ export default function CouponList() {
         loadCoupons();
     }, []);
 
-    const loadCoupons = () => {
-        setServerError(false);
-        apiCall("/api/couponEvent/getActives", "GET").then(({ data, error, status }) => {
-            if (error && status === 500) {
-                setServerError(true);
-            } else if (data) {
-                setCoupons(data as CouponEvent[])
-            }
-        })
-    }
     if (serverError) {
-        return <ServerErrorComponent message="쿠폰 목록을 불러오는데 실패했습니다." onRetry={loadCoupons} />
+        return <ServerErrorComponent message={serverError.message} onRetry={serverError.onRetry} />
     } else if (isLoading) {
         return <Spinner message="쿠폰 목록을 불러오고 있습니다."/>
     } else if (coupons.length === 0) {
