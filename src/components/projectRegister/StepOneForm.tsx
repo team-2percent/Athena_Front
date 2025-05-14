@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react"
 import { Upload, ChevronDown, Check, Trash2 } from "lucide-react"
 import DatePicker from "./DatePicker"
 
-import { useProjectFormStore } from "@/stores/useProjectFormStore"
+import { useProjectFormStore, type ImageFile } from "@/stores/useProjectFormStore"
 
 interface StepOneFormProps {
   onUpdateFormData: (data: Partial<any>) => void
@@ -74,7 +74,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
   const handleFiles = (files: FileList | null) => {
     if (!files) return
 
-    const newImages: any[] = []
+    const newImages: ImageFile[] = []
 
     // 최대 5개까지만 처리
     const remainingSlots = 5 - images.length
@@ -89,7 +89,12 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       const id = `img-${Date.now()}-${i}`
       const preview = URL.createObjectURL(file)
 
-      newImages.push({ id, file, preview })
+      newImages.push({
+        id,
+        file,
+        preview,
+        isExisting: false,
+      })
     }
 
     const updatedImages = [...images, ...newImages]
@@ -142,13 +147,27 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
 
   // 이미지 삭제 핸들러
   const handleRemoveImage = (id: string) => {
+    const imageToRemove = images.find((img) => img.id === id)
     const updatedImages = images.filter((img) => img.id !== id)
     onUpdateFormData({ images: updatedImages })
 
-    const imageToRemove = images.find((img) => img.id === id)
-    if (imageToRemove && imageToRemove.preview) {
+    // File 객체로부터 생성된 미리보기 URL만 해제
+    if (imageToRemove && imageToRemove.preview && !imageToRemove.isExisting) {
       URL.revokeObjectURL(imageToRemove.preview)
     }
+  }
+
+  // 이미지 파일명 또는 URL에서 표시 이름 추출
+  const getImageDisplayName = (image: ImageFile) => {
+    if (image.file) {
+      return image.file.name
+    }
+    if (image.url) {
+      // URL에서 파일명 추출
+      const urlParts = image.url.split("/")
+      return urlParts[urlParts.length - 1]
+    }
+    return "이미지"
   }
 
   return (
@@ -304,7 +323,10 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
                         >
                           <Trash2 className="h-4 w-4 text-red-500" />
                         </button>
-                        <p className="text-xs text-gray-500 mt-1 truncate">{image.file ? image.file.name : "이미지"}</p>
+                        <p className="text-xs text-gray-500 mt-1 truncate">
+                          {getImageDisplayName(image)}
+                          {image.isExisting && <span className="ml-1 text-blue-500">(기존)</span>}
+                        </p>
                       </div>
                     ))}
                   </div>

@@ -1,10 +1,12 @@
 import { create } from "zustand"
 
-// 이미지 파일 타입
+// 이미지 파일 타입 확장 - URL 형태의 이미지도 처리할 수 있도록
 export interface ImageFile {
   id: string
-  file: File
-  preview: string
+  file?: File // 새로 업로드하는 이미지의 경우 File 객체
+  preview: string // 미리보기 URL (File 객체의 경우 createObjectURL, 기존 이미지의 경우 서버 URL)
+  url?: string // 서버에 이미 저장된 이미지의 URL (기존 이미지인 경우에만 존재)
+  isExisting?: boolean // 기존 이미지인지 여부
 }
 
 // 구성 항목 타입
@@ -100,38 +102,21 @@ const initialState = {
 
 // Zustand 스토어 생성
 export const useProjectFormStore = create<ProjectFormState>()((set, get) => ({
-    ...initialState,
+  ...initialState,
 
-    // 현재 단계 설정
-    setCurrentStep: (step) => set({ currentStep: step }),
+  // 현재 단계 설정
+  setCurrentStep: (step) => set({ currentStep: step }),
 
-    // 폼 데이터 업데이트
-    updateFormData: (data) => {
-      // 이미지 데이터가 있는 경우 기존 이미지의 미리보기 URL 해제
-      if (data.images) {
-        const currentImages = get().images
-        // 새 이미지 목록에 없는 기존 이미지의 미리보기 URL 해제
-        const newImageIds = new Set(data.images.map((img) => img.id))
-        currentImages.forEach((img) => {
-          if (!newImageIds.has(img.id) && img.preview) {
-            try {
-              URL.revokeObjectURL(img.preview)
-            } catch (e) {
-              console.error("Failed to revoke object URL:", e)
-            }
-          }
-        })
-      }
-
-      set((state) => ({ ...state, ...data }))
-    },
-
-    // 폼 초기화
-    resetForm: () => {
-      // 이미지 미리보기 URL 해제
+  // 폼 데이터 업데이트
+  updateFormData: (data) => {
+    // 이미지 데이터가 있는 경우 기존 이미지의 미리보기 URL 해제
+    if (data.images) {
       const currentImages = get().images
+      // 새 이미지 목록에 없는 기존 이미지의 미리보기 URL 해제
+      const newImageIds = new Set(data.images.map((img) => img.id))
       currentImages.forEach((img) => {
-        if (img.preview) {
+        // File 객체로부터 생성된 미리보기 URL만 해제 (서버 URL은 해제하지 않음)
+        if (!newImageIds.has(img.id) && img.preview && !img.isExisting) {
           try {
             URL.revokeObjectURL(img.preview)
           } catch (e) {
@@ -139,21 +124,39 @@ export const useProjectFormStore = create<ProjectFormState>()((set, get) => ({
           }
         }
       })
+    }
 
-      set(initialState)
-    },
+    set((state) => ({ ...state, ...data }))
+  },
 
-    // 프로젝트 ID 설정
-    setProjectId: (id) => set({ projectId: id }),
+  // 폼 초기화
+  resetForm: () => {
+    // 이미지 미리보기 URL 해제 (File 객체로부터 생성된 URL만)
+    const currentImages = get().images
+    currentImages.forEach((img) => {
+      if (img.preview && !img.isExisting) {
+        try {
+          URL.revokeObjectURL(img.preview)
+        } catch (e) {
+          console.error("Failed to revoke object URL:", e)
+        }
+      }
+    })
 
-    // 에러 설정
-    setError: (error) => set({ error }),
+    set(initialState)
+  },
 
-    // 로딩 상태 설정
-    setLoading: (isLoading) => set({ isLoading }),
+  // 프로젝트 ID 설정
+  setProjectId: (id) => set({ projectId: id }),
 
-    // 제출 상태 설정
-    setSubmitting: (isSubmitting) => set({ isSubmitting }),
+  // 에러 설정
+  setError: (error) => set({ error }),
+
+  // 로딩 상태 설정
+  setLoading: (isLoading) => set({ isLoading }),
+
+  // 제출 상태 설정
+  setSubmitting: (isSubmitting) => set({ isSubmitting }),
 }))
 
 // 프로젝트 ID 가져오기 함수 (컴포넌트에서 호출)
@@ -204,24 +207,22 @@ export const submitProject = async (
   setError(null)
 
   try {
-    // 1. 이미지 업로드
-    const imageFiles = state.images.map((img) => img.file)
+    // 이미지 처리 - 기존 이미지(URL)와 새 이미지(File)를 함께 처리
+    const imageData = state.images
+      .map((img) => {
+        // 기존 이미지는 URL을 그대로 전송
+        if (img.url) {
+          return { url: img.url }
+        }
+        // 새 이미지는 File 객체 전송
+        else if (img.file) {
+          return { file: img.file }
+        }
+        return null
+      })
+      .filter(Boolean)
 
-    if (imageFiles.length > 0) {
-      console.log("Uploading images with imageGroupId:", state.projectId)
-      const uploadResponse = await uploadImages(state.projectId, imageFiles)
-
-      if (!uploadResponse.success) {
-        console.error("Image upload failed:", uploadResponse.error)
-        setError("이미지 업로드에 실패했습니다.")
-        setSubmitting(false)
-        return false
-      }
-
-      console.log("Image upload response:", uploadResponse.data)
-    }
-
-    // 2. 프로젝트 정보 등록
+    // 프로젝트 정보 등록
     const projectData = {
       sellerId: 1, // 임시 값, 실제로는 로그인한 사용자 ID를 사용해야 함
       categoryId: 1, // 임시 값, 실제로는 선택한 카테고리 ID를 사용해야 함
@@ -233,6 +234,7 @@ export const submitProject = async (
       startAt: state.startDate.toISOString(),
       endAt: state.endDate.toISOString(),
       shippedAt: state.deliveryDate.toISOString(),
+      images: imageData, // URL과 File 객체가 혼합된 배열
       products: state.supportOptions.map((option) => ({
         name: option.name,
         description: option.description,

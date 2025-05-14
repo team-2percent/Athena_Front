@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react"
 import RegisterHeader from "@/components/projectRegister/RegisterHeader"
+import StepButtons from "@/components/projectRegister/StepButtons"
 import StepOneForm from "@/components/projectRegister/StepOneForm"
 import StepTwoForm from "@/components/projectRegister/StepTwoForm"
 import StepThreeForm from "@/components/projectRegister/StepThreeForm"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { useProjectFormStore } from "@/stores/useProjectFormStore"
 import Spinner from "@/components/common/Spinner"
 import { useApi } from "@/hooks/useApi"
+import { useImageUpload } from "@/hooks/useImageUpload"
 
 // 목 데이터: 실제로는 API에서 가져올 데이터
 const mockProductData = {
@@ -71,14 +73,16 @@ const mockProductData = {
 export default function ProductEdit() {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+  const pathname = usePathname()
   const { apiCall } = useApi()
+  const { uploadImages } = useImageUpload()
 
   // Zustand 스토어에서 상태와 액션 가져오기
-  const { currentStep, setCurrentStep, updateFormData, resetForm, setLoading } = useProjectFormStore()
+  const { currentStep, setCurrentStep, updateFormData, resetForm, setLoading, setProjectId } = useProjectFormStore()
 
   // 데이터 로드 (실제로는 API 호출)
   useEffect(() => {
-    const loadProductData = async () => {
+    const loadProjectData = async () => {
       try {
         // 실제 구현에서는 API 호출
         // const response = await fetch(`/api/products/${productId}`);
@@ -87,27 +91,16 @@ export default function ProductEdit() {
         // 목 데이터 사용
         const data = mockProductData
 
-        // 이미지 URL을 File 객체로 변환 (실제 구현에서는 다른 방식 필요)
-        const imagePromises = data.images.map(async (img) => {
-          try {
-            // 실제 구현에서는 URL에서 파일을 가져오는 로직 필요
-            // 여기서는 간단히 처리
-            const response = await fetch(img.url)
-            const blob = await response.blob()
-            const file = new File([blob], img.name, { type: blob.type })
+        // 프로젝트 ID 설정 (실제 구현에서는 API 응답에서 가져옴)
+        setProjectId(1) // 임시 ID
 
-            return {
-              id: img.id,
-              file: file,
-              preview: img.url,
-            }
-          } catch (error) {
-            console.error("이미지 로드 실패:", error)
-            return null
-          }
-        })
-
-        const loadedImages = (await Promise.all(imagePromises)).filter(Boolean)
+        // 이미지 처리 - 기존 이미지는 URL 형태로 저장
+        const processedImages = data.images.map((img) => ({
+          id: img.id,
+          preview: img.url, // 미리보기로 URL 사용
+          url: img.url, // 서버 URL 저장
+          isExisting: true, // 기존 이미지 표시
+        }))
 
         updateFormData({
           targetAmount: data.targetAmount,
@@ -117,7 +110,7 @@ export default function ProductEdit() {
           startDate: new Date(data.startDate),
           endDate: new Date(data.endDate),
           deliveryDate: new Date(data.deliveryDate),
-          images: loadedImages as any[],
+          images: processedImages,
           markdown: data.markdown,
           supportOptions: data.supportOptions,
         })
@@ -129,8 +122,16 @@ export default function ProductEdit() {
       }
     }
 
-    loadProductData()
-  }, [updateFormData])
+    loadProjectData()
+
+    // 컴포넌트 언마운트 시 폼 데이터 초기화
+    return () => {
+      // 다른 페이지로 이동할 때만 초기화 (productEdit 내 이동은 제외)
+      if (!pathname.includes("productEdit")) {
+        resetForm()
+      }
+    }
+  }, [updateFormData, setProjectId, pathname, resetForm])
 
   // 단계가 변경될 때 화면 맨 위로 스크롤
   useEffect(() => {
@@ -165,12 +166,77 @@ export default function ProductEdit() {
   }
 
   // 수정 완료 처리
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // 상품 수정 로직 구현 (실제로는 API 호출)
-    console.log("수정할 데이터:", useProjectFormStore.getState())
-    alert("상품이 수정되었습니다.")
-    resetForm()
-    router.push("/my")
+    const success = await submitProject(apiCall, uploadImages)
+
+    if (success) {
+      alert("상품이 성공적으로 수정되었습니다.")
+      resetForm()
+      router.push("/my")
+    }
+  }
+
+  // 프로젝트 제출 함수
+  const submitProject = async (
+    apiCall: <T>(url: string, method: string, body?: any) => Promise<any>,
+    uploadImages: (imageGroupId: number, files: File[]) => Promise<any>,
+  ) => {
+    const state = useProjectFormStore.getState()
+    setLoading(true)
+
+    try {
+      // 이미지 처리 - 기존 이미지(URL)와 새 이미지(File)를 함께 처리
+      const imageData = state.images
+        .map((img) => {
+          // 기존 이미지는 URL을 그대로 전송
+          if (img.url) {
+            return { url: img.url }
+          }
+          // 새 이미지는 File 객체 전송
+          else if (img.file) {
+            return { file: img.file }
+          }
+          return null
+        })
+        .filter(Boolean)
+
+      // 프로젝트 데이터 준비
+      const projectData = {
+        id: state.projectId,
+        title: state.title,
+        description: state.description,
+        goalAmount: Number.parseInt(state.targetAmount.replace(/,/g, ""), 10),
+        contentMarkdown: state.markdown,
+        startAt: state.startDate.toISOString(),
+        endAt: state.endDate.toISOString(),
+        shippedAt: state.deliveryDate.toISOString(),
+        images: imageData, // URL과 File 객체 모두 포함
+        products: state.supportOptions.map((option) => ({
+          name: option.name,
+          description: option.description,
+          price: Number.parseInt(option.price.replace(/,/g, ""), 10),
+          stock: Number.parseInt(option.stock.replace(/,/g, ""), 10),
+          options: option.composition ? option.composition.map((item) => item.content) : [],
+        })),
+      }
+
+      console.log("Submitting updated project data:", projectData)
+
+      // 실제 구현에서는 API 호출
+      // const response = await apiCall(`/api/project/${state.projectId}`, "PUT", projectData)
+
+      // 목 응답
+      const mockResponse = { success: true }
+
+      setLoading(false)
+      return mockResponse.success
+    } catch (error) {
+      console.error("Error during submission:", error)
+      alert("프로젝트 수정 중 오류가 발생했습니다.")
+      setLoading(false)
+      return false
+    }
   }
 
   if (isLoading) {
@@ -193,25 +259,13 @@ export default function ProductEdit() {
       </div>
 
       {/* 단계별 버튼 */}
-      <div className="flex justify-center gap-4 mt-10">
-        {/* 왼쪽 버튼 (단계에 따라 다름) */}
-        <button
-          type="button"
-          onClick={currentStep === 3 ? handleSubmit : handleNext}
-          className="bg-main-color text-white font-bold py-4 px-12 rounded-full min-w-[200px]"
-        >
-          {currentStep === 3 ? "수정 완료" : "다음 단계로"}
-        </button>
-
-        {/* 오른쪽 버튼 (단계에 따라 다름) */}
-        <button
-          type="button"
-          onClick={currentStep === 1 ? handleCancel : handlePrev}
-          className="bg-gray-200 text-gray-700 font-bold py-4 px-12 rounded-full min-w-[200px]"
-        >
-          {currentStep === 1 ? "취소" : "이전 단계로"}
-        </button>
-      </div>
+      <StepButtons
+        currentStep={currentStep}
+        onNext={handleNext}
+        onPrev={handlePrev}
+        onCancel={handleCancel}
+        onSubmit={handleSubmit}
+      />
     </div>
   )
 }
