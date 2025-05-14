@@ -10,7 +10,7 @@ import SearchBar from "./SearchBar"
 import { useRouter } from 'next/navigation';
 import LoginModal from "../login/LoginModal"
 import SignupModal from "../login/SignUpModal"
-import useAuthStore from "@/stores/auth"
+import { useAuth } from "@/contexts/AuthContext"
 import { usePathname } from 'next/navigation';
 
 const uris: Record<string, string> = {
@@ -20,9 +20,10 @@ const uris: Record<string, string> = {
   "마감임박": "deadline",
 }
 const Header = () => {
-  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
-  const isAdmin = useAuthStore((s) => s.role === "ADMIN");
-  const { logout } = useAuthStore();
+  const { checkAuth, role } = useAuth();
+  const isLoggedIn = checkAuth();
+  const isAdmin = role === "ADMIN";
+  const { logout } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false)

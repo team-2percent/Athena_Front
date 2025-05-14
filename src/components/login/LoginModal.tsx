@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import { X } from "lucide-react"
 import clsx from "clsx"
 import { useApi } from "@/hooks/useApi"
-import useAuthStore from "@/stores/auth"
+import { useAuth } from "@/contexts/AuthContext"
 
 interface LoginModalProps {
   isOpen: boolean
@@ -16,7 +16,7 @@ interface LoginModalProps {
 
 export default function LoginModal({ isOpen, onClose, moveToSignupModal }: LoginModalProps) {
   const { apiCall } = useApi();
-  const { login } = useAuthStore();
+  const { login } = useAuth();
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [disabled, setDisabled] = useState(true);
@@ -31,7 +31,6 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
     e.preventDefault()
 
     apiCall("/api/user/login", "POST", { email, password }).then(({ data }: { data: any }) => {
-      console.log(data)
       login(data.accessToken, data.refreshToken);
       onClose()
     })

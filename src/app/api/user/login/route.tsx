@@ -18,8 +18,8 @@ export async function POST(request: NextRequest) {
     // TODO: 실제 로그인 로직 구현 필요
     // 예시 응답
     const mockResponse = {
-      "accessToken": adminJWT,
-      "refreshToken": adminJWT,
+      "accessToken": userJWT,
+      "refreshToken": userJWT,
       "userId": 9007199254740991
     };
 

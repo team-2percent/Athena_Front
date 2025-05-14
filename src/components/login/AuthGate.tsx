@@ -2,29 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import useAuthStore from "@/stores/auth";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
+ // 페이지 접근성 설정
 export function AuthGate() {
   const pathname = usePathname();
   const router = useRouter();
-  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
-  const role = useAuthStore((s) => s.role);
-  const { tokenCheck } = useAuthStore();
+  const { checkAuth, role } = useAuth();
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    tokenCheck().then(() => {
-      if (
-        role !== "ADMIN" && pathname.startsWith("/admin") ||
-        !isLoggedIn && (pathname.startsWith("/my") || pathname.startsWith("/project/register") || pathname.endsWith("/edit"))
-      ) {
-        router.replace("/");
-        return;
-      }
-      setChecked(true);
-    });
-  }, []);
+    if (pathname.startsWith("/admin") && role !== "ADMIN") {
+      router.replace("/");
+    }
+
+    if (!checkAuth() && (pathname.startsWith("/my") || pathname.startsWith("/project/register") || pathname.endsWith("/edit"))) {
+      router.replace("/");
+    }
+
+    setChecked(true);
+  }, [pathname, role, router]);
 
   if (!checked) return null;
 

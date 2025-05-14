@@ -8,7 +8,7 @@ interface ApiResponse<T> {
   status: number;
 }
 
-const api_base = "http://localhost:8000";
+const api_base = "http://localhost:3000";
 
 export function useApi() {
   const { logout } = useAuth();
