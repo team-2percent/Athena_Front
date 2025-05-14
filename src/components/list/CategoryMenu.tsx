@@ -6,28 +6,28 @@ import clsx from "clsx"
 import Spinner from "../common/Spinner"
 
 export default function CategoryMenu({ categoryId }: {categoryId : number}) {
-    const [categories, setCategories] = useState<{id: number, name: string, image: string}[]>([])
+    const [categories, setCategories] = useState<{id: number, name: string}[]>([])
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter()
     useEffect(() => {
         // 카테고리 불러오기 로직
         setCategories(
             [
-                { id: 0, name: "전체", image: "/abstract-profile.png" },
-                { id: 1, name: "카테고리 1", image: "/abstract-profile.png" },
-                { id: 2, name: "카테고리 2", image: "/abstract-profile.png" },
-                { id: 3, name: "카테고리 3", image: "/abstract-profile.png" },
-                { id: 4, name: "카테고리 4", image: "/abstract-profile.png" },
-                { id: 5, name: "카테고리 5", image: "/abstract-profile.png" },
-                { id: 6, name: "카테고리 6", image: "/abstract-profile.png" },
-                { id: 7, name: "카테고리 7", image: "/abstract-profile.png" },
-                { id: 8, name: "카테고리 8", image: "/abstract-profile.png" },
-                { id: 9, name: "카테고리 9", image: "/abstract-profile.png" },
-                { id: 10, name: "카테고리 10", image: "/abstract-profile.png" },
-                { id: 11, name: "카테고리 11", image: "/abstract-profile.png" },
-                { id: 12, name: "카테고리 12", image: "/abstract-profile.png" },
-                { id: 13, name: "카테고리 13", image: "/abstract-profile.png" },
-                { id: 14, name: "카테고리 14", image: "/abstract-profile.png" },
+                { id: 0, name: "전체" },
+                { id: 1, name: "카테고리 1" },
+                { id: 2, name: "카테고리 2" },
+                { id: 3, name: "카테고리 3" },
+                { id: 4, name: "카테고리 4" },
+                { id: 5, name: "카테고리 5" },
+                { id: 6, name: "카테고리 6" },
+                { id: 7, name: "카테고리 7" },
+                { id: 8, name: "카테고리 8" },
+                { id: 9, name: "카테고리 9" },
+                { id: 10, name: "카테고리 10" },
+                { id: 11, name: "카테고리 11" },
+                { id: 12, name: "카테고리 12" },
+                { id: 13, name: "카테고리 13" },
+                { id: 14, name: "카테고리 14" },
             ]
         )
         setIsLoading(false);
@@ -45,10 +45,10 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
             {categories.map((category) => (
             <div
                 key={category.id}
-                className={clsx("flex flex-col items-center cursor-pointer p-3 rounded-lg w-23", categoryId === category.id && "bg-gray-200")}
+                className={clsx("flex flex-col items-center cursor-pointer p-3 rounded-lg w-23", categoryId === category.id && "bg-secondary-color")}
                 onClick={() => handleCategoryClick(category.id)}
             >
-                <div
+                {/* <div
                 className="relative w-16 h-16 overflow-hidden bg-gray-200 mb-2 rounded-lg"
                 >
                 <img
@@ -56,8 +56,8 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
                     alt={category.name}
                     className="w-full h-full object-cover"
                 />
-                </div>
-                <span className="text-sm text-center text-sub-gray">
+                </div> */}
+                <span className={clsx("text-sm text-center", categoryId === category.id && "text-main-color")}>
                 {category.name}
                 </span>
             </div>
