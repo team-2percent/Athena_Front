@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { X, CheckSquare, Square } from 'lucide-react'
 import clsx from "clsx"
+import { useApi } from "@/hooks/useApi" 
 
 interface SignupModalProps {
   isOpen: boolean
@@ -12,11 +13,12 @@ interface SignupModalProps {
 }
 
 export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
-  const [name, setName] = useState("")
+  const { apiCall } = useApi()
+  const [nickname, setNickname] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [agreeToMarketing, setAgreeToMarketing] = useState(false)
+  // const [agreeToMarketing, setAgreeToMarketing] = useState(false)
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [isEmailValid, setIsEmailValid] = useState(true)
   const [isPasswordMatch, setIsPasswordMatch] = useState(true)
@@ -46,7 +48,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
     }
 
     // 10자리 이상 구성 여부 검사
-    if (password.length < 10) {
+    if (password.length < 8) {
       return false;
     } 
 
@@ -56,14 +58,10 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   // 회원가입 로직
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (false) {
-      // 회원가입 로직 추후 구현
-      console.log("Signup attempt with:", { name, email, password, confirmPassword, agreeToMarketing })
-    } else {
-      setIsError(true)
-      setErrorMessage("이미 존재하는 이메일입니다.")
-      // 외 다른 메세지는 백엔드와 협의
-    }
+    apiCall("/api/user", "POST", { nickname, email, password }).then(({ data }: { data: any }) => {
+      console.log(data)
+      onClose()
+    })
   }
 
   // 이메일 양식 확인
@@ -83,8 +81,8 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
 
   useEffect(() => {
     setIsError(false)
-    setDisabled(email === "" || password === "" || confirmPassword === "" || name === "" || password !== confirmPassword);
-  }, [name, email, confirmPassword, password])
+    setDisabled(email === "" || password === "" || confirmPassword === "" || nickname === "" || password !== confirmPassword);
+  }, [nickname, email, confirmPassword, password])
 
   if (!isOpen) return null;
 
@@ -114,20 +112,20 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             {/* Name Input */}
             <div className="mb-6">
               <label
-                htmlFor="name"
-                className={`text-sm ${focusedField === "name" ? "text-main-color" : "text-main-color"}`}
+                htmlFor="nickname"
+                className={`text-sm ${focusedField === "nickname" ? "text-main-color" : "text-main-color"}`}
               >
-                이름
+                닉네임
               </label>
               <input
-                id="name"
+                id="nickname"
                 type="text"
                 className={`w-full p-2 border-b ${
-                  focusedField === "name" ? "border-main-color" : "border-gray-300"
+                  focusedField === "nickname" ? "border-main-color" : "border-gray-300"
                 } focus:outline-none text-lg`}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                onFocus={() => setFocusedField("name")}
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                onFocus={() => setFocusedField("nickname")}
                 onBlur={() => setFocusedField(null)}
               />
             </div>
@@ -208,7 +206,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             </div>
 
             {/* Marketing Consent Checkbox */}
-            <div className="mb-8">
+            {/* <div className="mb-8">
               <button
                 type="button"
                 className="flex items-start gap-2"
@@ -221,7 +219,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                 )}
                 <span className="text-gray-800">광고성 정보 수신에 동의합니다.</span>
               </button>
-            </div>
+            </div> */}
 
             {/* Signup Button */}
             <button
