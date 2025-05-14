@@ -5,6 +5,8 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { X } from "lucide-react"
 import clsx from "clsx"
+import { useApi } from "@/hooks/useApi"
+import useAuthStore from "@/stores/auth"
 
 interface LoginModalProps {
   isOpen: boolean
@@ -12,6 +14,8 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+  const { apiCall } = useApi();
+  const { login } = useAuthStore();
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [disabled, setDisabled] = useState(true);
@@ -25,13 +29,11 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // 로그인 로직 추후 구현
-    if (false) {
-      console.log("Login attempt with:", { email, password })
-    } else {
-      setErrorMessage("이메일과 비밀번호를 확인해주세요.")
-    }
-    
+    apiCall("/api/user/login", "POST", { email, password }).then(({ data }: { data: any }) => {
+      console.log(data)
+      login(data.accessToken, data.refreshToken);
+      onClose()
+    })
   }
 
   useEffect(() => {
