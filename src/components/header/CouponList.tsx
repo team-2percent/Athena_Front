@@ -78,7 +78,7 @@ export default function CouponList() {
             <div className="flex flex-col items-end">
             <button
                 type="button"
-                className={clsx("rounded-full w-fit px-4 py-1.5 text-sm font-medium", coupon.userIssued ? "bg-disabled-background text-disabled-color" : "bg-main-color text-white")}
+                className={clsx("rounded-full w-fit px-4 py-1.5 text-sm font-medium", coupon.userIssued ? "pointer-events-none bg-disabled-background text-disabled-color" : "bg-main-color text-white")}
                 onClick={() => handleGetCoupon(coupon.id)}
             >
                 {coupon.userIssued ? "발급완료" : "발급받기"}
