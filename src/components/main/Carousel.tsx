@@ -9,25 +9,28 @@ export default function CardCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
 
-  // Sample card data for the carousel
+  // mock Data
   const carouselCards = [
     {
-      id: 1,
+      category: "디자인 문구",
+      categoryId: 1,
+      projectId: 1,
       image: "/project-test.png",
       title: "마녀로 마법사로\n변신한 고양이",
-      description: "고양이 일러스트 PVC 스티커",
     },
     {
-      id: 2,
+      category: "보드게임",
+      categoryId: 2,
+      projectId: 2,
       image: "/project-test2.png",
       title: "마법의 세계로\n떠나는 여행",
-      description: "판타지 일러스트 컬렉션",
     },
     {
-      id: 3,
+      category: "캐릭터",
+      categoryId: 3,
+      projectId: 3,
       image: "/project-test3.png",
       title: "신비로운 숲속의\n마법 생물들",
-      description: "환상적인 생물 스티커 세트",
     },
   ]
 
@@ -48,7 +51,7 @@ export default function CardCarousel() {
 
   // 캐러셀 상품 클릭 시 상품 페이지로 이동
   const handleCardClick = () => {
-    router.push(`/project/${carouselCards[currentIndex].id}`);
+    router.push(`/project/${carouselCards[currentIndex].projectId}`);
   }
 
   const currentCard = carouselCards[currentIndex];
@@ -85,8 +88,8 @@ export default function CardCarousel() {
 
       {/* Title at bottom left with semi-transparent background */}
       <div className="absolute bottom-0 left-0 p-8 z-20 rounded-tr-lg">
+        <p className="text-lg mb-1 text-white/90">{currentCard.category}</p>
         <h2 className="text-2xl font-bold text-white">{currentCard.title}</h2>
-        <p className="text-md mt-1 text-white/80">{currentCard.description}</p>
       </div>
 
       {/* Navigation Controls */}

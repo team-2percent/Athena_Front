@@ -1,7 +1,7 @@
 "use client"
 
 import Carousel from "@/components/main/Carousel";
-import CategorySlider from "@/components/main/CategorySlider";
+// import CategorySlider from "@/components/main/CategorySlider";
 import RankProjectCard from "@/components/main/RankProjectCard";
 import { Trophy } from "lucide-react";
 
@@ -186,6 +186,7 @@ export default function Home() {
 
   return (
     <div className="w-full h-fit flex flex-col items-center justify-center">
+      <h2 className="text-2xl font-bold mb-4 text-left w-full max-w-[900px]"><span className="text-main-color">카테고리 1위!</span>  추천 상품</h2>
       <Carousel />
       {/* Popular Projects */}
       <section className="mt-16 px-4">
