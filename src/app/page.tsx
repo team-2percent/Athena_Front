@@ -4,56 +4,34 @@ import Carousel from "@/components/main/Carousel";
 // import CategorySlider from "@/components/main/CategorySlider";
 import RankProjectCard from "@/components/main/RankProjectCard";
 import { Trophy } from "lucide-react";
+import { useApi } from "@/hooks/useApi";
+import { useEffect, useState } from "react";
+import Spinner from "@/components/common/Spinner";
+
+interface Project {
+  id: number;
+  title: string;
+  views: number;
+  sellerName: string;
+  achievementRate: number;
+  startAt: string;
+  endAt: string;
+  imageUrl: string;
+  createdAt: string;
+}
 
 export default function Home() {
-  // Sample project data 추후 삭제
-  const topProjects = {
-    1 :{
-      id: 1,
-      rank: 1,
-      image: "/project-test.png",
-      sellerName: "판매자 이름",
-      projectName: "상품 이름",
-      achievementRate: 10,
-      size: 360,
-      liked: true,
-      daysLeft: 5
-    },
-    2: {
-      id: 2,
-      rank: 2,
-      image: "/project-test2.png",
-      sellerName: "판매자 이름",
-      projectName: "상품 이름",
-      achievementRate: 5,
-      size: 230,
-      liked: true,
-      daysLeft: 1
-    },
-    3: {
-      id: 3,
-      rank: 3,
-      image: "/project-test3.png",
-      sellerName: "판매자 이름",
-      projectName: "상품 이름",
-      achievementRate: 1.02,
-      size: 200,
-      liked: true,
-      daysLeft: 2
-    },
+  const { isLoading, apiCall } = useApi();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const loadRankProjects = () => {
+    apiCall("/api/project/all", "GET").then(({ data }) => {
+      setProjects(data as Project[]);
+    })
   }
 
-  const gridProjects = Array.from({ length: 17 }, (_, i) => ({
-    id: i + 4,
-    rank: i + 4,
-    image: "/project-test.png",
-    sellerName: "판매자 이름",
-    projectName: "상품 이름",
-    achievementRate: 0.8,
-    size: 160,
-    daysLeft: 10,
-    liked: false,
-  }))
+  useEffect(() => {
+    loadRankProjects();
+  }, []);
 
   const categories = [
     {
@@ -184,16 +162,13 @@ export default function Home() {
     ],
   }
 
-  return (
-    <div className="w-full h-fit flex flex-col items-center justify-center">
-      <h2 className="text-2xl font-bold mb-4 text-left w-full max-w-[900px]"><span className="text-main-color">카테고리 1위!</span>  추천 상품</h2>
-      <Carousel />
-      {/* Popular Projects */}
-      <section className="mt-16 px-4">
-          <h2 className="text-2xl font-bold mb-4 text-center">인기 상품</h2>
-
-          {/* Top 3 Projects - Responsive */}
-          <div className="flex flex-col md:flex-row gap-4 md:gap-20 mb-10 md:mb-2 md:items-end md:justify-center items-center">
+  const renderRankProjects = () => {
+    if (isLoading || projects.length === 0) {
+      return <Spinner message="상품을 불러오는 중"/>
+    }
+    return (
+      <>
+        <div className="flex flex-col md:flex-row gap-4 md:gap-20 mb-10 md:mb-2 md:items-end md:justify-center items-center">
             {/* 2nd Place */}
             <div className="h-fit w-fit order-2 md:order-1">
               <div className="flex items-end w-fit mb-2">
@@ -201,7 +176,8 @@ export default function Home() {
                 <div className="text-left font-bold text-2xl text-[rgb(204,204,204)]">2위</div>
               </div>
               <RankProjectCard
-                {...topProjects[1]}
+                projectName={projects[1].title} daysLeft={100} {...projects[1]}
+                liked={false}
                 size={280}
                 // className="mx-auto md:mx-0"
               />
@@ -214,7 +190,8 @@ export default function Home() {
                 <div className="text-left font-bold text-3xl text-[rgb(251,229,162)]">1위</div>
               </div>
               <RankProjectCard
-                {...topProjects[1]}
+                projectName={projects[0].title} daysLeft={100} {...projects[0]}
+                liked={false}
                 size={320}
                 // className="mx-auto md:mx-0"
               />
@@ -227,7 +204,8 @@ export default function Home() {
                 <div className="text-left font-bold text-xl text-[rgb(222,169,155)]">3위</div>
               </div>
               <RankProjectCard
-                {...topProjects[2]}
+                projectName={projects[2].title} daysLeft={100} {...projects[2]}
+                liked={false}
                 size={240}
                 // className="mx-auto md:mx-0"
               />
@@ -237,18 +215,32 @@ export default function Home() {
           {/* Project Grid - Responsive */}
           <div className="flex items-center justify-center mb-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
-              {gridProjects.map((project) => (
+              {projects.slice(3).map((project, index) => (
                 <div key={project.id} className="mb-4">
                   <RankProjectCard
-                    {...project}
-                    size={200}
-                    // className="mx-auto"
-                    rankElement={<div className="font-medium text-base">{project.rank}</div>}
-                  />
+                  projectName={project.title} daysLeft={100} {...project}
+                  liked={false}
+                  size={200}
+                  // className="mx-auto"
+                  rankElement={<div className="font-medium text-base">{index + 3}</div>}                  />
                 </div>
               ))}
             </div>
           </div>
+      </>
+    )
+  }
+
+    return (
+      <div className="w-full h-fit flex flex-col items-center justify-center">
+        <h2 className="text-2xl font-bold mb-6 text-left w-full max-w-[900px]"><span className="text-main-color">카테고리 1위!</span>  추천 상품</h2>
+        <Carousel />
+        {/* Popular Projects */}
+        <section className="mt-16 px-4">
+          <h2 className="text-2xl font-bold mb-6 text-center">인기 상품</h2>
+
+          {/* Top 3 Projects - Responsive */}
+          {renderRankProjects()}
         </section>
 
         {/* Category Projects */}
