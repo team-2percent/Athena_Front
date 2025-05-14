@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Percent, Heart, Bell, X, Trash2 } from "lucide-react"
+import { Percent, Heart, Bell, X, Trash2, LogOut, User } from "lucide-react"
 import CouponModal from "./CouponModal"
 import PopularSearch from "./PopularSearch"
 import SearchBar from "./SearchBar"
@@ -21,13 +21,29 @@ const uris: Record<string, string> = {
 }
 const Header = () => {
   const isLoggedIn = useAuthStore((state: { isLoggedIn: boolean }) => state.isLoggedIn);
+  const { logout } = useAuthStore();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false)
   const [showCouponModal, setShowCouponModal] = useState(false)
   const [searchWord, setSearchWord] = useState("");
+  const [showAuthMenu, setShowAuthMenu] = useState(false);
+  const authMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname().split("/")[1];
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (authMenuRef.current && !authMenuRef.current.contains(event.target as Node)) {
+        setShowAuthMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // 로그인 모달 열기 / 닫기
   const openLoginModal = () => {
@@ -75,7 +91,7 @@ const Header = () => {
   }
 
   const handleProfileClick = () => {
-    router.push("/my")
+    setShowAuthMenu(!showAuthMenu)
   }
 
   const notifications = [
@@ -152,17 +168,40 @@ const Header = () => {
               <button type="button" aria-label="알림" onClick={toggleNotifications}>
                 <Bell className="h-6 w-6 text-sub-gray" />
               </button>
-              <div className="flex items-center space-x-3">
+              <div className="relative flex items-center space-x-3">
                 <span className="text-sm font-medium whitespace-nowrap">대충사는사람</span>
-                <button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick}>
-                  <Image
-                    src="/abstract-profile.png"
-                    alt="프로필 이미지"
-                    width={40}
-                    height={40}
-                    className="h-full w-full object-cover"
-                  />
-                </button>
+                <div className="relative flex items-center" ref={authMenuRef}>
+                  <button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick}>
+                    <Image
+                      src="/abstract-profile.png"
+                      alt="프로필 이미지"
+                      width={40}
+                      height={40}
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                  {
+                    showAuthMenu &&
+                    <div className="absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 transition-all duration-200">
+                      <button
+                        type="button"
+                        onClick={() => router.push("/my")}
+                        className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
+                      >
+                        <User className="h-4 w-4" />
+                        마이페이지
+                      </button>
+                      <button
+                          type="button"
+                          onClick={logout}
+                          className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
+                      >
+                          <LogOut className="h-4 w-4" />
+                          로그아웃
+                      </button>
+                    </div>
+                  }
+                </div>
               </div>
               </>
               :
