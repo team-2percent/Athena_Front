@@ -14,10 +14,12 @@ const useAuthStore = create<AuthStore>((set) => ({
     isLoggedIn: false,
     tokenCheck: async () => {
         const accessToken = localStorage.getItem('accessToken');
+        
         if (accessToken) {
-            set({ isLoggedIn: true });
+            const decoded = jwtDecode<{ role: string }>(accessToken);
+            set({ isLoggedIn: true, role: decoded.role });
         } else {
-            set({ isLoggedIn: false });
+            set({ isLoggedIn: false, role: "" });
         }
     },
     login: (accessToken: string, refreshToken: string) => {
