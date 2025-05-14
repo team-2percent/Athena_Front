@@ -8,6 +8,8 @@ import Image from "next/image"
 import { ThumbsUp, ThumbsDown } from "lucide-react"
 import useAuthStore from "@/stores/auth"
 import FollowItem from "../profile/FollowItem"
+// 상단에 useApi 훅 import 추가
+import { useApi } from "@/hooks/useApi"
 
 interface Review {
   id: number
@@ -20,6 +22,7 @@ interface Review {
 
 const ProjectTabs = () => {
   const isLoggedIn = useAuthStore((state: { isLoggedIn: boolean }) => state.isLoggedIn)
+  const { apiCall, isLoading: apiLoading } = useApi()
   const [activeTab, setActiveTab] = useState("소개")
   const [reviewText, setReviewText] = useState("")
   const [reviews, setReviews] = useState<Review[]>([])
@@ -52,30 +55,31 @@ const ProjectTabs = () => {
     }
   }, [activeTab])
 
+  // fetchReviews 함수를 다음과 같이 수정:
   const fetchReviews = async () => {
     try {
       setIsLoading(true)
       setError(null)
 
-      const response = await fetch(`/api/comment/${projectId}`)
+      const { data, error, status } = await apiCall<Review[]>(`/api/comment/${projectId}`, "GET")
 
-      if (!response.ok) {
-        throw new Error("리뷰를 불러오는데 실패했습니다.")
+      if (error) {
+        throw new Error(error)
       }
 
-      const data = await response.json()
+      if (data) {
+        // API 응답 데이터를 컴포넌트에서 사용하는 형식으로 변환
+        const formattedReviews = data.map((review: any) => ({
+          id: review.id,
+          userName: review.userName,
+          content: review.content,
+          createdAt: review.createdAt,
+          likes: 0, // 기본값 설정
+          profileImage: "/abstract-profile.png", // 기본 프로필 이미지 설정
+        }))
 
-      // API 응답 데이터를 컴포넌트에서 사용하는 형식으로 변환
-      const formattedReviews = data.map((review: any) => ({
-        id: review.id,
-        userName: review.userName,
-        content: review.content,
-        createdAt: review.createdAt,
-        likes: 0, // 기본값 설정
-        profileImage: "/abstract-profile.png", // 기본 프로필 이미지 설정
-      }))
-
-      setReviews(formattedReviews)
+        setReviews(formattedReviews)
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.")
       console.error("리뷰 불러오기 오류:", err)
@@ -84,17 +88,32 @@ const ProjectTabs = () => {
     }
   }
 
+  // handleReviewSubmit 함수를 다음과 같이 수정:
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!reviewText.trim()) return
 
-    // 실제 구현에서는 API를 통해 리뷰를 제출해야 함
-    console.log("리뷰 제출:", reviewText)
+    try {
+      const { data, error, status } = await apiCall("/api/comment/create", "POST", {
+        projectId,
+        content: reviewText,
+      })
 
-    // 리뷰 제출 후 입력 필드 초기화 및 리뷰 목록 새로고침
-    setReviewText("")
-    fetchReviews()
+      if (error) {
+        setError(error)
+        return
+      }
+
+      console.log("리뷰 제출 성공:", data)
+
+      // 리뷰 제출 후 입력 필드 초기화 및 리뷰 목록 새로고침
+      setReviewText("")
+      fetchReviews()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.")
+      console.error("리뷰 제출 오류:", err)
+    }
   }
 
   // 날짜 포맷 함수
