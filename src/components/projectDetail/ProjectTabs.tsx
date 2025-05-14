@@ -2,22 +2,34 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useParams } from "next/navigation"
 import Image from "next/image"
 import { ThumbsUp, ThumbsDown } from "lucide-react"
 import useAuthStore from "@/stores/auth"
 import FollowItem from "../profile/FollowItem"
 
+interface Review {
+  id: number
+  userName: string
+  content: string
+  createdAt: string
+  likes?: number
+  profileImage?: string
+}
 
 const ProjectTabs = () => {
   const isLoggedIn = useAuthStore((state: { isLoggedIn: boolean }) => state.isLoggedIn)
   const [activeTab, setActiveTab] = useState("소개")
-  const [commentText, setCommentText] = useState("")
+  const [reviewText, setReviewText] = useState("")
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab)
   }
-      
+
   const seller = {
     id: 101,
     username: "가작가",
@@ -30,40 +42,71 @@ const ProjectTabs = () => {
     console.log(`판매자 ${id} 팔로우`)
   }
 
-  // API 호출에 따른 업데이트 예정
-  // 댓글 데이터
-  const reviews = [
-    {
-      id: 1,
-      user: "대충투자자자",
-      date: "2025. 04. 23.",
-      content: "스마게야 맨날 이딴 거나 팔아제끼지말고\n게임이나 똑바로 만들어라 ——",
-      likes: 358,
-      profileImage: "/abstract-profile.png",
-    },
-    {
-      id: 2,
-      user: "대충투자자자",
-      date: "2025. 04. 23.",
-      content: "스마게야 맨날 이딴 거나 팔아제끼지말고\n게임이나 똑바로 만들어라 ——",
-      likes: 358,
-      profileImage: "/abstract-profile.png",
-    },
-    {
-      id: 3,
-      user: "대충투자자자",
-      date: "2025. 04. 23.",
-      content: "스마게야 맨날 이딴 거나 팔아제끼지말고\n게임이나 똑바로 만들어라 ——",
-      likes: 358,
-      profileImage: "/abstract-profile.png",
-    },
-  ]
+  const { id } = useParams()
+  const projectId = id
 
-  const handleCommentSubmit = (e: React.FormEvent) => {
+  // 리뷰 데이터 가져오기
+  useEffect(() => {
+    if (activeTab === "후기") {
+      fetchReviews()
+    }
+  }, [activeTab])
+
+  const fetchReviews = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const response = await fetch(`/api/comment/${projectId}`)
+
+      if (!response.ok) {
+        throw new Error("리뷰를 불러오는데 실패했습니다.")
+      }
+
+      const data = await response.json()
+
+      // API 응답 데이터를 컴포넌트에서 사용하는 형식으로 변환
+      const formattedReviews = data.map((review: any) => ({
+        id: review.id,
+        userName: review.userName,
+        content: review.content,
+        createdAt: review.createdAt,
+        likes: 0, // 기본값 설정
+        profileImage: "/abstract-profile.png", // 기본 프로필 이미지 설정
+      }))
+
+      setReviews(formattedReviews)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.")
+      console.error("리뷰 불러오기 오류:", err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // 댓글 제출 로직 구현
-    console.log("댓글 제출:", commentText)
-    setCommentText("")
+
+    if (!reviewText.trim()) return
+
+    // 실제 구현에서는 API를 통해 리뷰를 제출해야 함
+    console.log("리뷰 제출:", reviewText)
+
+    // 리뷰 제출 후 입력 필드 초기화 및 리뷰 목록 새로고침
+    setReviewText("")
+    fetchReviews()
+  }
+
+  // 날짜 포맷 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date
+      .toLocaleDateString("ko-KR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      })
+      .replace(/\. /g, ". ")
   }
 
   return (
@@ -161,69 +204,97 @@ const ProjectTabs = () => {
               username={seller.username}
               oneLinear={seller.oneLinear}
               profileImage={seller.profileImage}
-              onFollow={handleFollow} isFollowing={false}            />
+              onFollow={handleFollow}
+              isFollowing={false} // 팔로우 상태는 실제 데이터에 따라 설정해야 함
+            />
           </div>
         )}
 
         {activeTab === "후기" && (
           <div className="space-y-6">
-            {/* 댓글 입력 영역 */}
+            {/* 리뷰 입력 영역 */}
             {isLoggedIn && (
-              <form onSubmit={handleCommentSubmit} className="flex items-center space-x-4">
+              <form onSubmit={handleReviewSubmit} className="flex items-center space-x-4">
                 <div className="flex-1">
                   <input
                     type="text"
                     placeholder="뭐 말이라도 해보기..."
                     className="w-full rounded-xl border border-gray-border px-4 py-4 focus:border-main-color focus:outline-none"
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
+                    value={reviewText}
+                    onChange={(e) => setReviewText(e.target.value)}
                   />
                 </div>
                 <button
                   type="submit"
                   className="rounded-xl bg-main-color px-8 py-4 font-medium text-white hover:bg-secondary-color-dark"
                 >
-                  댓글 달기
+                  리뷰 작성
                 </button>
               </form>
             )}
-            {/* 댓글 목록 */}
-            <div className="space-y-4">
-              {reviews.map((review) => (
-                <div key={review.id} className="rounded-3xl border border-gray-border p-6 shadow-sm">
-                  <div className="flex items-start justify-between">
-                    <div className="flex space-x-4">
-                      {/* 댓글 단 유저의 프로필 사진 */}
-                      <div className="h-16 w-16 overflow-hidden rounded-full">
-                        <Image
-                          src={review.profileImage || "/placeholder.svg"}
-                          alt={`${review.user} 프로필`}
-                          width={64}
-                          height={64}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
 
-                      {/* 댓글 단 유저의 이름, 게시 날짜, 내용 */}
-                      <div>
-                        <h3 className="text-xl font-bold">{review.user}</h3>
-                        <p className="text-sub-gray">{review.date}</p>
-                        <div className="mt-3 whitespace-pre-line">{review.content}</div>
+            {/* 로딩 상태 표시 */}
+            {isLoading && (
+              <div className="flex justify-center py-8">
+                <p className="text-sub-gray">리뷰를 불러오는 중...</p>
+              </div>
+            )}
+
+            {/* 에러 메시지 표시 */}
+            {error && (
+              <div className="rounded-xl bg-red-50 p-4 text-red-500">
+                <p>{error}</p>
+                <button onClick={fetchReviews} className="mt-2 text-sm underline">
+                  다시 시도
+                </button>
+              </div>
+            )}
+
+            {/* 리뷰 목록 */}
+            {!isLoading && !error && (
+              <div className="space-y-4">
+                {reviews.length > 0 ? (
+                  reviews.map((review) => (
+                    <div key={review.id} className="rounded-3xl border border-gray-border p-6 shadow-sm">
+                      <div className="flex items-start justify-between">
+                        <div className="flex space-x-4">
+                          {/* 리뷰 작성자 프로필 사진 */}
+                          <div className="h-16 w-16 overflow-hidden rounded-full">
+                            <Image
+                              src={review.profileImage || "/placeholder.svg"}
+                              alt={`${review.userName} 프로필`}
+                              width={64}
+                              height={64}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+
+                          {/* 리뷰 작성자 이름, 게시 날짜, 내용 */}
+                          <div>
+                            <h3 className="text-xl font-bold">{review.userName}</h3>
+                            <p className="text-sub-gray">{formatDate(review.createdAt)}</p>
+                            <div className="mt-3 whitespace-pre-line">{review.content}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                          <button className="flex items-center space-x-1">
+                            <ThumbsUp className="h-6 w-6" />
+                            <span className="text-lg">{review.likes || 0}</span>
+                          </button>
+                          <button>
+                            <ThumbsDown className="h-6 w-6" />
+                          </button>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <button className="flex items-center space-x-1">
-                        <ThumbsUp className="h-6 w-6" /> {/* 좋아요 아이콘 */}
-                        <span className="text-lg">{review.likes}</span>
-                      </button>
-                      <button>
-                        <ThumbsDown className="h-6 w-6" /> {/* 싫어요 아이콘 */}
-                      </button>
-                    </div>
+                  ))
+                ) : (
+                  <div className="flex justify-center py-8">
+                    <p className="text-sub-gray">아직 리뷰가 없습니다. 첫 리뷰를 작성해보세요!</p>
                   </div>
-                </div>
-              ))}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
