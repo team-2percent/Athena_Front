@@ -54,6 +54,11 @@ const Header = () => {
     setShowLoginModal(false)
   }
 
+  const openSignupModalInLoginModal = () => {
+    setShowLoginModal(false)
+    setShowSignupModal(true)
+  }
+
   // 회원가입 모달 열기 / 닫기
   const openSignupModal = () => {
     setShowSignupModal(true)
@@ -131,7 +136,7 @@ const Header = () => {
   return (
     <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)]">
       {showCouponModal && <CouponModal isOpen={showCouponModal} onClose={() => setShowCouponModal(false)} />}
-      {showLoginModal && <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} />}
+      {showLoginModal && <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} moveToSignupModal={openSignupModalInLoginModal} />}
       {showSignupModal && <SignupModal isOpen={showSignupModal} onClose={closeSignupModal} />}
       <div className="container mx-auto px-4 py-4">
         {/* 상단 헤더 영역 */}

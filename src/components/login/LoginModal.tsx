@@ -11,9 +11,10 @@ import useAuthStore from "@/stores/auth"
 interface LoginModalProps {
   isOpen: boolean
   onClose: () => void
+  moveToSignupModal: () => void
 }
 
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, moveToSignupModal }: LoginModalProps) {
   const { apiCall } = useApi();
   const { login } = useAuthStore();
   const [email, setEmail] = useState("")
@@ -135,7 +136,11 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           </button>
 
           {/* Sign Up Button */}
-          <button type="button" className="w-full py-4 bg-gray-200 text-gray-800 rounded-xl font-medium text-lg">
+          <button
+            type="button"
+            onClick={moveToSignupModal}
+            className="w-full py-4 bg-gray-200 text-gray-800 rounded-xl font-medium text-lg"
+          >
             회원가입
           </button>
         </div>
