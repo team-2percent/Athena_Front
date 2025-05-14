@@ -4,6 +4,9 @@ import "./globals.css";
 import HeaderLoader from "@/components/HeaderLoader";
 import RegisterPageButtonLoader from "@/components/RegisterPageButtonLoader";
 
+// 로그인 토큰 관련
+import { AuthProvider } from '../contexts/AuthContext';
+
 // Pretendard 폰트를 사용하기 위해 불러옴
 const pretendard = localFont({
   src: "../../public/fonts/PretendardVariable.woff2",
@@ -27,13 +30,15 @@ export default function RootLayout({
       <body
         className={`${pretendard.variable} font-pretendard`} // Pretendard 사용
       >
-        <HeaderLoader />
-        <main className="flex-1 bg-white mt-1">
-          <div className="container mx-auto px-4 py-8">
-            {children}
-          </div>
-          <RegisterPageButtonLoader />
-        </main>
+        <AuthProvider>
+          <HeaderLoader />
+          <main className="flex-1 bg-white mt-1">
+            <div className="container mx-auto px-4 py-8">
+              {children}
+            </div>
+            <RegisterPageButtonLoader />
+          </main>
+        </AuthProvider>
       </body>
     </html>
   );
