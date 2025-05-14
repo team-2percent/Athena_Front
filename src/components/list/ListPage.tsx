@@ -35,8 +35,12 @@ export default function ListPage({ type, categoryId, searchWord, }: ListPageProp
   const morePage = lastProjectId !== null;
   const nextPageQueryParam = morePage ? `&cursorValue=${cursorValue}&lastProjectId=${lastProjectId}` : "";
 
-  const handleSortClick = (sort: string) => {
-      setSort(sort);
+  const handleSortClick = (newSort: string) => {
+      if(sort === newSort) return;
+      setCursorValue(null);
+      setLastProjectId(null);
+      setProjects([]);
+      setSort(newSort);
   }
 
   const loadProjects = () => {
