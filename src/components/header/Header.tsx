@@ -20,7 +20,7 @@ const uris: Record<string, string> = {
   "마감임박": "deadline",
 }
 const Header = () => {
-  const isLoggedIn = useAuthStore((state: { isLoggedIn: boolean }) => state.isLoggedIn);
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const { logout } = useAuthStore();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);

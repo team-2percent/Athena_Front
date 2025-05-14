@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 interface AuthStore {
     role: string;
     isLoggedIn: boolean;
+    tokenCheck: () => Promise<void>;
     login: (accessToken: string, refreshToken: string) => void;
     logout: () => void;
 }
@@ -11,6 +12,14 @@ interface AuthStore {
 const useAuthStore = create<AuthStore>((set) => ({
     role: "",
     isLoggedIn: false,
+    tokenCheck: async () => {
+        const accessToken = localStorage.getItem('accessToken');
+        if (accessToken) {
+            set({ isLoggedIn: true });
+        } else {
+            set({ isLoggedIn: false });
+        }
+    },
     login: (accessToken: string, refreshToken: string) => {
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
