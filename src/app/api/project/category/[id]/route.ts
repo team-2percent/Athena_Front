@@ -19,7 +19,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
                 achievementRate: 85,
                 description: "프로젝트1 설명입니다.",
                 liked: false,
-                daysLeft: 15
+                daysLeft: 15,
+                views: 100
             },
             {
                 id: 2, 
@@ -29,7 +30,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
                 achievementRate: 65,
                 description: "프로젝트2 설명입니다.",
                 liked: false,
-                daysLeft: 30
+                daysLeft: 30,
+                views: 200
             }
         ];
 

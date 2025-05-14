@@ -7,6 +7,7 @@ interface listProject {
     description: string
     liked: boolean
     daysLeft: number
+    views: number
 }
 
 export type { listProject }
