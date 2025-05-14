@@ -16,7 +16,7 @@ export default function ProjectsList({ projects, isLoading }: {
     isLoading: boolean
 }) {
     const renderList = () => {
-        if (isLoading) return <Spinner message="프로젝트를 불러오는 중입니다." />
+        if (projects.length === 0 && isLoading) return <Spinner message="프로젝트를 불러오는 중입니다." />
         else if (projects.length === 0) return <EmptyMessage message="프로젝트가 없습니다." />
         else 
         return (
