@@ -3,9 +3,9 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import { useParams } from "next/navigation"
 import { ChevronUp, ChevronDown, Plus, Check, ChevronRight, X } from "lucide-react"
 import AddressModal from "../profileEdit/AddressModal"
+import { useParams } from "next/navigation"
 import { useApi } from "@/hooks/useApi"
 
 interface AddressInfo {
@@ -66,10 +66,10 @@ interface SelectedProduct {
 
 // 주문 생성 요청 인터페이스
 interface CreateOrderRequest {
-  deliveryInfoId: string
-  projectId: string
+  deliveryInfoId: number
+  projectId: number
   orderItems: {
-    productId: string
+    productId: number
     quantity: number
   }[]
 }
@@ -94,9 +94,6 @@ interface PaymentReadyResponse {
 }
 
 const DonateDock = () => {
-  // API 호출을 위한 훅 추가
-  const { apiCall, isLoading: apiLoading } = useApi()
-
   // 현재 단계 (1: 상품 선택, 2: 결제 및 배송지 정보)
   const [step, setStep] = useState(1)
   const [isOpen, setIsOpen] = useState(false)
@@ -127,11 +124,8 @@ const DonateDock = () => {
   const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 })
 
   // 결제 관련 상태 추가
-  const [paymentError, setPaymentError] = useState<string | null>(null)
   const [isProcessingPayment, setIsProcessingPayment] = useState(false)
-
-  // URL에서 프로젝트 ID 가져오기
-  const { id: projectId } = useParams()
+  const [paymentError, setPaymentError] = useState<string | null>(null)
 
   // 새 배송지 정보를 객체로 관리
   const [newAddress, setNewAddress] = useState<Omit<AddressInfo, "id" | "isDefault">>({
@@ -203,7 +197,7 @@ const DonateDock = () => {
     }
   }, [projectId, apiCall])
 
-  // 주문 요약 더���기 버튼 참조
+  // 주문 요약 더보기 버튼 참조
   const orderSummaryMoreRef = useRef<HTMLButtonElement>(null)
 
   // 기본 상품 옵션 데이터 - API 데이터가 없을 때 사용
@@ -588,13 +582,14 @@ const DonateDock = () => {
     e.stopPropagation()
   }
 
-  // 결제 처리 함수 추가
+  // 결제 처리 함수
   const handlePayment = async () => {
     // 필수 입력값 검증
     if (!selectedAddress) {
       alert("배송지를 선택해주세요.")
       return
     }
+
     if (!selectedPay) {
       alert("결제 수단을 선택해주세요.")
       return
@@ -611,15 +606,17 @@ const DonateDock = () => {
 
       // 1. 주문 생성 API 호출
       const orderItems = selectedOptions.map((optionId) => ({
-        productId: optionId,
+        productId: Number.parseInt(optionId.replace("option", "")), // 'option1' -> 1
         quantity: quantities[optionId]?.quantity || 1,
       }))
 
       const orderRequest: CreateOrderRequest = {
-        deliveryInfoId: selectedAddress,
-        projectId: projectId as string,
+        deliveryInfoId: Number.parseInt(selectedAddress),
+        projectId: Number.parseInt(projectId as string),
         orderItems,
       }
+
+      console.log("주문 요청:", orderRequest)
 
       const { data: orderData, error: orderError } = await apiCall<CreateOrderResponse>(
         "/api/orders",
@@ -995,57 +992,38 @@ const DonateDock = () => {
                       </div>
                     </div>
 
+                    {/* 결제 오류 메시지 표시 */}
+                    {paymentError && (
+                      <div className="rounded-xl bg-red-50 p-4 text-red-500">
+                        <p>{paymentError}</p>
+                      </div>
+                    )}
+
                     {/* 하단 결제 정보 및 버튼 */}
                     <div className="mt-8 bg-white pb-8">
                       {/* 버튼 영역 */}
                       <div className="flex justify-end space-x-4">
                         <button
-                          className="rounded-xl bg-main-color px-8 py-3 font-medium text-white hover:bg-secondary-color-dark"
+                          className={`rounded-xl bg-main-color px-8 py-3 font-medium text-white hover:bg-secondary-color-dark ${
+                            isProcessingPayment ? "opacity-70 cursor-not-allowed" : ""
+                          }`}
                           onClick={handlePayment}
+                          disabled={isProcessingPayment}
                         >
-                          후원하기
+                          {isProcessingPayment ? "처리 중..." : "후원하기"}
                         </button>
                         <button
                           className="rounded-xl bg-cancel-background px-8 py-3 font-medium text-white hover:bg-cancel-background-dark"
                           onClick={goToPreviousStep}
+                          disabled={isProcessingPayment}
                         >
                           이전
                         </button>
                       </div>
                     </div>
                   </div>
-                </div>
-
-                {/* 결제 오류 메시지 표시 */}
-                {paymentError && (
-                  <div className="rounded-xl bg-red-50 p-4 text-red-500">
-                    <p>{paymentError}</p>
-                  </div>
                 )}
-
-                {/* 하단 결제 정보 및 버튼 */}
-                <div className="mt-8 bg-white pb-8">
-                  {/* 버튼 영역 */}
-                  <div className="flex justify-end space-x-4">
-                    <button
-                      className={`rounded-xl bg-main-color px-8 py-3 font-medium text-white hover:bg-secondary-color-dark ${
-                        isProcessingPayment ? "opacity-70 cursor-not-allowed" : ""
-                      }`}
-                      onClick={handlePayment}
-                      disabled={isProcessingPayment}
-                    >
-                      {isProcessingPayment ? "처리 중..." : "후원하기"}
-                    </button>
-                    <button
-                      className="rounded-xl bg-cancel-background px-8 py-3 font-medium text-white hover:bg-cancel-background-dark"
-                      onClick={goToPreviousStep}
-                      disabled={isProcessingPayment}
-                    >
-                      이전
-                    </button>
-                  </div>
-                </div>
-              </div>
+              </>
             )}
           </div>
         </div>

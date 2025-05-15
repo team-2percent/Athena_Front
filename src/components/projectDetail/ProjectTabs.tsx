@@ -9,6 +9,7 @@ import { ThumbsUp, ThumbsDown } from "lucide-react"
 import FollowItem from "../profile/FollowItem"
 import { useApi } from "@/hooks/useApi"
 import MarkdownRenderer from "../projectRegister/MarkdownRenderer"
+import useAuthStore from "@/stores/auth"
 
 interface Review {
   id: number
@@ -287,26 +288,6 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
 
             {activeTab === "후기" && (
               <div className="space-y-6">
-                {/* 리뷰 입력 영역 */}
-                {isLoggedIn && (
-                  <form onSubmit={handleReviewSubmit} className="flex items-center space-x-4">
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        placeholder="뭐 말이라도 해보기..."
-                        className="w-full rounded-xl border border-gray-border px-4 py-4 focus:border-main-color focus:outline-none"
-                        value={reviewText}
-                        onChange={(e) => setReviewText(e.target.value)}
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      className="rounded-xl bg-main-color px-8 py-4 font-medium text-white hover:bg-secondary-color-dark"
-                    >
-                      리뷰 작성
-                    </button>
-                  </form>
-                )}
 
                 {/* 로딩 상태 표시 */}
                 {reviewsLoading && (
