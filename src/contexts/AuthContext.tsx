@@ -16,16 +16,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [role, setRole] = useState<"ADMIN" | "USER" | null>(null);
   
   const checkAuth = useCallback(() => {
-    const accessToken = localStorage.getItem('accessToken');
-    const refreshToken = localStorage.getItem('refreshToken');
-    return !!accessToken && !!refreshToken;
+    if (typeof window !== 'undefined') {
+      const accessToken = localStorage.getItem('accessToken');
+      const refreshToken = localStorage.getItem('refreshToken');
+      return !!accessToken && !!refreshToken;
+    }
+    return false;
   }, []);
 
   const login = (accessToken: string, refreshToken: string) => {
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
-    const { role } = jwtDecode<{ role: "ADMIN" | "USER" }>(accessToken);
-    setRole(role as "ADMIN" | "USER");
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      const { role } = jwtDecode<{ role: "ADMIN" | "USER" }>(accessToken);
+      setRole(role as "ADMIN" | "USER");
+    }
   };
 
   const logout = () => {
