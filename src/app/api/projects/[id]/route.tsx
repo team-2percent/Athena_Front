@@ -2,9 +2,9 @@ import { type NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest, context: { params: { id: string } }) {
   const { params } = context;
-  const projectId = params?.id;
+  const id = params?.id;
 
-  if (!projectId) {
+  if (!id) {
     return NextResponse.json({ error: "Project ID is required" }, { status: 400 });
   }
 
@@ -262,7 +262,7 @@ export async function GET(request: NextRequest, context: { params: { id: string 
 
   // Filter comments by projectId
   const filteredProject = mockProjects
-    .filter((project) => project.projectId === projectId)
+    .filter((project) => project.projectId === id)
     .map((project) => ({
       projectId: project.projectId,
       title: project.title,
