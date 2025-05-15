@@ -207,20 +207,32 @@ export const submitProject = async (
   setError(null)
 
   try {
-    // 이미지 처리 - 기존 이미지(URL)와 새 이미지(File)를 함께 처리
-    const imageData = state.images
-      .map((img) => {
-        // 기존 이미지는 URL을 그대로 전송
-        if (img.url) {
-          return { url: img.url }
-        }
-        // 새 이미지는 File 객체 전송
-        else if (img.file) {
-          return { file: img.file }
-        }
-        return null
-      })
-      .filter(Boolean)
+    // 이미지 처리 - 새 이미지(File)를 먼저 업로드
+    const newImages = state.images.filter((img) => img.file && !img.isExisting)
+    const imageFiles = newImages.map((img) => img.file).filter(Boolean) as File[]
+
+    // 새 이미지가 있는 경우 먼저 업로드
+    let uploadedImageUrls: string[] = []
+    if (imageFiles.length > 0) {
+      console.log("Uploading images first...", imageFiles.length)
+      const uploadResult = await uploadImages(state.projectId, imageFiles)
+
+      if (!uploadResult.success) {
+        console.error("Image upload failed:", uploadResult.error)
+        setError("이미지 업로드에 실패했습니다: " + uploadResult.error)
+        setSubmitting(false)
+        return false
+      }
+
+      // 업로드된 이미지 URL 저장
+      uploadedImageUrls = uploadResult.data.urls || []
+      console.log("Images uploaded successfully:", uploadedImageUrls)
+    }
+
+    // 이미지 데이터 준비 - 기존 이미지 URL과 새로 업로드된 이미지 URL 합치기
+    const existingImageUrls = state.images.filter((img) => img.url && img.isExisting).map((img) => img.url) as string[]
+
+    const allImageUrls = [...existingImageUrls, ...uploadedImageUrls]
 
     // 프로젝트 정보 등록
     const projectData = {
@@ -234,7 +246,7 @@ export const submitProject = async (
       startAt: state.startDate.toISOString(),
       endAt: state.endDate.toISOString(),
       shippedAt: state.deliveryDate.toISOString(),
-      images: imageData, // URL과 File 객체가 혼합된 배열
+      imageUrls: allImageUrls, // 모든 이미지 URL 배열로 전송
       products: state.supportOptions.map((option) => ({
         name: option.name,
         description: option.description,
