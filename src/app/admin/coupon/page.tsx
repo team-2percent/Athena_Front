@@ -7,6 +7,7 @@ import { CouponListItem, CouponListResponse, CouponStatus, CouponStatusType } fr
 import { useApi } from "@/hooks/useApi"
 import Spinner from "@/components/common/Spinner"
 import { formatDateInAdmin } from "@/lib/utils"
+import clsx from "clsx"
 
 export default function CouponPage() {
     const router = useRouter()
@@ -16,7 +17,7 @@ export default function CouponPage() {
     const [currentPage, setCurrentPage] = useState<number>(0)
     const [couponList, setCouponList] = useState<CouponListItem[]>([])
     const [totalElements, setTotalElements] = useState<number>(0)
-    const [totalPages, setTotalPages] = useState<number>(0)
+    const [totalPageCount, setTotalPageCount] = useState<number>(0)
 
     const url = `/api/coupon?size=${pageSize}&page=${currentPage}${status !== "ALL" ? `&status=${status}` : ""}`
     const loadCouponList = () => {
@@ -25,10 +26,23 @@ export default function CouponPage() {
             if (data !== null) {
                 setCouponList(data.data);
                 setTotalElements(data.page.totalElements);  
-                setTotalPages(data.page.totalPages);
+                setTotalPageCount(data.page.totalPages);
                 setCurrentPage(data.page.number);
             }
         })
+    }
+
+    const leftPageDisabled = currentPage === 0
+    const rightPageDisabled = currentPage === totalPageCount - 1
+
+    const handlePrevPage = () => {
+        if (leftPageDisabled) return
+        setCurrentPage(currentPage - 1)
+    }
+    
+    const handleNextPage = () => {
+        if (rightPageDisabled) return
+        setCurrentPage(currentPage + 1)
     }
 
     const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -45,12 +59,11 @@ export default function CouponPage() {
 
     useEffect(() => {
         setCurrentPage(0);
-        loadCouponList();
     }, [status, pageSize])
 
     useEffect(() => {
         loadCouponList();
-    }, [status, currentPage, pageSize])
+    }, [status, currentPage])
 
     return (
         <div className="flex flex-col mx-auto w-full p-8">
@@ -122,10 +135,10 @@ export default function CouponPage() {
                 </tbody>
             </table>
 
-            <div className="flex justify-center gap-2 mt-8">
-                <button className="px-3 p-4">◀</button>
-                <button className="px-3 p-4 text-main-color">1</button>
-                <button className="px-3 p-4">▶</button>
+            <div className="flex justify-center gap-2">
+                <button className={clsx("px-3 py-2", leftPageDisabled ? "text-gray-300" : "text-main-color")} disabled={leftPageDisabled} onClick={handlePrevPage}>◀</button>
+                <button className="px-3 py-2 text-main-color">{currentPage + 1}</button>
+                <button className={clsx("px-3 py-2", rightPageDisabled ? "text-gray-300" : "text-main-color")} disabled={rightPageDisabled} onClick={handleNextPage}>▶</button>
             </div>
 
             

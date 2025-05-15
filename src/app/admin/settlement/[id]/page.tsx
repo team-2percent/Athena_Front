@@ -8,6 +8,7 @@ import Image from "next/image"
 import { useApi } from "@/hooks/useApi"
 import { useParams } from "next/navigation";
 import OverlaySpinner from "@/components/common/OverlaySpinner"
+import clsx from "clsx"
 
 interface SettlementInfo {
     "projectTitle": string,
@@ -80,6 +81,19 @@ export default function SettlementDetailPage() {
         "payoutAmount": number
     } | null>(null)
     const [history, setHistory] = useState<SettlementHistoryItem[] | null>(null)
+
+    const leftPageDisabled = currentPage === 0
+    const rightPageDisabled = currentPage === totalPageCount - 1
+
+    const handlePrevPage = () => {
+        if (leftPageDisabled) return
+        setCurrentPage(currentPage - 1)
+    }
+    
+    const handleNextPage = () => {
+        if (rightPageDisabled) return
+        setCurrentPage(currentPage + 1)
+    }
 
     const loadSettlement = () => {
         apiCall<SettlementInfo>(`/api/admin/settlements/${id}/info`, "GET").then(({ data }) => {
@@ -250,10 +264,10 @@ export default function SettlementDetailPage() {
                     </tbody>
                 </table>
                 <div className="flex justify-center gap-2">
-                <button className="px-3 py-2">◀</button>
-                <button className="px-3 py-2 text-secondary-color-dark">1</button>
-                <button className="px-3 py-2">▶</button>
-            </div>
+                    <button className={clsx("px-3 py-2", leftPageDisabled ? "text-gray-300" : "text-main-color")} disabled={leftPageDisabled} onClick={handlePrevPage}>◀</button>
+                    <button className="px-3 py-2 text-main-color">{currentPage + 1}</button>
+                    <button className={clsx("px-3 py-2", rightPageDisabled ? "text-gray-300" : "text-main-color")} disabled={rightPageDisabled} onClick={handleNextPage}>▶</button>
+                </div>
             </div>
             </div>
         )
@@ -263,6 +277,10 @@ export default function SettlementDetailPage() {
     useEffect(() => {
         loadSettlement()
     }, [])
+
+    useEffect(() => {
+        loadSettlement()
+    }, [currentPage])
 
     return (
         <div className="flex flex-col mx-auto w-full p-8 gap-6">

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { useApi } from "@/hooks/useApi";
 import { formatDateInAdmin } from "@/lib/utils";
 import clsx from "clsx";
+import { queryObjects } from "v8";
 
 interface Settlement {
     settlementId: number,
@@ -117,6 +118,10 @@ export default function SettlementPage() {
     useEffect(() => {
         loadSettlementList()
     }, [])
+
+    useEffect(() => {
+        loadSettlementList()
+    }, [queryParams.status, queryParams.year, queryParams.month, queryParams.page])
 
     return (
         <div className="flex flex-col mx-auto w-full p-8 gap-6">
