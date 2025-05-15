@@ -47,28 +47,18 @@ export default function ProfilePage() {
           purchases={profileData.purchases}
           profileImage={profileData.profileImage}
           buttons={
-            <div  className="flex flex-col gap-2">
-            <button
-              className={cn(
-                "px-8 py-3 rounded-lg border-2 border-main-color text-main-color font-medium text-center transition-colors",
-                "hover:bg-secondary-color active:bg-secondary-color",
-                "focus:outline-none focus:ring-2 focus:ring-main-color focus:ring-offset-2"
-              )}
-              onClick={handleClickEditProfile}
-            >
-              프로필 편집
-            </button>
-            <button
-              className={cn(
-                "px-8 py-3 rounded-lg border-2 border-main-color text-main-color font-medium text-center transition-colors",
-                "hover:bg-secondary-color active:bg-secondary-color",
-                "focus:outline-none focus:ring-2 focus:ring-main-color focus:ring-offset-2",
-              )}
-              onClick={handleClickViewTransaction}
-            >
-              거래 내역 보기
-            </button>
-          </div>
+            <div className="flex flex-col gap-2">
+              <button
+                className={cn(
+                  "px-8 py-3 rounded-lg border-2 border-main-color text-main-color font-medium text-center transition-colors",
+                  "hover:bg-secondary-color active:bg-secondary-color",
+                  "focus:outline-none focus:ring-2 focus:ring-main-color focus:ring-offset-2"
+                )}
+                onClick={handleClickEditProfile}
+              >
+                프로필 편집
+              </button>
+            </div>
           }
         />
 

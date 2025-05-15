@@ -5,12 +5,9 @@ import type React from "react"
 import { useState } from "react"
 import Image from "next/image"
 import { ThumbsUp, ThumbsDown } from "lucide-react"
-import useAuthStore from "@/stores/auth"
 import FollowItem from "../profile/FollowItem"
 
-
 const ProjectTabs = () => {
-  const isLoggedIn = useAuthStore((state: { isLoggedIn: boolean }) => state.isLoggedIn)
   const [activeTab, setActiveTab] = useState("소개")
   const [commentText, setCommentText] = useState("")
 
@@ -31,7 +28,7 @@ const ProjectTabs = () => {
   }
 
   // API 호출에 따른 업데이트 예정
-  // 댓글 데이터
+  // 후기 데이터
   const reviews = [
     {
       id: 1,
@@ -61,8 +58,8 @@ const ProjectTabs = () => {
 
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // 댓글 제출 로직 구현
-    console.log("댓글 제출:", commentText)
+    // 후기 제출 로직 구현
+    console.log("후기 제출:", commentText)
     setCommentText("")
   }
 
@@ -167,33 +164,13 @@ const ProjectTabs = () => {
 
         {activeTab === "후기" && (
           <div className="space-y-6">
-            {/* 댓글 입력 영역 */}
-            {isLoggedIn && (
-              <form onSubmit={handleCommentSubmit} className="flex items-center space-x-4">
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    placeholder="뭐 말이라도 해보기..."
-                    className="w-full rounded-xl border border-gray-border px-4 py-4 focus:border-main-color focus:outline-none"
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="rounded-xl bg-main-color px-8 py-4 font-medium text-white hover:bg-secondary-color-dark"
-                >
-                  댓글 달기
-                </button>
-              </form>
-            )}
-            {/* 댓글 목록 */}
+            {/* 후기 목록 */}
             <div className="space-y-4">
               {reviews.map((review) => (
                 <div key={review.id} className="rounded-3xl border border-gray-border p-6 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div className="flex space-x-4">
-                      {/* 댓글 단 유저의 프로필 사진 */}
+                      {/* 후기 단 유저의 프로필 사진 */}
                       <div className="h-16 w-16 overflow-hidden rounded-full">
                         <Image
                           src={review.profileImage || "/placeholder.svg"}
@@ -204,7 +181,7 @@ const ProjectTabs = () => {
                         />
                       </div>
 
-                      {/* 댓글 단 유저의 이름, 게시 날짜, 내용 */}
+                      {/* 후기 단 유저의 이름, 게시 날짜, 내용 */}
                       <div>
                         <h3 className="text-xl font-bold">{review.user}</h3>
                         <p className="text-sub-gray">{review.date}</p>

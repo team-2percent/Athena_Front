@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import ProfileTabs from "./ProfileTabs"
 import ProjectItem from "./ProjectItem"
+import PurchasedProjectItem from "./PurchasedProjectItem"
 import FollowItem from "./FollowItem"
 import ReviewItem from "./ReviewItem"
 import { Percent } from "lucide-react"
@@ -33,7 +34,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
       sellerName: "판매자 이름",
       projectName: "상품 이름",
       description:
-        "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개...",
+        "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개asdu9fhaiuosdhfgiadsghf78ays78fgyas78opdftya78sdfytg78asftgo8a67sdtgfo7a8stgfo78atfo687asdtgf78aetof78l6astgd78ftsdl78ftgsad7o8fgtla78sdft78loaetyfg7l8astglf87aso78ftasw78gsd7fasoyfo7l",
       imageUrl: "/tteokbokki/tteokbokki.jpg",
       achievementRate: 10,
       daysLeft: 1,
@@ -75,6 +76,36 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
       daysLeft: null,
       isCompleted: true,
       projectId: 204,
+    },
+  ]
+
+  // 구매한 상품 데이터 (실제로는 API에서 가져올 데이터)
+  const purchasedProjects = [
+    {
+      id: 101,
+      sellerName: "판매자 이름",
+      projectName: "구매한 상품 1",
+      description:
+        "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개...",
+      imageUrl: "/tteokbokki/tteokbokki.jpg",
+      achievementRate: 100,
+      daysLeft: null,
+      isCompleted: true,
+      projectId: 301,
+      hasReview: false,
+    },
+    {
+      id: 102,
+      sellerName: "판매자 이름",
+      projectName: "구매한 상품 2",
+      description:
+        "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개...",
+      imageUrl: "/tteokbokki/tteokbokki.jpg",
+      achievementRate: 100,
+      daysLeft: null,
+      isCompleted: true,
+      projectId: 302,
+      hasReview: true,
     },
   ]
 
@@ -190,10 +221,18 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
     // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
   }
 
+  // 프로젝트 삭제 핸들러
   const deleteProject = (id: number) => {
     console.log(`상품 ${id}를 삭제합니다.`)
     // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
     // 삭제 후 다시 조회하여 setProjects 호출
+  }
+
+  // 구매 내역 삭제 핸들러
+  const deletePurchase = (id: number) => {
+    console.log(`구매 내역 ${id}를 삭제합니다.`)
+    // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
+    // 삭제 후 다시 조회하여 setPurchasedProjects 호출
   }
 
   const loadUserCoupon = () => {
@@ -213,7 +252,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
   useEffect(() => {
     loadUserCoupon()
   }, []);
-
+    
   return (
     <div className="mt-12">
       {/* 탭 메뉴 */}
@@ -241,12 +280,32 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
           </div>
         )}
 
-        {activeTab === "판매 상품" && (isMy ? (
-          <MyProjectList projects={projects} deleteProject={deleteProject} />
-        ) : (
+        {activeTab === "판매 상품" &&
+          (isMy ? (
+            <MyProjectList projects={projects} deleteProject={deleteProject} />
+          ) : (
+            <div>
+              {projects.map((project) => (
+                <ProjectItem
+                  key={project.id}
+                  id={project.id}
+                  sellerName={project.sellerName}
+                  projectName={project.projectName}
+                  description={project.description}
+                  imageUrl={project.imageUrl}
+                  achievementRate={project.achievementRate}
+                  daysLeft={project.daysLeft}
+                  isCompleted={project.isCompleted}
+                  projectId={project.projectId}
+                />
+              ))}
+            </div>
+        ))}
+
+        {activeTab === "구매 상품" && (
           <div>
-            {projects.map((project) => (
-              <ProjectItem
+            {purchasedProjects.map((project) => (
+              <PurchasedProjectItem
                 key={project.id}
                 id={project.id}
                 sellerName={project.sellerName}
@@ -257,10 +316,12 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
                 daysLeft={project.daysLeft}
                 isCompleted={project.isCompleted}
                 projectId={project.projectId}
+                hasReview={project.hasReview}
+                onDeletePurchase={deletePurchase}
               />
             ))}
           </div>
-        ))}
+        )}
 
         {(activeTab === "후기" || activeTab === "내가 쓴 후기") && (
           <div>
@@ -289,7 +350,8 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
                 username={user.username}
                 oneLinear={user.oneLinear}
                 profileImage={user.profileImage}
-                onFollow={handleFollow} isFollowing={false}              />
+                onFollow={handleFollow}
+                isFollowing={false}              />
             ))}
           </div>
         )}
