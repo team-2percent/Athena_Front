@@ -13,7 +13,7 @@ interface ProjectItemProps {
   description: string
   imageUrl: string
   achievementRate: number
-  daysLeft: number | null // null인 경우 판매 종료
+  daysLeft: number | null | undefined // null인 경우 판매 종료
   isCompleted: boolean
   projectId: number
   isMy?: boolean
