@@ -24,7 +24,7 @@ export default function Home() {
   const { isLoading, apiCall } = useApi();
   const [projects, setProjects] = useState<Project[]>([]);
   const loadRankProjects = () => {
-    apiCall("/api/project/all", "GET").then(({ data }) => {
+    apiCall("/api/projects/all", "GET").then(({ data }) => {
       setProjects(data as Project[]);
     })
   }
