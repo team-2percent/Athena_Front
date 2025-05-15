@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import useAuthStore from "@/stores/auth";
 
 interface ApiResponse<T> {
   data: T | null;
@@ -8,10 +9,10 @@ interface ApiResponse<T> {
   status: number;
 }
 
-const api_base = "http://localhost:8000";
+const api_base = "http://localhost:3000";
 
 export function useApi() {
-  const { logout } = useAuth();
+  const { logout } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
 
   const refreshAccessToken = async () => {

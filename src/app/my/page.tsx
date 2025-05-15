@@ -9,11 +9,6 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 export default function ProfilePage() {
-    const isLoggedIn = useAuthStore((state: { isLoggedIn: boolean }) => state.isLoggedIn);
-    if (!isLoggedIn) {
-        redirect("/")
-    }
-
     const router = useRouter();
     const [isOpenViewTransaction, setIsOpenViewTransaction] = useState(false);
   // 프로필 데이터 (실제로는 API에서 가져올 데이터)
