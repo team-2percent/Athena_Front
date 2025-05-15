@@ -10,7 +10,41 @@ import MarkdownRenderer from "@/components/projectRegister/MarkdownRenderer"
 import { useApi } from "@/hooks/useApi";
 import { useParams } from "next/navigation";
 import OverlaySpinner from "@/components/common/OverlaySpinner"
+import { useEffect } from "react";
+import { formatDateInAdmin } from "@/lib/utils"
 
+interface ApprovalProject {
+    id: number,
+    category: {
+      id: number,
+      categoryName: string
+    },
+    title: string,
+    description: string,
+    goalAmount: number,
+    totalAmount: number,
+    markdown: string,
+    startAt: string,
+    endAt: string,
+    shippedAt: string,
+    approvalStatus: string,
+    createdAt: string,
+    imageUrls: string[],
+    sellerResponse: {
+      id: number,
+      nickname: string,
+      sellerIntroduction: string,
+      linkUrl: string
+    },
+    productResponses: {
+        id: number,
+        name: string,
+        description: string,
+        price: number,
+        stock: number,
+        options: string[]
+    }[]
+  }
 export default function ProjectApprovalDetailPage() {
     const { id } = useParams();
     const router = useRouter();
@@ -18,7 +52,7 @@ export default function ProjectApprovalDetailPage() {
     // const [comment, setComment] = useState("")
     const [approvalStatus, setApprovalStatus] = useState<"approve" | "reject" | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const [project, setProject] = useState<ApprovalProject | null>(null);
     const approve = approvalStatus === "approve" ? true : approvalStatus === "reject" ? false : null;
     const disabled = approvalStatus === null;
 
@@ -33,7 +67,103 @@ export default function ProjectApprovalDetailPage() {
         })
     }
 
-    const markdown = `# 프로젝트 기본 정보\n**안됨**\n## 프로젝트 기본 정보\n**안됨**\n## 프로젝트 기본 정보\n**안됨**\n## 프로젝트 기본 정보\n**안됨**`
+    const loadProject = () => {
+        apiCall<ApprovalProject>(`/api/admin/projects/${id}`, "GET").then(({ data }) => {
+            setProject(data);
+        })
+    }
+
+    useEffect(() => {
+        loadProject();
+    }, [id])
+
+    const renderProject = () => {
+        if (isLoading) return <OverlaySpinner message="처리 중입니다."/>
+        if (project === null) return <></>
+        return (
+            <div>
+                {/* 프로젝트 기본 정보 */}
+            <div className="flex flex-col gap-4">
+                <h2 className="text-2xl font-medium border-b pb-2">프로젝트 기본 정보</h2>
+                <div className="grid grid-cols-5 gap-4">
+                    {project.imageUrls.map((imageUrl) => (
+                        <div className="aspect-square w-50 h-50 relative overflow-hidden" key={imageUrl}>
+                            <img
+                                src={imageUrl}
+                                alt="프로젝트 이미지 1"
+                                className="object-cover w-full h-full rounded-lg"
+                            />
+                        </div>
+                    ))}
+                </div>
+                
+                <div className="space-y-4 mt-4">
+                <div className="flex">
+                    <span className="w-24 text-sub-gray">프로젝트</span>
+                    <span className="flex-1">{project.title}</span>
+                </div>
+
+                <div className="flex">
+                    <span className="w-24 text-sub-gray">카테고리</span>
+                    <span className="flex-1">{project.category.categoryName}</span>
+                </div>
+
+                <div className="flex">
+                    <span className="w-24 text-sub-gray">설명</span>
+                    <span className="flex-1">
+                        {project.description}
+                    </span>
+                </div>
+
+                <div className="flex">
+                    <span className="w-24 text-sub-gray">목표 가격</span>
+                    <span className="flex-1">{project.goalAmount} 원</span>
+                </div>
+
+                <div className="flex">
+                    <span className="w-24 text-sub-gray">판매 기간</span>
+                    <span className="flex-1">{formatDateInAdmin(project.startAt)} ~ {formatDateInAdmin(project.endAt)}</span>
+                </div>
+
+                <div className="flex">
+                    <span className="w-24 text-sub-gray">등록</span>
+                    <span className="flex-1">{formatDateInAdmin(project.createdAt)}</span>
+                </div>
+                </div>
+                
+                
+            </div>
+            <div className="flex flex-col gap-4 mt-6">
+                <h2 className="text-2xl font-medium border-b pb-2">상세 소개</h2>
+                <MarkdownRenderer content={project.markdown} />
+            </div>
+            {/* 판매자 정보 */}
+            <div className="flex flex-col gap-4">
+                <h2 className="text-2xl font-medium border-b pb-2">판매자 정보</h2>
+                <div className="flex items-center mt-4 justify-between">
+                    <div className="flex items-center gap-4">
+                        <button className="h-16 w-16 overflow-hidden rounded-full">
+                            <img
+                                src={project.sellerResponse.linkUrl}
+                                alt="프로필 이미지"
+                                className="h-full w-full object-cover"
+                            />
+                        </button>
+                        <div className="flex flex-col">
+                            <span className="text-xl font-medium">{project.sellerResponse.nickname}</span>
+                            <span className="text-sm text-gray-500">{project.sellerResponse.sellerIntroduction}</span>
+                        </div>
+                    </div>
+                    
+                    <div className="flex flex-col gap-2">
+                        <button className="ml-auto px-4 py-2 text-sm border rounded-md">프로필보기</button>
+                        <p className="text-sm text-gray-500">* 기존 프로필 페이지로 이동합니다.</p>
+                    </div>
+                </div>
+            </div>
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-col mx-auto w-full p-8 gap-6">
@@ -44,118 +174,11 @@ export default function ProjectApprovalDetailPage() {
                 목록으로
             </button>
             </div>
-            {/* 프로젝트 기본 정보 */}
-            <div className="flex flex-col gap-4">
-                <h2 className="text-2xl font-medium border-b pb-2">프로젝트 기본 정보</h2>
-                <div className="grid grid-cols-5 gap-4">
-                    <div className="aspect-square w-full relative">
-                        <Image
-                            src="/project-test.png"
-                            alt="프로젝트 이미지 1"
-                            fill
-                            className="object-cover rounded-lg"
-                        />
-                    </div>
-                    <div className="aspect-square w-full relative">
-                        <Image
-                            src="/project-test.png"
-                            alt="프로젝트 이미지 2"
-                            fill
-                            className="object-cover rounded-lg"
-                        />
-                    </div>
-                    <div className="aspect-square w-full relative">
-                        <Image
-                            src="/project-test.png"
-                            alt="프로젝트 이미지 3"
-                            fill
-                            className="object-cover rounded-lg"
-                        />
-                    </div>
-                    <div className="aspect-square w-full relative">
-                        <Image
-                            src="/project-test.png"
-                            alt="프로젝트 이미지 4"
-                            fill
-                            className="object-cover rounded-lg"
-                        />
-                    </div>
-                    <div className="aspect-square w-full relative">
-                        <Image
-                            src="/project-test.png"
-                            alt="프로젝트 이미지 5"
-                            fill
-                            className="object-cover rounded-lg"
-                        />
-                    </div>
-                </div>
-                
-                <div className="space-y-4 mt-4">
-                <div className="flex">
-                    <span className="w-24 text-sub-gray">프로젝트</span>
-                    <span className="flex-1">TG5555555</span>
-                </div>
+            
+            {renderProject()}
 
-                <div className="flex">
-                    <span className="w-24 text-sub-gray">카테고리</span>
-                    <span className="flex-1">디자인 문구</span>
-                </div>
-
-                <div className="flex">
-                    <span className="w-24 text-sub-gray">설명</span>
-                    <span className="flex-1">
-                        이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.이것은 프로젝트 설명입니다.
-                    </span>
-                </div>
-
-                <div className="flex">
-                    <span className="w-24 text-sub-gray">목표 가격</span>
-                    <span className="flex-1">100000000 원</span>
-                </div>
-
-                <div className="flex">
-                    <span className="w-24 text-sub-gray">판매 기간</span>
-                    <span className="flex-1">2025. 04. 25 ~ 2025. 05. 15 (19일)</span>
-                </div>
-
-                <div className="flex">
-                    <span className="w-24 text-sub-gray">등록</span>
-                    <span className="flex-1">2025. 04. 13</span>
-                </div>
-                </div>
-                
-                
-            </div>
-            <div className="flex flex-col gap-4 mt-6">
-                <h2 className="text-2xl font-medium border-b pb-2">상세 소개</h2>
-                <MarkdownRenderer content={markdown} />
-            </div>
-            {/* 판매자 정보 */}
-            <div className="flex flex-col gap-4">
-                <h2 className="text-2xl font-medium border-b pb-2">판매자 정보</h2>
-                <div className="flex items-center mt-4 justify-between">
-                    <div className="flex items-center gap-4">
-                        <button className="h-16 w-16 overflow-hidden rounded-full">
-                            <Image
-                                src="/abstract-profile.png"
-                                alt="프로필 이미지"
-                                width={64}
-                                height={64}
-                                className="h-full w-full object-cover"
-                            />
-                        </button>
-                        <div className="flex flex-col">
-                            <span className="text-xl font-medium">기적가</span>
-                        </div>
-                    </div>
-                    
-                    <div className="flex flex-col gap-2">
-                        <button className="ml-auto px-4 py-2 text-sm border rounded-md">프로필보기</button>
-                        <p className="text-sm text-gray-500">* 기존 프로필 페이지로 이동합니다.</p>
-                    </div>
-                </div>
-            </div>
             {/* 승인 반려 란 */}
+            {project?.approvalStatus === "PENDING" && (
             <div className="flex flex-col gap-4">
                 <h2 className="text-2xl font-medium border-b pb-2">프로젝트 승인 여부</h2>
                 <div className="flex justify-between">
@@ -203,7 +226,7 @@ export default function ProjectApprovalDetailPage() {
                     >저장</button>
                 </div>
                 </div>
-            </div>
+            </div>)}
             {/* 확인 모달 */}
             {
                 isModalOpen &&
