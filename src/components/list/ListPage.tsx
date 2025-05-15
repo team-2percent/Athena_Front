@@ -55,7 +55,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
           loadProjects();
         }
       },
-      { threshold: 0.8 }
+      { threshold: 0.3 }
     );
 
     if (loader.current) {
