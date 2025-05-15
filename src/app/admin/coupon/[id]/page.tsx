@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ArrowLeftIcon } from "lucide-react"
 import CouponTag from "@/components/admin/CouponTag";
 import { useApi } from "@/hooks/useApi";
@@ -9,12 +9,13 @@ import { CouponDetail } from "@/lib/CouponConstant";
 import Spinner from "@/components/common/Spinner";
 import { formatDateInAdmin } from "@/lib/utils";
 
-export default function ProjectApprovalDetailPage({ couponId } : { couponId: number }) {
+export default function ProjectApprovalDetailPage() {
+    const { id } = useParams();
     const router = useRouter();
     const { isLoading, apiCall } = useApi();
     const [coupon, setcoupon] = useState<CouponDetail | null>(null);
     const loadData = () => {
-        apiCall<{ data: CouponDetail }>(`/api/coupon/${couponId}`, "GET").then(({ data }) => {
+        apiCall<{ data: CouponDetail }>(`/api/coupon/${id}`, "GET").then(({ data }) => {
             if (data !== null) setcoupon(data.data);
         })
     }
