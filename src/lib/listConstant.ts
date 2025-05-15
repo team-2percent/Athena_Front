@@ -1,18 +1,18 @@
 const listType = {
     "new": {
-        "apiUrl": "/api/project/new",
+        "apiUrl": "/api/projects/new",
         "sort": null
     },
     "deadline": {
-        "apiUrl": "/api/project/deadline",
+        "apiUrl": "/api/projects/deadline",
         "sort": ["DEADLINE", "DEADLINE_RECOMMENDED", "DEADLINE_POPULAR", "DEEADLINE_SUCCESS_RATE"]
     },
     "category": {
-        "apiUrl": "/api/project/category",
+        "apiUrl": "/api/projects/category",
         "sort": ["LATEST", "RECOMMENDED", "POPULAR", "SUCCESS_RATE"]
     },
     "search": {
-        "apiUrl": "/api/project/search",
+        "apiUrl": "/api/projects/search",
         "sort": ["LATEST", "RECOMMENDED", "POPULAR", "SUCCESS_RATE"]
     }
 }
