@@ -12,23 +12,27 @@ export async function GET(request: Request) {
         const projects = [
             {
                 id: 1,
-                image: "/project1.jpg",
+                imageUrl: "/project1.jpg",
                 sellerName: "판매자1", 
-                projectName: "프로젝트1",
+                title: "프로젝트1",
+                description: "프로젝트 설명입니다.",
                 achievementRate: 85,
-                description: "프로젝트1 설명입니다.",
-                liked: false,
-                daysLeft: 15
+                createdAt: null,
+                endAt: "2025-06-02T00:00:06",
+                daysLeft: 15,
+                views: 10,
             },
             {
                 id: 2, 
-                image: "/project2.jpg",
+                imageUrl: "/project2.jpg",
                 sellerName: "판매자2",
-                projectName: "프로젝트2", 
+                title: "프로젝트2", 
+                description: "프로젝트 설명입니다.",
                 achievementRate: 65,
-                description: "프로젝트2 설명입니다.",
-                liked: false,
-                daysLeft: 30
+                createdAt: null,
+                endAt: "2025-06-02T00:00:06",
+                daysLeft: 30,
+                views: 0,
             }
         ];
 

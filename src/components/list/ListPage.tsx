@@ -14,13 +14,7 @@ interface ListPageProps {
     searchWord?: string
 }
 
-const sorts = {
-    "deadline" : ["deadline", "recommend", "view", "achievement"],
-    "category" : ["new", "recommend", "view", "achievement"],
-    "search" : ["new", "recommend", "view", "achievement"],
-}
-
-export default function ListPage({ type, categoryId, searchWord, }: ListPageProps) {
+export default function ListPage({ type, categoryId, searchWord }: ListPageProps) {
   const { isLoading, apiCall } = useApi();
   const [projects, setProjects] = useState<listProject[]>([]);
   const [cursorValue, setCursorValue] = useState<string | null>(null);
@@ -45,13 +39,10 @@ export default function ListPage({ type, categoryId, searchWord, }: ListPageProp
 
   const loadProjects = () => {
     apiCall(url + nextPageQueryParam, "GET").then(({ data }: { data: any }) => {
-      console.log(data);
       if ("data" in data) setProjects([...projects, ...(data.data as listProject[])]);
       if ("nextCursorValue" in data) setCursorValue(data.nextCursorValue as string | null);
       if ("nextProjectId" in data) setLastProjectId(data.nextProjectId as number | null); 
       if ("total" in data) setTotalCount(data.total as number);
-
-      console.log(cursorValue, lastProjectId);
     }).catch((error) => {
       console.error("프로젝트 조회에 실패했습니다.", error);
     })

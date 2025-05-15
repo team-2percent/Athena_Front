@@ -5,13 +5,15 @@ import ListProject from "./ListProjectCard"
 export default function ProjectsList({ projects, isLoading }: {
     projects: {
         id: number
-        image: string
+        imageUrl: string
         sellerName: string
-        projectName: string
-        achievementRate: number
+        title: string
         description: string
-        liked: boolean
+        achievementRate: number
+        createdAt: string | null
+        endAt: string
         daysLeft: number
+        views: number
     }[]
     isLoading: boolean
 }) {
@@ -25,9 +27,9 @@ export default function ProjectsList({ projects, isLoading }: {
                 <ListProject 
                     key={project.id}
                     id={project.id}
-                    image={project.image}
+                    image={project.imageUrl}
                     sellerName={project.sellerName}
-                    projectName={project.projectName}
+                    projectName={project.title}
                     achievementRate={project.achievementRate}
                     description={project.description}
                     liked={false}

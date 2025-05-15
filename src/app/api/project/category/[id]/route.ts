@@ -6,32 +6,33 @@ export async function GET(request: Request, { params }: { params: { id: string }
     const sortType = searchParams.get("sortType");
     const cursorValue = searchParams.get("cursorValue");
     const lastProjectId = searchParams.get("lastProjectId");
-    console.log(id, sortType, cursorValue, lastProjectId);
 
     try {
         // 더미 데이터 생성
         const projects = [
             {
                 id: 1,
-                image: "/project1.jpg",
+                imageUrl: "/project1.jpg",
                 sellerName: "판매자1", 
-                projectName: "프로젝트1",
+                title: "프로젝트1",
+                description: "프로젝트 설명입니다.",
                 achievementRate: 85,
-                description: "프로젝트1 설명입니다.",
-                liked: false,
+                createdAt: null,
+                endAt: "2025-06-02T00:00:06",
                 daysLeft: 15,
-                views: 100
+                views: 10,
             },
             {
                 id: 2, 
-                image: "/project2.jpg",
+                imageUrl: "/project2.jpg",
                 sellerName: "판매자2",
-                projectName: "프로젝트2", 
+                title: "프로젝트2", 
+                description: "프로젝트 설명입니다.",
                 achievementRate: 65,
-                description: "프로젝트2 설명입니다.",
-                liked: false,
+                createdAt: null,
+                endAt: "2025-06-02T00:00:06",
                 daysLeft: 30,
-                views: 200
+                views: 0,
             }
         ];
 

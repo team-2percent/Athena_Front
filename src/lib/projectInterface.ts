@@ -1,13 +1,14 @@
 interface listProject {
     id: number
-    image: string
+    imageUrl: string
     sellerName: string
-    projectName: string
+    title: string
     achievementRate: number
     description: string
-    liked: boolean
     daysLeft: number
     views: number
+    createdAt: string | null
+    endAt: string
 }
 
 export type { listProject }
