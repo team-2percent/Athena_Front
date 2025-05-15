@@ -1,9 +1,15 @@
 'use client'
 
 import { useRouter } from "next/navigation";
+import useAuthStore from "@/stores/auth";
 
 export default function RegisterPageButton() {
+    const { isLoggedIn } = useAuthStore();
     const router = useRouter();
+
+    if (!isLoggedIn) {
+        return null;
+    }
 
     return (
         <button

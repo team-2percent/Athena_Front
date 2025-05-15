@@ -1,14 +1,20 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import ProfileTabs from "./ProfileTabs"
 import ProjectItem from "./ProjectItem"
+import PurchasedProjectItem from "./PurchasedProjectItem"
 import FollowItem from "./FollowItem"
 import ReviewItem from "./ReviewItem"
 import { Percent } from "lucide-react"
 import MyProjectList from "./MyProjectList"
 import clsx from "clsx"
+import { useApi } from "@/hooks/useApi"
+import { UserCoupon } from "@/lib/couponInterface"
+import CouponList from "./CouponList"
+import Spinner from "../common/Spinner"
+import EmptyMessage from "../common/EmptyMessage"
 
 interface ProfileContentProps {
   introduction: string
@@ -17,6 +23,8 @@ interface ProfileContentProps {
 }
 
 export default function ProfileContent({ introduction, links, isMy }: ProfileContentProps) {
+  const { isLoading, apiCall } = useApi();
+  const [userCoupons, setUserCoupons] = useState<UserCoupon[]>([]);
   const [activeTab, setActiveTab] = useState("소개")
 
   // 상품 데이터 (실제로는 API에서 가져올 데이터)
@@ -26,7 +34,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
       sellerName: "판매자 이름",
       projectName: "상품 이름",
       description:
-        "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개...",
+        "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개asdu9fhaiuosdhfgiadsghf78ays78fgyas78opdftya78sdfytg78asftgo8a67sdtgfo7a8stgfo78atfo687asdtgf78aetof78l6astgd78ftsdl78ftgsad7o8fgtla78sdft78loaetyfg7l8astglf87aso78ftasw78gsd7fasoyfo7l",
       imageUrl: "/tteokbokki/tteokbokki.jpg",
       achievementRate: 10,
       daysLeft: 1,
@@ -68,6 +76,36 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
       daysLeft: null,
       isCompleted: true,
       projectId: 204,
+    },
+  ]
+
+  // 구매한 상품 데이터 (실제로는 API에서 가져올 데이터)
+  const purchasedProjects = [
+    {
+      id: 101,
+      sellerName: "판매자 이름",
+      projectName: "구매한 상품 1",
+      description:
+        "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개...",
+      imageUrl: "/tteokbokki/tteokbokki.jpg",
+      achievementRate: 100,
+      daysLeft: null,
+      isCompleted: true,
+      projectId: 301,
+      hasReview: false,
+    },
+    {
+      id: 102,
+      sellerName: "판매자 이름",
+      projectName: "구매한 상품 2",
+      description:
+        "상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개 상품 소개...",
+      imageUrl: "/tteokbokki/tteokbokki.jpg",
+      achievementRate: 100,
+      daysLeft: null,
+      isCompleted: true,
+      projectId: 302,
+      hasReview: true,
     },
   ]
 
@@ -175,55 +213,7 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
     },
   ]
 
-  // mock data: 쿠폰 데이터 추후 삭제
-  const coupons = [
-    {
-      id: 1,
-      amount: "1000000원",
-      title: "~~~~ 쿠폰",
-      description:
-        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12",
-      state: "UNUSED"
-    },
-    {
-      id: 2,
-      amount: "1000000원",
-      title: "~~~~ 쿠폰",
-      description:
-        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12",
-      state: "USED"
-    },
-    {
-      id: 3,
-      amount: "1000000원",
-      title: "~~~~ 쿠폰",
-      description:
-        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12",
-      state: "EXPIRED"
-    },
-    {
-      id: 4,
-      amount: "1000000원",
-      title: "~~~~ 쿠폰",
-      description:
-        "쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다. 쿠폰 설명입니다.",
-      validUntil: "2023-5-12",
-      state: "EXPIRED"
-    },
-  ]
-
-  const couponStateMessage = (state: string, expiredDate: string) => {
-    if (state === "UNUSED") {
-      return `${expiredDate}까지 사용가능`
-    } else if (state === "USED") {
-      return "사용완료"
-    } else if (state === "EXPIRED") {
-      return `${expiredDate} 만료`
-    }
-  }
+  
 
   // 팔로우 버튼 클릭 핸들러
   const handleFollow = (userId: number) => {
@@ -231,12 +221,38 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
     // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
   }
 
+  // 프로젝트 삭제 핸들러
   const deleteProject = (id: number) => {
     console.log(`상품 ${id}를 삭제합니다.`)
     // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
     // 삭제 후 다시 조회하여 setProjects 호출
   }
 
+  // 구매 내역 삭제 핸들러
+  const deletePurchase = (id: number) => {
+    console.log(`구매 내역 ${id}를 삭제합니다.`)
+    // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
+    // 삭제 후 다시 조회하여 setPurchasedProjects 호출
+  }
+
+  const loadUserCoupon = () => {
+    apiCall("/api/userCoupon", "GET").then(({ data }) => setUserCoupons(data as UserCoupon[]))
+  }
+
+  const renderCouponList = () => {
+    if (isLoading) {
+      return <Spinner message="쿠폰 목록을 불러오고 있습니다." />
+    } else if (userCoupons.length === 0) {
+      return <EmptyMessage message="쿠폰이 없습니다." />
+    } else {
+      return <CouponList coupons={userCoupons} />
+    }
+  }
+
+  useEffect(() => {
+    loadUserCoupon()
+  }, []);
+    
   return (
     <div className="mt-12">
       {/* 탭 메뉴 */}
@@ -264,12 +280,32 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
           </div>
         )}
 
-        {activeTab === "판매 상품" && (isMy ? (
-          <MyProjectList projects={projects} deleteProject={deleteProject} />
-        ) : (
+        {activeTab === "판매 상품" &&
+          (isMy ? (
+            <MyProjectList projects={projects} deleteProject={deleteProject} />
+          ) : (
+            <div>
+              {projects.map((project) => (
+                <ProjectItem
+                  key={project.id}
+                  id={project.id}
+                  sellerName={project.sellerName}
+                  projectName={project.projectName}
+                  description={project.description}
+                  imageUrl={project.imageUrl}
+                  achievementRate={project.achievementRate}
+                  daysLeft={project.daysLeft}
+                  isCompleted={project.isCompleted}
+                  projectId={project.projectId}
+                />
+              ))}
+            </div>
+        ))}
+
+        {activeTab === "구매 상품" && (
           <div>
-            {projects.map((project) => (
-              <ProjectItem
+            {purchasedProjects.map((project) => (
+              <PurchasedProjectItem
                 key={project.id}
                 id={project.id}
                 sellerName={project.sellerName}
@@ -280,10 +316,12 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
                 daysLeft={project.daysLeft}
                 isCompleted={project.isCompleted}
                 projectId={project.projectId}
+                hasReview={project.hasReview}
+                onDeletePurchase={deletePurchase}
               />
             ))}
           </div>
-        ))}
+        )}
 
         {(activeTab === "후기" || activeTab === "내가 쓴 후기") && (
           <div>
@@ -312,7 +350,8 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
                 username={user.username}
                 oneLinear={user.oneLinear}
                 profileImage={user.profileImage}
-                onFollow={handleFollow} isFollowing={false}              />
+                onFollow={handleFollow}
+                isFollowing={false}              />
             ))}
           </div>
         )}
@@ -333,35 +372,8 @@ export default function ProfileContent({ introduction, links, isMy }: ProfileCon
           </div>
         )}
 
-        {activeTab === "쿠폰" && <div className="flex flex-col gap-4">
-          {coupons.map((coupon) => (
-          <div className="rounded-2xl border border-gray-border flex overflow-hidden" key={coupon.id}>
-            {/* 왼쪽: 퍼센트 아이콘 */}
-            <div className={clsx("relative min-w-[70px] h-[100px] flex items-center justify-center", coupon.state === "UNUSED" ? "bg-main-color" : "bg-disabled-background")}>
-              <div className="absolute top-0 right-0 w-4 h-4 bg-white rounded-full translate-x-1/2 translate-y-[-50%]"></div>
-              <div className="absolute bottom-0 right-0 w-4 h-4 bg-white rounded-full translate-x-1/2 translate-y-[50%]"></div>
-              <Percent className="h-8 w-8 text-white" />
-            </div>
-      
-            {/* 중앙: 쿠폰 제목 및 설명 */}
-            <div className="flex-1 p-4 flex flex-col justify-center">
-              <h3 className="text-lg font-bold">{coupon.title}</h3>
-              <p className="text-sm text-sub-gray mt-1">{coupon.description}</p>
-            </div>
-      
-            {/* 구분선 */}
-            <div className="w-0 border-l border-dashed border-gray-border my-4"></div>
-      
-            {/* 오른쪽: 금액 및 유효기간 */}
-            <div className="p-4 flex flex-col justify-center items-end min-w-[140px]">
-              <p className={clsx("text-xl font-bold", coupon.state === "UNUSED" ? "text-main-color" : "text-disabled-text")}>{coupon.amount}</p>
-              <p className="text-xs text-sub-gray mt-1">
-                {couponStateMessage(coupon.state, coupon.validUntil)}
-              </p>
-            </div>
-          </div>
-        ))}
-        </div>
+        {activeTab === "쿠폰" && 
+            renderCouponList()
         }
       </div>
     </div>

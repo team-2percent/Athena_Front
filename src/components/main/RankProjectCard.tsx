@@ -3,7 +3,7 @@ import ProjectCard from "../common/ProjectCard"
 
 interface RankProjectProps {
     id: number
-    image: string
+    imageUrl: string
     sellerName: string
     projectName: string
     achievementRate: number
@@ -13,11 +13,11 @@ interface RankProjectProps {
     rankElement?: ReactNode
 }
 
-const RankProject = ({ id, image, sellerName, projectName, achievementRate, liked, size, daysLeft, rankElement }: RankProjectProps) => {
+const RankProject = ({ id, imageUrl, sellerName, projectName, achievementRate, liked, size, daysLeft, rankElement }: RankProjectProps) => {
     return (
         <ProjectCard 
             id={id}
-            image={image}
+            image={imageUrl}
             sellerName={sellerName}
             projectName={projectName}
             achievementRate={achievementRate}

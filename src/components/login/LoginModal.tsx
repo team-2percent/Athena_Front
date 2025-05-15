@@ -5,13 +5,18 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { X } from "lucide-react"
 import clsx from "clsx"
+import { useApi } from "@/hooks/useApi"
+import useAuthStore from "@/stores/auth"
 
 interface LoginModalProps {
   isOpen: boolean
   onClose: () => void
+  moveToSignupModal: () => void
 }
 
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, moveToSignupModal }: LoginModalProps) {
+  const { apiCall } = useApi();
+  const { login } = useAuthStore();
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [disabled, setDisabled] = useState(true);
@@ -25,13 +30,10 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // 로그인 로직 추후 구현
-    if (false) {
-      console.log("Login attempt with:", { email, password })
-    } else {
-      setErrorMessage("이메일과 비밀번호를 확인해주세요.")
-    }
-    
+    apiCall("/api/user/login", "POST", { email, password }).then(({ data }: { data: any }) => {
+      login(data.accessToken, data.refreshToken)
+      onClose()
+    })
   }
 
   useEffect(() => {
@@ -133,7 +135,11 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           </button>
 
           {/* Sign Up Button */}
-          <button type="button" className="w-full py-4 bg-gray-200 text-gray-800 rounded-xl font-medium text-lg">
+          <button
+            type="button"
+            onClick={moveToSignupModal}
+            className="w-full py-4 bg-gray-200 text-gray-800 rounded-xl font-medium text-lg"
+          >
             회원가입
           </button>
         </div>

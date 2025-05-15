@@ -3,13 +3,14 @@
 import { useState, useRef, useEffect } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import clsx from "clsx"
+import { listType, sortName } from "@/lib/listConstant"
 
 interface ListHeaderProps {
   type: "category" | "search" | "new" | "deadline"
   count: number
   searchWord?: string
-  sort?: "new" | "deadline" | "recommend" | "view" | "achievement" | null
-  onClickSort?: (sort: "deadline" | "recommend" | "view" | "achievement") => void
+  sort?: string | null
+  onClickSort?: (sort: string) => void
   category?: {
     id: number
     name: string
@@ -22,29 +23,8 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
   const buttonRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // 현재 정렬 방식에 따른 텍스트 표시
-  const getSortText = () => {
-    console.log(sort);
-    if (!sort) return null
-
-    switch (sort) {
-      case "new":
-        return "최신순"
-      case "deadline":
-        return "마감순"
-      case "recommend":
-        return "추천순"
-      case "view":
-        return "조회순"
-      case "achievement":
-        return "달성률순"
-      default:
-        return null
-    }
-  }
-
   // 정렬 옵션 클릭 핸들러
-  const handleSortClick = (sortOption: "deadline" | "recommend" | "view" | "achievement") => {
+  const handleSortClick = (sortOption: string) => {
     if (onClickSort) {
       onClickSort(sortOption)
     }
@@ -70,35 +50,6 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
     }
   }, [])
 
-  // type에 따른 드롭다운 메뉴 옵션 가져오기
-  const getDropdownOptions = () => {
-    switch (type) {
-      case "deadline":
-        return [
-          { value: "deadline", label: "마감순" },
-          { value: "recommend", label: "추천순" },
-          { value: "view", label: "조회순" },
-          { value: "achievement", label: "달성률순" },
-        ]
-      case "category":
-        return [
-          { value: "new", label: "최신순" },
-          { value: "recommend", label: "추천순" },
-          { value: "view", label: "조회순" },
-          { value: "achievement", label: "달성률순" },
-        ]
-      case "search":
-        return [
-          { value: "new", label: "최신순" },
-          { value: "recommend", label: "추천순" },
-          { value: "view", label: "조회순" },
-          { value: "achievement", label: "달성률순" },
-        ]
-      default:
-        return []
-    }
-  }
-
   return (
     <div className="flex justify-between items-center w-full max-w-7xl mx-auto py-3 border-b border-gray-100 mb-8">
         {/* 상품 개수 표시 */}
@@ -117,7 +68,7 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
                 className="flex items-center text-main-color font-normal"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                {getSortText()} {isOpen ? <ChevronUp className="ml-1 h-5 w-5" /> : <ChevronDown className="ml-1 h-5 w-5" />}
+                {sortName[sort as keyof typeof sortName]} {isOpen ? <ChevronUp className="ml-1 h-5 w-5" /> : <ChevronDown className="ml-1 h-5 w-5" />}
             </button>
 
             {/* 드롭다운 메뉴 */}
@@ -130,13 +81,13 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
                     right: buttonRef.current ? window.innerWidth - buttonRef.current.getBoundingClientRect().right : 0,
                 }}
                 >
-                {getDropdownOptions().map((option) => (
+                {type !== "new" && listType[type].sort.map((option) => (
                     <button
-                    key={option.value}
-                    className={clsx("font-normal", sort === option.value ? "text-main-color" : "text-gray-500")}
-                    onClick={() => handleSortClick(option.value as "deadline" | "recommend" | "view" | "achievement")}
+                    key={option}
+                    className={clsx("font-normal", sort === option ? "text-main-color" : "text-gray-500")}
+                    onClick={() => handleSortClick(option as "deadline" | "recommend" | "view" | "achievement")}
                     >
-                    {option.label}
+                    {sortName[option as keyof typeof sortName]}
                     </button>
                 ))}
                 </div>

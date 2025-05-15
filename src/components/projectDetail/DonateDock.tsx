@@ -3,9 +3,9 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
+import { useParams } from "next/navigation"
 import { ChevronUp, ChevronDown, Plus, Check, ChevronRight, X } from "lucide-react"
 import AddressModal from "../profileEdit/AddressModal"
-import { useParams } from "next/navigation"
 import { useApi } from "@/hooks/useApi"
 
 interface AddressInfo {
@@ -64,7 +64,39 @@ interface SelectedProduct {
   quantity: number
 }
 
+// 주문 생성 요청 인터페이스
+interface CreateOrderRequest {
+  deliveryInfoId: string
+  projectId: string
+  orderItems: {
+    productId: string
+    quantity: number
+  }[]
+}
+
+// 주문 생성 응답 인터페이스
+interface CreateOrderResponse {
+  orderId: number
+  totalPrice: number
+  orderedAt: string
+  items: {
+    productId: number
+    productName: string
+    quantity: number
+    price: number
+  }[]
+}
+
+// 결제 준비 응답 인터페이스
+interface PaymentReadyResponse {
+  next_redirect_pc_url: string
+  tid: string
+}
+
 const DonateDock = () => {
+  // API 호출을 위한 훅 추가
+  const { apiCall, isLoading: apiLoading } = useApi()
+
   // 현재 단계 (1: 상품 선택, 2: 결제 및 배송지 정보)
   const [step, setStep] = useState(1)
   const [isOpen, setIsOpen] = useState(false)
@@ -93,6 +125,13 @@ const DonateDock = () => {
 
   // 팝오버 위치 계산을 위한 상태
   const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 })
+
+  // 결제 관련 상태 추가
+  const [paymentError, setPaymentError] = useState<string | null>(null)
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
+
+  // URL에서 프로젝트 ID 가져오기
+  const { id: projectId } = useParams()
 
   // 새 배송지 정보를 객체로 관리
   const [newAddress, setNewAddress] = useState<Omit<AddressInfo, "id" | "isDefault">>({
@@ -549,53 +588,73 @@ const DonateDock = () => {
     e.stopPropagation()
   }
 
-  // 결제 처리 함수
-  const handlePayment = () => {
+  // 결제 처리 함수 추가
+  const handlePayment = async () => {
+    // 필수 입력값 검증
+    if (!selectedAddress) {
+      alert("배송지를 선택해주세요.")
+      return
+    }
     if (!selectedPay) {
       alert("결제 수단을 선택해주세요.")
       return
     }
 
-    if (!selectedAddress) {
-      alert("배송지를 선택해주세요.")
+    if (selectedOptions.length === 0) {
+      alert("최소 1개 이상의 상품을 선택해주세요.")
       return
     }
 
     try {
-      // 선택된 상품 정보 구성
-      const orderItems = selectedOptions.map((optionId) => {
-        const option = projectOptions.find((opt) => opt.id === optionId)
-        return {
-          productId: Number(optionId.replace("option", "")), // 'option1' -> 1
-          quantity: quantities[optionId]?.quantity || 0,
-          price: option ? Number(option.price.replace(/,/g, "")) : 0,
-        }
-      })
+      setIsProcessingPayment(true)
+      setPaymentError(null)
 
-      // 선택된 배송지 정보
-      const selectedAddressInfo = addresses.find((addr) => addr.id === selectedAddress)
+      // 1. 주문 생성 API 호출
+      const orderItems = selectedOptions.map((optionId) => ({
+        productId: optionId,
+        quantity: quantities[optionId]?.quantity || 1,
+      }))
 
-      // 주문 정보 로깅 (실제 API 호출 대신)
-      console.log("주문 정보:", {
-        projectId: Number(projectId),
-        items: orderItems,
-        shippingAddress: {
-          name: selectedAddressInfo?.name,
-          address: selectedAddressInfo?.address,
-          detailAddress: selectedAddressInfo?.detailAddress,
-          zipCode: selectedAddressInfo?.zipCode,
-        },
-        paymentMethod: selectedPay,
-      })
+      const orderRequest: CreateOrderRequest = {
+        deliveryInfoId: selectedAddress,
+        projectId: projectId as string,
+        orderItems,
+      }
 
-      // 결제 성공 메시지 표시
-      alert("결제 기능은 현재 준비 중입니다. 곧 서비스될 예정입니다.")
+      const { data: orderData, error: orderError } = await apiCall<CreateOrderResponse>(
+        "/api/orders",
+        "POST",
+        orderRequest,
+      )
 
-      // 독 닫기
+      if (orderError || !orderData) {
+        throw new Error(orderError || "주문 생성에 실패했습니다.")
+      }
+
+      console.log("주문 생성 성공:", orderData)
+
+      // 2. 결제 준비 API 호출
+      const { data: paymentData, error: paymentError } = await apiCall<PaymentReadyResponse>(
+        `/api/payment/ready/${orderData.orderId}`,
+        "POST",
+      )
+
+      if (paymentError || !paymentData) {
+        throw new Error(paymentError || "결제 준비에 실패했습니다.")
+      }
+
+      console.log("결제 준비 성공:", paymentData)
+
+      // 3. 결제 페이지로 이동
+      window.open(paymentData.next_redirect_pc_url, "_blank")
+
+      // 4. 독 닫기
       setIsOpen(false)
-    } catch (err) {
-      console.error("결제 처리 중 오류:", err)
-      alert("결제 처리 중 오류가 발생했습니다. 다시 시도해주세요.")
+    } catch (error) {
+      console.error("결제 처리 오류:", error)
+      setPaymentError(error instanceof Error ? error.message : "결제 처리 중 오류가 발생했습니다.")
+    } finally {
+      setIsProcessingPayment(false)
     }
   }
 
@@ -955,8 +1014,38 @@ const DonateDock = () => {
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* 결제 오류 메시지 표시 */}
+                {paymentError && (
+                  <div className="rounded-xl bg-red-50 p-4 text-red-500">
+                    <p>{paymentError}</p>
+                  </div>
                 )}
-              </>
+
+                {/* 하단 결제 정보 및 버튼 */}
+                <div className="mt-8 bg-white pb-8">
+                  {/* 버튼 영역 */}
+                  <div className="flex justify-end space-x-4">
+                    <button
+                      className={`rounded-xl bg-main-color px-8 py-3 font-medium text-white hover:bg-secondary-color-dark ${
+                        isProcessingPayment ? "opacity-70 cursor-not-allowed" : ""
+                      }`}
+                      onClick={handlePayment}
+                      disabled={isProcessingPayment}
+                    >
+                      {isProcessingPayment ? "처리 중..." : "후원하기"}
+                    </button>
+                    <button
+                      className="rounded-xl bg-cancel-background px-8 py-3 font-medium text-white hover:bg-cancel-background-dark"
+                      onClick={goToPreviousStep}
+                      disabled={isProcessingPayment}
+                    >
+                      이전
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>

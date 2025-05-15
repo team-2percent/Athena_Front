@@ -140,13 +140,6 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
     }
   }, [isOpen, selectedDate])
 
-  // 최소 날짜가 변경되었을 때 선택된 날짜가 최소 날짜보다 이전이면 최소 날짜로 설정
-  useEffect(() => {
-    if (minDate && selectedDate < minDate) {
-      onChange(new Date(minDate))
-    }
-  }, [minDate, selectedDate, onChange])
-
   return (
     <div className="relative" ref={datePickerRef}>
       <div className="relative">
