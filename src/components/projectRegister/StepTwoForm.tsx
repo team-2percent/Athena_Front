@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Plus, Trash2, X } from "lucide-react"
 import MarkdownEditor from "./MarkdownEditor"
 import DatePicker from "./DatePicker"
+import { useProjectFormStore } from "@/stores/useProjectFormStore"
 
 // 예산 항목 타입
 interface BudgetItem {
@@ -21,129 +22,6 @@ interface ProjectSchedule {
   startDate: Date
   endDate: Date
   details?: string
-}
-
-// 구성 항목 타입
-interface CompositionItem {
-  id: number
-  content: string // 항목명을 content로 변경
-}
-
-// 후원 옵션 타입
-interface SupportOption {
-  id: number
-  name: string
-  price: string
-  description: string
-  stock: string
-  composition?: CompositionItem[] // 구성 항목 추가
-}
-
-// 구성 다이얼로그 컴포넌트
-interface CompositionDialogProps {
-  isOpen: boolean
-  onClose: () => void
-  composition: CompositionItem[]
-  onSave: (composition: CompositionItem[]) => void
-}
-
-const CompositionDialog = ({ isOpen, onClose, composition, onSave }: CompositionDialogProps) => {
-  const [items, setItems] = useState<CompositionItem[]>(composition || [])
-  const [focusedField, setFocusedField] = useState<string | null>(null)
-
-  if (!isOpen) return null
-
-  const addItem = () => {
-    const newId = items.length > 0 ? Math.max(...items.map((item) => item.id)) + 1 : 1
-    setItems([...items, { id: newId, content: "" }])
-  }
-
-  const removeItem = (id: number) => {
-    setItems(items.filter((item) => item.id !== id))
-  }
-
-  const updateItem = (id: number, content: string) => {
-    setItems(items.map((item) => (item.id === id ? { ...item, content } : item)))
-  }
-
-  const handleSave = () => {
-    onSave(items)
-    onClose()
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* 오버레이 */}
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-
-      {/* 다이얼로그 */}
-      <div className="relative z-10 w-full max-w-2xl rounded-3xl bg-white p-6 shadow-lg">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">구성 항목 설정</h2>
-          <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <X size={24} />
-          </button>
-        </div>
-
-        <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-          {items.map((item) => (
-            <div key={item.id} className="flex items-end gap-4">
-              <div className="flex-1">
-                <label
-                  htmlFor={`item-content-${item.id}`}
-                  className={`text-sm ${focusedField === `item-content-${item.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
-                >
-                  구성 세부 내용
-                </label>
-                <input
-                  id={`item-content-${item.id}`}
-                  type="text"
-                  value={item.content}
-                  onChange={(e) => updateItem(item.id, e.target.value)}
-                  placeholder="구성 세부 내용을 입력하세요"
-                  className={`w-full p-2 border-b ${
-                    focusedField === `item-content-${item.id}` ? "border-secondary-color-dark" : "border-gray-300"
-                  } focus:outline-none text-lg`}
-                  onFocus={() => setFocusedField(`item-content-${item.id}`)}
-                  onBlur={() => setFocusedField(null)}
-                />
-              </div>
-
-              <button
-                type="button"
-                onClick={() => removeItem(item.id)}
-                className="p-2 text-gray-400 hover:text-red-500 transition-colors mb-2"
-                aria-label="항목 삭제"
-              >
-                <Trash2 className="h-5 w-5" />
-              </button>
-            </div>
-          ))}
-
-          {/* 항목 추가 버튼 */}
-          <div
-            className="border border-dashed border-gray-300 rounded-xl p-3 flex items-center justify-center cursor-pointer hover:bg-gray-50 h-14"
-            onClick={addItem}
-          >
-            <div className="flex items-center text-gray-500">
-              <Plus className="w-5 h-5 mr-2" />
-              <span className="text-sm font-medium">구성 항목 추가</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6 flex justify-end">
-          <button
-            type="button"
-            onClick={handleSave}
-            className="bg-main-color text-white font-bold py-2 px-6 rounded-full"
-          >
-            저장
-          </button>
-        </div>
-      </div>
-    </div>
-  )
 }
 
 // 일정 내용 다이얼로그 컴포넌트
@@ -233,26 +111,20 @@ interface StepTwoFormProps {
   targetAmount?: string
   initialData?: {
     markdown?: string
-    supportOptions?: SupportOption[]
   }
+  onUpdateMarkdown?: (markdown: string) => void
 }
 
-// Add a prop to receive the target amount from step 1
-export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoFormProps) {
-  const [markdown, setMarkdown] = useState(
-    initialData?.markdown ||
-      "# 상품 상세 설명\n\n상품에 대한 자세한 설명을 작성해주세요.\n\n## 특징\n\n- 첫 번째 특징\n- 두 번째 특징\n- 세 번째 특징\n\n## 사용 방법\n\n1. 첫 번째 단계\n2. 두 번째 단계\n3. 세 번째 단계\n\n> 참고: 마크다운 문법을 사용하여 작성할 수 있습니다.",
-  )
+export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown }: StepTwoFormProps) {
+  // Zustand 스토어에서 상태 가져오기
+  const { markdown, updateFormData } = useProjectFormStore()
+
   // Use the targetAmount from props
   const [totalBudget, setTotalBudget] = useState(targetAmount || "0")
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([])
   const [schedules, setSchedules] = useState<ProjectSchedule[]>([])
   const [budgetInputMethod, setBudgetInputMethod] = useState<"form" | "direct">("form")
   const [scheduleInputMethod, setScheduleInputMethod] = useState<"form" | "direct">("form")
-  const [supportOptions, setSupportOptions] = useState<SupportOption[]>(initialData?.supportOptions || [])
-  const [focusedField, setFocusedField] = useState<string | null>(null)
-  const [compositionDialogOpen, setCompositionDialogOpen] = useState(false)
-  const [currentOptionId, setCurrentOptionId] = useState<number | null>(null)
   const [scheduleDetailsDialogOpen, setScheduleDetailsDialogOpen] = useState(false)
   const [currentScheduleId, setCurrentScheduleId] = useState<number | null>(null)
 
@@ -260,6 +132,15 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
   useEffect(() => {
     setTotalBudget(targetAmount || "0")
   }, [targetAmount])
+
+  // 마크다운이 변경될 때마다 부모 컴포넌트에 알림
+  const handleMarkdownChange = (newMarkdown: string) => {
+    if (onUpdateMarkdown) {
+      onUpdateMarkdown(newMarkdown)
+    } else {
+      updateFormData({ markdown: newMarkdown })
+    }
+  }
 
   // 예산 항목 추가
   const addBudgetItem = () => {
@@ -298,32 +179,6 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
     if (currentScheduleId !== null) {
       setSchedules(
         schedules.map((schedule) => (schedule.id === currentScheduleId ? { ...schedule, details } : schedule)),
-      )
-    }
-  }
-
-  // 후원 옵션 추가
-  const addSupportOption = () => {
-    const newId = supportOptions.length > 0 ? Math.max(...supportOptions.map((option) => option.id)) + 1 : 1
-    setSupportOptions([...supportOptions, { id: newId, name: "", price: "", description: "", stock: "" }])
-  }
-
-  // 후원 옵션 필드 업데이트
-  const updateSupportOption = (id: number, field: keyof SupportOption, value: string) => {
-    setSupportOptions(supportOptions.map((option) => (option.id === id ? { ...option, [field]: value } : option)))
-  }
-
-  // 구성 다이얼로그 열기
-  const openCompositionDialog = (optionId: number) => {
-    setCurrentOptionId(optionId)
-    setCompositionDialogOpen(true)
-  }
-
-  // 구성 저장
-  const saveComposition = (composition: CompositionItem[]) => {
-    if (currentOptionId !== null) {
-      setSupportOptions(
-        supportOptions.map((option) => (option.id === currentOptionId ? { ...option, composition } : option)),
       )
     }
   }
@@ -420,29 +275,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
 
   // 마크다운 업데이트
   const updateMarkdown = () => {
-    setMarkdown(generateMarkdown())
-  }
-
-  // 총 예산 변경
-  const handleTotalBudgetChange = (value: string) => {
-    // 숫자만 입력 가능하도록 처리
-    const numericValue = value.replace(/[^0-9]/g, "")
-    // 천 단위 콤마 포맷팅
-    setTotalBudget(numericValue ? formatNumber(numericValue) : "")
-  }
-
-  // 가격 입력 처리 (천 단위 콤마 포맷팅)
-  const handlePriceChange = (id: number, value: string) => {
-    const numericValue = value.replace(/[^0-9]/g, "")
-    const formattedValue = numericValue ? formatNumber(numericValue) : ""
-    updateSupportOption(id, "price", formattedValue)
-  }
-
-  // 재고 입력 처리 (천 단위 콤마 포맷팅)
-  const handleStockChange = (id: number, value: string) => {
-    const numericValue = value.replace(/[^0-9]/g, "")
-    const formattedValue = numericValue ? formatNumber(numericValue) : ""
-    updateSupportOption(id, "stock", formattedValue)
+    handleMarkdownChange(generateMarkdown())
   }
 
   return (
@@ -715,8 +548,19 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
       {/* 마크다운 에디터 */}
       <div className="flex flex-col mt-8">
         <h2 className="text-xl font-bold mb-4">상품 상세 설명</h2>
-        <MarkdownEditor value={markdown} onChange={setMarkdown} />
+        <MarkdownEditor value={markdown} onChange={handleMarkdownChange} />
       </div>
+
+      {/* 일정 내용 다이얼로그 */}
+      {scheduleDetailsDialogOpen && currentScheduleId !== null && (
+        <ScheduleDetailsDialog
+          isOpen={scheduleDetailsDialogOpen}
+          onClose={() => setScheduleDetailsDialogOpen(false)}
+          details={schedules.find((schedule) => schedule.id === currentScheduleId)?.details || ""}
+          onSave={saveScheduleDetails}
+          scheduleIndex={schedules.findIndex((schedule) => schedule.id === currentScheduleId)}
+        />
+      )}
     </div>
   )
 }

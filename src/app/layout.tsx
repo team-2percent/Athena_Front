@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local"; // 지정한 폰트를 사용하기 위해 불러옴
 import "./globals.css";
 import HeaderLoader from "@/components/HeaderLoader";
-import RegisterPageButton from "@/components/projectRegister/RegisterPageButton";
-
+import RegisterPageButtonLoader from "@/components/RegisterPageButtonLoader";
+import AuthProvider from "@/components/AuthProvider";
 // Pretendard 폰트를 사용하기 위해 불러옴
 const pretendard = localFont({
   src: "../../public/fonts/PretendardVariable.woff2",
@@ -27,13 +27,15 @@ export default function RootLayout({
       <body
         className={`${pretendard.variable} font-pretendard`} // Pretendard 사용
       >
-        <HeaderLoader />
-        <main className="flex-1 bg-white mt-1">
-          <div className="container mx-auto px-4 py-8">
+        <AuthProvider>
+          <HeaderLoader />
+          <main className="flex-1 bg-white mt-1">
+            <div className="container mx-auto px-4 py-8">
             {children}
           </div>
-          <RegisterPageButton />
-        </main>
+            <RegisterPageButtonLoader />
+          </main>
+        </AuthProvider>
       </body>
     </html>
   );

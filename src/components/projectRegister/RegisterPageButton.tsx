@@ -1,14 +1,20 @@
 'use client'
 
 import { useRouter } from "next/navigation";
+import useAuthStore from "@/stores/auth";
 
 export default function RegisterPageButton() {
+    const { isLoggedIn } = useAuthStore();
     const router = useRouter();
+
+    if (!isLoggedIn) {
+        return null;
+    }
 
     return (
         <button
             onClick={() => router.push('/project/register')}
-            className="fixed bottom-8 right-8 w-20 h-20 bg-[#FF8FAB] hover:bg-[#F67E9C] rounded-full shadow-lg flex items-center justify-center transition-colors duration-200"
+            className="fixed bottom-8 right-8 w-20 h-20 bg-main-color hover:bg-secondary-color-dark rounded-full shadow-lg flex items-center justify-center transition-colors duration-200"
             aria-label="프로젝트 등록"
         >
             <svg 
