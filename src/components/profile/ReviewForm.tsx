@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useRef, useEffect, useState } from "react"
+import { useApi } from "@/hooks/useApi"
 import { X } from "lucide-react"
 
 interface ReviewFormProps {
@@ -14,7 +15,9 @@ interface ReviewFormProps {
 }
 
 export default function ReviewForm({ isOpen, onClose, projectId, projectName, sellerName }: ReviewFormProps) {
+  const { apiCall, isLoading: apiLoading } = useApi()
   const [reviewContent, setReviewContent] = useState("")
+  const [reviewsError, setReviewsError] = useState<string | null>(null)
   const modalRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -69,24 +72,32 @@ export default function ReviewForm({ isOpen, onClose, projectId, projectName, se
     }
   }, [isOpen])
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!reviewContent.trim()) {
-      alert("후기 내용을 입력해주세요.")
-      return
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+      e.preventDefault()
+  
+      if (!reviewContent.trim()) return
+  
+      try {
+        const { data, error, status } = await apiCall("/api/comment/create", "POST", {
+          projectId,
+          content: reviewContent,
+        })
+  
+        if (error) {
+          setReviewsError(error)
+          return
+        }
+  
+        console.log("리뷰 제출 성공:", data)
+        onClose() // 모달 닫기
+  
+        // 리뷰 제출 후 입력 필드 초기화 및 리뷰 목록 새로고침
+        setReviewContent("")
+      } catch (err) {
+        setReviewsError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.")
+        console.error("리뷰 제출 오류:", err)
+      }
     }
-
-    // 여기서 후기 제출 API 호출
-    console.log("후기 제출:", {
-      projectId,
-      content: reviewContent,
-    })
-
-    // 성공 시 모달 닫기
-    alert("후기가 등록되었습니다.")
-    onClose()
-  }
 
   if (!isOpen) return null
 
@@ -105,7 +116,7 @@ export default function ReviewForm({ isOpen, onClose, projectId, projectName, se
           <p className="text-sub-gray text-sm">{sellerName}</p>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleReviewSubmit}>
           <div className="mb-4">
             <textarea
               ref={textareaRef}

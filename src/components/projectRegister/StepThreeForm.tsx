@@ -4,6 +4,8 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { Plus, Check, X, Trash2 } from "lucide-react"
+import { useProjectFormStore } from "@/stores/useProjectFormStore"
+import type { CompositionItem, SupportOption } from "@/stores/useProjectFormStore"
 
 // 계좌 정보 타입 정의
 interface BankAccount {
@@ -173,29 +175,6 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
   )
 }
 
-// 인터페이스 수정
-interface StepThreeFormProps {
-  initialData?: {
-    supportOptions?: SupportOption[]
-  }
-}
-
-// 구성 항목 타입
-interface CompositionItem {
-  id: number
-  content: string
-}
-
-// 후원 옵션 타입
-interface SupportOption {
-  id: number
-  name: string
-  price: string
-  description: string
-  stock: string
-  composition?: CompositionItem[]
-}
-
 // 구성 다이얼로그 컴포넌트
 interface CompositionDialogProps {
   isOpen: boolean
@@ -303,14 +282,22 @@ const CompositionDialog = ({ isOpen, onClose, composition, onSave }: Composition
   )
 }
 
+interface StepThreeFormProps {
+  initialData?: {
+    supportOptions?: SupportOption[]
+  }
+}
+
 export default function StepThreeForm({ initialData }: StepThreeFormProps) {
+  // Zustand 스토어에서 상태와 액션 가져오기
+  const { supportOptions, updateFormData } = useProjectFormStore()
+
   // 계좌 관련 상태
   const [selectedAccountId, setSelectedAccountId] = useState<number | null>(null)
   const [useAccountNextTime, setUseAccountNextTime] = useState(false)
   const [isAddAccountModalOpen, setIsAddAccountModalOpen] = useState(false)
 
-  // 후원 상품 관련 상태 (2단계에서 가져옴)
-  const [supportOptions, setSupportOptions] = useState<SupportOption[]>(initialData?.supportOptions || [])
+  // 후원 상품 관련 상태
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [compositionDialogOpen, setCompositionDialogOpen] = useState(false)
   const [currentOptionId, setCurrentOptionId] = useState<number | null>(null)
@@ -375,54 +362,63 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
     setAccounts(accounts.filter((account) => account.id !== id))
   }
 
-  // 후원 옵션 추가 (2단계에서 가져옴)
+  // 후원 옵션 추가
   const addSupportOption = () => {
     const newId = supportOptions.length > 0 ? Math.max(...supportOptions.map((option) => option.id)) + 1 : 1
-    setSupportOptions([...supportOptions, { id: newId, name: "", price: "", description: "", stock: "" }])
+    const updatedOptions = [...supportOptions, { id: newId, name: "", price: "", description: "", stock: "" }]
+    updateFormData({ supportOptions: updatedOptions })
   }
 
-  // 후원 옵션 필드 업데이트 (2단계에서 가져옴)
+  // 후원 옵션 필드 업데이트
   const updateSupportOption = (id: number, field: keyof SupportOption, value: string) => {
-    setSupportOptions(supportOptions.map((option) => (option.id === id ? { ...option, [field]: value } : option)))
+    const updatedOptions = supportOptions.map((option) => (option.id === id ? { ...option, [field]: value } : option))
+    updateFormData({ supportOptions: updatedOptions })
   }
 
-  // 구성 다이얼로그 열기 (2단계에서 가져옴)
+  // 구성 다이얼로그 열기
   const openCompositionDialog = (optionId: number) => {
     setCurrentOptionId(optionId)
     setCompositionDialogOpen(true)
   }
 
-  // 구성 저장 (2단계에서 가져옴)
+  // 구성 저장
   const saveComposition = (composition: CompositionItem[]) => {
     if (currentOptionId !== null) {
-      setSupportOptions(
-        supportOptions.map((option) => (option.id === currentOptionId ? { ...option, composition } : option)),
+      const updatedOptions = supportOptions.map((option) =>
+        option.id === currentOptionId ? { ...option, composition } : option,
       )
+      updateFormData({ supportOptions: updatedOptions })
     }
   }
 
-  // 가격 입력 처리 (천 단위 콤마 포맷팅) (2단계에서 가져옴)
+  // 가격 입력 처리 (천 단위 콤마 포맷팅)
   const handlePriceChange = (id: number, value: string) => {
     const numericValue = value.replace(/[^0-9]/g, "")
     const formattedValue = numericValue ? formatNumber(numericValue) : ""
     updateSupportOption(id, "price", formattedValue)
   }
 
-  // 재고 입력 처리 (천 단위 콤마 포맷팅) (2단계에서 가져옴)
+  // 재고 입력 처리 (천 단위 콤마 포맷팅)
   const handleStockChange = (id: number, value: string) => {
     const numericValue = value.replace(/[^0-9]/g, "")
     const formattedValue = numericValue ? formatNumber(numericValue) : ""
     updateSupportOption(id, "stock", formattedValue)
   }
 
-  // 천 단위 콤마 포맷팅 (2단계에서 가져옴)
+  // 천 단위 콤마 포맷팅
   const formatNumber = (value: string) => {
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
   }
 
+  // 후원 옵션 삭제
+  const removeSupportOption = (id: number) => {
+    const updatedOptions = supportOptions.filter((option) => option.id !== id)
+    updateFormData({ supportOptions: updatedOptions })
+  }
+
   return (
     <div className="space-y-8">
-      {/* 후원 상품 설정 (2단계에서 가져옴) */}
+      {/* 후원 상품 설정 */}
       <div className="flex flex-col">
         <div className="mb-4">
           <h2 className="text-xl font-bold">후원 상품 설정</h2>
@@ -438,9 +434,7 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
               {/* 삭제 버튼 추가 */}
               <button
                 type="button"
-                onClick={() => {
-                  setSupportOptions(supportOptions.filter((o) => o.id !== option.id))
-                }}
+                onClick={() => removeSupportOption(option.id)}
                 className="absolute right-4 top-4 p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-gray-100"
                 aria-label="옵션 삭제"
               >

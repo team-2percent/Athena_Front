@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Plus, Trash2, X } from "lucide-react"
 import MarkdownEditor from "./MarkdownEditor"
 import DatePicker from "./DatePicker"
+import { useProjectFormStore } from "@/stores/useProjectFormStore"
 
 // 예산 항목 타입
 interface BudgetItem {
@@ -111,14 +112,13 @@ interface StepTwoFormProps {
   initialData?: {
     markdown?: string
   }
+  onUpdateMarkdown?: (markdown: string) => void
 }
 
-// 1단계에서 입력한 목표 금액을 props로 받아서 사용
-export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoFormProps) {
-  const [markdown, setMarkdown] = useState(
-    initialData?.markdown ||
-      "# 상품 상세 설명\n\n상품에 대한 자세한 설명을 작성해주세요.\n\n## 특징\n\n- 첫 번째 특징\n- 두 번째 특징\n- 세 번째 특징\n\n## 사용 방법\n\n1. 첫 번째 단계\n2. 두 번째 단계\n3. 세 번째 단계\n\n> 참고: 마크다운 문법을 사용하여 작성할 수 있습니다.",
-  )
+export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown }: StepTwoFormProps) {
+  // Zustand 스토어에서 상태 가져오기
+  const { markdown, updateFormData } = useProjectFormStore()
+
   // Use the targetAmount from props
   const [totalBudget, setTotalBudget] = useState(targetAmount || "0")
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([])
@@ -132,6 +132,15 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
   useEffect(() => {
     setTotalBudget(targetAmount || "0")
   }, [targetAmount])
+
+  // 마크다운이 변경될 때마다 부모 컴포넌트에 알림
+  const handleMarkdownChange = (newMarkdown: string) => {
+    if (onUpdateMarkdown) {
+      onUpdateMarkdown(newMarkdown)
+    } else {
+      updateFormData({ markdown: newMarkdown })
+    }
+  }
 
   // 예산 항목 추가
   const addBudgetItem = () => {
@@ -266,7 +275,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
 
   // 마크다운 업데이트
   const updateMarkdown = () => {
-    setMarkdown(generateMarkdown())
+    handleMarkdownChange(generateMarkdown())
   }
 
   return (
@@ -539,7 +548,7 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
       {/* 마크다운 에디터 */}
       <div className="flex flex-col mt-8">
         <h2 className="text-xl font-bold mb-4">상품 상세 설명</h2>
-        <MarkdownEditor value={markdown} onChange={setMarkdown} />
+        <MarkdownEditor value={markdown} onChange={handleMarkdownChange} />
       </div>
 
       {/* 일정 내용 다이얼로그 */}
@@ -552,7 +561,6 @@ export default function StepTwoForm({ targetAmount = "", initialData }: StepTwoF
           scheduleIndex={schedules.findIndex((schedule) => schedule.id === currentScheduleId)}
         />
       )}
-
     </div>
   )
 }
