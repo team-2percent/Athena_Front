@@ -6,9 +6,6 @@ import RegisterPageButtonLoader from "@/components/RegisterPageButtonLoader";
 import  AuthProvider from "@/components/AuthProvider";
 import { AuthGate } from "@/components/login/AuthGate";
 
-// 로그인 토큰 관련
-import { AuthProvider } from '../contexts/AuthContext';
-
 // Pretendard 폰트를 사용하기 위해 불러옴
 const pretendard = localFont({
   src: "../../public/fonts/PretendardVariable.woff2",
