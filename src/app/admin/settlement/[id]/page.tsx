@@ -5,132 +5,159 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import SettlementTag from "@/components/admin/SettlementTag"
 import Image from "next/image"
-import ConfirmModal from "@/components/common/ConfirmModal"
+import { useApi } from "@/hooks/useApi"
+import { useParams } from "next/navigation";
+import OverlaySpinner from "@/components/common/OverlaySpinner"
+
+interface SettlementInfo {
+    "projectTitle": string,
+    "sellerNickname": string,
+    "userId": number,
+    "targetAmount": number,
+    "totalSales": number,
+    "payoutAmount": number,
+    "platformFee": number,
+    "totalCount": number,
+    "settledAt": string | null,
+    "status": "COMPLETED" | "PENDING" | "FAILED",
+    "bankAccount": {
+      "bankName": string,
+      "accountNumber": string
+    },
+    "fundingStartDate": string,
+    "fundingEndDate": string
+}
+
+interface SettlementProductSummaryItem {
+    "productName": string,
+    "totalQuantity": number,
+    "totalPrice": number,
+    "platformFee": number,
+    "payoutAmount": number
+}
+
+interface SettlementProductSummary {
+    "items": SettlementProductSummaryItem[],
+    "total": {
+        "totalQuantity": number,
+        "totalPrice": number,
+        "platformFee": number,
+        "payoutAmount": number
+    }
+}
+
+interface SettlementHistoryItem {
+    "productName": string,
+    "quantity": number,
+    "totalPrice": number,
+    "fee": number,
+    "amount": number,
+    "orderedAt": string
+}
+
+interface SettlementHistory {
+    "content": SettlementHistoryItem[],
+    "pageInfo": {
+        "currentPage": number,
+        "totalPages": number
+    }
+}
+
 
 export default function SettlementDetailPage() {
+    const { id } = useParams();
     const router = useRouter()
+    const { isLoading, apiCall } = useApi();
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [currentPage, setCurrentPage] = useState(1);
-    const [settlement, setSettlement] = useState<any>({
-        id: 1,
-        projectName: "프로젝트 1",
-        accountNumber: "1234567890",
-        totalAmount: 1000000,
-        fee: 10000,
-        status: "pending",
-        seller: "판매자 1",
-        settlementDate: "2023.06.01 15:00",
-        bank: "신한은행",
-        accountHolder: "홍길동",
-        goalAmount: 1000000,
-        startDate: "2023.06.01 15:00",
-        endDate: "2023.06.01 15:00",
-        totalSold: 100,
-        buyerCount: 10,
-        products: [
-            {
-                id: 1,
-                name: "상품1",
-                soldCount: 4500,
-                totalAmount: 250000000,
-                fee: 2500000,
-                settlementAmount: 247500000
-            },
-            {
-                id: 2,
-                name: "상품2",
-                soldCount: 3000,
-                totalAmount: 30000000,
-                fee: 300000,
-                settlementAmount: 29700000
-            },
-            {
-                id: 3,
-                name: "상품3",
-                soldCount: 1500,
-                totalAmount: 20000000,
-                fee: 200000,
-                settlementAmount: 19800000
+    const [totalPageCount, setTotalPageCount] = useState(0);
+    const [info, setInfo] = useState<SettlementInfo | null>(null)
+    const [productSummary, setProductSummary] = useState<SettlementProductSummaryItem[] | null>(null)
+    const [productSummaryTotal, setProductSummaryTotal] = useState<{
+        "totalQuantity": number,
+        "totalPrice": number,
+        "platformFee": number,
+        "payoutAmount": number
+    } | null>(null)
+    const [history, setHistory] = useState<SettlementHistoryItem[] | null>(null)
+
+    const loadSettlement = () => {
+        apiCall<SettlementInfo>(`/api/admin/settlements/${id}/info`, "GET").then(({ data }) => {
+            setInfo(data)
+        })
+        apiCall<SettlementProductSummary>(`/api/admin/settlements/${id}/product-summary`, "GET").then(({ data }) => {
+            if (data) {
+                setProductSummary(data.items)
+                setProductSummaryTotal(data.total)
             }
-        ]
-    })
-
-    interface Project {
-        id: number;
-        name: string;
-        soldCount: number;
-        totalAmount: number;
-        fee: number;
-        settlementAmount: number;
-    }
-
-    const handleConfirmSettlement = () => {
-        // api 요청
+        })
+        apiCall<SettlementHistory>(`/api/admin/settlements/${id}/histories`, "GET").then(({ data }) => {
+            if (data) {
+                setHistory(data.content)
+                setTotalPageCount(data.pageInfo.totalPages)
+            }
+        })
         setIsModalOpen(false)
         router.push("/admin/settlement")
     }
 
-    return (
-        <div className="flex flex-col mx-auto w-full p-8 gap-6">
-            <div className="flex w-full">
-                <button 
-                    className="text-sm text-gray-500 flex items-center gap-2" 
-                    onClick={() => router.push("/admin/settlement")}
-                >
-                    <ArrowLeftIcon className="w-4 h-4" />
-                    목록으로
-                </button>
-            </div>
-            {/* 프로젝트 기본 정보 */}
+    const render = () => {
+        if (isLoading) return <OverlaySpinner message="정산 정보를 불러오고 있습니다." />
+        if (!info || !productSummary || !productSummaryTotal || !history) return null
+
+        return (
+            <div>
+                {/* 프로젝트 기본 정보 */}
+
             <div className="flex flex-col gap-6 p-6">
                 <h2 className="text-2xl font-medium border-b pb-2">프로젝트 기본 정보</h2>
                 <table className="w-full border-collapse text-left">
                     <tbody>
                         <tr>
                             <td className="p-2 w-[10%] font-semibold">프로젝트명</td>
-                            <td className="p-2">{settlement.projectName}</td>
+                            <td className="p-2">{info.projectTitle}</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[10%] font-semibold">목표 금액</td>
-                            <td className="p-2">{settlement.goalAmount.toLocaleString()} 원</td>
+                            <td className="p-2">{info.targetAmount.toLocaleString()} 원</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[10%] font-semibold">펀딩 기간</td>
-                            <td className="p-2">{settlement.startDate} ~ {settlement.endDate}</td>
+                            <td className="p-2">{info.fundingStartDate} ~ {info.fundingEndDate}</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[10%] font-semibold">총 판매 금액</td>
-                            <td className="p-2">{settlement.totalAmount.toLocaleString()} 원</td>
+                            <td className="p-2">{info.totalSales.toLocaleString()} 원</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[10%] font-semibold">수수료</td>
-                            <td className="p-2">{settlement.fee.toLocaleString()} 원</td>
+                            <td className="p-2">{info.platformFee.toLocaleString()} 원</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[10%] font-semibold">지급 금액</td>
-                            <td className="p-2">{(settlement.totalAmount - settlement.fee).toLocaleString()} 원</td>
+                            <td className="p-2">{(info.totalSales - info.platformFee).toLocaleString()} 원</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[10%] font-semibold">총 판매 개수</td>
-                            <td className="p-2">{settlement.totalSold} 개</td>
+                            <td className="p-2">{info.totalCount} 개</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[10%] font-semibold">구매자</td>
-                            <td className="p-2">{settlement.buyerCount} 명</td>
+                            <td className="p-2">{info.totalCount} 명</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[10%] font-semibold">정산 일자</td>
-                            <td className="p-2">{settlement.settlementDate}</td>
+                            <td className="p-2">{info.settledAt ? info.settledAt : "-"}</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[10%] font-semibold">정산 상태</td>
-                            <td className="p-2"><SettlementTag status={settlement.status} /></td>
+                            <td className="p-2"><SettlementTag status={info.status} /></td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[10%] font-semibold">정산 계좌 정보</td>
                             <td className="p-2">
                                 <div className="flex gap-2">
-                                    <span>{settlement.bank} {settlement.accountNumber} {settlement.accountHolder}</span>
+                                    <span>{info.bankAccount.bankName} {info.bankAccount.accountNumber}</span>
                                 </div>
                             </td>
                         </tr>
@@ -152,13 +179,16 @@ export default function SettlementDetailPage() {
                             />
                         </button>
                         <div className="flex flex-col">
-                            <span className="text-xl font-medium">기적가</span>
+                            <span className="text-xl font-medium">{info.sellerNickname}</span>
                             <span className="text-sm text-gray-500">판매자 소개</span>
                         </div>
                     </div>
                     
                     <div className="flex flex-col gap-2">
-                        <button className="ml-auto px-4 py-2 text-sm border rounded-md">프로필보기</button>
+                        <button
+                            className="ml-auto px-4 py-2 text-sm border rounded-md"
+                            onClick={() => router.push(`/profile/${info.userId}`)}
+                        >프로필보기</button>
                         <p className="text-sm text-gray-500">* 기존 프로필 페이지로 이동합니다.</p>
                     </div>
                 </div>
@@ -177,18 +207,18 @@ export default function SettlementDetailPage() {
                         </tr>
                         <tr className="text-sm">
                             <td className="border-b p-4">전체</td>
-                            <td className="border-b p-4">{settlement.products.reduce((acc: number, cur: Project) => acc + cur.soldCount, 0).toLocaleString()}</td>
-                            <td className="border-b p-4">{settlement.products.reduce((acc: number, cur: Project) => acc + cur.totalAmount, 0).toLocaleString()}</td>
-                            <td className="border-b p-4">{settlement.products.reduce((acc: number, cur: Project) => acc + cur.settlementAmount, 0).toLocaleString()}</td>
-                            <td className="border-b p-4">{settlement.products.reduce((acc: number, cur: Project) => acc + cur.fee, 0).toLocaleString()}</td>
+                            <td className="border-b p-4">{productSummaryTotal.totalQuantity}</td>
+                            <td className="border-b p-4">{productSummaryTotal.totalPrice.toLocaleString()}</td>
+                            <td className="border-b p-4">{productSummaryTotal.payoutAmount.toLocaleString()}</td>
+                            <td className="border-b p-4">{productSummaryTotal.platformFee.toLocaleString()}</td>
                         </tr>
-                        {settlement.products.map((product: Project) => (
-                            <tr key={product.id} className="text-sm">
-                                <td className="border-b p-4">{product.name}</td>
-                                <td className="border-b p-4">{product.soldCount.toLocaleString()}</td>
-                                <td className="border-b p-4">{product.totalAmount.toLocaleString()}</td>
-                                <td className="border-b p-4">{product.settlementAmount.toLocaleString()}</td>
-                                <td className="border-b p-4">{product.fee.toLocaleString()}</td>
+                        {productSummary.map((product) => (
+                            <tr key={product.productName} className="text-sm">
+                                <td className="border-b p-4">{product.productName}</td>
+                                <td className="border-b p-4">{product.totalQuantity.toLocaleString()}</td>
+                                <td className="border-b p-4">{product.totalPrice.toLocaleString()}</td>
+                                <td className="border-b p-4">{product.payoutAmount.toLocaleString()}</td>
+                                <td className="border-b p-4">{product.platformFee.toLocaleString()}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -207,42 +237,14 @@ export default function SettlementDetailPage() {
                             <th className="border-b p-4">지급 금액</th>
                             <th className="border-b p-4">정산 일자</th>
                         </tr>
-                        {[
-                            {
-                                id: 1,
-                                name: "상품1",
-                                count: 4500,
-                                totalAmount: 250000000,
-                                fee: 50000000,
-                                settlementAmount: 50000000,
-                                date: "2025.04.14"
-                            },
-                            {
-                                id: 2,
-                                name: "상품2", 
-                                count: 4500,
-                                totalAmount: 250000000,
-                                fee: 50000000,
-                                settlementAmount: 50000000,
-                                date: "2025.04.14"
-                            },
-                            {
-                                id: 3,
-                                name: "상품3",
-                                count: 4500,
-                                totalAmount: 250000000,
-                                fee: 50000000,
-                                settlementAmount: 50000000,
-                                date: "2025.04.14"
-                            }
-                        ].map((item) => (
-                            <tr key={item.id} className="text-sm">
-                                <td className="border-b p-4">{item.name}</td>
-                                <td className="border-b p-4">{item.count.toLocaleString()}</td>
-                                <td className="border-b p-4">{item.totalAmount.toLocaleString()}</td>
+                        {history.map((item) => (
+                            <tr key={item.productName} className="text-sm">
+                                <td className="border-b p-4">{item.productName}</td>
+                                <td className="border-b p-4">{item.quantity.toLocaleString()}</td>
+                                <td className="border-b p-4">{item.totalPrice.toLocaleString()}</td>
                                 <td className="border-b p-4">{item.fee.toLocaleString()}</td>
-                                <td className="border-b p-4">{item.settlementAmount.toLocaleString()}</td>
-                                <td className="border-b p-4">{item.date}</td>
+                                <td className="border-b p-4">{item.amount.toLocaleString()}</td>
+                                <td className="border-b p-4">{item.orderedAt}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -253,23 +255,27 @@ export default function SettlementDetailPage() {
                 <button className="px-3 py-2">▶</button>
             </div>
             </div>
-            <div className="flex justify-end">
-                <button
-                    className="px-8 py-2 rounded-md bg-main-color hover:bg-secondary-color-dark text-white"
-                    onClick={() => setIsModalOpen(true)}
+            </div>
+        )
+
+    }
+
+    useEffect(() => {
+        loadSettlement()
+    }, [])
+
+    return (
+        <div className="flex flex-col mx-auto w-full p-8 gap-6">
+            <div className="flex w-full">
+                <button 
+                    className="text-sm text-gray-500 flex items-center gap-2" 
+                    onClick={() => router.push("/admin/settlement")}
                 >
-                    정산 완료
+                    <ArrowLeftIcon className="w-4 h-4" />
+                    목록으로
                 </button>
             </div>
-            {
-                isModalOpen &&
-                <ConfirmModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    message="정산을 완료하시겠습니까?"
-                    onConfirm={handleConfirmSettlement}
-                />
-            }
+            {render()}
         </div>
     )
 }
