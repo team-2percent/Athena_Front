@@ -147,7 +147,7 @@ export async function GET(request: NextRequest, context: { params: { id: string 
   - 헤이즐넛 초콜릿
   - 딸기 초콜릿
 
-  ![초콜릿 이미지](/placeholder.svg?height=400&width=600&query=chocolate)`,
+  ![초콜릿 이미지](https://mblogthumb-phinf.pstatic.net/MjAyMzA4MDVfNjYg/MDAxNjkxMjQwODQ4MDQ5.Gp2vSuUPm3y5EnIgXlCuQd8fiTB74Fm6KrMF8-3vrsUg.FApJSVh_dkQXjcsoS5mbsGv5JCvbcm4O4akZRjY4_ZQg.JPEG.epochejonae/IMG_3806.jpg?type=w966)`,
       startAt: "2025-05-01T00:00:00",
       endAt: "2025-05-31T23:59:59",
       shippedAt: "2025-06-20T00:00:00",
@@ -198,7 +198,7 @@ export async function GET(request: NextRequest, context: { params: { id: string 
 
   ## 주요 기능
 
-  1. **음성 제어**: 구글 어시스턴트, 알렉사, 시리와 ���동
+  1. **음성 제어**: 구글 어시스턴트, 알렉사, 시리와 연동
   2. **원격 제어**: 외출 중에도 스마트폰으로 제어 가능
   3. **자동화**: 시간, 위치, 상황에 따른 자동화 설정
   4. **에너지 모니터링**: 전력 사용량 실시간 모니터링
@@ -210,7 +210,7 @@ export async function GET(request: NextRequest, context: { params: { id: string 
   - 크기: 100 x 100 x 25mm
   - 무게: 150g
 
-  ![스마트 홈 디바이스](/placeholder.svg?height=400&width=600&query=smart+home+device)`,
+  ![스마트 홈 디바이스](https://www.sisa-news.com/data/photos/20100832/art_1281856849.jpg)`,
       startAt: "2025-04-15T00:00:00",
       endAt: "2025-06-15T23:59:59",
       shippedAt: "2025-07-30T00:00:00",

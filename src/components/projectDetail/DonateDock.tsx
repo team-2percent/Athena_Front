@@ -5,6 +5,8 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { ChevronUp, ChevronDown, Plus, Check, ChevronRight, X } from "lucide-react"
 import AddressModal from "../profileEdit/AddressModal"
+import { useParams } from "next/navigation"
+import { useApi } from "@/hooks/useApi"
 
 interface AddressInfo {
   id: string
@@ -15,6 +17,37 @@ interface AddressInfo {
   isDefault: boolean
 }
 
+// API에서 가져오는 상품 정보 인터페이스
+interface ProductResponse {
+  id: number
+  name: string
+  description: string
+  price: number
+  stock: number
+  options: string[]
+}
+
+// 프로젝트 데이터 인터페이스
+interface ProjectData {
+  id: number
+  title: string
+  description: string
+  goalAmount: number
+  totalAmount: number
+  convertedMarkdown: string
+  startAt: string
+  endAt: string
+  shippedAt: string
+  imageUrls: string[]
+  sellerResponse: {
+    id: number
+    sellerIntroduction: string
+    linkUrl: string
+  }
+  productResponses: ProductResponse[]
+}
+
+// 컴포넌트에서 사용하는 상품 옵션 인터페이스
 interface ProjectOption {
   id: string
   title: string
@@ -26,7 +59,7 @@ interface ProjectOption {
   color?: string
 }
 
-// 선택된 상품 정보 인터페이스 추가
+// 선택된 상품 정보 인터페이스
 interface SelectedProduct {
   quantity: number
 }
@@ -37,12 +70,10 @@ const DonateDock = () => {
   const [isOpen, setIsOpen] = useState(false)
 
   // 단일 선택에서 복수 선택으로 변경
-  const [selectedOptions, setSelectedOptions] = useState<string[]>(["option2"])
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([])
 
   // 상품별 수량 관리를 위한 객체 맵으로 변경
-  const [quantities, setQuantities] = useState<Record<string, SelectedProduct>>({
-    option2: { quantity: 1 },
-  })
+  const [quantities, setQuantities] = useState<Record<string, SelectedProduct>>({})
 
   // 현재 펼쳐진 상품 ID 추적을 위한 상태 추가
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null)
@@ -71,8 +102,73 @@ const DonateDock = () => {
     zipCode: "",
   })
 
-  // 상품 옵션 데이터 - remaining을 숫자로 변경
-  const projectOptions: ProjectOption[] = [
+  // API 관련 상태 추가
+  const { apiCall, isLoading: apiLoading } = useApi()
+  const [projectData, setProjectData] = useState<ProjectData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [projectOptions, setProjectOptions] = useState<ProjectOption[]>([])
+
+  // URL에서 프로젝트 ID 가져오기
+  const { id: projectId } = useParams()
+
+  // 프로젝트 데이터 가져오기
+  useEffect(() => {
+    const fetchProjectData = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+
+        const { data, error } = await apiCall<ProjectData>(`/api/project/${projectId}`, "GET")
+
+        if (error) {
+          throw new Error(error)
+        }
+
+        if (data) {
+          setProjectData(data)
+
+          // 상품 옵션 데이터 변환
+          if (data.productResponses && data.productResponses.length > 0) {
+            const options = data.productResponses.map((product) => ({
+              id: `option${product.id}`,
+              title: product.name,
+              description: product.description,
+              price: product.price.toLocaleString(),
+              remaining: product.stock,
+              details: product.options || [],
+              color: product.id % 2 === 0 ? "pink" : undefined, // 예시로 짝수 ID에 색상 추가
+            }))
+            setProjectOptions(options)
+          } else {
+            // 기본 상품 옵션 설정
+            setProjectOptions(defaultProjectOptions)
+          }
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "프로젝트 정보를 불러오는 중 오류가 발생했습니다.")
+        console.error("프로젝트 정보 불러오기 오류:", err)
+        // 오류 발생 시 기본 상품 옵션 설정
+        setProjectOptions(defaultProjectOptions)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    if (projectId) {
+      fetchProjectData()
+    } else {
+      // 프로젝트 ID가 없는 경우 기본 상품 옵션 설정
+      setProjectOptions(defaultProjectOptions)
+      setIsLoading(false)
+    }
+  }, [projectId, apiCall])
+
+  // 주문 요약 더보기 버튼 참조
+  const orderSummaryMoreRef = useRef<HTMLButtonElement>(null)
+
+  // 기본 상품 옵션 데이터 - API 데이터가 없을 때 사용
+  const defaultProjectOptions: ProjectOption[] = [
     {
       id: "option1",
       title: "마음만 받을게요",
@@ -110,47 +206,6 @@ const DonateDock = () => {
       price: "150,000",
       remaining: 100, // 100개
       details: ["떡볶이 1인분", "피자 1판", "특별 소스 세트", "배송비 무료", "예상 배송일: 2025년 6월 10일"],
-    },
-    {
-      id: "option5",
-      title: "한정판 굿즈",
-      description: "게살피자 캐릭터 피규어와 스티커 세트",
-      price: "30,000",
-      remaining: 50, // 50개
-      details: ["캐릭터 피규어 1개", "스티커 세트 1개", "배송비 무료", "예상 배송일: 2025년 6월 20일"],
-    },
-    {
-      id: "option6",
-      title: "디지털 아트북",
-      description: "게살피자 제작 과정을 담은 디지털 아트북",
-      price: "15,000",
-      remaining: 999999, // 무제한에 가까운 큰 숫자
-      details: ["디지털 아트북 PDF", "메이킹 영상 포함", "즉시 이메일 발송"],
-    },
-    {
-      id: "option7",
-      title: "VIP 패키지",
-      description: "모든 혜택을 한번에 누릴 수 있는 VIP 패키지",
-      price: "300,000",
-      remaining: 10, // 10개
-      color: "pink",
-      details: [
-        "떡볶이 세트",
-        "피자 2판",
-        "한정판 굿즈 세트",
-        "디지털 아트북",
-        "개발자 사인",
-        "배송비 무료",
-        "예상 배송일: 2025년 6월 5일",
-      ],
-    },
-    {
-      id: "option8",
-      title: "응원 메시지",
-      description: "개발자에게 응원 메시지를 보낼 수 있습니다",
-      price: "3,000",
-      remaining: 999999, // 무제한에 가까운 큰 숫자
-      details: ["응원 메시지 전달", "감사 이메일 회신"],
     },
   ]
 
@@ -205,9 +260,6 @@ const DonateDock = () => {
       isDefault: false,
     },
   ])
-
-  // 주문 요약 더보기 버튼 참조
-  const orderSummaryMoreRef = useRef<HTMLButtonElement>(null)
 
   // useEffect 훅에서 스크롤 방지 로직 추가
   useEffect(() => {
@@ -497,6 +549,71 @@ const DonateDock = () => {
     e.stopPropagation()
   }
 
+  // 결제 처리 함수
+  const handlePayment = async () => {
+    if (!selectedPay) {
+      alert("결제 수단을 선택해주세요.")
+      return
+    }
+
+    if (!selectedAddress) {
+      alert("배송지를 선택해주세요.")
+      return
+    }
+
+    try {
+      // 선택된 상품 정보 구성
+      const orderItems = selectedOptions.map((optionId) => {
+        const option = projectOptions.find((opt) => opt.id === optionId)
+        return {
+          productId: Number(optionId.replace("option", "")), // 'option1' -> 1
+          quantity: quantities[optionId]?.quantity || 0,
+          price: option ? Number(option.price.replace(/,/g, "")) : 0,
+        }
+      })
+
+      // 선택된 배송지 정보
+      const selectedAddressInfo = addresses.find((addr) => addr.id === selectedAddress)
+
+      // 주문 생성 요청
+      const { data: orderData, error: orderError } = await apiCall("/api/orders", "POST", {
+        projectId: Number(projectId),
+        items: orderItems,
+        shippingAddress: {
+          name: selectedAddressInfo?.name,
+          address: selectedAddressInfo?.address,
+          detailAddress: selectedAddressInfo?.detailAddress,
+          zipCode: selectedAddressInfo?.zipCode,
+        },
+        paymentMethod: selectedPay,
+      })
+
+      if (orderError) {
+        throw new Error(orderError)
+      }
+
+      // 결제 준비 요청
+      const orderId = orderData.id
+      const { data: paymentData, error: paymentError } = await apiCall(`/api/payment/ready/${orderId}`, "POST")
+
+      if (paymentError) {
+        throw new Error(paymentError)
+      }
+
+      // 결제 페이지로 이동
+      if (paymentData && paymentData.paymentUrl) {
+        window.open(paymentData.paymentUrl, "_blank")
+        // 독 닫기
+        setIsOpen(false)
+      } else {
+        throw new Error("결제 URL을 받지 못했습니다.")
+      }
+    } catch (err) {
+      console.error("결제 처리 중 오류:", err)
+      alert("결제 처리 중 오류가 발생했습니다. 다시 시도해주세요.")
+    }
+  }
+
   return (
     <>
       {/* 고정된 후원하기 버튼 */}
@@ -533,292 +650,328 @@ const DonateDock = () => {
               </button>
             </div>
 
+            {/* 로딩 상태 표시 */}
+            {isLoading && (
+              <div className="flex justify-center items-center py-20">
+                <p className="text-sub-gray text-lg">상품 정보를 불러오는 중...</p>
+              </div>
+            )}
+
+            {/* 에러 메시지 표시 */}
+            {error && (
+              <div className="rounded-xl bg-red-50 p-4 text-red-500 my-4">
+                <p>{error}</p>
+                <button onClick={() => window.location.reload()} className="mt-2 text-sm underline">
+                  다시 시도
+                </button>
+              </div>
+            )}
+
             {/* 단계별 내용 */}
-            {step === 1 ? (
-              // 1단계: 상품 선택
-              <div className="space-y-6">
-                <h3 className="mb-2 text-lg font-medium">상품 선택 (복수 선택 가능)</h3>
+            {!isLoading && !error && (
+              <>
+                {step === 1 ? (
+                  // 1단계: 상품 선택
+                  <div className="space-y-6">
+                    <h3 className="mb-2 text-lg font-medium">상품 선택 (복수 선택 가능)</h3>
 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                  {/* 왼쪽 영역: 상품 카드 목록 (1/3 너비) - 스크롤 가능하도록 수정 */}
-                  <div className="md:col-span-1">
-                    <div className="h-[500px] overflow-y-auto pr-2 pt-4 space-y-6">
-                      {projectOptions.map((option) => {
-                        const isSelected = selectedOptions.includes(option.id)
-                        return (
-                          <div
-                            key={option.id}
-                            className={`relative flex cursor-pointer items-center rounded-xl border p-4 transition-all ${
-                              isSelected ? "border-2 border-main-color" : "border-gray-border hover:border-secondary-color-dark"
-                            }`}
-                            onClick={() => handleOptionSelect(option.id)}
-                          >
-                            <div className="absolute -right-2 -top-4">
-                              <div className="rounded-full border-2 border-main-color bg-white px-3 py-1 text-sm text-main-color shadow-sm">
-                                <span>{formatRemaining(option.remaining)}</span>
-                              </div>
-                            </div>
-
-                            <div className="flex-1">
-                              <div className="flex items-center">
-                                <div
-                                  className={`mr-2 h-5 w-5 rounded-md flex items-center justify-center ${isSelected ? "bg-main-color" : "border border-gray-border"}`}
-                                >
-                                  {isSelected && <Check className="h-4 w-4 text-white" />}
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                      {/* 왼쪽 영역: 상품 카드 목록 (1/3 너비) - 스크롤 가능하도록 수정 */}
+                      <div className="md:col-span-1">
+                        <div className="h-[500px] overflow-y-auto pr-2 pt-4 space-y-6">
+                          {projectOptions.map((option) => {
+                            const isSelected = selectedOptions.includes(option.id)
+                            return (
+                              <div
+                                key={option.id}
+                                className={`relative flex cursor-pointer items-center rounded-xl border p-4 transition-all ${
+                                  isSelected
+                                    ? "border-2 border-main-color"
+                                    : "border-gray-border hover:border-secondary-color-dark"
+                                }`}
+                                onClick={() => handleOptionSelect(option.id)}
+                              >
+                                <div className="absolute -right-2 -top-4">
+                                  <div className="rounded-full border-2 border-main-color bg-white px-3 py-1 text-sm text-main-color shadow-sm">
+                                    <span>{formatRemaining(option.remaining)}</span>
+                                  </div>
                                 </div>
-                                <h4 className={`text-lg font-bold ${isSelected ? "text-main-color" : ""}`}>
-                                  {option.title}
-                                </h4>
-                              </div>
 
-                              {isSelected && (
-                                <div className="mt-2 flex items-center">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      decreaseQuantity(option.id)
-                                    }}
-                                    className="h-8 w-8 pb-1 rounded-full bg-gray-border flex items-center justify-center text-sub-gray"
-                                  >
-                                    -
-                                  </button>
-                                  <span className="mx-4 text-lg">{quantities[option.id]?.quantity || 0}</span>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      increaseQuantity(option.id)
-                                    }}
-                                    className="h-8 w-8 pb-1 rounded-full bg-gray-border flex items-center justify-center text-sub-gray"
-                                  >
-                                    +
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-
-                            <div className={`text-xl font-medium ${isSelected ? "text-main-color" : ""}`}>
-                              {option.price}원
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  {/* 오른쪽 영역: 선택된 상품 세부 정보 (2/3 너비) */}
-                  <div className="md:col-span-2 rounded-xl border border-gray-border mt-4 flex flex-col h-[484px]">
-                    {/* 스크롤 영역 - 선택된 상품 목록만 포함 */}
-                    <div className="h-[430px] overflow-y-auto p-4 flex-grow">
-                      {selectedOptions.length > 0 ? (
-                        <>
-                          <h4 className="mb-4 text-lg font-bold">선택된 상품 ({selectedOptions.length}개)</h4>
-
-                          <div className="space-y-4">
-                            {selectedOptions.map((optionId) => {
-                              const option = projectOptions.find((opt) => opt.id === optionId)
-                              if (!option) return null
-
-                              const quantity = quantities[optionId]?.quantity || 0
-                              const price = Number.parseInt(option.price.replace(/,/g, ""), 10)
-                              const itemTotal = price * quantity
-                              const isExpanded = expandedProductId === optionId
-
-                              return (
-                                <div key={optionId} className="border border-gray-border rounded-lg overflow-hidden">
-                                  {/* 상품 헤더 - 클릭 시 펼침/접힘 */}
-                                  <div
-                                    className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50"
-                                    onClick={(e) => toggleProductExpand(optionId, e)}
-                                  >
-                                    <div className="flex items-center">
-                                      <ChevronRight
-                                        className={`h-5 w-5 mr-2 text-sub-gray transition-transform ${isExpanded ? "rotate-90" : ""}`}
-                                      />
-                                      <h5 className="font-medium">{option.title}</h5>
+                                <div className="flex-1">
+                                  <div className="flex items-center">
+                                    <div
+                                      className={`mr-2 h-5 w-5 rounded-md flex items-center justify-center ${
+                                        isSelected ? "bg-main-color" : "border border-gray-border"
+                                      }`}
+                                    >
+                                      {isSelected && <Check className="h-4 w-4 text-white" />}
                                     </div>
-                                    <span>
-                                      {quantity}개 × {option.price}원 = {itemTotal.toLocaleString()}원
-                                    </span>
+                                    <h4 className={`text-lg font-bold ${isSelected ? "text-main-color" : ""}`}>
+                                      {option.title}
+                                    </h4>
                                   </div>
 
-                                  {/* 펼쳐진 상태일 때만 구성 정보 표시 */}
-                                  {isExpanded && (
-                                    <div className="bg-gray-50 p-4 border-t border-gray-border">
-                                      <div className="mb-4">
-                                        <p className="text-sub-gray">{option.description}</p>
-                                      </div>
-
-                                      <h6 className="mb-2 font-medium">구성</h6>
-                                      {option.details && option.details.length > 0 ? (
-                                        <ul className="space-y-2">
-                                          {option.details.map((detail, index) => (
-                                            <li key={index} className="flex items-start">
-                                              <span className="mr-2 text-main-color">•</span>
-                                              <span>{detail}</span>
-                                            </li>
-                                          ))}
-                                        </ul>
-                                      ) : (
-                                        <p className="text-sub-gray">구성 정보가 없습니다.</p>
-                                      )}
+                                  {isSelected && (
+                                    <div className="mt-2 flex items-center">
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          decreaseQuantity(option.id)
+                                        }}
+                                        className="h-8 w-8 pb-1 rounded-full bg-gray-border flex items-center justify-center text-sub-gray"
+                                      >
+                                        -
+                                      </button>
+                                      <span className="mx-4 text-lg">{quantities[option.id]?.quantity || 0}</span>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          increaseQuantity(option.id)
+                                        }}
+                                        className="h-8 w-8 pb-1 rounded-full bg-gray-border flex items-center justify-center text-sub-gray"
+                                      >
+                                        +
+                                      </button>
                                     </div>
                                   )}
                                 </div>
-                              )
-                            })}
-                          </div>
-                        </>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center h-full py-12">
-                          <p className="text-sub-gray text-lg">상품을 선택해주세요</p>
-                        </div>
-                      )}
-                    </div>
 
-                    {/* 총 금액 영역 - 하단에 고정 */}
-                    <div className="border-t border-gray-border p-4">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium">합계</span>
-                        <span className="text-xl font-bold text-main-color">{getTotalPrice()}원</span>
+                                <div className={`text-xl font-medium ${isSelected ? "text-main-color" : ""}`}>
+                                  {option.price}원
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+
+                      {/* 오른쪽 영역: 선택된 상품 세부 정보 (2/3 너비) */}
+                      <div className="md:col-span-2 rounded-xl border border-gray-border mt-4 flex flex-col h-[484px]">
+                        {/* 스크롤 영역 - 선택된 상품 목록만 포함 */}
+                        <div className="h-[430px] overflow-y-auto p-4 flex-grow">
+                          {selectedOptions.length > 0 ? (
+                            <>
+                              <h4 className="mb-4 text-lg font-bold">선택된 상품 ({selectedOptions.length}개)</h4>
+
+                              <div className="space-y-4">
+                                {selectedOptions.map((optionId) => {
+                                  const option = projectOptions.find((opt) => opt.id === optionId)
+                                  if (!option) return null
+
+                                  const quantity = quantities[optionId]?.quantity || 0
+                                  const price = Number.parseInt(option.price.replace(/,/g, ""), 10)
+                                  const itemTotal = price * quantity
+                                  const isExpanded = expandedProductId === optionId
+
+                                  return (
+                                    <div
+                                      key={optionId}
+                                      className="border border-gray-border rounded-lg overflow-hidden"
+                                    >
+                                      {/* 상품 헤더 - 클릭 시 펼침/접힘 */}
+                                      <div
+                                        className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50"
+                                        onClick={(e) => toggleProductExpand(optionId, e)}
+                                      >
+                                        <div className="flex items-center">
+                                          <ChevronRight
+                                            className={`h-5 w-5 mr-2 text-sub-gray transition-transform ${
+                                              isExpanded ? "rotate-90" : ""
+                                            }`}
+                                          />
+                                          <h5 className="font-medium">{option.title}</h5>
+                                        </div>
+                                        <span>
+                                          {quantity}개 × {option.price}원 = {itemTotal.toLocaleString()}원
+                                        </span>
+                                      </div>
+
+                                      {/* 펼쳐진 상태일 때만 구성 정보 표시 */}
+                                      {isExpanded && (
+                                        <div className="bg-gray-50 p-4 border-t border-gray-border">
+                                          <div className="mb-4">
+                                            <p className="text-sub-gray">{option.description}</p>
+                                          </div>
+
+                                          <h6 className="mb-2 font-medium">구성</h6>
+                                          {option.details && option.details.length > 0 ? (
+                                            <ul className="space-y-2">
+                                              {option.details.map((detail, index) => (
+                                                <li key={index} className="flex items-start">
+                                                  <span className="mr-2 text-main-color">•</span>
+                                                  <span>{detail}</span>
+                                                </li>
+                                              ))}
+                                            </ul>
+                                          ) : (
+                                            <p className="text-sub-gray">구성 정보가 없습니다.</p>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            </>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center h-full py-12">
+                              <p className="text-sub-gray text-lg">상품을 선택해주세요</p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 총 금액 영역 - 하단에 고정 */}
+                        <div className="border-t border-gray-border p-4">
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium">합계</span>
+                            <span className="text-xl font-bold text-main-color">{getTotalPrice()}원</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
 
-                {/* 다음 단계 버튼 */}
-                <div className="mt-8 bg-white pb-8">
-                  <div className="flex justify-end">
-                    <button
-                      className={`rounded-xl px-8 py-3 font-medium ${
-                        selectedOptions.length > 0
-                          ? "bg-main-color text-white hover:bg-secondary-color-dark"
-                          : "bg-gray-border text-sub-gray cursor-not-allowed"
-                      }`}
-                      onClick={goToNextStep}
-                      disabled={selectedOptions.length === 0}
-                    >
-                      다음 단계
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              // 2단계: 결제 및 배송지 정보
-              <div className="space-y-6">
-                {/* 결제 수단 */}
-                <div>
-                  <h3 className="mb-4 text-lg font-medium">결제 수단</h3>
-                  <div
-                    className={`inline-block cursor-pointer rounded-xl border px-16 p-4 transition-all ${
-                      selectedPay === "kakaopay" ? "border-2 border-main-color" : "border-gray-border hover:border-main-color"
-                    }`}
-                    onClick={() => handlePaySelect("kakaopay")}
-                  >
-                    <span className="font-medium">카카오페이</span>
-                  </div>
-                </div>
-
-                {/* 배송지 선택 - 가로 스크롤로 변경 */}
-                <div>
-                  <h3 className="mb-4 text-lg font-medium">배송지 선택</h3>
-
-                  <div className="relative">
-                    <div className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide">
-                      {addresses.map((address) => (
-                        <div
-                          key={address.id}
-                          className={`flex-shrink-0 w-60 cursor-pointer rounded-xl border p-4 transition-all ${
-                            selectedAddress === address.id
-                              ? "border-2 border-main-color"
-                              : "border-gray-border hover:border-main-color"
+                    {/* 다음 단계 버튼 */}
+                    <div className="mt-8 bg-white pb-8">
+                      <div className="flex justify-end">
+                        <button
+                          className={`rounded-xl px-8 py-3 font-medium ${
+                            selectedOptions.length > 0
+                              ? "bg-main-color text-white hover:bg-secondary-color-dark"
+                              : "bg-gray-border text-sub-gray cursor-not-allowed"
                           }`}
-                          onClick={() => handleAddressSelect(address.id)}
+                          onClick={goToNextStep}
+                          disabled={selectedOptions.length === 0}
                         >
-                          <div className="flex items-center justify-between mb-2 overflow-hidden">
-                            <h4 className="font-bold line-clamp-1 whitespace-pre-wrap break-words">{address.name}</h4>
-                            {address.isDefault && (
-                              <span className="text-xs bg-gray-100 text-sub-gray px-2 py-1 rounded-full">
-                                기본 배송지
-                              </span>
-                            )}
-                          </div>
-                          <div className="overflow-hidden">
-                            <p className="line-clamp-2 text-sub-gray whitespace-pre-wrap break-words">
-                              [{address.zipCode}] {address.address} {address.detailAddress}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-
-                      {/* 배송지 추가 버튼 */}
-                      <div
-                        className="flex-shrink-0 w-60 border border-dashed border-gray-border rounded-xl p-4 flex items-center justify-center cursor-pointer hover:bg-gray-50 relative"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          addNewAddress(e)
-                        }}
-                      >
-                        <div className="flex flex-col items-center text-sub-gray">
-                          <Plus className="w-10 h-10 mb-2" />
-                          <span className="text-sm font-medium">배송지 추가</span>
-                        </div>
+                          다음 단계
+                        </button>
                       </div>
                     </div>
                   </div>
-                </div>
-
-                {/* 주문 요약 */}
-                <div className="rounded-xl border border-gray-border p-4">
-                  <h3 className="mb-4 text-lg font-medium">주문 요약</h3>
-
-                  <div className="space-y-4">
-                    {/* 총 선택 상품 개수만 표시 */}
-                    <div className="flex mb-0 justify-between items-center">
-                      <button
-                        ref={orderSummaryMoreRef}
-                        onClick={toggleOrderSummaryPopover}
-                        className="text-main-color hover:text-main-color font-medium flex items-center"
+                ) : (
+                  // 2단계: 결제 및 배송지 정보
+                  <div className="space-y-6">
+                    {/* 결제 수단 */}
+                    <div>
+                      <h3 className="mb-4 text-lg font-medium">결제 수단</h3>
+                      <div
+                        className={`inline-block cursor-pointer rounded-xl border px-16 p-4 transition-all ${
+                          selectedPay === "kakaopay"
+                            ? "border-2 border-main-color"
+                            : "border-gray-border hover:border-main-color"
+                        }`}
+                        onClick={() => handlePaySelect("kakaopay")}
                       >
-                        선택한 상품 {selectedOptions.length}개 보기
-                        <ChevronRight
-                          className={`ml-1 h-4 w-4 transition-transform ${showOrderSummaryPopover ? "rotate-180" : ""}`}
-                        />
-                      </button>
+                        <span className="font-medium">카카오페이</span>
+                      </div>
                     </div>
 
-                    <div className="pt-2 flex justify-between text-sub-gray">
-                      <span>배송비</span>
-                      <span>무료</span>
+                    {/* 배송지 선택 - 가로 스크롤로 변경 */}
+                    <div>
+                      <h3 className="mb-4 text-lg font-medium">배송지 선택</h3>
+
+                      <div className="relative">
+                        <div className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide">
+                          {addresses.map((address) => (
+                            <div
+                              key={address.id}
+                              className={`flex-shrink-0 w-60 cursor-pointer rounded-xl border p-4 transition-all ${
+                                selectedAddress === address.id
+                                  ? "border-2 border-main-color"
+                                  : "border-gray-border hover:border-main-color"
+                              }`}
+                              onClick={() => handleAddressSelect(address.id)}
+                            >
+                              <div className="flex items-center justify-between mb-2 overflow-hidden">
+                                <h4 className="font-bold line-clamp-1 whitespace-pre-wrap break-words">
+                                  {address.name}
+                                </h4>
+                                {address.isDefault && (
+                                  <span className="text-xs bg-gray-100 text-sub-gray px-2 py-1 rounded-full">
+                                    기본 배송지
+                                  </span>
+                                )}
+                              </div>
+                              <div className="overflow-hidden">
+                                <p className="line-clamp-2 text-sub-gray whitespace-pre-wrap break-words">
+                                  [{address.zipCode}] {address.address} {address.detailAddress}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+
+                          {/* 배송지 추가 버튼 */}
+                          <div
+                            className="flex-shrink-0 w-60 border border-dashed border-gray-border rounded-xl p-4 flex items-center justify-center cursor-pointer hover:bg-gray-50 relative"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              addNewAddress(e)
+                            }}
+                          >
+                            <div className="flex flex-col items-center text-sub-gray">
+                              <Plus className="w-10 h-10 mb-2" />
+                              <span className="text-sm font-medium">배송지 추가</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 주문 요약 */}
+                    <div className="rounded-xl border border-gray-border p-4">
+                      <h3 className="mb-4 text-lg font-medium">주문 요약</h3>
+
+                      <div className="space-y-4">
+                        {/* 총 선택 상품 개수만 표시 */}
+                        <div className="flex mb-0 justify-between items-center">
+                          <button
+                            ref={orderSummaryMoreRef}
+                            onClick={toggleOrderSummaryPopover}
+                            className="text-main-color hover:text-main-color font-medium flex items-center"
+                          >
+                            선택한 상품 {selectedOptions.length}개 보기
+                            <ChevronRight
+                              className={`ml-1 h-4 w-4 transition-transform ${
+                                showOrderSummaryPopover ? "rotate-180" : ""
+                              }`}
+                            />
+                          </button>
+                        </div>
+
+                        <div className="pt-2 flex justify-between text-sub-gray">
+                          <span>배송비</span>
+                          <span>무료</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 border-t border-gray-border pt-4">
+                        <div className="flex justify-between">
+                          <span className="font-medium">총 결제 금액</span>
+                          <span className="text-xl font-bold">{getTotalPrice()}원</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 하단 결제 정보 및 버튼 */}
+                    <div className="mt-8 bg-white pb-8">
+                      {/* 버튼 영역 */}
+                      <div className="flex justify-end space-x-4">
+                        <button
+                          className="rounded-xl bg-main-color px-8 py-3 font-medium text-white hover:bg-secondary-color-dark"
+                          onClick={handlePayment}
+                        >
+                          후원하기
+                        </button>
+                        <button
+                          className="rounded-xl bg-cancel-background px-8 py-3 font-medium text-white hover:bg-cancel-background-dark"
+                          onClick={goToPreviousStep}
+                        >
+                          이전
+                        </button>
+                      </div>
                     </div>
                   </div>
-
-                  <div className="mt-4 border-t border-gray-border pt-4">
-                    <div className="flex justify-between">
-                      <span className="font-medium">총 결제 금액</span>
-                      <span className="text-xl font-bold">{getTotalPrice()}원</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 하단 결제 정보 및 버튼 */}
-                <div className="mt-8 bg-white pb-8">
-                  {/* 버튼 영역 */}
-                  <div className="flex justify-end space-x-4">
-                    <button
-                      className="rounded-xl bg-main-color px-8 py-3 font-medium text-white hover:bg-secondary-color-dark"
-                      onClick={toggleDock}
-                    >
-                      후원하기
-                    </button>
-                    <button
-                      className="rounded-xl bg-cancel-background px-8 py-3 font-medium text-white hover:bg-cancel-background-dark"
-                      onClick={goToPreviousStep}
-                    >
-                      이전
-                    </button>
-                  </div>
-                </div>
-              </div>
+                )}
+              </>
             )}
           </div>
         </div>

@@ -349,7 +349,7 @@ const ProjectDetail = () => {
       )}
 
       {/* 탭 메뉴 및 소개 영역 추가 */}
-      <ProjectTabs />
+      <ProjectTabs projectData={projectData} isLoading={isLoading} error={error} />
     </div>
   )
 }
