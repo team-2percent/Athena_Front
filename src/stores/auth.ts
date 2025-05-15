@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { jwtDecode } from "jwt-decode";
 
-export type UserRole = "ADMIN" | "USER" | "";
+export type UserRole = "ROLE_ADMIN" | "ROLE_USER" | "";
 
 interface AuthStore {
   isLoggedIn: boolean;
