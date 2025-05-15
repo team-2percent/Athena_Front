@@ -7,24 +7,37 @@ import ConfirmModal from "@/components/common/ConfirmModal"
 import { useRouter } from "next/navigation";
 import { ArrowLeftIcon } from "lucide-react"
 import MarkdownRenderer from "@/components/projectRegister/MarkdownRenderer"
+import { useApi } from "@/hooks/useApi";
+import { useParams } from "next/navigation";
+import OverlaySpinner from "@/components/common/OverlaySpinner"
 
 export default function ProjectApprovalDetailPage() {
+    const { id } = useParams();
     const router = useRouter();
-    const [comment, setComment] = useState("")
+    const { isLoading, apiCall } = useApi();
+    // const [comment, setComment] = useState("")
     const [approvalStatus, setApprovalStatus] = useState<"approve" | "reject" | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const approve = approvalStatus === "approve" ? true : approvalStatus === "reject" ? false : null;
+    const disabled = approvalStatus === null;
+
     const handleConfirm = () => {
-        // 요청 로직
-        console.log("요청")
-        setIsModalOpen(false);
-        router.back();
+        apiCall(`/api/admin/projects/${id}/approval`, "PATCH", {
+            approve: approve,
+            // comment: comment
+        }).then(({ data }) => {
+            console.log(data);
+            setIsModalOpen(false);
+            router.push("/admin/approval/project");
+        })
     }
 
     const markdown = `# 프로젝트 기본 정보\n**안됨**\n## 프로젝트 기본 정보\n**안됨**\n## 프로젝트 기본 정보\n**안됨**\n## 프로젝트 기본 정보\n**안됨**`
 
     return (
         <div className="flex flex-col mx-auto w-full p-8 gap-6">
+            {isLoading && <OverlaySpinner message="처리 중입니다."/>}
             <div className="flex w-full">
             <button className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.back()}>
                 <ArrowLeftIcon className="w-4 h-4" />
@@ -145,6 +158,7 @@ export default function ProjectApprovalDetailPage() {
             {/* 승인 반려 란 */}
             <div className="flex flex-col gap-4">
                 <h2 className="text-2xl font-medium border-b pb-2">프로젝트 승인 여부</h2>
+                <div className="flex justify-between">
                 <div className="flex items-center space-x-4 mt-4">
                     <label className="flex items-center space-x-2">
                         <input
@@ -170,20 +184,24 @@ export default function ProjectApprovalDetailPage() {
                     </label>
                 </div>
 
-                <textarea
+                {/* <textarea
                     disabled={approvalStatus !== "reject"}
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     placeholder={approvalStatus === "reject" ? "반려 코멘트를 입력하세요" : ""}
                     className={clsx("w-full h-32 p-3 border rounded-md resize-none", approvalStatus !== "reject" && "bg-gray-100 text-sub-gray pointer-events-none")}
-                />
+                /> */}
 
                 <div className="flex justify-end space-x-4">
                     <button
-                        disabled={approvalStatus === null}
-                        className="px-8 py-2 rounded-md bg-main-color hover:bg-secondary-color-dark text-white"
+                        disabled={disabled}
+                        className={clsx(
+                            "px-8 py-2 rounded-md",
+                            disabled ? "bg-disabled-background text-disabled-text pointer-events-none" : "bg-main-color hover:bg-secondary-color-dark text-white"
+                        )}
                         onClick={() => setIsModalOpen(true)}
                     >저장</button>
+                </div>
                 </div>
             </div>
             {/* 확인 모달 */}
