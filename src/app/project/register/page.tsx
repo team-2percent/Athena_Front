@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation"
 import { useProjectFormStore, fetchProjectId, submitProject } from "@/stores/useProjectFormStore"
 import { useApi } from "@/hooks/useApi"
 import { useImageUpload } from "@/hooks/useImageUpload"
+import Spinner from "@/components/common/Spinner"
 
 export default function ProjectRegister() {
   const router = useRouter()
@@ -110,10 +111,9 @@ export default function ProjectRegister() {
 
       {/* 로딩 인디케이터 */}
       {(isLoading || isSubmitting) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-            <div className="w-16 h-16 border-4 border-pink-300 border-t-pink-500 rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-lg font-medium">처리 중입니다...</p>
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white p-6 border rounded-lg shadow-lg text-center">
+            <Spinner message="잠시만 기다려 주세요..." />
           </div>
         </div>
       )}
