@@ -5,8 +5,6 @@ import useAuthStore from "@/stores/auth";
 export function useHydrateAuth() {
   const setLoggedIn = useAuthStore((s) => s.setLoggedIn);
   const setRole = useAuthStore((s) => s.setRole);
-  const setHydrated = useAuthStore((s) => s.setHydrated);
-
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
@@ -21,8 +19,7 @@ export function useHydrateAuth() {
         setRole("");
       }
     }
-    setHydrated(true);
-  }, [setLoggedIn, setRole, setHydrated]);
+  }, [setLoggedIn, setRole]);
 }
 
 export default useHydrateAuth;
