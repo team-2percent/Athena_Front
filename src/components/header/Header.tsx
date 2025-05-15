@@ -12,6 +12,7 @@ import LoginModal from "../login/LoginModal"
 import SignupModal from "../login/SignUpModal"
 import { useAuth } from "@/contexts/AuthContext"
 import { usePathname } from 'next/navigation';
+import { useApi } from "@/hooks/useApi";
 
 const uris: Record<string, string> = {
   "전체": "",
@@ -24,6 +25,8 @@ const Header = () => {
   const isLoggedIn = checkAuth();
   const isAdmin = role === "ADMIN";
   const { logout } = useAuth();
+  const { apiCall } = useApi();
+  const [user, setUser] = useState<{nickname: string, imageUrl: string} | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false)
@@ -101,6 +104,16 @@ const Header = () => {
     setShowAuthMenu(!showAuthMenu)
   }
 
+  // 유저 정보 조회
+  const loadUserInfo = () => {
+    apiCall<{id: number, nickname: string, imageUrl: string}>("/api/user/Header", "GET").then(({ data }) => {
+      if (data !== null) setUser({
+        nickname: data.nickname,
+        imageUrl: data.imageUrl,
+      })
+    })
+  }
+
   const notifications = [
     {
       id: 1,
@@ -121,6 +134,10 @@ const Header = () => {
       profileImage: "/abstract-profile.png",
     },
   ]
+
+  useEffect(() => {
+    loadUserInfo();
+  }, [])
 
   // 모달 뒷배경 스크롤 방지
   useEffect(() => {
@@ -176,17 +193,25 @@ const Header = () => {
                 <Bell className="h-6 w-6 text-sub-gray" />
               </button>
               <div className="relative flex items-center space-x-3">
-                <span className="text-sm font-medium whitespace-nowrap">대충사는사람</span>
+                {user ?
+                  <span className="text-sm font-medium whitespace-nowrap">{user?.nickname}</span>
+                  :
+                  <div className="h-5 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+                }
                 <div className="relative flex items-center" ref={authMenuRef}>
+                  {user ?
                   <button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick}>
                     <Image
-                      src="/abstract-profile.png"
+                      src={user?.imageUrl || "/abstract-profile.png"}
                       alt="프로필 이미지"
                       width={40}
                       height={40}
                       className="h-full w-full object-cover"
                     />
                   </button>
+                  :
+                  <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+                  }
                   {
                     showAuthMenu &&
                     <div className="absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 transition-all duration-200">
