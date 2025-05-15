@@ -3,9 +3,8 @@ import localFont from "next/font/local"; // 지정한 폰트를 사용하기 위
 import "./globals.css";
 import HeaderLoader from "@/components/HeaderLoader";
 import RegisterPageButtonLoader from "@/components/RegisterPageButtonLoader";
-
-// 로그인 토큰 관련
-import { AuthProvider } from '../contexts/AuthContext';
+import AuthProvider from "@/components/AuthProvider";
+import { AuthGate } from "@/components/login/AuthGate";
 
 // Pretendard 폰트를 사용하기 위해 불러옴
 const pretendard = localFont({
@@ -31,11 +30,12 @@ export default function RootLayout({
         className={`${pretendard.variable} font-pretendard`} // Pretendard 사용
       >
         <AuthProvider>
+          <AuthGate />
           <HeaderLoader />
           <main className="flex-1 bg-white mt-1">
             <div className="container mx-auto px-4 py-8">
-              {children}
-            </div>
+            {children}
+          </div>
             <RegisterPageButtonLoader />
           </main>
         </AuthProvider>

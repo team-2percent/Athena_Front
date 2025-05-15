@@ -83,7 +83,7 @@ const TableHeader: React.FC<ComponentProps> = ({ children }) => (
 
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
-    <div className="markdown-content p-4">
+    <div className="markdown-content">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSanitize]}
