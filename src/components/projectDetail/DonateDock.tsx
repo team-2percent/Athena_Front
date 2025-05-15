@@ -164,7 +164,7 @@ const DonateDock = () => {
     }
   }, [projectId, apiCall])
 
-  // 주문 요약 더보기 버튼 참조
+  // 주문 요약 더���기 버튼 참조
   const orderSummaryMoreRef = useRef<HTMLButtonElement>(null)
 
   // 기본 상품 옵션 데이터 - API 데이터가 없을 때 사용
@@ -550,7 +550,7 @@ const DonateDock = () => {
   }
 
   // 결제 처리 함수
-  const handlePayment = async () => {
+  const handlePayment = () => {
     if (!selectedPay) {
       alert("결제 수단을 선택해주세요.")
       return
@@ -575,8 +575,8 @@ const DonateDock = () => {
       // 선택된 배송지 정보
       const selectedAddressInfo = addresses.find((addr) => addr.id === selectedAddress)
 
-      // 주문 생성 요청
-      const { data: orderData, error: orderError } = await apiCall("/api/orders", "POST", {
+      // 주문 정보 로깅 (실제 API 호출 대신)
+      console.log("주문 정보:", {
         projectId: Number(projectId),
         items: orderItems,
         shippingAddress: {
@@ -588,26 +588,11 @@ const DonateDock = () => {
         paymentMethod: selectedPay,
       })
 
-      if (orderError) {
-        throw new Error(orderError)
-      }
+      // 결제 성공 메시지 표시
+      alert("결제 기능은 현재 준비 중입니다. 곧 서비스될 예정입니다.")
 
-      // 결제 준비 요청
-      const orderId = orderData.id
-      const { data: paymentData, error: paymentError } = await apiCall(`/api/payment/ready/${orderId}`, "POST")
-
-      if (paymentError) {
-        throw new Error(paymentError)
-      }
-
-      // 결제 페이지로 이동
-      if (paymentData && paymentData.paymentUrl) {
-        window.open(paymentData.paymentUrl, "_blank")
-        // 독 닫기
-        setIsOpen(false)
-      } else {
-        throw new Error("결제 URL을 받지 못했습니다.")
-      }
+      // 독 닫기
+      setIsOpen(false)
     } catch (err) {
       console.error("결제 처리 중 오류:", err)
       alert("결제 처리 중 오류가 발생했습니다. 다시 시도해주세요.")
