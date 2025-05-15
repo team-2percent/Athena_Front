@@ -233,11 +233,11 @@ export default function Home() {
 
     return (
       <div className="w-full h-fit flex flex-col items-center justify-center">
-        <h2 className="text-2xl font-bold mb-6 text-left w-full max-w-[900px]"><span className="text-main-color">카테고리 1위!</span>  추천 상품</h2>
+        <h2 className="text-2xl font-bold mb-6 text-left w-full max-w-[900px]"><span className="text-main-color">카테고리 1위!</span> 추천 프로젝트</h2>
         <Carousel />
         {/* Popular Projects */}
         <section className="mt-16 px-4">
-          <h2 className="text-2xl font-bold mb-6 text-center">인기 상품</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center">인기 프로젝트</h2>
 
           {/* Top 3 Projects - Responsive */}
           {renderRankProjects()}
