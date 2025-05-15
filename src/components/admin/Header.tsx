@@ -6,7 +6,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
-import { useAuth } from "@/contexts/AuthContext";
+import useAuthStore from "@/stores/auth"
 
 const uris: Record<string, string> = {
     "프로젝트 승인 관리": "approval",
@@ -16,7 +16,7 @@ const uris: Record<string, string> = {
 
 export default function AdminHeader() {
     const pathname = usePathname().split("/")[2];
-    const { logout } = useAuth();
+    const { logout } = useAuthStore();
     const router = useRouter();
     const [showAuthMenu, setShowAuthMenu] = useState(false);
 

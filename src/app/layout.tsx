@@ -3,7 +3,7 @@ import localFont from "next/font/local"; // 지정한 폰트를 사용하기 위
 import "./globals.css";
 import HeaderLoader from "@/components/HeaderLoader";
 import RegisterPageButtonLoader from "@/components/RegisterPageButtonLoader";
-import { AuthProvider } from "@/contexts/AuthContext";
+import  AuthProvider from "@/components/AuthProvider";
 import { AuthGate } from "@/components/login/AuthGate";
 
 // Pretendard 폰트를 사용하기 위해 불러옴

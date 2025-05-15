@@ -1,38 +1,37 @@
 import { create } from "zustand";
 import { jwtDecode } from "jwt-decode";
 
+export type UserRole = "ADMIN" | "USER" | "";
+
 interface AuthStore {
-    role: string;
-    isLoggedIn: boolean;
-    tokenCheck: () => Promise<void>;
-    login: (accessToken: string, refreshToken: string) => void;
-    logout: () => void;
+  isLoggedIn: boolean;
+  role: UserRole;
+  setLoggedIn: (loggedIn: boolean) => void;
+  setRole: (role: UserRole) => void;
+  login: (accessToken: string, refreshToken: string) => void;
+  logout: () => void;
 }
 
 const useAuthStore = create<AuthStore>((set) => ({
-    role: "",
-    isLoggedIn: false,
-    tokenCheck: async () => {
-        const accessToken = localStorage.getItem('accessToken');
-        
-        if (accessToken) {
-            const decoded = jwtDecode<{ role: string }>(accessToken);
-            set({ isLoggedIn: true, role: decoded.role });
-        } else {
-            set({ isLoggedIn: false, role: "" });
-        }
+  isLoggedIn: false,
+  role: "",
+  setLoggedIn: (loggedIn) => set({ isLoggedIn: loggedIn }),
+  setRole: (role) => set({ role }),
+  login: (accessToken, refreshToken) => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+    }
+    const { role } = jwtDecode<{ role: UserRole }>(accessToken);
+    set({ isLoggedIn: true, role })
     },
-    login: (accessToken: string, refreshToken: string) => {
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-        const decoded = jwtDecode<{ role: string }>(accessToken);
-        set({ isLoggedIn: true, role: decoded.role });
-    },
-    logout: () => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken'); 
-        set({ isLoggedIn: false, role: "" });
-    },
-}))
+  logout: () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+    }
+    set({ isLoggedIn: false, role: "" });
+  },
+}));
 
 export default useAuthStore;
