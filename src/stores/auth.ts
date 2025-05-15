@@ -1,20 +1,23 @@
 import { create } from "zustand";
 import { jwtDecode } from "jwt-decode";
 
-export type UserRole = "ADMIN" | "USER" | "";
+export type UserRole = "ROLE_ADMIN" | "ROLE_USER" | "";
 
 interface AuthStore {
   isLoggedIn: boolean;
   role: UserRole;
+  hydrated: boolean;
   setLoggedIn: (loggedIn: boolean) => void;
   setRole: (role: UserRole) => void;
   login: (accessToken: string, refreshToken: string) => void;
   logout: () => void;
+  setHydrated: (hydrated: boolean) => void;
 }
 
 const useAuthStore = create<AuthStore>((set) => ({
   isLoggedIn: false,
   role: "",
+  hydrated: false,
   setLoggedIn: (loggedIn) => set({ isLoggedIn: loggedIn }),
   setRole: (role) => set({ role }),
   login: (accessToken, refreshToken) => {
@@ -32,6 +35,7 @@ const useAuthStore = create<AuthStore>((set) => ({
     }
     set({ isLoggedIn: false, role: "" });
   },
+  setHydrated: (hydrated) => set({ hydrated }),
 }));
 
 export default useAuthStore;

@@ -22,7 +22,7 @@ const uris: Record<string, string> = {
 }
 const Header = () => {
   const { isLoggedIn, role, logout } = useAuthStore();
-  const isAdmin = role === "ADMIN";
+  const isAdmin = role === "ROLE_ADMIN";
   const { apiCall } = useApi();
   const [user, setUser] = useState<{nickname: string, imageUrl: string} | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);

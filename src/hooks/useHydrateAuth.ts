@@ -5,7 +5,6 @@ import useAuthStore from "@/stores/auth";
 export function useHydrateAuth() {
   const setLoggedIn = useAuthStore((s) => s.setLoggedIn);
   const setRole = useAuthStore((s) => s.setRole);
-
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
