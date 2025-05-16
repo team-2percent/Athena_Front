@@ -10,14 +10,15 @@ export function useHydrateAuth() {
     const refreshToken = localStorage.getItem("refreshToken");
 
     if (accessToken && refreshToken) {
+      setLoggedIn(true);
       try {
         const { role } = jwtDecode<{ role: "ROLE_ADMIN" | "ROLE_USER" }>(accessToken);
-        setLoggedIn(true);
         setRole(role);
       } catch {
-        setLoggedIn(false);
         setRole("");
       }
+    } else {
+      setLoggedIn(false);
     }
   }, [setLoggedIn, setRole]);
 }
