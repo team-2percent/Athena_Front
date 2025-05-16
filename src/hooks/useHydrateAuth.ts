@@ -11,7 +11,7 @@ export function useHydrateAuth() {
 
     if (accessToken && refreshToken) {
       try {
-        const { role } = jwtDecode<{ role: "ADMIN" | "USER" }>(accessToken);
+        const { role } = jwtDecode<{ role: "ROLE_ADMIN" | "ROLE_USER" }>(accessToken);
         setLoggedIn(true);
         setRole(role);
       } catch {

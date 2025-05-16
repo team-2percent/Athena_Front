@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string }}) {
-    const settlementId = +params.id
+export async function GET(request: NextRequest) {
+    const params = request.nextUrl.pathname.split("/");
+    const settlementId = params[params.length - 1];
     console.log(settlementId)
 
     return NextResponse.json({

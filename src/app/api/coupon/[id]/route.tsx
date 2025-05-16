@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest) {
   try {
-    const id = params.id;
+    const params = request.nextUrl.pathname.split("/");
+    const id = params[params.length - 1]; // Extract the coupon ID from the URL
 
     // 쿠폰 데이터 예시 (실제로는 DB에서 조회)
     const coupon = {
