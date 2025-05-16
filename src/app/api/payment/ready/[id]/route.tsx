@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
-    const { id: orderId } = params;
+export async function POST(request: NextRequest) {
+    const Params = request.nextUrl.pathname.split('/');
+    const orderId = Params[Params.length - 1]; // Extract the order ID from the URL
 
     if (!orderId) {
         return NextResponse.json(

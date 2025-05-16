@@ -42,6 +42,7 @@ const CouponStatus = {
 }
 
 const CouponStatusColor = {
+    ALL: "bg-gray-500",
     PREVIOUS: "bg-yellow-500",
     INPROGRESS: "bg-green-500",
     COMPLETED: "bg-blue-500",

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest, { params }: { params: { projectId: string } }) {
-    const { projectId } = params;
+export async function GET(request: NextRequest) {
+    const params = request.nextUrl.pathname.split("/");
+    const projectId = params[params.length - 1];
     console.log(projectId)
     const markdown = `# 프로젝트 기본 정보\n**프로젝트입니다!**\n## 프로젝트 기본 정보\n\n## 프로젝트 기본 정보\n\n## 프로젝트 기본 정보\n`
     const project = {

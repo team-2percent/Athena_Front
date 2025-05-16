@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-    const { id } = params;
+export async function GET(request: NextRequest) {
+    const params = request.nextUrl.pathname.split('/');
+    const id = params[params.length - 1]; // Extract the user ID from the URL
 
     // Mock data for demonstration purposes
     const user = {

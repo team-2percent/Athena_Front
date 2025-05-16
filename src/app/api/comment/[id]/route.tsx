@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 
-export async function GET(request: NextRequest, context: { params: { id: string } }) {
-    const { params } = context;
-    const projectId = params?.id;
+export async function GET(request: NextRequest) {
+    const params = request.nextUrl.pathname.split("/");
+    const projectId = params[params.length - 1];
+    console.log(projectId)
 
     if (!projectId) {
         return NextResponse.json(

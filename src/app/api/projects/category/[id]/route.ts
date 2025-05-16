@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-    const { id } = params;
+export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const sortType = searchParams.get("sortType");
     const cursorValue = searchParams.get("cursorValue");

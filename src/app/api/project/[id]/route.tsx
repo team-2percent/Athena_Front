@@ -1,8 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-export async function GET(request: NextRequest, context: { params: { id: string } }) {
-  const { params } = context;
-  const id = params?.id;
+export async function GET(request: NextRequest) {
+  const params = request.nextUrl.pathname.split("/");
+  const id = params[params.length - 1]; // Extract the project ID from the URL
 
   if (!id) {
     return NextResponse.json({ error: "Project ID is required" }, { status: 400 });
