@@ -2,8 +2,6 @@
 
 import ProfileHeader from "@/components/profile/ProfileHeader"
 import ProfileContent from "@/components/profile/ProfileContent"
-import useAuthStore from "@/stores/auth"
-import { redirect } from "next/navigation"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
@@ -16,11 +14,6 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
-  const isLoggedIn = useAuthStore((state: { isLoggedIn: boolean }) => state.isLoggedIn)
-  if (!isLoggedIn) {
-    redirect("/")
-  }
-
   const router = useRouter()
   const { apiCall, isLoading } = useApi()
   const [isOpenViewTransaction, setIsOpenViewTransaction] = useState(false)
