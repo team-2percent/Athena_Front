@@ -26,7 +26,7 @@ export default function CardCarousel() {
       title: string;
       categoryId: number;
       categoryName: string;
-    }[]>("/api/projects/categoryTop", "GET").then(({data}) => {
+    }[]>("/api/project/categoryTop", "GET").then(({data}) => {
       if (data) setCategoryTopProjects(data);
     })
   }

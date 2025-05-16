@@ -9,7 +9,7 @@ interface ApiResponse<T> {
   status: number;
 }
 
-const api_base = "http://localhost:3000";
+const api_base = "https://athena.i-am-jay.com";
 
 export function useApi() {
   const { logout } = useAuthStore();
