@@ -24,8 +24,8 @@ export default function Home() {
   const { isLoading, apiCall } = useApi();
   const [projects, setProjects] = useState<Project[]>([]);
   const loadRankProjects = () => {
-    apiCall("/api/projects/all", "GET").then(({ data }) => {
-      setProjects(data as Project[]);
+    apiCall<Project[]>("/api/projects/all", "GET").then(({ data }) => {
+      if (data !== null) setProjects(data);
     })
   }
 
@@ -163,7 +163,7 @@ export default function Home() {
   }
 
   const renderRankProjects = () => {
-    if (isLoading || projects.length === 0) {
+    if (isLoading || projects === null || projects.length < 3) {
       return <Spinner message="상품을 불러오는 중"/>
     }
     return (
