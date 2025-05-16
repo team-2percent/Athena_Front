@@ -161,7 +161,9 @@ const Header = () => {
           {/* 로고와 검색창 */}
           <div className="flex items-center space-x-4">
             <Link href="/" className="flex items-center">
-              <Image src="/src/athenna_logo.png" alt="Athenna 로고" width={40} height={40} className="h-10 w-auto" />
+              <div className="w-10 h-10 overflow-hidden">
+                <img src="/src/athenna_logo.png" alt="Athenna 로고" className="h-10 w-auto object-cover" />
+              </div>
             </Link>
           </div>
 
@@ -299,11 +301,9 @@ const Header = () => {
               <div key={notification.id}>
                 <div className="flex py-4">
                   <div className="mr-4 h-12 w-12 overflow-hidden rounded-full">
-                    <Image
+                    <img
                       src={notification.profileImage || "/placeholder.svg"}
                       alt="프로필 이미지"
-                      width={48}
-                      height={48}
                       className="h-full w-full object-cover"
                     />
                   </div>

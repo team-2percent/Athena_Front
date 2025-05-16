@@ -42,13 +42,13 @@ export default function ReviewItem({
           <div className="relative w-60 h-60 flex-shrink-0">
             {/* 상품 이미지 클릭 시 상품 상세 페이지로 이동 */}
             <div className="w-full h-full cursor-pointer" onClick={handleProjectClick}>
-              <Image
-                src={projectImage || "/placeholder.svg"}
-                alt={projectName}
-                width={256}
-                height={192}
-                className="w-full h-full object-cover rounded-lg"
-              />
+              <div className="w-64 h-48 overflow-hidden rounded-lg">
+                <img
+                  src={projectImage || "/placeholder.svg"}
+                  alt={projectName}
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              </div>
             </div>
 
             {/* 하트 아이콘 */}

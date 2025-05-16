@@ -26,11 +26,9 @@ export default function FollowItem({ id, username, oneLinear, profileImage, isFo
         {/* 프로필 이미지 */}
         <div className="flex items-center">
           <div className="w-20 h-20 rounded-full bg-gray-200 overflow-hidden mr-6">
-            <Image
+            <img
               src={profileImage || "/placeholder.svg"}
               alt={`${username}의 프로필 이미지`}
-              width={80}
-              height={80}
               className="w-full h-full object-cover"
             />
           </div>

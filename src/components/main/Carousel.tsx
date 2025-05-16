@@ -77,12 +77,10 @@ export default function CardCarousel() {
     >
       {/* Background Card Image */}
       <div className="absolute inset-0 z-0">
-        <Image
+        <img
           src={currentCard.imageUrl || "/placeholder.svg"}
           alt={currentCard.title}
-          fill
-          className="object-cover"
-          priority
+          className="object-cover w-full h-full"
         />
       </div>
 

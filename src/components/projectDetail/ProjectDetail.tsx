@@ -214,12 +214,14 @@ const ProjectDetail = () => {
           <div className="flex flex-col">
             {/* 이미지 표시 영역 (캐러셀) */}
             <div ref={imageContainerRef} className="relative aspect-square w-full overflow-hidden rounded-3xl">
-              <Image
-                src={images[currentImageIndex] || "/placeholder.svg"}
-                alt={projectData?.title || "프로젝트 이미지"}
-                fill
-                className="object-cover"
-              />
+              <div className="relative h-16 w-16">
+                <img
+                  src={images[currentImageIndex] || "/placeholder.svg"}
+                  alt={projectData?.title || "프로젝트 이미지"}
+                  className="object-cover"
+                />
+              </div>
+              
 
               {/* 캐러셀 좌우 버튼 */}
               <button
@@ -255,11 +257,10 @@ const ProjectDetail = () => {
                     onClick={() => setCurrentImageIndex(idx)}
                   >
                     <div className="relative h-20 w-20">
-                      <Image
+                      <img
                         src={images[idx] || "/placeholder.svg"}
                         alt={`프로젝트 이미지 ${idx + 1}`}
-                        fill
-                        className="object-cover"
+                        className="w-full h-full object-cover"
                       />
                     </div>
                   </div>

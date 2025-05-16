@@ -184,7 +184,7 @@ export default function SettlementDetailPage() {
                 <div className="flex items-center mt-4 justify-between">
                     <div className="flex items-center gap-4">
                         <button className="h-16 w-16 overflow-hidden rounded-full">
-                            <Image
+                            <img
                                 src="/abstract-profile.png"
                                 alt="프로필 이미지"
                                 width={64}

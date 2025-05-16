@@ -158,14 +158,13 @@ export default function ProfileInfo() {
                         {/* 프로필 이미지 섹션 */}
                         <div className="flex flex-col items-center bg-white rounded-lg shadow py-6 px-10 space-y-4">
                             <h3 className="text-lg font-medium">프로필 이미지</h3>
-                            <div className="relative w-32 h-32 mb-4">
+                            <div className="relative w-32 h-32 overflow-hidden rounded-full mb-4">
                                 {profileImage ? (
                                 <>
-                                    <Image
+                                    <img
                                     src={profileImage || "/placeholder.svg"}
                                     alt="프로필 이미지"
-                                    fill
-                                    className="rounded-full object-cover"
+                                    className="w-full h-full object-cover"
                                     />
                                     <button
                                     type="button"

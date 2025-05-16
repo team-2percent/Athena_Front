@@ -15,11 +15,9 @@ export default function ProfileHeader({ nickname, following, purchases, profileI
       <div className="flex">
         {/* 프로필 이미지 */}
         <div className="w-36 h-36 rounded-full bg-gray-200 overflow-hidden mr-8 flex-shrink-0">
-          <Image
+          <img
             src={profileImage || "/placeholder.svg"}
             alt="프로필 이미지"
-            width={192}
-            height={192}
             className="w-full h-full object-cover"
           />
         </div>

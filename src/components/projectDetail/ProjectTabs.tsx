@@ -316,11 +316,9 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                             <div className="flex space-x-4">
                               {/* 리뷰 작성자 프로필 사진 */}
                               <div className="h-16 w-16 overflow-hidden rounded-full">
-                                <Image
+                                <img
                                   src={review.profileImage || "/placeholder.svg"}
                                   alt={`${review.userName} 프로필`}
-                                  width={64}
-                                  height={64}
                                   className="h-full w-full object-cover"
                                 />
                               </div>
