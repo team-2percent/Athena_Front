@@ -134,8 +134,8 @@ const Header = () => {
   ]
 
   useEffect(() => {
-    loadUserInfo();
-  }, [])
+    if (isLoggedIn) loadUserInfo();
+  }, [isLoggedIn])
 
   // 모달 뒷배경 스크롤 방지
   useEffect(() => {
