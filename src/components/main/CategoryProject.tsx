@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import ProjectCard from "../common/ProjectCard"
+import ProjectCard from "../common/ProjectGridItem"
 
 interface CategoryProjectProps {
     id: number
