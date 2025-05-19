@@ -1,4 +1,4 @@
-import ProjectCard from "../common/ProjectCard"
+import ProjectCard from "../common/ProjectGridItem"
 
 
 interface ListProjectProps {
