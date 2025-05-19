@@ -112,6 +112,13 @@ const Header = () => {
     })
   }
 
+  // 로그아웃
+  const handleLogout = () => {
+    apiCall("/api/user/logout", "POST").then(() => {
+      logout();
+    })
+  }
+
   const notifications = [
     {
       id: 1,
@@ -189,14 +196,15 @@ const Header = () => {
               <button type="button" aria-label="알림" onClick={toggleNotifications}>
                 <Bell className="h-6 w-6 text-sub-gray" />
               </button>
+
               <div className="relative flex items-center space-x-3">
-                {user ?
+                {isLoading ?
                   <span className="text-sm font-medium whitespace-nowrap">{user?.nickname}</span>
                   :
                   <div className="h-5 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
                 }
                 <div className="relative flex items-center" ref={authMenuRef}>
-                  {user ?
+                  {isLoading ?
                   <button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick}>
                     <Image
                       src={user?.imageUrl || "/abstract-profile.png"}
@@ -207,7 +215,7 @@ const Header = () => {
                     />
                   </button>
                   :
-                  <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+                  <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" onClick={handleProfileClick}/>
                   }
                   {
                     showAuthMenu &&
@@ -232,7 +240,7 @@ const Header = () => {
                       </button>
                       <button
                           type="button"
-                          onClick={logout}
+                          onClick={handleLogout}
                           className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
                       >
                           <LogOut className="h-4 w-4" />
