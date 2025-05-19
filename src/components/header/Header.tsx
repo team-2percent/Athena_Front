@@ -23,7 +23,7 @@ const uris: Record<string, string> = {
 const Header = () => {
   const { isLoggedIn, role, logout } = useAuthStore();
   const isAdmin = role === "ROLE_ADMIN";
-  const { apiCall } = useApi();
+  const { isLoading, apiCall } = useApi();
   const [user, setUser] = useState<{nickname: string, imageUrl: string} | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
@@ -185,9 +185,6 @@ const Header = () => {
                 onClick={handleCouponClick}
               >
                 <Percent className="h-6 w-6 text-sub-gray" />
-              </button>
-                <button type="button" aria-label="찜 목록">
-                <Heart className="h-6 w-6 text-sub-gray" />
               </button>
               <button type="button" aria-label="알림" onClick={toggleNotifications}>
                 <Bell className="h-6 w-6 text-sub-gray" />
