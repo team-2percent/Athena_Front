@@ -7,7 +7,7 @@ import { CouponListItem, CouponListResponse, CouponStatus, CouponStatusType } fr
 import { useApi } from "@/hooks/useApi"
 import Spinner from "@/components/common/Spinner"
 import { formatDateInAdmin } from "@/lib/utils"
-import clsx from "clsx"
+import Pagination from "@/components/common/Pagination"
 
 export default function CouponPage() {
     const router = useRouter()
@@ -17,13 +17,13 @@ export default function CouponPage() {
     const [currentPage, setCurrentPage] = useState<number>(0)
     const [couponList, setCouponList] = useState<CouponListItem[]>([])
     const [totalElements, setTotalElements] = useState<number>(0)
-    const [totalPageCount, setTotalPageCount] = useState<number>(0)
+    const [totalPageCount, setTotalPageCount] = useState<number>(1)
 
     const url = `/api/coupon?size=${pageSize}&page=${currentPage}${status !== "ALL" ? `&status=${status}` : ""}`
     const loadCouponList = () => {
         apiCall<CouponListResponse>(url, "GET").then(({ data }) => {
             console.log(data);
-            if (data !== null) {
+            if (data?.data) {
                 setCouponList(data.data);
                 setTotalElements(data.page.totalElements);  
                 setTotalPageCount(data.page.totalPages);
@@ -32,17 +32,8 @@ export default function CouponPage() {
         })
     }
 
-    const leftPageDisabled = currentPage === 0
-    const rightPageDisabled = currentPage === totalPageCount - 1
-
-    const handlePrevPage = () => {
-        if (leftPageDisabled) return
-        setCurrentPage(currentPage - 1)
-    }
-    
-    const handleNextPage = () => {
-        if (rightPageDisabled) return
-        setCurrentPage(currentPage + 1)
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
     }
 
     const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -63,7 +54,7 @@ export default function CouponPage() {
 
     useEffect(() => {
         loadCouponList();
-    }, [status, currentPage])
+    }, [currentPage])
 
     return (
         <div className="flex flex-col mx-auto w-full p-8">
@@ -71,14 +62,14 @@ export default function CouponPage() {
                 <h2 className="text-2xl font-medium">쿠폰 목록</h2>
                 <div className="flex gap-4">
                     <select className="border rounded px-4 py-2" onChange={handlePageSizeChange}>
-                        <option value="10" selected={pageSize === 10}>10개씩</option>
-                        <option value="20" selected={pageSize === 20}>20개씩</option>
-                        <option value="50" selected={pageSize === 50}>50개씩</option>
+                        <option value="10">10개씩</option>
+                        <option value="20">20개씩</option>
+                        <option value="50">50개씩</option>
                     </select>
                     <select className="border rounded px-4 py-2" onChange={handleStatusChange}>
                         {
                             Object.entries(CouponStatus).map(([key, value]) => (
-                                <option value={key} selected={status === key}>{value}</option>
+                                <option key={key} value={key}>{value}</option>
                             ))
                         }
                     </select>
@@ -134,14 +125,7 @@ export default function CouponPage() {
                 )}
                 </tbody>
             </table>
-
-            <div className="flex justify-center gap-2">
-                <button className={clsx("px-3 py-2", leftPageDisabled ? "text-gray-300" : "text-main-color")} disabled={leftPageDisabled} onClick={handlePrevPage}>◀</button>
-                <button className="px-3 py-2 text-main-color">{currentPage + 1}</button>
-                <button className={clsx("px-3 py-2", rightPageDisabled ? "text-gray-300" : "text-main-color")} disabled={rightPageDisabled} onClick={handleNextPage}>▶</button>
-            </div>
-
-            
+            <Pagination totalPages={totalPageCount} currentPage={currentPage} onPageChange={handlePageChange}/>
         </div>
     )
 }

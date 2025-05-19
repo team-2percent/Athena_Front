@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { formatDateInAdmin } from "@/lib/utils";
 import clsx from "clsx";
+import Pagination from "@/components/common/Pagination";
 
 interface Project {
     projectId: number;
@@ -38,7 +39,7 @@ export default function ApprovalPage() {
         keyword: "",
         sort: "asc"
     });
-    const [totalPageCount, setTotalPageCount] = useState(0);
+    const [totalPageCount, setTotalPageCount] = useState(1);
     const [pendingCount, setPendingCount] = useState(0);
 
     const [search, setSearch] = useState("");
@@ -57,25 +58,6 @@ export default function ApprovalPage() {
             });
             setTotalPageCount(data.pageInfo.totalPages);
             setPendingCount(data.pendingCount);
-        })
-    }
-
-    const leftPageDisabled = queryParams.page === 0
-    const rightPageDisabled = queryParams.page === totalPageCount - 1
-
-    const handlePrevPage = () => {
-        if (leftPageDisabled) return
-        setQueryParams({
-            ...queryParams,
-            page: queryParams.page - 1
-        })
-    }
-    
-    const handleNextPage = () => {
-        if (rightPageDisabled) return
-        setQueryParams({
-            ...queryParams,
-            page: queryParams.page + 1
         })
     }
 
@@ -165,11 +147,7 @@ export default function ApprovalPage() {
                     ))}
                 </tbody>
             </table>
-            <div className="flex justify-center gap-2">
-                <button className={clsx("px-3 py-2", leftPageDisabled ? "text-gray-300" : "text-main-color")} disabled={leftPageDisabled} onClick={handlePrevPage}>◀</button>
-                <button className="px-3 py-2 text-main-color">{queryParams.page + 1}</button>
-                <button className={clsx("px-3 py-2", rightPageDisabled ? "text-gray-300" : "text-main-color")} disabled={rightPageDisabled} onClick={handleNextPage}>▶</button>
-            </div>
+            <Pagination totalPages={totalPageCount} currentPage={queryParams.page} onPageChange={handlePageChange} />
         </div>
     )
 }
