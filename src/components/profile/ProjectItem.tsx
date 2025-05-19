@@ -53,14 +53,11 @@ export default function ProjectItem({
         <div className="relative w-60 h-60 flex-shrink-0">
           {/* 상품 이미지 클릭 시 상품 상세 페이지로 이동 */}
           <div className="w-full h-full cursor-pointer" onClick={handleProjectClick}>
-            <div className="w-64 h-48 overflow-hidden rounded-lg">
-              <img
-                src={imageUrl || "/placeholder.svg"}
-                alt={projectName}
-                className={`w-full h-full object-cover rounded-lg ${isCompleted ? "brightness-50" : ""}`}
-              />
-            </div>
-            
+            <img
+              src={imageUrl || "/placeholder.svg"}
+              alt={projectName}
+              className={`w-full h-full object-cover rounded-lg ${isCompleted ? "brightness-50" : ""}`}
+            />
           </div>
 
           {/* 하트 아이콘 */}

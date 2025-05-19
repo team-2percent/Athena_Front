@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useEffect, useState, useRef } from "react"
 import Link from "next/link"
 import ProfileTabs from "./ProfileTabs"
@@ -12,6 +14,7 @@ import type { UserCoupon } from "@/lib/couponInterface"
 import CouponList from "./CouponList"
 import Spinner from "../common/Spinner"
 import EmptyMessage from "../common/EmptyMessage"
+import DeleteModal from "./DeleteModal"
 
 interface ProfileContentProps {
   isMy?: boolean
@@ -109,6 +112,13 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
   // 후기 상태
   const [myReviews, setMyReviews] = useState<MyReview[]>([])
   const [isLoadingReviews, setIsLoadingReviews] = useState(false)
+
+  // 삭제 모달 상태
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false)
+  const [deleteError, setDeleteError] = useState(false)
+  const [deleteSuccess, setDeleteSuccess] = useState(false)
+  const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [deleteType, setDeleteType] = useState<"project" | "purchase">("project")
 
   // 팔로우/팔로잉 데이터 (실제로는 API에서 가져올 데이터)
   const followData = [
@@ -327,20 +337,53 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
     // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
   }
 
-  // 프로젝트 삭제 핸들러
-  const deleteProject = (id: number) => {
-    console.log(`상품 ${id}를 삭제합니다.`)
-    // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
-    // 삭제 후 다시 조회하여 setProjects 호출
-    setMyProjects((prev) => prev.filter((project) => project.projectId !== id))
+  // 삭제 모달 관련 핸들러
+  const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>, id: number) => {
+    e.stopPropagation()
+    setIsOpenDeleteModal(true)
+    setDeleteId(id)
+    setDeleteType("project")
+    setDeleteError(false)
+    setDeleteSuccess(false)
+  }
+
+  const handlePurchaseDeleteClick = (id: number) => {
+    setIsOpenDeleteModal(true)
+    setDeleteId(id)
+    setDeleteType("purchase")
+    setDeleteError(false)
+    setDeleteSuccess(false)
+  }
+
+  const handleCloseDeleteModal = () => {
+    setIsOpenDeleteModal(false)
+    setDeleteError(false)
+    setDeleteSuccess(false)
+  }
+
+  const handleConfirmDelete = () => {
+    if (deleteId !== null) {
+      try {
+        if (deleteType === "project") {
+          // 판매 상품 삭제
+          // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
+          setMyProjects((prev) => prev.filter((project) => project.projectId !== deleteId))
+        } else {
+          // 구매 상품 삭제
+          // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
+          setMyOrders((prev) => prev.filter((order) => order.orderId !== deleteId))
+        }
+        setDeleteSuccess(true)
+      } catch (error) {
+        console.error(`${deleteType === "project" ? "상품" : "구매 내역"} 삭제에 실패했습니다.`, error)
+        setDeleteError(true)
+      }
+    }
   }
 
   // 구매 내역 삭제 핸들러
   const deletePurchase = (id: number) => {
-    console.log(`구매 내역 ${id}를 삭제합니다.`)
-    // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
-    // 삭제 후 다시 조회하여 setPurchasedProjects 호출
-    setMyOrders((prev) => prev.filter((order) => order.orderId !== id))
+    handlePurchaseDeleteClick(id)
   }
 
   // 유저 정보 가져오기
@@ -452,6 +495,18 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
 
   return (
     <div className="mt-12">
+      {/* 삭제 확인 모달 */}
+      {isOpenDeleteModal && (
+        <DeleteModal
+          isOpen={isOpenDeleteModal}
+          onClose={handleCloseDeleteModal}
+          onConfirm={handleConfirmDelete}
+          deleteError={deleteError}
+          deleteSuccess={deleteSuccess}
+          itemType={deleteType === "project" ? "상품" : "구매 내역"}
+        />
+      )}
+
       {/* 탭 메뉴 */}
       <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} isMy={isMy} />
 
@@ -495,12 +550,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
                     isCompleted={project.isCompleted}
                     projectId={project.projectId}
                     isMy={isMy}
-                    onClickDelete={(e) => {
-                      e.stopPropagation()
-                      if (window.confirm("정말로 이 상품을 삭제하시겠습니까?")) {
-                        deleteProject(project.projectId)
-                      }
-                    }}
+                    onClickDelete={(e) => handleDeleteClick(e, project.projectId)}
                   />
                 ))}
 

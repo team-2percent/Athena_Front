@@ -1,8 +1,6 @@
 "use client"
 
 import type React from "react"
-
-import Image from "next/image"
 import { Heart, Check, MessageSquare, Trash } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -50,11 +48,10 @@ export default function PurchasedProjectItem({
     }
   }
 
+  // handleDeleteClick 함수 수정
   const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
-    if (window.confirm("구매 내역을 삭제하시겠습니까?")) {
-      onDeletePurchase(id)
-    }
+    onDeletePurchase(id)
   }
 
   // 달성률이 100%를 초과하더라도 게이지 바는 100%까지만 표시
@@ -68,13 +65,11 @@ export default function PurchasedProjectItem({
           <div className="relative w-60 h-60 flex-shrink-0">
             {/* 상품 이미지 클릭 시 상품 상세 페이지로 이동 */}
             <div className="w-full h-full cursor-pointer" onClick={handleProjectClick}>
-              <div className="w-64 h-48 overflow-hidden rounded-lg">
-                <img
-                  src={imageUrl || "/placeholder.svg"}
-                  alt={projectName}
-                  className={`w-full h-full object-cover rounded-lg ${isCompleted ? "brightness-50" : ""}`}
-                />
-              </div>
+              <img
+                src={imageUrl || "/placeholder.svg"}
+                alt={projectName}
+                className={`w-full h-full object-cover rounded-lg ${isCompleted ? "brightness-50" : ""}`}
+              />
             </div>
 
             {/* 하트 아이콘 */}
@@ -135,7 +130,9 @@ export default function PurchasedProjectItem({
                 <button
                   className={cn(
                     "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors w-full justify-center",
-                    hasReview ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-main-color text-white hover:bg-secondary-color-dark",
+                    hasReview
+                      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                      : "bg-main-color text-white hover:bg-secondary-color-dark",
                   )}
                   onClick={handleReviewClick}
                   disabled={hasReview}
@@ -151,7 +148,6 @@ export default function PurchasedProjectItem({
                   <span>삭제</span>
                 </button>
               </div>
-
             </div>
           </div>
         </div>

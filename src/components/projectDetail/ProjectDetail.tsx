@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import Image from "next/image"
 import { Heart, Share2, ChevronLeft, ChevronRight } from "lucide-react"
 import ProjectTabs from "./ProjectTabs"
 import clsx from "clsx"
@@ -108,9 +107,15 @@ const ProjectDetail = () => {
   // 현재 이미지 인덱스를 기준으로 표시할 이미지 목록 업데이트
   const updateVisibleImages = (currentIdx: number) => {
     const totalImages = images.length
-    const visibleCount = 5 // 한 번에 보여줄 이미지 수
+    const visibleCount = Math.min(5, totalImages) // 이미지가 5개 미만이면 실제 이미지 개수만큼만 표시
 
-    // 현재 이미지를 중심으로 앞뒤로 이미지를 배치
+    if (totalImages <= 5) {
+      // 이미지가 5개 이하면 모든 이미지 표시
+      setVisibleImages(Array.from({ length: totalImages }, (_, i) => i))
+      return
+    }
+
+    // 이미지가 5개 초과일 때만 슬라이딩 윈도우 적용
     let startIdx = currentIdx - Math.floor(visibleCount / 2)
 
     // 경계 조건 처리
@@ -123,11 +128,7 @@ const ProjectDetail = () => {
     }
 
     // 표시할 이미지 인덱스 배열 생성
-    const newVisibleImages = Array.from({ length: visibleCount }, (_, i) => {
-      const idx = (startIdx + i) % totalImages
-      return idx >= 0 ? idx : idx + totalImages
-    })
-
+    const newVisibleImages = Array.from({ length: visibleCount }, (_, i) => startIdx + i)
     setVisibleImages(newVisibleImages)
   }
 
@@ -143,20 +144,6 @@ const ProjectDetail = () => {
   const prevImage = () => {
     const newIndex = (currentImageIndex - 1 + images.length) % images.length
     setCurrentImageIndex(newIndex)
-  }
-
-  const nextThumbnails = () => {
-    // 현재 표시된 이미지 중 마지막 이미지의 다음 이미지로 이동
-    const lastVisibleIndex = visibleImages[visibleImages.length - 1]
-    const nextIndex = (lastVisibleIndex + 1) % images.length
-    setCurrentImageIndex(nextIndex)
-  }
-
-  const prevThumbnails = () => {
-    // 현재 표시된 이미지 중 첫 번째 이미지의 이전 이미지로 이동
-    const firstVisibleIndex = visibleImages[0]
-    const prevIndex = (firstVisibleIndex - 1 + images.length) % images.length
-    setCurrentImageIndex(prevIndex)
   }
 
   // 날짜 포맷 함수
@@ -214,40 +201,36 @@ const ProjectDetail = () => {
           <div className="flex flex-col">
             {/* 이미지 표시 영역 (캐러셀) */}
             <div ref={imageContainerRef} className="relative aspect-square w-full overflow-hidden rounded-3xl">
-              <div className="relative h-16 w-16">
-                <img
-                  src={images[currentImageIndex] || "/placeholder.svg"}
-                  alt={projectData?.title || "프로젝트 이미지"}
-                  className="object-cover"
-                />
-              </div>
-              
+              <img
+                src={images[currentImageIndex] || "/placeholder.svg"}
+                alt={projectData?.title || "프로젝트 이미지"}
+                className="h-full w-full object-cover"
+              />
 
-              {/* 캐러셀 좌우 버튼 */}
-              <button
-                onClick={prevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-sub-gray shadow-md hover:bg-white"
-                aria-label="이전 이미지"
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </button>
-              <button
-                onClick={nextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-sub-gray shadow-md hover:bg-white"
-                aria-label="다음 이미지"
-              >
-                <ChevronRight className="h-6 w-6" />
-              </button>
+              {/* 이미지가 2개 이상일 때만 캐러셀 좌우 버튼 표시 */}
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-sub-gray shadow-md hover:bg-white"
+                    aria-label="이전 이미지"
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-sub-gray shadow-md hover:bg-white"
+                    aria-label="다음 이미지"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </button>
+                </>
+              )}
             </div>
 
             {/* 이미지 목록 */}
-            <div className="relative mt-4 flex items-center">
-              {/* 왼쪽 버튼 */}
-              <button onClick={prevThumbnails} className="mr-2 text-sub-gray" aria-label="이전 이미지 목록">
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-
-              <div className="flex flex-1 justify-between">
+            <div className="mt-4">
+              <div className="flex justify-center gap-4">
                 {visibleImages.map((idx) => (
                   <div
                     key={idx}
@@ -266,11 +249,6 @@ const ProjectDetail = () => {
                   </div>
                 ))}
               </div>
-
-              {/* 오른쪽 버튼 */}
-              <button onClick={nextThumbnails} className="ml-2 text-sub-gray" aria-label="다음 이미지 목록">
-                <ChevronRight className="h-5 w-5" />
-              </button>
             </div>
           </div>
 

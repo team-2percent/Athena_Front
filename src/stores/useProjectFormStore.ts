@@ -169,7 +169,7 @@ export const fetchProjectId = async (
   setError(null)
 
   try {
-    const response = await apiCall<{ id: number }>("/api/project", "GET")
+    const response = await apiCall<{ id: number }>("/api/projects", "GET")
 
     if (response.error) {
       console.error("Error fetching project ID:", response.error)
@@ -258,7 +258,7 @@ export const submitProject = async (
 
     console.log("Submitting project data:", projectData)
 
-    const response = await apiCall("/api/project", "POST", projectData)
+    const response = await apiCall("/api/projects", "POST", projectData)
 
     if (response.error) {
       console.error("Project submission failed:", response.error)
