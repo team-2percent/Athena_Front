@@ -204,41 +204,11 @@ const DonateDock = () => {
   const defaultProjectOptions: ProjectOption[] = [
     {
       id: "option1",
-      title: "마음만 받을게요",
-      description: "돈통 ㄱㅅ",
-      price: "1,000",
-      remaining: 999999, // 무제한에 가까운 큰 숫자
+      title: "옵션 없음",
+      description: "이 상품은 옵션이 없습니다.",
+      price: "0",
+      remaining: 1, // 무제한에 가까운 큰 숫자
       details: [],
-    },
-    {
-      id: "option2",
-      title: "피자 아닌 떡볶이",
-      description: "떡볶이 하나 (색상 선택 가능)\n맵기 정도 (순한, 조금매운, 매운 선택 가능)",
-      price: "5,000",
-      remaining: 200000000, // 2억
-      color: "pink",
-      details: [
-        "떡볶이 하나 (색상 선택 가능)",
-        "맵기 정도 (순한, 조금매운, 매운 선택 가능)",
-        "배송비 무료",
-        "예상 배송일: 2025년 6월 13일",
-      ],
-    },
-    {
-      id: "option3",
-      title: "비밀스런 피자",
-      description: "강 잡숴보셈 ㄹㅇ",
-      price: "100,000",
-      remaining: 200000000, // 2억
-      details: ["피자 1판", "비밀 소스 포함", "배송비 무료", "예상 배송일: 2025년 6월 13일"],
-    },
-    {
-      id: "option4",
-      title: "프리미엄 세트",
-      description: "떡볶이와 피자를 한번에 즐길 수 있는 프리미엄 세트",
-      price: "150,000",
-      remaining: 100, // 100개
-      details: ["떡볶이 1인분", "피자 1판", "특별 소스 세트", "배송비 무료", "예상 배송일: 2025년 6월 10일"],
     },
   ]
 

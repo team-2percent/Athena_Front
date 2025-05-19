@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, type ReactNode } from "react"
-import Image from "next/image"
 import { Check, Heart } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"

@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import ProjectItem from "./ProjectItem"
+import ProjectItem from "./ProjectListItem"
 import DeleteModal from "./DeleteModal"
 
 export default function MyProjectList({
