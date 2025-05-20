@@ -18,6 +18,7 @@ interface SettlementInfo {
     "totalSales": number,
     "payoutAmount": number,
     "platformFee": number,
+    "platformPlan": number
     "totalCount": number,
     "settledAt": string | null,
     "status": "COMPLETED" | "PENDING" | "FAILED",
@@ -138,6 +139,10 @@ export default function SettlementDetailPage() {
                         <tr>
                             <td className="p-2 w-[10%] font-semibold">펀딩 기간</td>
                             <td className="p-2">{info.fundingStartDate} ~ {info.fundingEndDate}</td>
+                        </tr>
+                        <tr>
+                            <td className="p-2 w-[10%] font-semibold">요금제</td>
+                            <td className="p-2">{info.fundingStartDate} ~ {info.platformPlan}</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[10%] font-semibold">총 판매 금액</td>

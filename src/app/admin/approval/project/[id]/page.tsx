@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import clsx from "clsx"
 import ConfirmModal from "@/components/common/ConfirmModal"
 import { useRouter } from "next/navigation";
@@ -21,6 +20,7 @@ interface ApprovalProject {
     },
     title: string,
     description: string,
+    platformPlan: string,
     goalAmount: number,
     totalAmount: number,
     markdown: string,
@@ -110,6 +110,13 @@ export default function ProjectApprovalDetailPage() {
 
                 <div className="flex">
                     <span className="w-24 text-sub-gray">설명</span>
+                    <span className="flex-1">
+                        {project.platformPlan}
+                    </span>
+                </div>
+
+                <div className="flex">
+                    <span className="w-24 text-sub-gray">요금제</span>
                     <span className="flex-1">
                         {project.description}
                     </span>
