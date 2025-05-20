@@ -230,7 +230,7 @@ const DonateDock = () => {
       title: "옵션 없음",
       description: "이 상품은 옵션이 없습니다.",
       price: "0",
-      remaining: 1, // 무제한에 가까운 큰 숫자
+      remaining: 1,
       details: [],
     },
   ]

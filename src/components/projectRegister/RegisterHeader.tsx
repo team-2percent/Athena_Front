@@ -19,7 +19,7 @@ export default function RegisterHeader({
       case 2:
         return "상품 상세 설명"
       case 3:
-        return "본인(팀) 소개"
+        return "후원 설정"
       default:
         return "기본 정보"
     }

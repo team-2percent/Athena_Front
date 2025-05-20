@@ -249,9 +249,9 @@ export const submitProject = async (
 
     // 프로젝트 정보 등록
     const projectData = {
-      sellerId: 1, // 임시 값, 실제로는 로그인한 사용자 ID를 사용해야 함
+      sellerId: 0, // 임시 값, 실제로는 로그인한 사용자 ID를 사용해야 함
       categoryId: state.categoryId || 0, // 선택한 카테고리 ID 사용
-      bankAccountId: 1, // 임시 값, 실제로는 사용자의 은행 계좌 ID를 사용해야 함
+      bankAccountId: 0, // 임시 값, 실제로는 사용자의 은행 계좌 ID를 사용해야 함
       imageGroupId: state.projectId,
       title: state.title,
       description: state.description,

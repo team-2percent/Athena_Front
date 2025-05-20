@@ -27,7 +27,7 @@ interface ProjectData {
   description: string
   goalAmount: number
   totalAmount: number
-  convertedMarkdown: string
+  markdown: string
   startAt: string
   endAt: string
   shippedAt: string
@@ -231,7 +231,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
             {activeTab === "소개" && (
               <div className="space-y-8">
                 {/* 마크다운 렌더러를 사용하여 프로젝트 소개 내용 표시 */}
-                <MarkdownRenderer content={projectData?.convertedMarkdown || defaultMarkdown} />
+                <MarkdownRenderer content={projectData?.markdown || defaultMarkdown} />
               </div>
             )}
 
