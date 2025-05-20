@@ -203,6 +203,8 @@ export const fetchProjectId = async (
   }
 }
 
+import useAuthStore from "@/stores/auth"
+
 // 프로젝트 제출 함수 (컴포넌트에서 호출)
 export const submitProject = async (
   apiCall: <T>(url: string, method: string, body?: any) => Promise<ApiResponse<T>>,
@@ -210,6 +212,9 @@ export const submitProject = async (
 ) => {
   const state = useProjectFormStore.getState()
   const { setError, setSubmitting } = state
+
+  // useAuthStore에서 userId 가져오기
+  const userId = useAuthStore.getState().userId
 
   if (!state.projectId) {
     setError("프로젝트 ID가 없습니다. 페이지를 새로고침 해주세요.")
@@ -249,7 +254,7 @@ export const submitProject = async (
 
     // 프로젝트 정보 등록
     const projectData = {
-      sellerId: 0, // 임시 값, 실제로는 로그인한 사용자 ID를 사용해야 함
+      sellerId: userId || 0, // 로그인한 사용자 ID 사용
       categoryId: state.categoryId || 0, // 선택한 카테고리 ID 사용
       bankAccountId: 0, // 임시 값, 실제로는 사용자의 은행 계좌 ID를 사용해야 함
       imageGroupId: state.projectId,
@@ -285,7 +290,6 @@ export const submitProject = async (
     console.log("Project submission response:", response.data)
     setSubmitting(false)
     return true
-    
   } catch (err) {
     console.error("Error during submission:", err)
     setError("프로젝트 등록 중 오류가 발생했습니다.")

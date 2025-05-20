@@ -12,64 +12,6 @@ import Spinner from "@/components/common/Spinner"
 import { useApi } from "@/hooks/useApi"
 import { useImageUpload } from "@/hooks/useImageUpload"
 
-// 목 데이터: 실제로는 API에서 가져올 데이터
-const mockProductData = {
-  category: "예술",
-  title: "아름다운 수채화 작품 모음집",
-  description: "다양한 풍경과 인물을 담은 수채화 작품 모음집입니다. 10년간의 작업물을 엄선했습니다.",
-  targetAmount: "5000000",
-  startDate: new Date("2025-06-01"),
-  endDate: new Date("2025-07-01"),
-  deliveryDate: new Date("2025-07-15"),
-  // 대표 이미지는 실제 파일 객체가 아닌 URL만 제공 (실제 구현에서는 파일 객체로 변환 필요)
-  images: [
-    {
-      id: "img-1",
-      url: "/watercolor-painting-still-life.png",
-      name: "수채화1.jpg",
-    },
-    {
-      id: "img-2",
-      url: "/watercolor-landscape.png",
-      name: "풍경화.jpg",
-    },
-  ],
-  // 마크다운 내용
-  markdown:
-    "# 수채화 작품 모음집\n\n10년간의 작업물 중 엄선한 작품들을 모았습니다.\n\n## 특징\n\n- 고급 수채화 용지 사용\n- 특수 코팅 처리로 변색 방지\n- 작가의 작업 노트 포함\n\n## 구성\n\n1. 풍경화 섹션 (10작품)\n2. 인물화 섹션 (8작품)\n3. 추상화 섹션 (7작품)\n\n> 참고: 한정판으로 제작됩니다.",
-  // 후원 옵션
-  supportOptions: [
-    {
-      id: 1,
-      name: "얼리버드 패키지",
-      price: "35000",
-      description: "10% 할인된 가격으로 제공되는 얼리버드 특별 패키지",
-      stock: "50",
-      composition: [
-        { id: 1, content: "수채화 작품집 1권" },
-        { id: 2, content: "작가 친필 사인" },
-      ],
-    },
-    {
-      id: 2,
-      name: "디럭스 패키지",
-      price: "55000",
-      description: "한정판 아트 프린트가 포함된 디럭스 패키지",
-      stock: "30",
-      composition: [
-        { id: 1, content: "수채화 작품집 1권" },
-        { id: 2, content: "작가 친필 사인" },
-        { id: 3, content: "한정판 아트 프린트 2장" },
-      ],
-    },
-  ],
-  // 팀 정보
-  teamName: "컬러풀 스튜디오",
-  teamIntro:
-    "10년 경력의 수채화 전문 작가 그룹입니다. 다양한 전시회와 출판 경험을 가지고 있으며, 수채화의 아름다움을 많은 사람들과 나누고자 합니다.",
-  teamImage: "/art-studio-team.png",
-}
-
 export default function ProductEdit() {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
@@ -84,35 +26,76 @@ export default function ProductEdit() {
   useEffect(() => {
     const loadProjectData = async () => {
       try {
-        // 실제 구현에서는 API 호출
-        // const response = await fetch(`/api/products/${productId}`);
-        // const data = await response.json();
+        setIsLoading(true)
 
-        // 목 데이터 사용
-        const data = mockProductData
+        // URL에서 프로젝트 ID 가져오기
+        const id = pathname.split("/")[2] // URL에서 ID 추출 (/project/[id]/edit)
 
-        // 프로젝트 ID 설정 (실제 구현에서는 API 응답에서 가져옴)
-        setProjectId(1) // 임시 ID
+        if (!id) {
+          console.error("프로젝트 ID를 찾을 수 없습니다.")
+          setIsLoading(false)
+          return
+        }
 
-        // 이미지 처리 - 기존 이미지는 URL 형태로 저장
-        const processedImages = data.images.map((img) => ({
-          id: img.id,
-          preview: img.url, // 미리보기로 URL 사용
-          url: img.url, // 서버 URL 저장
-          isExisting: true, // 기존 이미지 표시
-        }))
+        // API 호출로 프로젝트 데이터 가져오기
+        const response = await apiCall<any>(`/api/project/${id}`, "GET")
 
+        if (response.error) {
+          console.error("프로젝트 데이터 로드 실패:", response.error)
+          setIsLoading(false)
+          return
+        }
+
+        const data = response.data
+
+        if (!data) {
+          console.error("프로젝트 데이터가 없습니다.")
+          setIsLoading(false)
+          return
+        }
+
+        console.log("API에서 받은 프로젝트 데이터:", data)
+
+        // 프로젝트 ID 설정
+        setProjectId(Number(id))
+
+        // 이미지 처리 - API에서 받은 이미지 URL을 ImageFile 형식으로 변환
+        const processedImages =
+          data.imageUrls?.map((url: string, index: number) => ({
+            id: `img-${index}`,
+            preview: url,
+            url: url,
+            isExisting: true,
+          })) || []
+
+        // 후원 옵션 처리 - productResponses 사용
+        const processedOptions =
+          data.productResponses?.map((product: any) => ({
+            id: product.id,
+            name: product.name,
+            price: product.price.toString(),
+            description: product.description,
+            stock: product.stock.toString(),
+            composition: product.options?.map((option: string, index: number) => ({
+              id: index + 1,
+              content: option,
+            })),
+          })) || []
+
+        // 폼 데이터 업데이트
         updateFormData({
-          targetAmount: data.targetAmount,
-          category: data.category,
-          title: data.title,
-          description: data.description,
-          startDate: new Date(data.startDate),
-          endDate: new Date(data.endDate),
-          deliveryDate: new Date(data.deliveryDate),
+          targetAmount: data.goalAmount?.toString() || "",
+          category: data.category?.categoryName || "",
+          categoryId: data.category?.id || null,
+          title: data.title || "",
+          description: data.description || "",
+          startDate: data.startAt ? new Date(data.startAt) : new Date(),
+          endDate: data.endAt ? new Date(data.endAt) : new Date(),
+          deliveryDate: data.shippedAt ? new Date(data.shippedAt) : new Date(),
           images: processedImages,
-          markdown: data.markdown,
-          supportOptions: data.supportOptions,
+          markdown: data.markdown || "", // contentMarkdown 필드 사용
+          supportOptions: processedOptions,
+          planType: data.planType || "basic",
         })
 
         setIsLoading(false)
@@ -127,11 +110,11 @@ export default function ProductEdit() {
     // 컴포넌트 언마운트 시 폼 데이터 초기화
     return () => {
       // 다른 페이지로 이동할 때만 초기화 (productEdit 내 이동은 제외)
-      if (!pathname.includes("productEdit")) {
+      if (!pathname.includes("edit")) {
         resetForm()
       }
     }
-  }, [updateFormData, setProjectId, pathname, resetForm])
+  }, [updateFormData, setProjectId, pathname, resetForm, apiCall])
 
   // 단계가 변경될 때 화면 맨 위로 스크롤
   useEffect(() => {
@@ -167,7 +150,7 @@ export default function ProductEdit() {
 
   // 수정 완료 처리
   const handleSubmit = async () => {
-    // 상품 수정 로직 구현 (실제로는 API 호출)
+    // 상품 수정 로직 구현 (API 호출)
     const success = await submitProject(apiCall, uploadImages)
 
     if (success) {
@@ -211,8 +194,10 @@ export default function ProductEdit() {
         startAt: state.startDate.toISOString(),
         endAt: state.endDate.toISOString(),
         shippedAt: state.deliveryDate.toISOString(),
+        categoryId: state.categoryId,
         images: imageData, // URL과 File 객체 모두 포함
         products: state.supportOptions.map((option) => ({
+          id: option.id, // 기존 옵션의 ID 포함
           name: option.name,
           description: option.description,
           price: Number.parseInt(option.price.replace(/,/g, ""), 10),
@@ -221,18 +206,22 @@ export default function ProductEdit() {
         })),
       }
 
-      console.log("Submitting updated project data:", projectData)
+      console.log("프로젝트 수정 데이터:", projectData)
 
-      // 실제 구현에서는 API 호출
-      // const response = await apiCall(`/api/project/${state.projectId}`, "PUT", projectData)
+      // 실제 API 호출
+      const response = await apiCall(`/api/project/${state.projectId}`, "PUT", projectData)
 
-      // 목 응답
-      const mockResponse = { success: true }
+      if (response.error) {
+        console.error("프로젝트 수정 실패:", response.error)
+        alert(`프로젝트 수정 실패: ${response.error}`)
+        setLoading(false)
+        return false
+      }
 
       setLoading(false)
-      return mockResponse.success
+      return true
     } catch (error) {
-      console.error("Error during submission:", error)
+      console.error("프로젝트 수정 중 오류 발생:", error)
       alert("프로젝트 수정 중 오류가 발생했습니다.")
       setLoading(false)
       return false
