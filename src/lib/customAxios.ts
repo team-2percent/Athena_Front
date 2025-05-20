@@ -8,22 +8,11 @@ headers: {
 },
 });
 
-const getAccessTokenPromise = () => {
-return new Promise((resolve, reject) => {
-    try {
-        const accessToken = localStorage.getItem('refresh_token')
-        resolve(accessToken);
-    } catch (err) {
-        reject(err);
-    }
-});
-};
-
 // 요청 인터셉터
 customAxios.interceptors.request.use(
     config => {
         // 쿠키에서 access_token 가져오기
-        const accessToken = localStorage.getItem('access_token');
+        const accessToken = localStorage.getItem('accessToken');
 
         // access_token이 있으면 헤더에 추가
         if (accessToken) {
@@ -38,6 +27,7 @@ customAxios.interceptors.request.use(
 );
 
 // 응답 인터셉터: refresh 로직 구현 시 주석 풀어주세요.
+// 403이 뜨면 accessToken을 다시 보내고 -> accessToken이 다시 와서 저장, 만약 실패하면 logout
 // customAxios.interceptors.response.use(async function (response) {
 //     // 2xx 범위에 있는 상태 코드인 경우
 //     return response;

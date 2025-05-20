@@ -7,9 +7,8 @@ export function useHydrateAuth() {
   const setRole = useAuthStore((s) => s.setRole);
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
 
-    if (accessToken && refreshToken) {
+    if (accessToken) {
       setLoggedIn(true);
       try {
         const { role } = jwtDecode<{ role: "ROLE_ADMIN" | "ROLE_USER" }>(accessToken);

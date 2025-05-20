@@ -30,7 +30,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
     e.preventDefault()
 
     apiCall("/api/user/login", "POST", { email, password }).then(({ data }: { data: any }) => {
-      login(data.accessToken, data.refreshToken)
+      if (data.accessToken) login(data.accessToken)
       onClose()
     })
   }
