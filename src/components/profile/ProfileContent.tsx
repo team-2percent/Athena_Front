@@ -125,12 +125,13 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
 
     try {
       // 자신의 프로필이면 /api/my/projects, 다른 사용자의 프로필이면 /api/user/{userId}/projects
-      const baseUrl = isMy ? "/api/my/projects" : `/api/user/${userId}/projects`
+      const baseUrl = isMy ? "/api/my/project" : `/api/user/${userId}/project`
       const url = `${baseUrl}${cursorValue && lastProjectId ? `?cursorValue=${cursorValue}&lastProjectId=${lastProjectId}` : ""}`
       const response = await apiCall(url, "GET")
 
       // API 응답 구조에 맞게 데이터 처리
       const responseData = response.data as MyProjectsResponse
+      console.log("판매 상품 데이터:", responseData)
 
       if (responseData && responseData.content) {
         // 기존 프로젝트에 새로운 프로젝트 추가
@@ -154,11 +155,12 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
     setIsLoadingOrders(true)
 
     try {
-      const url = `/api/my/orders${orderCursorValue && lastOrderId ? `?cursorValue=${orderCursorValue}&lastOrderId=${lastOrderId}` : ""}`
+      const url = `/api/my/order${orderCursorValue && lastOrderId ? `?cursorValue=${orderCursorValue}&lastOrderId=${lastOrderId}` : ""}`
       const response = await apiCall(url, "GET")
 
       // API 응답 구조에 맞게 데이터 처리
       const responseData = response.data as MyOrdersResponse
+      console.log("구매 상품 데이터:", responseData)
 
       if (responseData && responseData.content) {
         // 기존 주문에 새로운 주문 추가
@@ -182,11 +184,12 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
     setIsLoadingCoupons(true)
 
     try {
-      const url = `/api/my/coupons${nextCouponId ? `?nextCouponId=${nextCouponId}` : ""}`
+      const url = `/api/my/coupon${nextCouponId ? `?nextCouponId=${nextCouponId}` : ""}`
       const response = await apiCall(url, "GET")
 
       // API 응답 구조에 맞게 데이터 처리
       const responseData = response.data as MyCouponsResponse
+      console.log("쿠폰 데이터:", responseData)
 
       if (responseData && responseData.content) {
         // 기존 쿠폰에 새로운 쿠폰 추가
@@ -210,9 +213,10 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
     setIsLoadingReviews(true)
 
     try {
-      const response = await apiCall("/api/my/comments", "GET")
+      const response = await apiCall("/api/my/comment", "GET")
 
       if (response && response.data) {
+        console.log("후기 데이터:", response.data)
         setMyReviews(response.data as MyReview[])
       }
     } catch (error) {
@@ -258,6 +262,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
       const url = isMy ? "/api/my/info" : `/api/user/${userId}/info`
       const response = await apiCall(url, "GET")
       if (response && response.data) {
+        console.log("유저 정보 데이터:", response.data)
         setUserInfo(response.data as UserInfo)
       }
     } catch (error) {
@@ -443,7 +448,9 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
                     sellerName={order.sellerNickname}
                     projectName={order.productTitle}
                     description="상품 설명이 여기에 표시됩니다."
-                    imageUrl={order.thumbnailUrl || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"}
+                    imageUrl={
+                      order.thumbnailUrl || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"
+                    }
                     achievementRate={order.achievementRate}
                     daysLeft={null}
                     isCompleted={true}

@@ -16,7 +16,7 @@ interface ProjectData {
   description: string
   goalAmount: number
   totalAmount: number
-  convertedMarkdown: string
+  markdown: string
   startAt: string
   endAt: string
   shippedAt: string
@@ -52,20 +52,6 @@ const ProjectDetail = () => {
   // URL에서 프로젝트 ID 가져오기
   const { id: projectId } = useParams()
 
-  // 피자 이미지 배열 (10개) - 프로젝트 데이터가 없을 때 사용할 기본 이미지
-  const defaultImages = [
-    "/pizza/pizza-variant1.jpg",
-    "/pizza/pizza-variant2.png",
-    "/pizza/pizza-variant3.png",
-    "/pizza/pizza-variant4.png",
-    "/pizza/pizza-variant5.png",
-    "/pizza/pizza-variant6.png",
-    "/pizza/pizza-variant7.png",
-    "/pizza/pizza-variant8.png",
-    "/pizza/pizza-variant9.png",
-    "/pizza/pizza-variant10.png",
-  ]
-
   // 프로젝트 데이터 가져오기
   useEffect(() => {
     const fetchProjectData = async () => {
@@ -97,7 +83,7 @@ const ProjectDetail = () => {
   }, [projectId, apiCall])
 
   // 사용할 이미지 배열 결정
-  const images = projectData?.imageUrls?.length ? projectData.imageUrls : defaultImages
+  const images = projectData?.imageUrls?.length ? projectData.imageUrls : []
 
   // 이미지 목록에 표시할 이미지 인덱스 계산
   useEffect(() => {
@@ -201,55 +187,69 @@ const ProjectDetail = () => {
           <div className="flex flex-col">
             {/* 이미지 표시 영역 (캐러셀) */}
             <div ref={imageContainerRef} className="relative aspect-square w-full overflow-hidden rounded-3xl">
-              <img
-                src={images[currentImageIndex] || "/placeholder.svg"}
-                alt={projectData?.title || "프로젝트 이미지"}
-                className="h-full w-full object-cover"
-              />
-
-              {/* 이미지가 2개 이상일 때만 캐러셀 좌우 버튼 표시 */}
-              {images.length > 1 && (
+              {images.length > 0 ? (
                 <>
-                  <button
-                    onClick={prevImage}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-sub-gray shadow-md hover:bg-white"
-                    aria-label="이전 이미지"
-                  >
-                    <ChevronLeft className="h-6 w-6" />
-                  </button>
-                  <button
-                    onClick={nextImage}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-sub-gray shadow-md hover:bg-white"
-                    aria-label="다음 이미지"
-                  >
-                    <ChevronRight className="h-6 w-6" />
-                  </button>
+                  <img
+                    src={images[currentImageIndex] || "/placeholder.svg"}
+                    alt={projectData?.title || "프로젝트 이미지"}
+                    className="h-full w-full object-cover"
+                  />
+
+                  {/* 이미지가 2개 이상일 때만 캐러셀 좌우 버튼 표시 */}
+                  {images.length > 1 && (
+                    <>
+                      <button
+                        onClick={prevImage}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-sub-gray shadow-md hover:bg-white"
+                        aria-label="이전 이미지"
+                      >
+                        <ChevronLeft className="h-6 w-6" />
+                      </button>
+                      <button
+                        onClick={nextImage}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-sub-gray shadow-md hover:bg-white"
+                        aria-label="다음 이미지"
+                      >
+                        <ChevronRight className="h-6 w-6" />
+                      </button>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="h-full w-full bg-gray-100 flex items-center justify-center">
+                    <div className="text-center">
+                      <p className="text-gray-500 text-xl font-medium">이미지 없음</p>
+                    </div>
+                  </div>
                 </>
               )}
             </div>
 
             {/* 이미지 목록 */}
-            <div className="mt-4">
-              <div className="flex justify-center gap-4">
-                {visibleImages.map((idx) => (
-                  <div
-                    key={idx}
-                    className={`cursor-pointer overflow-hidden rounded-xl transition-all duration-200 ${
-                      currentImageIndex === idx ? "ring-4 ring-main-color" : "hover:ring-2 hover:ring-main-color"
-                    }`}
-                    onClick={() => setCurrentImageIndex(idx)}
-                  >
-                    <div className="relative h-20 w-20">
-                      <img
-                        src={images[idx] || "/placeholder.svg"}
-                        alt={`프로젝트 이미지 ${idx + 1}`}
-                        className="w-full h-full object-cover"
-                      />
+            {images.length > 0 && (
+              <div className="mt-4">
+                <div className="flex justify-center gap-4">
+                  {visibleImages.map((idx) => (
+                    <div
+                      key={idx}
+                      className={`cursor-pointer overflow-hidden rounded-xl transition-all duration-200 ${
+                        currentImageIndex === idx ? "ring-4 ring-main-color" : "hover:ring-2 hover:ring-main-color"
+                      }`}
+                      onClick={() => setCurrentImageIndex(idx)}
+                    >
+                      <div className="relative h-20 w-20">
+                        <img
+                          src={images[idx] || "/placeholder.svg"}
+                          alt={`프로젝트 이미지 ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* 오른쪽: 메타데이터 영역 */}
@@ -303,24 +303,17 @@ const ProjectDetail = () => {
                 </button>
               </div>
 
-              {/* 후원하기 버튼과 후원 중 표시 */}
-              <div className="relative w-2/3">
+              {/* 후원하기 버튼 */}
+              <div className="w-2/3">
                 <button
                   className="w-full rounded-xl bg-main-color py-4 text-center text-xl font-bold text-white hover:bg-secondary-color-dark"
                   onClick={() => {
-                    // 이벤트 이름 변경
                     const event = new CustomEvent("toggleDonateDock")
                     window.dispatchEvent(event)
                   }}
                 >
                   후원하기
                 </button>
-                {/* 배지 형태로 표시. 위치는 후원하기 버튼에 의존함. */}
-                <div className="absolute -right-3 -top-4">
-                  <div className="rounded-full border-2 border-main-color bg-white px-6 py-1 text-main-color shadow-md">
-                    <span className="text-lg">125명 후원 중!</span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
