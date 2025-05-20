@@ -657,7 +657,7 @@ const DonateDock = () => {
       console.log("주문 요청:", orderRequest)
 
       const { data: orderData, error: orderError } = await apiCall<CreateOrderResponse>(
-        "/api/orders",
+        "/api/order",
         "POST",
         orderRequest,
       )

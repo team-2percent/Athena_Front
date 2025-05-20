@@ -35,6 +35,12 @@ export interface ApiResponse<T> {
 // planType 타입 추가
 export type PlanType = "basic" | "pro" | "premium"
 
+// 카테고리 타입 추가
+export interface Category {
+  id: number
+  categoryName: string
+}
+
 // 프로젝트 폼 상태 타입
 interface ProjectFormState {
   // 프로젝트 기본 정보
@@ -44,6 +50,7 @@ interface ProjectFormState {
   // 1단계 폼 데이터
   targetAmount: string
   category: string
+  categoryId: number | null // 카테고리 ID 추가
   title: string
   description: string
   startDate: Date
@@ -86,7 +93,8 @@ const initialState = {
   currentStep: 1,
 
   targetAmount: "",
-  category: "책",
+  category: "",
+  categoryId: null,
   title: "",
   description: "",
   startDate: new Date(),
@@ -242,7 +250,8 @@ export const submitProject = async (
     // 프로젝트 정보 등록
     const projectData = {
       sellerId: 1, // 임시 값, 실제로는 로그인한 사용자 ID를 사용해야 함
-      categoryId: 1, // 임시 값, 실제로는 선택한 카테고리 ID를 사용해야 함
+      categoryId: state.categoryId || 0, // 선택한 카테고리 ID 사용
+      bankAccountId: 1, // 임시 값, 실제로는 사용자의 은행 계좌 ID를 사용해야 함
       imageGroupId: state.projectId,
       title: state.title,
       description: state.description,
@@ -252,6 +261,7 @@ export const submitProject = async (
       endAt: state.endDate.toISOString(),
       shippedAt: state.deliveryDate.toISOString(),
       imageUrls: allImageUrls, // 모든 이미지 URL 배열로 전송
+      planType: state.planType, // 선택한 플랜 타입
       products: state.supportOptions.map((option) => ({
         name: option.name,
         description: option.description,
@@ -275,6 +285,7 @@ export const submitProject = async (
     console.log("Project submission response:", response.data)
     setSubmitting(false)
     return true
+    
   } catch (err) {
     console.error("Error during submission:", err)
     setError("프로젝트 등록 중 오류가 발생했습니다.")
