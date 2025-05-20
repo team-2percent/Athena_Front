@@ -339,8 +339,9 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
               <ul className="list-disc pl-5 space-y-2 text-gray-700">
                 <li>첫 번째에 있는 이미지가 대표 썸네일이 됩니다.</li>
                 <li>최대 5개까지 업로드 가능합니다.</li>
+                <li>JPEG 파일만 업로드 가능합니다.</li>
                 <li>초상권, 저작권, 명예훼손 등의 우려가 있는 이미지는 사용을 삼가 주시기 바랍니다.</li>
-                <li>이미지 사용에 따른 법적 책임은 이용약관에 따라 작품 게시자 본인에게 있습니다.</li>
+                <li>이미지 사용에 따른 법적 책임은 본인에게 있습니다.</li>
               </ul>
             </div>
           </div>

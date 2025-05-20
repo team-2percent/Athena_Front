@@ -32,6 +32,9 @@ export interface ApiResponse<T> {
   status: number
 }
 
+// planType 타입 추가
+export type PlanType = "basic" | "pro" | "premium"
+
 // 프로젝트 폼 상태 타입
 interface ProjectFormState {
   // 프로젝트 기본 정보
@@ -53,6 +56,7 @@ interface ProjectFormState {
 
   // 3단계 폼 데이터
   supportOptions: SupportOption[]
+  planType: PlanType
 
   // 로딩 및 에러 상태
   isLoading: boolean
@@ -94,6 +98,7 @@ const initialState = {
     "# 상품 상세 설명\n\n상품에 대한 자세한 설명을 작성해주세요.\n\n## 특징\n\n- 첫 번째 특징\n- 두 번째 특징\n- 세 번째 특징\n\n## 사용 방법\n\n1. 첫 번째 단계\n2. 두 번째 단계\n3. 세 번째 단계\n\n> 참고: 마크다운 문법을 사용하여 작성할 수 있습니다.",
 
   supportOptions: [],
+  planType: "basic" as PlanType,
 
   isLoading: false,
   isSubmitting: false,
@@ -169,7 +174,7 @@ export const fetchProjectId = async (
   setError(null)
 
   try {
-    const response = await apiCall<{ id: number }>("/api/projects", "GET")
+    const response = await apiCall<{ id: number }>("/api/project", "GET")
 
     if (response.error) {
       console.error("Error fetching project ID:", response.error)
@@ -258,7 +263,7 @@ export const submitProject = async (
 
     console.log("Submitting project data:", projectData)
 
-    const response = await apiCall("/api/projects", "POST", projectData)
+    const response = await apiCall("/api/project", "POST", projectData)
 
     if (response.error) {
       console.error("Project submission failed:", response.error)
