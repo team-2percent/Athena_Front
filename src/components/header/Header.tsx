@@ -23,8 +23,9 @@ const uris: Record<string, string> = {
 const Header = () => {
   const { isLoggedIn, role, logout } = useAuthStore();
   const isAdmin = role === "ROLE_ADMIN";
-  const { apiCall } = useApi();
+  const { isLoading, apiCall } = useApi();
   const [user, setUser] = useState<{nickname: string, imageUrl: string} | null>(null);
+  const [userLoadError, setUserLoadError] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false)
@@ -104,11 +105,21 @@ const Header = () => {
 
   // 유저 정보 조회
   const loadUserInfo = () => {
-    apiCall<{id: number, nickname: string, imageUrl: string}>("/api/user/Header", "GET").then(({ data }) => {
-      if (data !== null) setUser({
+    setUserLoadError(false);
+    apiCall<{id: number, nickname: string, imageUrl: string}>("/api/user/Header", "GET").then(({ data, error }) => {
+      if (error) {
+        setUserLoadError(true)
+      } else if (data !== null) setUser({
         nickname: data.nickname,
         imageUrl: data.imageUrl,
       })
+    })
+  }
+
+  // 로그아웃
+  const handleLogout = () => {
+    apiCall("/api/user/logout", "POST").then(() => {
+      logout();
     })
   }
 
@@ -132,6 +143,31 @@ const Header = () => {
       profileImage: "/abstract-profile.png",
     },
   ]
+
+  const renderProfile = () => {
+    if (isLoading) {
+      return <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" onClick={handleProfileClick}/>
+    } else if (userLoadError) {
+      return <button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick}>
+                <Image
+                  src={"/abstract-profile.png"}
+                  alt="프로필 이미지"
+                  width={40}
+                  height={40}
+                  className="h-full w-full object-cover"
+                />
+              </button>
+    }
+    return (<button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick}>
+            <Image
+              src={user?.imageUrl || "/abstract-profile.png"}
+              alt="프로필 이미지"
+              width={40}
+              height={40}
+              className="h-full w-full object-cover"
+            />
+          </button>)
+  }
 
   useEffect(() => {
     if (isLoggedIn) loadUserInfo();
@@ -186,32 +222,18 @@ const Header = () => {
               >
                 <Percent className="h-6 w-6 text-sub-gray" />
               </button>
-                <button type="button" aria-label="찜 목록">
-                <Heart className="h-6 w-6 text-sub-gray" />
-              </button>
               <button type="button" aria-label="알림" onClick={toggleNotifications}>
                 <Bell className="h-6 w-6 text-sub-gray" />
               </button>
+
               <div className="relative flex items-center space-x-3">
-                {user ?
+                {!isLoading ?
                   <span className="text-sm font-medium whitespace-nowrap">{user?.nickname}</span>
                   :
                   <div className="h-5 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
                 }
                 <div className="relative flex items-center" ref={authMenuRef}>
-                  {user ?
-                  <button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick}>
-                    <Image
-                      src={user?.imageUrl || "/abstract-profile.png"}
-                      alt="프로필 이미지"
-                      width={40}
-                      height={40}
-                      className="h-full w-full object-cover"
-                    />
-                  </button>
-                  :
-                  <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
-                  }
+                {renderProfile()}
                   {
                     showAuthMenu &&
                     <div className="absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 transition-all duration-200">
@@ -235,7 +257,7 @@ const Header = () => {
                       </button>
                       <button
                           type="button"
-                          onClick={logout}
+                          onClick={handleLogout}
                           className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
                       >
                           <LogOut className="h-4 w-4" />

@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import useAuthStore from "@/stores/auth"
+import { useApi } from "@/hooks/useApi"
 
 const uris: Record<string, string> = {
     "프로젝트 승인 관리": "approval",
@@ -17,12 +18,14 @@ const uris: Record<string, string> = {
 export default function AdminHeader() {
     const pathname = usePathname().split("/")[2];
     const { logout } = useAuthStore();
+    const { apiCall } = useApi();
     const router = useRouter();
     const [showAuthMenu, setShowAuthMenu] = useState(false);
 
     const handleLogout = () => {
-        logout();
-        router.push("/");
+        apiCall("/api/user/logout", "POST").then(() => {
+            logout();
+        })        
     }
 
     const handleTabClick = (tab: string) => {
@@ -43,7 +46,6 @@ export default function AdminHeader() {
 
                 {/* 관리자 이름 + 로그인 메뉴 */}
                 <div className="flex items-center space-x-3 m-none">
-                    <span className="text-sm font-medium whitespace-nowrap">대충사는사람</span>
                     <div className="relative flex items-center">
                         <button
                             type="button"

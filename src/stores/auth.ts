@@ -9,7 +9,7 @@ interface AuthStore {
   hydrated: boolean;
   setLoggedIn: (loggedIn: boolean) => void;
   setRole: (role: UserRole) => void;
-  login: (accessToken: string, refreshToken: string) => void;
+  login: (accessToken: string) => void;
   logout: () => void;
   setHydrated: (hydrated: boolean) => void;
 }
@@ -20,10 +20,9 @@ const useAuthStore = create<AuthStore>((set) => ({
   hydrated: false,
   setLoggedIn: (loggedIn) => set({ isLoggedIn: loggedIn }),
   setRole: (role) => set({ role }),
-  login: (accessToken, refreshToken) => {
+  login: (accessToken) => {
     if (typeof window !== "undefined") {
       localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
     }
     const { role } = jwtDecode<{ role: UserRole }>(accessToken);
     set({ isLoggedIn: true, role })
@@ -31,7 +30,6 @@ const useAuthStore = create<AuthStore>((set) => ({
   logout: () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
     }
     set({ isLoggedIn: false, role: "" });
   },
