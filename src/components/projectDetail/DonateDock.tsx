@@ -93,25 +93,6 @@ interface PaymentReadyResponse {
   tid: string
 }
 
-// 1. 결제 승인 응답 인터페이스 추가 (PaymentReadyResponse 아래에 추가)
-interface PaymentApproveResponse {
-  aid: string
-  tid: string
-  cid: string
-  paymentMethodType: string
-  amount: {
-    total: number
-    taxFree: number
-    vat: number
-    point: number
-    discount: number
-  }
-  itemName: string
-  itemCode: string
-  quantity: number
-  approvedAt: string
-}
-
 const DonateDock = () => {
   // 현재 단계 (1: 상품 선택, 2: 결제 및 배송지 정보)
   const [step, setStep] = useState(1)
@@ -144,10 +125,6 @@ const DonateDock = () => {
 
   // 결제 관련 상태 추가
   const [isProcessingPayment, setIsProcessingPayment] = useState(false)
-  // 2. 결제 완료 모달 상태 추가 (isProcessingPayment 상태 아래에 추가)
-  const [showPaymentCompleteModal, setShowPaymentCompleteModal] = useState(false)
-  const [paymentResult, setPaymentResult] = useState<PaymentApproveResponse | null>(null)
-  const [paymentTid, setPaymentTid] = useState<string | null>(null)
   const [paymentError, setPaymentError] = useState<string | null>(null)
 
   // 새 배송지 정보를 객체로 관리
@@ -317,51 +294,6 @@ const DonateDock = () => {
       document.body.style.overflow = ""
     }
   }, [isOpen])
-
-  // 5. 결제 창 메시지 수신 이벤트 리스너 추가 (useEffect 내부에 추가)
-  // 독이 열리거나 닫힐 때 스크롤 제어를 위한 useEffect 아래에 추가
-  useEffect(() => {
-    // 결제 완료 후 메시지 수신을 위한 이벤트 리스너
-    const handlePaymentMessage = async (event: MessageEvent) => {
-      // 결제 관련 메시지인지 확인
-      if (
-        event.data &&
-        typeof event.data === "object" &&
-        event.data.type === "KAKAO_PAYMENT_SUCCESS" &&
-        event.data.orderId &&
-        event.data.pgToken
-      ) {
-        const { orderId, pgToken } = event.data
-        await handlePaymentApproval(orderId, pgToken)
-      }
-    }
-
-    window.addEventListener("message", handlePaymentMessage)
-
-    return () => {
-      window.removeEventListener("message", handlePaymentMessage)
-    }
-  }, [])
-
-  // 6. URL 파라미터 처리를 위한 useEffect 추가 (위의 useEffect 아래에 추가)
-  useEffect(() => {
-    // URL에서 pg_token과 orderId 파라미터 확인
-    const checkUrlParams = async () => {
-      const urlParams = new URLSearchParams(window.location.search)
-      const pgToken = urlParams.get("pg_token")
-      const orderId = urlParams.get("orderId")
-
-      if (pgToken && orderId) {
-        // URL에서 파라미터 제거 (브라우저 히스토리에 남지 않도록)
-        window.history.replaceState({}, document.title, window.location.pathname)
-
-        // 결제 승인 처리
-        await handlePaymentApproval(orderId, pgToken)
-      }
-    }
-
-    checkUrlParams()
-  }, [])
 
   // 팝오버 외부 클릭 시 닫기
   useEffect(() => {
@@ -657,7 +589,7 @@ const DonateDock = () => {
       console.log("주문 요청:", orderRequest)
 
       const { data: orderData, error: orderError } = await apiCall<CreateOrderResponse>(
-        "/api/order",
+        "/api/orders",
         "POST",
         orderRequest,
       )
@@ -681,23 +613,7 @@ const DonateDock = () => {
       console.log("결제 준비 성공:", paymentData)
 
       // 3. 결제 페이지로 이동
-      // paymentData.next_redirect_pc_url 사용하는 부분 바로 위에 추가
-      setPaymentTid(paymentData.tid)
-      const popupWidth = 450
-      const popupHeight = 700
-      const left = window.screen.width / 2 - popupWidth / 2
-      const top = window.screen.height / 2 - popupHeight / 2
-
-      const paymentWindow = window.open(
-        paymentData.next_redirect_pc_url,
-        "KakaoPayment",
-        `width=${popupWidth},height=${popupHeight},left=${left},top=${top},resizable=yes,scrollbars=yes,status=yes`,
-      )
-
-      // 팝업 창이 차단되었는지 확인
-      if (!paymentWindow || paymentWindow.closed || typeof paymentWindow.closed === "undefined") {
-        alert("팝업 창이 차단되었습니다. 팝업 차단을 해제해주세요.")
-      }
+      window.open(paymentData.next_redirect_pc_url, "_blank")
 
       // 4. 독 닫기
       setIsOpen(false)
@@ -709,91 +625,6 @@ const DonateDock = () => {
     }
   }
 
-  // 4. 결제 승인 처리 함수 추가 (handlePayment 함수 아래에 추가)
-  const handlePaymentApproval = async (orderId: string, pgToken: string) => {
-    try {
-      setIsProcessingPayment(true)
-      setPaymentError(null)
-
-      console.log(`결제 승인 요청: orderId=${orderId}, pgToken=${pgToken}`)
-
-      const { data: approveData, error: approveError } = await apiCall<PaymentApproveResponse>(
-        `/api/payment/approve/${orderId}?pg_token=${pgToken}`,
-        "GET",
-      )
-
-      if (approveError || !approveData) {
-        throw new Error(approveError || "결제 승인에 실패했습니다.")
-      }
-
-      console.log("결제 승인 성공:", approveData)
-      setPaymentResult(approveData)
-      setShowPaymentCompleteModal(true)
-
-      // 결제 완료 후 선택된 상품 초기화
-      setSelectedOptions([])
-      setQuantities({})
-
-      return true
-    } catch (error) {
-      console.error("결제 승인 오류:", error)
-      setPaymentError(error instanceof Error ? error.message : "결제 승인 중 오류가 발생했습니다.")
-      return false
-    } finally {
-      setIsProcessingPayment(false)
-    }
-  }
-
-  // 7. 결제 완료 모달 추가 (return 문 바로 위에 추가)
-  // 결제 완료 모달
-  const PaymentCompleteModal = () => {
-    if (!showPaymentCompleteModal || !paymentResult) return null
-
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-          <div className="mb-4 flex items-center justify-center">
-            <div className="rounded-full bg-green-100 p-3">
-              <Check className="h-8 w-8 text-green-500" />
-            </div>
-          </div>
-
-          <h3 className="mb-2 text-center text-2xl font-bold">결제 완료</h3>
-          <p className="mb-6 text-center text-sub-gray">결제가 성공적으로 완료되었습니다.</p>
-
-          <div className="mb-6 space-y-3 rounded-xl bg-gray-50 p-4">
-            <div className="flex justify-between">
-              <span className="text-sub-gray">결제 금액</span>
-              <span className="font-medium">{paymentResult.amount.total.toLocaleString()}원</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sub-gray">결제 수단</span>
-              <span className="font-medium">카카오페이</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sub-gray">결제 일시</span>
-              <span className="font-medium">{new Date(paymentResult.approvedAt).toLocaleString("ko-KR")}</span>
-            </div>
-          </div>
-
-          <div className="flex justify-center">
-            <button
-              onClick={() => {
-                setShowPaymentCompleteModal(false)
-                setIsOpen(false)
-              }}
-              className="rounded-xl bg-main-color px-8 py-3 font-medium text-white hover:bg-secondary-color-dark"
-            >
-              확인
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // 8. 결제 완료 모달 렌더링 추가 (return 문 내부 마지막에 추가)
-  // 결제 완료 모달 렌더링 부분을 return 문 내부 마지막에 추가
   return (
     <>
       {/* 고정된 후원하기 버튼 */}
@@ -1299,9 +1130,6 @@ const DonateDock = () => {
           </div>
         </div>
       )}
-
-      {/* 결제 완료 모달 */}
-      <PaymentCompleteModal />
     </>
   )
 }

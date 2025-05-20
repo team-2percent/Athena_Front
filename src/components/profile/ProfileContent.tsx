@@ -5,8 +5,9 @@ import type React from "react"
 import { useEffect, useState, useRef } from "react"
 import Link from "next/link"
 import ProfileTabs from "./ProfileTabs"
-import ProjectListItem from "./ProjectListItem"
+import ProjectItem from "./ProjectListItem"
 import PurchasedProjectItem from "./PurchasedProjectItem"
+import FollowItem from "./FollowItem"
 import ReviewItem from "./ReviewItem"
 import { useApi } from "@/hooks/useApi"
 import type { UserCoupon } from "@/lib/couponInterface"
@@ -71,6 +72,7 @@ interface MyReview {
   userName: string
   content: string
   createdAt: string
+  // 추가 필드 (UI에 필요한 데이터)
   projectName?: string
   projectImage?: string
   likes?: number
@@ -116,6 +118,86 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
   const [deleteError, setDeleteError] = useState(false)
   const [deleteSuccess, setDeleteSuccess] = useState(false)
   const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [deleteType, setDeleteType] = useState<"project" | "purchase">("project")
+
+  // 팔로우/팔로잉 데이터 (실제로는 API에서 가져올 데이터)
+  const followData = [
+    {
+      id: 2,
+      username: "팔로워 이름",
+      oneLinear: "여행하며 세상을 배우는 중임.",
+      profileImage: "/abstract-profile.png",
+    },
+    {
+      id: 3,
+      username: "팔로워 이름",
+      oneLinear: "요리로 행복 나누는 중",
+      profileImage: "/abstract-profile.png",
+    },
+    {
+      id: 4,
+      username: "팔로워 이름",
+      oneLinear: "책 읽는 거 좋아해요.",
+      profileImage: "/abstract-profile.png",
+    },
+    {
+      id: 5,
+      username: "팔로워 이름",
+      oneLinear: "음악으로 감정 표현함.",
+      profileImage: "/abstract-profile.png",
+    },
+    {
+      id: 6,
+      username: "팔로워 이름",
+      oneLinear: "운동 중. 에너지 충전 완료.",
+      profileImage: "/abstract-profile.png",
+    },
+    {
+      id: 7,
+      username: "팔로워 이름",
+      oneLinear: "사진 찍는 거 재밌어요.",
+      profileImage: "/abstract-profile.png",
+    },
+  ]
+
+  const followingData = [
+    {
+      id: 12,
+      username: "팔로잉 이름",
+      oneLinear: "커피 한 잔으로 하루 시작함.",
+      profileImage: "/abstract-profile.png",
+    },
+    {
+      id: 13,
+      username: "팔로잉 이름",
+      oneLinear: "환경 보호 중이에요.",
+      profileImage: "/abstract-profile.png",
+    },
+    {
+      id: 14,
+      username: "팔로잉 이름",
+      oneLinear: "기술로 세상 바꾸고 싶음.",
+      profileImage: "/abstract-profile.png",
+    },
+    {
+      id: 15,
+      username: "팔로잉 이름",
+      oneLinear: "예술로 감동 주는 중",
+      profileImage: "/abstract-profile.png",
+    },
+    {
+      id: 16,
+      username: "팔로잉 이름",
+      oneLinear: "동물 좋아해요.",
+      profileImage: "/abstract-profile.png",
+    },
+    {
+      id: 17,
+      username: "팔로잉 이름",
+      oneLinear: "영화 보면서 꿈꾸는 중임.",
+      profileImage: "/abstract-profile.png",
+    },
+  ]
 
   // 판매 상품 불러오기
   const loadMyProjects = async () => {
@@ -134,7 +216,17 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
 
       if (responseData && responseData.content) {
         // 기존 프로젝트에 새로운 프로젝트 추가
-        setMyProjects((prev) => [...prev, ...responseData.content])
+        setMyProjects((prev) => [
+          ...prev,
+          ...responseData.content.map((project) => ({
+            ...project,
+            sellerName: isMy ? "내 상품" : "판매자",
+            description: "상품 설명이 여기에 표시됩니다.",
+            imageUrl: "/tteokbokki/tteokbokki.jpg", // 기본 이미지
+            achievementRate: 100,
+            daysLeft: project.isCompleted ? null : 30,
+          })),
+        ])
 
         // 다음 페이지 정보 설정
         setCursorValue(responseData.nextCursorValue)
@@ -162,7 +254,14 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
 
       if (responseData && responseData.content) {
         // 기존 주문에 새로운 주문 추가
-        setMyOrders((prev) => [...prev, ...responseData.content])
+        setMyOrders((prev) => [
+          ...prev,
+          ...responseData.content.map((order) => ({
+            ...order,
+            // 임의로 후기 작성 여부 설정 (실제로는 API에서 제공해야 함)
+            hasReview: Math.random() > 0.5,
+          })),
+        ])
 
         // 다음 페이지 정보 설정
         setOrderCursorValue(responseData.nextCursorValue)
@@ -213,7 +312,17 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
       const response = await apiCall("/api/my/comments", "GET")
 
       if (response && response.data) {
-        setMyReviews(response.data as MyReview[])
+        // API 응답 데이터를 ReviewItem 컴포넌트에 맞게 변환
+        const reviews = (response.data as MyReview[]).map((review) => ({
+          ...review,
+          // UI에 필요한 추가 필드 (실제로는 API에서 제공해야 함)
+          projectName: "상품 이름", // 임시 데이터
+          projectImage: "/tteokbokki/tteokbokki.jpg", // 임시 이미지
+          likes: Math.floor(Math.random() * 500), // 임시 좋아요 수
+          projectId: review.id, // 임시 프로젝트 ID
+        }))
+
+        setMyReviews(reviews)
       }
     } catch (error) {
       console.error("후기 조회에 실패했습니다.", error)
@@ -222,11 +331,26 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
     }
   }
 
+  // 팔로우 버튼 클릭 핸들러
+  const handleFollow = (userId: number) => {
+    console.log(`사용자 ${userId}를 팔로우합니다.`)
+    // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
+  }
+
   // 삭제 모달 관련 핸들러
   const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>, id: number) => {
     e.stopPropagation()
     setIsOpenDeleteModal(true)
     setDeleteId(id)
+    setDeleteType("project")
+    setDeleteError(false)
+    setDeleteSuccess(false)
+  }
+
+  const handlePurchaseDeleteClick = (id: number) => {
+    setIsOpenDeleteModal(true)
+    setDeleteId(id)
+    setDeleteType("purchase")
     setDeleteError(false)
     setDeleteSuccess(false)
   }
@@ -237,18 +361,29 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
     setDeleteSuccess(false)
   }
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     if (deleteId !== null) {
       try {
-        // 판매 상품 삭제
-        await apiCall(`/api/project/${deleteId}`, "DELETE")
-        setMyProjects((prev) => prev.filter((project) => project.projectId !== deleteId))
+        if (deleteType === "project") {
+          // 판매 상품 삭제
+          // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
+          setMyProjects((prev) => prev.filter((project) => project.projectId !== deleteId))
+        } else {
+          // 구매 상품 삭제
+          // 실제로는 API 호출 등의 로직이 들어갈 것입니다.
+          setMyOrders((prev) => prev.filter((order) => order.orderId !== deleteId))
+        }
         setDeleteSuccess(true)
       } catch (error) {
-        console.error("상품 삭제에 실패했습니다.", error)
+        console.error(`${deleteType === "project" ? "상품" : "구매 내역"} 삭제에 실패했습니다.`, error)
         setDeleteError(true)
       }
     }
+  }
+
+  // 구매 내역 삭제 핸들러
+  const deletePurchase = (id: number) => {
+    handlePurchaseDeleteClick(id)
   }
 
   // 유저 정보 가져오기
@@ -368,7 +503,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
           onConfirm={handleConfirmDelete}
           deleteError={deleteError}
           deleteSuccess={deleteSuccess}
-          itemType="상품"
+          itemType={deleteType === "project" ? "상품" : "구매 내역"}
         />
       )}
 
@@ -403,13 +538,13 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
             ) : (
               <>
                 {myProjects.map((project) => (
-                  <ProjectListItem
+                  <ProjectItem
                     key={project.projectId}
                     id={project.projectId}
                     sellerName={project.sellerName || "내 상품"}
                     projectName={project.title}
                     description={project.description || "상품 설명이 여기에 표시됩니다."}
-                    imageUrl={project.imageUrl || "/placeholder.svg"}
+                    imageUrl={project.imageUrl || "/tteokbokki/tteokbokki.jpg"}
                     achievementRate={project.achievementRate || 100}
                     daysLeft={project.daysLeft}
                     isCompleted={project.isCompleted}
@@ -443,12 +578,13 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
                     sellerName={order.sellerNickname}
                     projectName={order.productTitle}
                     description="상품 설명이 여기에 표시됩니다."
-                    imageUrl={order.thumbnailUrl || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"}
+                    imageUrl={order.thumbnailUrl || "/tteokbokki/tteokbokki.jpg"}
                     achievementRate={order.achievementRate}
                     daysLeft={null}
                     isCompleted={true}
                     projectId={order.productId}
                     hasReview={order.hasReview || false}
+                    onDeletePurchase={deletePurchase}
                   />
                 ))}
 
@@ -477,7 +613,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
                     projectName={review.projectName || "상품 이름"}
                     reviewDate={formatDate(review.createdAt)}
                     reviewContent={review.content}
-                    projectImage={review.projectImage || "/placeholder.svg"}
+                    projectImage={review.projectImage || "/tteokbokki/tteokbokki.jpg"}
                     likes={review.likes || 0}
                     projectId={review.projectId || review.id}
                   />
@@ -490,6 +626,38 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
                 )}
               </>
             )}
+          </div>
+        )}
+
+        {activeTab === "팔로워" && (
+          <div>
+            {followData.map((user) => (
+              <FollowItem
+                key={user.id}
+                id={user.id}
+                username={user.username}
+                oneLinear={user.oneLinear}
+                profileImage={user.profileImage}
+                onFollow={handleFollow}
+                isFollowing={false}
+              />
+            ))}
+          </div>
+        )}
+
+        {activeTab === "팔로잉" && (
+          <div>
+            {followingData.map((user) => (
+              <FollowItem
+                key={user.id}
+                id={user.id}
+                username={user.username}
+                oneLinear={user.oneLinear}
+                profileImage={user.profileImage}
+                onFollow={handleFollow}
+                isFollowing={true}
+              />
+            ))}
           </div>
         )}
 

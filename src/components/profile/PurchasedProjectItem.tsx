@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { Heart, Check, MessageSquare } from "lucide-react"
+import { Heart, Check, MessageSquare, Trash } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import ReviewForm from "./ReviewForm"
@@ -18,6 +18,7 @@ interface PurchasedProjectItemProps {
   isCompleted: boolean
   projectId: number
   hasReview: boolean
+  onDeletePurchase: (id: number) => void
 }
 
 export default function PurchasedProjectItem({
@@ -31,6 +32,7 @@ export default function PurchasedProjectItem({
   isCompleted,
   projectId,
   hasReview,
+  onDeletePurchase,
 }: PurchasedProjectItemProps) {
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false)
   const router = useRouter()
@@ -44,6 +46,12 @@ export default function PurchasedProjectItem({
     if (!hasReview) {
       setIsReviewFormOpen(true)
     }
+  }
+
+  // handleDeleteClick 함수 수정
+  const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    onDeletePurchase(id)
   }
 
   // 달성률이 100%를 초과하더라도 게이지 바는 100%까지만 표시
@@ -117,8 +125,8 @@ export default function PurchasedProjectItem({
                 )}
               </div>
 
-              {/* 후기 작성 버튼 */}
-              <div className="flex justify-end mt-4">
+              {/* 후기 작성 및 구매 내역 삭제 버튼 - 아래로 이동 */}
+              <div className="flex gap-4 mt-4 justify-end">
                 <button
                   className={cn(
                     "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors w-full justify-center",
@@ -131,6 +139,13 @@ export default function PurchasedProjectItem({
                 >
                   <MessageSquare className="h-5 w-5" />
                   <span>{hasReview ? "후기 작성 완료" : "후기 작성"}</span>
+                </button>
+                <button
+                  className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-sub-gray rounded-lg hover:bg-gray-100 transition-colors w-full justify-center"
+                  onClick={handleDeleteClick}
+                >
+                  <Trash className="h-5 w-5" />
+                  <span>삭제</span>
                 </button>
               </div>
             </div>

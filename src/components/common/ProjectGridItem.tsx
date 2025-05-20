@@ -73,7 +73,7 @@ export default function ProjectCard({
               <p className="text-sm">감사합니다.</p>
             </div>
           )}
-          <img src={image || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"} alt={projectName} className="rounded-lg object-cover w-full h-full" />
+          <img src={image || "/placeholder.svg"} alt={projectName} className="rounded-lg object-cover w-full h-full" />
           <button
             type="button"
             onClick={handleLikedClick}

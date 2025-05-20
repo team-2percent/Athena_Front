@@ -5,9 +5,8 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { Upload, ChevronDown, Check, Trash2 } from "lucide-react"
 import DatePicker from "./DatePicker"
-import { useApi } from "@/hooks/useApi"
 
-import { useProjectFormStore, type ImageFile, type Category } from "@/stores/useProjectFormStore"
+import { useProjectFormStore, type ImageFile } from "@/stores/useProjectFormStore"
 
 interface StepOneFormProps {
   onUpdateFormData: (data: Partial<any>) => void
@@ -16,12 +15,8 @@ interface StepOneFormProps {
 }
 
 export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
-  // API 호출 훅 사용
-  const { apiCall, isLoading: apiLoading } = useApi()
-
   // Zustand 스토어에서 상태 가져오기
-  const { targetAmount, category, categoryId, title, description, startDate, endDate, deliveryDate, images } =
-    useProjectFormStore()
+  const { targetAmount, category, title, description, startDate, endDate, deliveryDate, images } = useProjectFormStore()
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false)
   const [targetAmountError, setTargetAmountError] = useState("")
   const [minDeliveryDate, setMinDeliveryDate] = useState(() => {
@@ -31,47 +26,14 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
     return date
   })
   const [isDragging, setIsDragging] = useState(false)
-  const [categories, setCategories] = useState<Category[]>([])
-  const [categoriesLoading, setCategoriesLoading] = useState(false)
   const dragCounter = useRef(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // 카테고리 목록 가져오기
-  useEffect(() => {
-    const fetchCategories = async () => {
-      setCategoriesLoading(true)
-      try {
-        const response = await apiCall<Category[]>("/api/category", "GET")
-        if (response.data) {
-          setCategories(response.data)
+  const categoryOptions = ["책", "예술", "음악", "공예", "디자인"]
 
-          // 카테고리가 있고 아직 선택된 카테고리가 없으면 첫 번째 카테고리 선택
-          if (response.data.length > 0 && !category) {
-            const firstCategory = response.data[0]
-            onUpdateFormData({
-              category: firstCategory.categoryName,
-              categoryId: firstCategory.id,
-            })
-          }
-        } else {
-          console.error("카테고리 목록을 가져오는데 실패했습니다:", response.error)
-        }
-      } catch (error) {
-        console.error("카테고리 API 호출 중 오류 발생:", error)
-      } finally {
-        setCategoriesLoading(false)
-      }
-    }
-
-    fetchCategories()
-  }, [apiCall, onUpdateFormData, category])
-
-  const handleCategorySelect = (selectedCategory: Category) => {
+  const handleCategorySelect = (selectedCategory: string) => {
     setIsCategoryDropdownOpen(false)
-    onUpdateFormData({
-      category: selectedCategory.categoryName,
-      categoryId: selectedCategory.id,
-    })
+    onUpdateFormData({ category: selectedCategory })
   }
 
   // 숫자만 입력 가능하도록 처리
@@ -221,27 +183,20 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
               type="button"
               className="flex w-full items-center justify-between rounded-full border border-gray-300 px-4 py-3 text-left text-gray-700 focus:outline-none"
               onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-              disabled={categoriesLoading}
             >
-              {categoriesLoading ? (
-                <span className="text-gray-400">카테고리 로딩 중...</span>
-              ) : category ? (
-                <span>{category}</span>
-              ) : (
-                <span className="text-gray-400">카테고리를 선택해주세요</span>
-              )}
+              <span>{category}</span>
               <ChevronDown className="h-5 w-5" />
             </button>
-            {isCategoryDropdownOpen && categories.length > 0 && (
+            {isCategoryDropdownOpen && (
               <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
-                {categories.map((cat) => (
+                {categoryOptions.map((option) => (
                   <div
-                    key={cat.id}
+                    key={option}
                     className="flex cursor-pointer items-center justify-between px-4 py-3 hover:bg-gray-100"
-                    onClick={() => handleCategorySelect(cat)}
+                    onClick={() => handleCategorySelect(option)}
                   >
-                    <span>{cat.categoryName}</span>
-                    {category === cat.categoryName && <Check className="h-5 w-5 text-main-color" />}
+                    <span>{option}</span>
+                    {category === option && <Check className="h-5 w-5 text-main-color" />}
                   </div>
                 ))}
               </div>
@@ -384,9 +339,8 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
               <ul className="list-disc pl-5 space-y-2 text-gray-700">
                 <li>첫 번째에 있는 이미지가 대표 썸네일이 됩니다.</li>
                 <li>최대 5개까지 업로드 가능합니다.</li>
-                <li>JPEG 파일만 업로드 가능합니다.</li>
                 <li>초상권, 저작권, 명예훼손 등의 우려가 있는 이미지는 사용을 삼가 주시기 바랍니다.</li>
-                <li>이미지 사용에 따른 법적 책임은 게시자 본인에게 있습니다.</li>
+                <li>이미지 사용에 따른 법적 책임은 이용약관에 따라 작품 게시자 본인에게 있습니다.</li>
               </ul>
             </div>
           </div>

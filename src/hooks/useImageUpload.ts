@@ -27,7 +27,7 @@ export function useImageUpload() {
 
       const accessToken = localStorage.getItem("accessToken")
 
-      const response = await fetch("https://athena.i-am-jay.com/api/image", {
+      const response = await fetch("http://localhost:3000/api/images", {
         method: "POST",
         headers: {
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),

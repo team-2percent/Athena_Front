@@ -7,9 +7,6 @@ import { Plus, Check, X, Trash2 } from "lucide-react"
 import { useProjectFormStore } from "@/stores/useProjectFormStore"
 import type { CompositionItem, SupportOption } from "@/stores/useProjectFormStore"
 
-// PlanSelection 컴포넌트 import 추가
-import PlanSelection from "./PlanSelection"
-
 // 계좌 정보 타입 정의
 interface BankAccount {
   id: number
@@ -239,7 +236,7 @@ const CompositionDialog = ({ isOpen, onClose, composition, onSave }: Composition
                   type="text"
                   value={item.content}
                   onChange={(e) => updateItem(item.id, e.target.value)}
-                  placeholder="구성 세부 내용을 입력하세요"
+                  placeholder="���성 세부 내용을 입력하세요"
                   className={`w-full p-2 border-b ${
                     focusedField === `item-content-${item.id}` ? "border-secondary-color-dark" : "border-gray-300"
                   } focus:outline-none text-lg`}
@@ -291,8 +288,6 @@ interface StepThreeFormProps {
   }
 }
 
-// StepThreeForm 함수 내부에서 return문 수정
-// 기존 return문의 최상위 div 내부 맨 위에 PlanSelection 컴포넌트 추가
 export default function StepThreeForm({ initialData }: StepThreeFormProps) {
   // Zustand 스토어에서 상태와 액션 가져오기
   const { supportOptions, updateFormData } = useProjectFormStore()
@@ -574,9 +569,6 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
           </div>
         </div>
       </div>
-
-      {/* 플랜 선택 섹션 추가 */}
-      <PlanSelection />
 
       {/* 후원 받을 계좌 정보 */}
       <div className="flex flex-col mt-8">
