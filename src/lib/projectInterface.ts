@@ -1,3 +1,12 @@
+interface MainProject {
+    sellerName: string,
+    title: string,
+    description: string,
+    imageUrl: string,
+    achievementRate: number,
+    projectId: number
+}
+
 interface listProject {
     id: number
     imageUrl: string
@@ -11,4 +20,4 @@ interface listProject {
     endAt: string
 }
 
-export type { listProject }
+export type { listProject, MainProject }

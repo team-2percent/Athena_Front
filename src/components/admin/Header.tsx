@@ -35,7 +35,7 @@ export default function AdminHeader() {
     }
 
     return (
-        <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)]">
+        <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)] z-5">
             <div className="container mx-auto px-4 py-4">
                 {/* 상단 헤더 영역 */}
                 <div className="flex items-center justify-between">

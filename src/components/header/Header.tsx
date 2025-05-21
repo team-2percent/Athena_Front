@@ -187,7 +187,7 @@ const Header = () => {
   }, [showLoginModal, showSignupModal, showCouponModal])
 
   return (
-    <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)]">
+    <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)] z-5">
       {showCouponModal && <CouponModal isOpen={showCouponModal} onClose={() => setShowCouponModal(false)} />}
       {showLoginModal && <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} moveToSignupModal={openSignupModalInLoginModal} />}
       {showSignupModal && <SignupModal isOpen={showSignupModal} onClose={closeSignupModal} />}
