@@ -29,8 +29,8 @@ export default function RootLayout({
       >
         <AuthProvider>
           <HeaderLoader />
-          <main className="flex-1 bg-white mt-1">
-            <div className="container mx-auto px-4 py-8">
+          <main className="flex-1 bg-white m-none mt-1">
+            <div className="py-8">
             {children}
           </div>
             <RegisterPageButtonLoader />
