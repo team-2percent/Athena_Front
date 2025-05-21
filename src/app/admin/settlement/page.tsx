@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react"
 import { useApi } from "@/hooks/useApi";
 import { formatDateInAdmin } from "@/lib/utils";
-import clsx from "clsx";
-import { queryObjects } from "v8";
 import Pagination from "@/components/common/Pagination";
+import EmptyMessage from "@/components/common/EmptyMessage";
 
 interface Settlement {
     settlementId: number,
@@ -36,7 +35,7 @@ interface QueryParamsSettlementList {
 }
 
 export default function SettlementPage() {
-    const { apiCall } = useApi()
+    const { isLoading, apiCall } = useApi()
     const router = useRouter();
 
     const queryParamInitial: QueryParamsSettlementList = {
@@ -49,7 +48,9 @@ export default function SettlementPage() {
     const [settlementList, setSettlementList] = useState<any[]>([])
     const [totalPageCount, setTotalPageCount] = useState<number>(1)
     const [queryParams, setQueryParams] = useState<QueryParamsSettlementList>(queryParamInitial)
-    const baseUri = "/api/admin/settlements"
+    const [loadError, setLoadError] = useState(false);
+    const isEmpty = totalPageCount === 0 && !isLoading && !loadError;
+    const baseUri = "/api/admin/settlement"
     const queryParamUri = Object.entries(queryParams).filter(([key, value]) => value !== queryParamInitial[key as keyof QueryParamsSettlementList]).map(([key, value]) => `${key}=${value}`).join("&")
     const url = `${baseUri}${queryParamUri ? `?${queryParamUri}` : ""}`
 
@@ -173,6 +174,7 @@ export default function SettlementPage() {
                     </tbody>
                 </table>
             </div>
+            {isEmpty && <EmptyMessage message="정산 내역이 없습니다." />}
             <Pagination totalPages={totalPageCount} currentPage={queryParams.page} onPageChange={handlePageChange}/>
         </div>
     )

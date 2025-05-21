@@ -29,7 +29,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
 
   const url = type === "category" ? 
     `${listType[type].apiUrl}${categoryId === 0 ? `${sort ? `?sortType=${sort}` : ""}` : `?categoryId=${categoryId}${sort ? `&sortType=${sort}` : ""}`}` : 
-    `${listType[type].apiUrl}${sort ? `?${sortTypeParamName}=${sort}` : ""}${type === "search" && searchWord ? `${sort ? "&" : "?"}searchWord=${searchWord}` : ""}`
+    `${listType[type].apiUrl}${sort ? `?${sortTypeParamName}=${sort}` : ""}${type === "search" && searchWord ? `${sort ? "&" : "?"}searchTerm=${searchWord}` : ""}`
   const morePage = lastProjectId !== null;
   const nextPageQueryParam = morePage ? `&cursorValue=${cursorValue}&lastProjectId=${lastProjectId}` : "";
 
