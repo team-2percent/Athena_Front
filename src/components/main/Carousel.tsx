@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -21,7 +21,7 @@ const desserts = [
     image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvOTMwYTE2MzktODFiMS00YTUzLTkzYmQtMDk1NTRlZmMyMDQzL2I1ZjQwZjY0LWRhNDQtNGJmMC1hNmUxLWVhY2RmOTI4NzUzYS5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
     alt: "트러플 초콜릿",
     title: "트러플 판매자",
-    subtitle: "무슨무슨 트러플 초콜릿",
+    subtitle: "무슨무슨 트러플 초콜릿2",
     badge: "10000% 달성!",
     description: "뭔가 뭔가 만들어서 어쩌구저쩌구 합니다 사려면 지금이 기회!",
   },
@@ -30,7 +30,7 @@ const desserts = [
     image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvNmM5M2ZhZjAtYzkzOC00ZjE2LTkzZTctZGM2ZTk5ZGM1ZTk4L2Q4YmYxNzBmLTY2NGItNDRlMS04NGU1LTNjYjUyZGY0YzVlYy5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
     alt: "특별 디저트",
     title: "트러플 판매자",
-    subtitle: "무슨무슨 트러플 초콜릿",
+    subtitle: "무슨무슨 트러플 초콜릿3",
     badge: "10000% 달성!",
     description: "뭔가 뭔가 만들어서 어쩌구저쩌구 합니다 사려면 지금이 기회!",
   },
@@ -39,7 +39,7 @@ const desserts = [
     image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvNmM5M2ZhZjAtYzkzOC00ZjE2LTkzZTctZGM2ZTk5ZGM1ZTk4L2Q4YmYxNzBmLTY2NGItNDRlMS04NGU1LTNjYjUyZGY0YzVlYy5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
     alt: "특별 디저트",
     title: "트러플 판매자",
-    subtitle: "무슨무슨 트러플 초콜릿",
+    subtitle: "무슨무슨 트러플 초콜릿4",
     badge: "10000% 달성!",
     description: "뭔가 뭔가 만들어서 어쩌구저쩌구 합니다 사려면 지금이 기회!",
   },
@@ -48,68 +48,66 @@ const desserts = [
     image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvNmM5M2ZhZjAtYzkzOC00ZjE2LTkzZTctZGM2ZTk5ZGM1ZTk4L2Q4YmYxNzBmLTY2NGItNDRlMS04NGU1LTNjYjUyZGY0YzVlYy5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
     alt: "특별 디저트",
     title: "트러플 판매자",
-    subtitle: "무슨무슨 트러플 초콜릿",
+    subtitle: "무슨무슨 트러플 초콜릿5",
     badge: "10000% 달성!",
     description: "뭔가 뭔가 만들어서 어쩌구저쩌구 합니다 사려면 지금이 기회!",
   },
 ]
 
 export default function Carousel() {
-  const [currentIndex, setCurrentIndex] = useState(1)
-  const [touchStart, setTouchStart] = useState(0)
-  const [touchEnd, setTouchEnd] = useState(0)
+  const length = 5;
+  const [currentIndex, setCurrentIndex] = useState(0)
   const carouselRef = useRef<HTMLDivElement>(null)
+  const autoplayTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // 자동 슬라이드 시작 함수
+  const startAutoplay = () => {
+    if (autoplayTimerRef.current) {
+      clearInterval(autoplayTimerRef.current)
+    }
+
+    autoplayTimerRef.current = setInterval(() => {
+      goToNext()
+    }, 5000)
+  }
+
+  // 자동 슬라이드 중지 함수
+  const stopAutoplay = () => {
+    if (autoplayTimerRef.current) {
+      clearInterval(autoplayTimerRef.current)
+      autoplayTimerRef.current = null
+    }
+  }
 
   const goToPrevious = () => {
-    const isFirstSlide = currentIndex === 0
-    const newIndex = isFirstSlide ? desserts.length - 1 : currentIndex - 1
-    setCurrentIndex(newIndex)
+    setCurrentIndex((currentIndex + length - 1) % length)
   }
 
   const goToNext = () => {
-    const isLastSlide = currentIndex === desserts.length - 1
-    const newIndex = isLastSlide ? 0 : currentIndex + 1
-    setCurrentIndex(newIndex)
+    setCurrentIndex(prevIndex => (prevIndex + 1) % length)
   }
-
-  // Handle touch events for mobile swipe
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX)
-  }
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX)
-  }
-
-  const handleTouchEnd = () => {
-    if (touchStart - touchEnd > 50) {
-      // Swipe left
-      goToNext()
-    }
-
-    if (touchStart - touchEnd < -50) {
-      // Swipe right
-      goToPrevious()
-    }
-  }
-
   // Get the previous, current, and next indices with wrap-around
   const getPrevIndex = (index: number) => {
-    return index === 0 ? desserts.length - 1 : index - 1
+    return (index + length - 1) % length
   }
 
   const getNextIndex = (index: number) => {
-    return index === desserts.length - 1 ? 0 : index + 1
+    return (index + 1) % length
   }
+
+  useEffect(() => {
+    startAutoplay()
+    
+    return () => {
+      stopAutoplay()
+    }
+  }, [])
 
   return (
     <div className="w-full relative py-10 overflow-hidden bg-secondary-color">
       <div
         ref={carouselRef}
         className="flex items-center justify-center gap-4 overflow-hidden"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
       >
         {/* Previous Slide (Left Side) */}
         <div className="relative w-1/2 h-[350px] md:h-[400px] opacity-70 transform transition-all duration-300 rounded-xl overflow-hidden shrink-0">
@@ -121,7 +119,7 @@ export default function Carousel() {
         </div>
 
         {/* Current Slide (Center) */}
-        <div className="relative w-1/2 h-[350px] md:h-[400px] z-10 transition-all duration-300 rounded-xl overflow-hidden shrink-0">
+        <div className="relative w-1/2 h-[350px] md:h-[400px] transition-all duration-300 rounded-xl overflow-hidden shrink-0">
           <img
             src={desserts[currentIndex].image || "/placeholder.svg"}
             alt={desserts[currentIndex].alt}
@@ -159,7 +157,7 @@ export default function Carousel() {
       {/* Navigation Buttons */}
       <button
         onClick={goToPrevious}
-        className="absolute left-6 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-colors z-20"
+        className="absolute left-6 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-colors"
         aria-label="이전 이미지"
       >
         <ChevronLeft className="h-6 w-6 text-[#808080]" />
@@ -167,7 +165,7 @@ export default function Carousel() {
 
       <button
         onClick={goToNext}
-        className="absolute right-6 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-colors z-20"
+        className="absolute right-6 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-colors"
         aria-label="다음 이미지"
       >
         <ChevronRight className="h-6 w-6 text-[#808080]" />

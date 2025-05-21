@@ -192,7 +192,7 @@ export default function EditorPicks() {
         {/* Navigation Buttons */}
         <button
           onClick={goToPrevPage}
-          className="absolute left-0 top-1/3 -translate-y-1/2 -translate-x-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-all duration-300 hover:scale-105 active:scale-95 z-20"
+          className="absolute left-0 top-1/3 -translate-y-1/2 -translate-x-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-all duration-300"
           aria-label="이전 페이지"
         >
           <ChevronLeft className="h-6 w-6 text-[#808080]" />
@@ -200,7 +200,7 @@ export default function EditorPicks() {
 
         <button
           onClick={goToNextPage}
-          className="absolute right-0 top-1/3 -translate-y-1/2 translate-x-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-all duration-300 hover:scale-105 active:scale-95 z-20"
+          className="absolute right-0 top-1/3 -translate-y-1/2 translate-x-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-all duration-300"
           aria-label="다음 페이지"
         >
           <ChevronRight className="h-6 w-6 text-[#808080]" />
