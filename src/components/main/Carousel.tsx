@@ -5,57 +5,11 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { MainProject } from "@/lib/projectInterface"
+import { useRouter } from "next/navigation"
 
-const desserts = [
-  {
-    id: 1,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvODA0ZjQ3NmYtN2U3MS00ZDI5LTk2NDktYTVlMDcyYzIwZDRhL2JmNzVmMjkzLThjOGYtNDgyMS04YWYwLTEzYzQyZjE0YWIxMy5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
-    alt: "전통 디저트 상자",
-    title: "트러플 판매자",
-    subtitle: "무슨무슨 트러플 초콜릿",
-    badge: "10000% 달성!",
-    description: "뭔가 뭔가 만들어서 어쩌구저쩌구 합니다 사려면 지금이 기회!",
-  },
-  {
-    id: 2,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvOTMwYTE2MzktODFiMS00YTUzLTkzYmQtMDk1NTRlZmMyMDQzL2I1ZjQwZjY0LWRhNDQtNGJmMC1hNmUxLWVhY2RmOTI4NzUzYS5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
-    alt: "트러플 초콜릿",
-    title: "트러플 판매자",
-    subtitle: "무슨무슨 트러플 초콜릿2",
-    badge: "10000% 달성!",
-    description: "뭔가 뭔가 만들어서 어쩌구저쩌구 합니다 사려면 지금이 기회!",
-  },
-  {
-    id: 3,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvNmM5M2ZhZjAtYzkzOC00ZjE2LTkzZTctZGM2ZTk5ZGM1ZTk4L2Q4YmYxNzBmLTY2NGItNDRlMS04NGU1LTNjYjUyZGY0YzVlYy5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
-    alt: "특별 디저트",
-    title: "트러플 판매자",
-    subtitle: "무슨무슨 트러플 초콜릿3",
-    badge: "10000% 달성!",
-    description: "뭔가 뭔가 만들어서 어쩌구저쩌구 합니다 사려면 지금이 기회!",
-  },
-  {
-    id: 4,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvNmM5M2ZhZjAtYzkzOC00ZjE2LTkzZTctZGM2ZTk5ZGM1ZTk4L2Q4YmYxNzBmLTY2NGItNDRlMS04NGU1LTNjYjUyZGY0YzVlYy5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
-    alt: "특별 디저트",
-    title: "트러플 판매자",
-    subtitle: "무슨무슨 트러플 초콜릿4",
-    badge: "10000% 달성!",
-    description: "뭔가 뭔가 만들어서 어쩌구저쩌구 합니다 사려면 지금이 기회!",
-  },
-  {
-    id: 5,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvNmM5M2ZhZjAtYzkzOC00ZjE2LTkzZTctZGM2ZTk5ZGM1ZTk4L2Q4YmYxNzBmLTY2NGItNDRlMS04NGU1LTNjYjUyZGY0YzVlYy5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
-    alt: "특별 디저트",
-    title: "트러플 판매자",
-    subtitle: "무슨무슨 트러플 초콜릿5",
-    badge: "10000% 달성!",
-    description: "뭔가 뭔가 만들어서 어쩌구저쩌구 합니다 사려면 지금이 기회!",
-  },
-]
-
-export default function Carousel() {
-  const length = 5;
+export default function Carousel({ projects, isLoading }: {projects: MainProject[], isLoading: boolean}) {
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0)
   const carouselRef = useRef<HTMLDivElement>(null)
   const autoplayTimerRef = useRef<NodeJS.Timeout | null>(null)
@@ -80,19 +34,23 @@ export default function Carousel() {
   }
 
   const goToPrevious = () => {
-    setCurrentIndex((currentIndex + length - 1) % length)
+    setCurrentIndex(prev => (prev + projects.length - 1) % projects.length )
   }
 
   const goToNext = () => {
-    setCurrentIndex(prevIndex => (prevIndex + 1) % length)
+    setCurrentIndex(prev => (prev + 1) % projects.length);
   }
   // Get the previous, current, and next indices with wrap-around
   const getPrevIndex = (index: number) => {
-    return (index + length - 1) % length
+    return (index + projects.length - 1) % projects.length
   }
 
   const getNextIndex = (index: number) => {
-    return (index + 1) % length
+    return (index + 1) % projects.length
+  }
+
+  const moveToProjectPage = (projectId: number) => {
+    router.push(`/project/${projectId}`)
   }
 
   useEffect(() => {
@@ -101,7 +59,11 @@ export default function Carousel() {
     return () => {
       stopAutoplay()
     }
-  }, [])
+  }, [projects])
+
+  if (projects === null || projects.length === 0) {
+    return <div>로딩 중입니다.</div> // 로딩 표시 필요
+  }
 
   return (
     <div className="w-full relative py-10 overflow-hidden bg-secondary-color">
@@ -110,48 +72,55 @@ export default function Carousel() {
         className="flex items-center justify-center gap-4 overflow-hidden"
       >
         {/* Previous Slide (Left Side) */}
-        <div className="relative w-1/2 h-[350px] md:h-[400px] opacity-70 transform transition-all duration-300 rounded-xl overflow-hidden shrink-0">
-          <img
-            src={desserts[getPrevIndex(currentIndex)].image || "/placeholder.svg"}
-            alt={desserts[getPrevIndex(currentIndex)].alt}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        {
+          projects[getPrevIndex(currentIndex)] && 
+          <div className="relative w-1/2 h-[350px] md:h-[400px] opacity-70 transform transition-all duration-300 rounded-xl overflow-hidden shrink-0">
+            <img
+              src={projects[getPrevIndex(currentIndex)].imageUrl || "/placeholder.svg"}
+              alt={projects[getPrevIndex(currentIndex)].title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        }
 
         {/* Current Slide (Center) */}
-        <div className="relative w-1/2 h-[350px] md:h-[400px] transition-all duration-300 rounded-xl overflow-hidden shrink-0">
+        {projects[currentIndex] && <div
+          className="relative w-1/2 h-[350px] md:h-[400px] transition-all duration-300 rounded-xl overflow-hidden shrink-0"
+          onClick={() => moveToProjectPage(projects[currentIndex].projectId)}
+        >
           <img
-            src={desserts[currentIndex].image || "/placeholder.svg"}
-            alt={desserts[currentIndex].alt}
+            src={projects[currentIndex].imageUrl || "/placeholder.svg"}
+            alt={projects[currentIndex].title}
             className="w-full h-full object-cover"
           />
 
-          {desserts[currentIndex].title && (
+          {projects[currentIndex].title && (
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent text-white">
               <div className="space-y-1">
-                <p className="text-sm font-medium">{desserts[currentIndex].title}</p>
-                {desserts[currentIndex].subtitle && (
-                  <h2 className="text-xl md:text-2xl font-bold">{desserts[currentIndex].subtitle}</h2>
+                <p className="text-sm font-medium">{projects[currentIndex].title}</p>
+                {projects[currentIndex].description && (
+                  <h2 className="text-xl md:text-2xl font-bold">{projects[currentIndex].description}</h2>
                 )}
-                {desserts[currentIndex].badge && (
-                  <span className="inline-block bg-[#fb6f92] text-white px-2 py-0.5 rounded-full text-xs font-medium">
-                    {desserts[currentIndex].badge}
+                <span className="inline-block bg-[#fb6f92] text-white px-2 py-0.5 rounded-full text-xs font-medium">
+                    {projects[currentIndex].achievementRate * 100} % 달성
                   </span>
-                )}
-                <p className="text-xs mt-1">{desserts[currentIndex].description}</p>
+                <p className="text-xs mt-1">{projects[currentIndex].description}</p>
               </div>
             </div>
           )}
-        </div>
+        </div>}
 
         {/* Next Slide (Right Side) */}
-        <div className="relative w-1/2 h-[350px] md:h-[400px] opacity-70 transform transition-all duration-300 rounded-xl overflow-hidden shrink-0">
-          <img
-            src={desserts[getNextIndex(currentIndex)].image || "/placeholder.svg"}
-            alt={desserts[getNextIndex(currentIndex)].alt}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        {
+          projects[getNextIndex(currentIndex)] && 
+          <div className="relative w-1/2 h-[350px] md:h-[400px] opacity-70 transform transition-all duration-300 rounded-xl overflow-hidden shrink-0">
+            <img
+              src={projects[getNextIndex(currentIndex)].imageUrl || "/placeholder.svg"}
+              alt={projects[getNextIndex(currentIndex)].title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        }
       </div>
 
       {/* Navigation Buttons */}
@@ -173,7 +142,7 @@ export default function Carousel() {
 
       {/* Dots Indicator */}
       <div className="flex justify-center gap-2 mt-6">
-        {desserts.map((_, index) => (
+        {projects.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}

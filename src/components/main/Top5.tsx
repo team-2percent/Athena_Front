@@ -1,65 +1,71 @@
-import Image from "next/image"
+"use client"
+
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { useApi } from "@/hooks/useApi"
+import { MainProject } from "@/lib/projectInterface"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation";
 
-const categories = [
-  { id: "all", name: "전체", active: true },
-  { id: "design", name: "디자인 문구", active: false },
-  { id: "food", name: "푸드", active: false },
-  { id: "boardgame", name: "보드게임", active: false },
-  { id: "doll", name: "인형", active: false },
-]
+interface Response {
+  allTopView: MainProject[],
+  categoryTopView: CategoryItem[]
+}
 
-const topProducts = [
-  {
-    id: 1,
-    rank: 1,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvYWIwNGI4MjctNDdhMy00MTE0LWJiYWYtNmY3ZTYzYWZiM2E0LzhlZGNhOWM0LTdhOGUtNDFjOS1iNzg1LTQ5ZDdjNjEzY2M2MS5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
-    title: "무슨무슨 트러플 초콜릿",
-    seller: "판매자 이름",
-    description: "무슨무슨 재료로 만들었습니다. 사려면 지금이 기회!",
-    achievement: "10000% 달성!",
-    featured: true,
-  },
-  {
-    id: 2,
-    rank: 2,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvYWIwNGI4MjctNDdhMy00MTE0LWJiYWYtNmY3ZTYzYWZiM2E0LzhlZGNhOWM0LTdhOGUtNDFjOS1iNzg1LTQ5ZDdjNjEzY2M2MS5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
-    title: "무슨무슨 트러플 초콜릿",
-    seller: "판매자 이름",
-    description: "무슨무슨 재료로 만들었습니다. 사려면 지금이 기회!",
-    achievement: "10000% 달성!",
-  },
-  {
-    id: 3,
-    rank: 3,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvYWIwNGI4MjctNDdhMy00MTE0LWJiYWYtNmY3ZTYzYWZiM2E0LzhlZGNhOWM0LTdhOGUtNDFjOS1iNzg1LTQ5ZDdjNjEzY2M2MS5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==", // Reusing image for demo
-    title: "무슨무슨 트러플 초콜릿",
-    seller: "판매자 이름",
-    description: "무슨무슨 재료로 만들었습니다. 사려면 지금이 기회!",
-    achievement: "10000% 달성!",
-  },
-  {
-    id: 4,
-    rank: 4,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvYWIwNGI4MjctNDdhMy00MTE0LWJiYWYtNmY3ZTYzYWZiM2E0LzhlZGNhOWM0LTdhOGUtNDFjOS1iNzg1LTQ5ZDdjNjEzY2M2MS5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==", // Reusing image for demo
-    title: "무슨무슨 트러플 초콜릿",
-    seller: "판매자 이름",
-    description: "무슨무슨 재료로 만들었습니다. 사려면 지금이 기회!",
-    achievement: "10000% 달성!",
-  },
-  {
-    id: 5,
-    rank: 5,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvYWIwNGI4MjctNDdhMy00MTE0LWJiYWYtNmY3ZTYzYWZiM2E0LzhlZGNhOWM0LTdhOGUtNDFjOS1iNzg1LTQ5ZDdjNjEzY2M2MS5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==", // Reusing image for demo
-    title: "무슨무슨 트러플 초콜릿",
-    seller: "판매자 이름",
-    description: "무슨무슨 재료로 만들었습니다. 사려면 지금이 기회!",
-    achievement: "10000% 달성!",
-  },
-]
+interface CategoryItem {
+  categoryId: number,
+  categoryName: string,
+  items: MainProject[]
+}
 
 export default function TopFive() {
+  const router = useRouter()
+  const { isLoading, apiCall } = useApi()
+  const [activeTab, setActiveTab] = useState(0) 
+  const [categories, setCategories] = useState<{ [key: number]: string }>({
+    0: "전체"
+  })
+  const [categoryProjects, setCategoryProjects] = useState<{ [key: number]: MainProject[] }>({
+    0: []
+  })
+  const rank1Project = categoryProjects[activeTab][0];
+  const restProject = categoryProjects[activeTab].slice(1);
+  
+
+  const loadProjects = () => {
+    apiCall<Response>("/api/project/categoryRankingView", "GET").then(({ data }) => {
+      if (data?.allTopView && data.categoryTopView) {
+        setCategoryProjects({
+          ...categoryProjects,
+          0: data?.allTopView
+        })
+        data.categoryTopView.map(categoryItem => {
+          setCategories(prev => {
+            prev[categoryItem.categoryId] = categoryItem.categoryName
+            return prev
+          })
+        })
+      }
+      
+    })
+  }
+
+  const moveToPage = (categoryId: number) => {
+    if (categoryId) router.push(`/category/${categoryId}`)
+  }
+
+  const moveToProjectPage = (projectId: number) => {
+    router.push(`/project/${projectId}`)
+  }
+
+  useEffect(() => {
+    loadProjects();
+  }, [])
+
+  if (categories === null) {
+    return <div>로딩 중입니다.</div> // 로딩 표시 필요
+  }
+  
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-12">
       <div className="flex items-center mb-8">
@@ -70,87 +76,87 @@ export default function TopFive() {
 
       {/* Category filters */}
       <div className="flex flex-wrap gap-2 mb-8">
-        {categories.map((category) => (
+        {Object.keys(categories).map((categoryId) => (
           <button
-            key={category.id}
+            key={categoryId}
             className={cn(
               "px-4 py-2 rounded-full text-sm font-medium transition-colors",
-              category.active ? "bg-main-color text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300",
+              +categoryId === activeTab ? "bg-main-color text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300",
             )}
           >
-            {category.name}
+            {categories[+categoryId]}
           </button>
         ))}
       </div>
 
-      {/* Top products grid - revised layout */}
+      {/* Top projects grid - revised layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Featured product (larger) - takes up half the grid */}
-        {topProducts
-          .filter((product) => product.featured)
-          .map((product) => (
-            <div key={product.id} className="bg-white rounded-lg overflow-hidden">
-              <div className="relative">
-                <div className="absolute top-2 left-2 z-10">
-                  <div className="bg-main-color text-white w-8 h-8 flex items-center justify-center rounded-sm font-bold">
-                    {product.rank}
-                  </div>
-                </div>
-                <div className="relative aspect-square">
-                    <img 
-                        src={product.image || "/placeholder.svg"} 
-                        alt={product.title} 
-                        className="w-full h-full object-cover"
-                    />
-                </div>
-                <div className="p-4">
-                  <p className="text-sm text-gray-600">{product.seller}</p>
-                  <h3 className="font-bold text-lg mt-1">{product.title}</h3>
-                  <p className="text-sm mt-1">{product.description}</p>
-                  <p className="text-main-color font-bold mt-2">{product.achievement}</p>
-                </div>
+        { rank1Project && <div
+          className="bg-white rounded-lg overflow-hidden"
+          onClick={() => moveToProjectPage(rank1Project.projectId)}
+        >
+          <div className="relative">
+            <div className="absolute top-2 left-2 z-10">
+              <div className="bg-main-color text-white w-8 h-8 flex items-center justify-center rounded-sm font-bold">
+                1
               </div>
             </div>
-          ))}
+            <div className="relative aspect-square">
+                <img 
+                    src={rank1Project.imageUrl || "/placeholder.svg"} 
+                    alt={rank1Project.title} 
+                    className="w-full h-full object-cover"
+                />
+            </div>
+            <div className="p-4">
+              <p className="text-sm text-gray-600">{rank1Project.sellerName}</p>
+              <h3 className="font-bold text-lg mt-1">{rank1Project.title}</h3>
+              <p className="text-sm mt-1">{rank1Project.description}</p>
+              <p className="text-main-color font-bold mt-2">{rank1Project.achievementRate * 100} % 달성!</p>
+            </div>
+          </div>
+        </div>}
 
-        {/* Regular products (smaller) - takes up the other half in a 2x2 grid */}
-        <div className="grid grid-cols-2 grid-rows-2 gap-4">
-          {topProducts
-            .filter((product) => !product.featured)
-            .map((product) => (
-              <div key={product.id} className="bg-white rounded-lg overflow-hidden">
+        {/* Regular projects (smaller) - takes up the other half in a 2x2 grid */}
+        {restProject && <div className="grid grid-cols-2 grid-rows-2 gap-4">
+          {restProject
+            .map((project, idx) => (
+              <div
+                key={project.projectId} className="bg-white rounded-lg overflow-hidden"
+                onClick={() => moveToProjectPage(project.projectId)}
+              >
                 <div className="relative">
                     <div className="absolute top-2 left-2 z-10">
                         <div className="bg-main-color text-white w-6 h-6 flex items-center justify-center rounded-sm font-bold text-sm">
-                        {product.rank}
+                        {idx + 2}
                         </div>
                     </div>
                     <div className="relative aspect-square">
                     <img 
-                        src={product.image || "/placeholder.svg"} 
-                        alt={product.title} 
+                        src={project.imageUrl || "/placeholder.svg"} 
+                        alt={project.title} 
                         className="w-full h-full object-cover"
                     />
                     </div>
                   <div className="p-2">
-                    <p className="text-xs text-gray-600">{product.seller}</p>
-                    <h3 className="font-bold text-sm">{product.title}</h3>
-                    <p className="text-main-color font-bold text-xs mt-1">{product.achievement}</p>
+                    <p className="text-xs text-gray-600">{project.sellerName}</p>
+                    <h3 className="font-bold text-sm">{project.title}</h3>
+                    <p className="text-main-color font-bold text-xs mt-1">{project.achievementRate * 100} % 달성!</p>
                   </div>
                 </div>
               </div>
             ))}
-        </div>
+        </div>}
       </div>
 
       {/* View all projects button */}
       <div className="flex justify-end mt-8">
-        <Link
-          href="#"
+        <button
+          onClick={() => moveToPage(activeTab)}
           className="inline-flex items-center px-4 py-2 border border-main-color text-main-color rounded hover:bg-pink-50 transition-colors"
         >
           프로젝트 전체보기 →
-        </Link>
+        </button>
       </div>
     </div>
   )

@@ -3,65 +3,14 @@
 import { useState, useRef, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { MainProject } from "@/lib/projectInterface"
 
-const products = [
-  {
-    id: 1,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvMjljM2E4M2UtY2U2Yi00MGI4LThhOTAtMzFhNDZlMzk0YjZjLzNhYjk0M2Y4LTEyMzMtNDM0MS1iMDY2LWY3NDQ2YzZhYTZkMC5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
-    sellerName: "판매자 이름",
-    title: "무슨무슨 트러플 초콜릿",
-    description: "무슨무슨 재료로 만들었습니다. 사려면 지금이 기회!",
-    achievement: "10000% 달성!",
-  },
-  {
-    id: 2,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvMjljM2E4M2UtY2U2Yi00MGI4LThhOTAtMzFhNDZlMzk0YjZjLzNhYjk0M2Y4LTEyMzMtNDM0MS1iMDY2LWY3NDQ2YzZhYTZkMC5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
-    sellerName: "판매자 이름",
-    title: "무슨무슨 트러플 초콜릿",
-    description: "무슨무슨 재료로 만들었습니다. 사려면 지금이 기회!",
-    achievement: "10000% 달성!",
-  },
-  {
-    id: 3,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvMjljM2E4M2UtY2U2Yi00MGI4LThhOTAtMzFhNDZlMzk0YjZjLzNhYjk0M2Y4LTEyMzMtNDM0MS1iMDY2LWY3NDQ2YzZhYTZkMC5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
-    sellerName: "판매자 이름",
-    title: "무슨무슨 트러플 초콜릿",
-    description: "무슨무슨 재료로 만들었습니다. 사려면 지금이 기회!",
-    achievement: "10000% 달성!",
-  },
-  {
-    id: 4,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvMjljM2E4M2UtY2U2Yi00MGI4LThhOTAtMzFhNDZlMzk0YjZjLzNhYjk0M2Y4LTEyMzMtNDM0MS1iMDY2LWY3NDQ2YzZhYTZkMC5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
-    sellerName: "판매자 이름",
-    title: "무슨무슨 트러플 초콜릿",
-    description: "무슨무슨 재료로 만들었습니다. 사려면 지금이 기회!",
-    achievement: "10000% 달성!",
-  },
-  {
-    id: 5,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvMjljM2E4M2UtY2U2Yi00MGI4LThhOTAtMzFhNDZlMzk0YjZjLzNhYjk0M2Y4LTEyMzMtNDM0MS1iMDY2LWY3NDQ2YzZhYTZkMC5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
-    sellerName: "판매자 이름",
-    title: "무슨무슨 트러플 초콜릿",
-    description: "무슨무슨 재료로 만들었습니다. 사려면 지금이 기회!",
-    achievement: "10000% 달성!",
-  },
-  {
-    id: 6,
-    image: "https://img.tumblbug.com/eyJidWNrZXQiOiJ0dW1ibGJ1Zy1pbWctYXNzZXRzIiwia2V5IjoiY292ZXIvMjljM2E4M2UtY2U2Yi00MGI4LThhOTAtMzFhNDZlMzk0YjZjLzNhYjk0M2Y4LTEyMzMtNDM0MS1iMDY2LWY3NDQ2YzZhYTZkMC5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjQ2NSwiaGVpZ2h0Ijo0NjUsIndpdGhvdXRFbmxhcmdlbWVudCI6dHJ1ZX19fQ==",
-    sellerName: "판매자 이름",
-    title: "무슨무슨 트러플 초콜릿",
-    description: "무슨무슨 재료로 만들었습니다. 사려면 지금이 기회!",
-    achievement: "10000% 달성!",
-  },
-]
-
-export default function EditorPicks() {
+export default function EditorPicks({ projects, isLoading }: {projects: MainProject[], isLoading: boolean}) {
   const [currentPage, setCurrentPage] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
   const [itemsPerPage, setItemsPerPage] = useState(4) // Default to 4 items per page
+  const totalPages = Math.ceil(projects.length / itemsPerPage)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
-
   // Calculate total pages based on screen size and items
   useEffect(() => {
     const handleResize = () => {
@@ -74,7 +23,6 @@ export default function EditorPicks() {
       }
 
       setItemsPerPage(newItemsPerPage)
-      setTotalPages(Math.ceil(products.length / newItemsPerPage))
     }
 
     // Initial calculation
@@ -107,11 +55,11 @@ export default function EditorPicks() {
   }
 
   const goToPrevPage = () => {
-    goToPage(currentPage - 1)
+    goToPage((currentPage - 1 + totalPages) % totalPages)
   }
 
   const goToNextPage = () => {
-    goToPage(currentPage + 1)
+    goToPage((currentPage + 1) % totalPages)
   }
 
   // Create page data with placeholders for empty slots
@@ -120,7 +68,7 @@ export default function EditorPicks() {
 
     for (let i = 0; i < totalPages; i++) {
       const startIndex = i * itemsPerPage
-      const pageItems = products.slice(startIndex, startIndex + itemsPerPage)
+      const pageItems = projects.slice(startIndex, startIndex + itemsPerPage)
 
       // Fill remaining slots with empty placeholders to maintain grid layout
       const emptySlots = itemsPerPage - pageItems.length
@@ -139,6 +87,10 @@ export default function EditorPicks() {
 
   const pages = getPageData()
 
+  if (projects === null || projects.length === 0) {
+    return <div>로딩 중입니다.</div> // 로딩 표시 필요
+  }
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-12">
       {/* Title */}
@@ -155,6 +107,8 @@ export default function EditorPicks() {
               transform: `translateX(-${currentPage * 100}%)`,
             }}
           >
+
+
             {/* Pages Container */}
             {pages.map((pageItems, pageIndex) => (
               <div key={pageIndex} className="w-full flex-shrink-0">
