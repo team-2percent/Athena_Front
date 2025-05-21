@@ -26,12 +26,13 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
   const [sort, setSort] = useState(type === "new" ? null : listType[type].sort[0]);
 
   const sortTypeParamName = type === "deadline" ? "sortTypeDeadline" : "sortType"
+  const lastProjectIdName = type === "search" || type === "category" ? "cursorId" : "lastProjectId"
 
   const url = type === "category" ? 
     `${listType[type].apiUrl}${categoryId === 0 ? `${sort ? `?sortType=${sort}` : ""}` : `?categoryId=${categoryId}${sort ? `&sortType=${sort}` : ""}`}` : 
     `${listType[type].apiUrl}${sort ? `?${sortTypeParamName}=${sort}` : ""}${type === "search" && searchWord ? `${sort ? "&" : "?"}searchTerm=${searchWord}` : ""}`
   const morePage = lastProjectId !== null;
-  const nextPageQueryParam = morePage ? `&cursorValue=${cursorValue}&cursorId=${lastProjectId}` : "";
+  const nextPageQueryParam = morePage ? `${type === "new" ? "?" : "&"}cursorValue=${cursorValue}&${lastProjectIdName}=${lastProjectId}` : "";
 
   const handleSortClick = (newSort: string) => {
       if(sort === newSort) return;
@@ -51,7 +52,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
         if ("content" in data) setProjects([...projects, ...(data.content as listProject[])]);
         if ("nextCursorValue" in data) setCursorValue(data.nextCursorValue as string | null);
         if ("nextProjectId" in data) setLastProjectId(data.nextProjectId as number | null); 
-        if ("total" in data) setTotalCount(data.total as number);
+        if (totalCount === 0 && "total" in data) setTotalCount(data.total as number);
       }
     })
   }
