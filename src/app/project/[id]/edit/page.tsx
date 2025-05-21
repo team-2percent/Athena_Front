@@ -95,7 +95,7 @@ export default function ProductEdit() {
           images: processedImages,
           markdown: data.markdown || "", // contentMarkdown 필드 사용
           supportOptions: processedOptions,
-          planType: data.planType || "basic",
+          platformPlan: data.planName || "BASIC",
         })
 
         setIsLoading(false)
@@ -186,7 +186,6 @@ export default function ProductEdit() {
 
       // 프로젝트 데이터 준비
       const projectData = {
-        id: state.projectId,
         title: state.title,
         description: state.description,
         goalAmount: Number.parseInt(state.targetAmount.replace(/,/g, ""), 10),
@@ -195,6 +194,7 @@ export default function ProductEdit() {
         endAt: state.endDate.toISOString(),
         shippedAt: state.deliveryDate.toISOString(),
         categoryId: state.categoryId,
+        bankAccountId: state.bankAccountId || 0, // 선택한 계좌 ID 사용
         images: imageData, // URL과 File 객체 모두 포함
         products: state.supportOptions.map((option) => ({
           id: option.id, // 기존 옵션의 ID 포함

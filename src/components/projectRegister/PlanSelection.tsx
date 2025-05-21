@@ -1,7 +1,7 @@
 "use client"
 import { Check } from "lucide-react"
 import { useProjectFormStore } from "@/stores/useProjectFormStore"
-import type { PlanType } from "@/stores/useProjectFormStore"
+import type { PlatformPlan } from "@/stores/useProjectFormStore"
 
 interface PlanFeature {
   text: string
@@ -9,7 +9,7 @@ interface PlanFeature {
 }
 
 interface PlanOption {
-  type: PlanType
+  type: PlatformPlan
   title: string
   platformFee: string
   settlementFee: string
@@ -21,12 +21,12 @@ interface PlanOption {
 }
 
 export default function PlanSelection() {
-  const { planType, updateFormData } = useProjectFormStore()
+  const { platformPlan, updateFormData } = useProjectFormStore()
 
   // 플랜 옵션 정의
   const planOptions: PlanOption[] = [
     {
-      type: "basic",
+      type: "BASIC",
       title: "Basic",
       platformFee: "3%",
       settlementFee: "0%",
@@ -40,7 +40,7 @@ export default function PlanSelection() {
       ],
     },
     {
-      type: "pro",
+      type: "PRO",
       title: "Pro",
       platformFee: "5%",
       settlementFee: "0%",
@@ -50,11 +50,11 @@ export default function PlanSelection() {
       tagline: "더 많은 사람들이 보기를 원하신다면",
       features: [
         { text: "Basic의 모든 서비스", included: true },
-        { text: "\"에디터 픽\"에 프로젝트 노출", included: true },
+        { text: '"에디터 픽"에 프로젝트 노출', included: true },
       ],
     },
     {
-      type: "premium",
+      type: "PREMIUM",
       title: "Premium",
       platformFee: "9%",
       settlementFee: "0%",
@@ -70,8 +70,8 @@ export default function PlanSelection() {
   ]
 
   // 플랜 선택 핸들러
-  const handleSelectPlan = (type: PlanType) => {
-    updateFormData({ planType: type })
+  const handleSelectPlan = (type: PlatformPlan) => {
+    updateFormData({ platformPlan: type })
   }
 
   return (
@@ -97,7 +97,7 @@ export default function PlanSelection() {
               <div className="mb-6">
                 <div className="flex items-center justify-between">
                   <h3 className="text-2xl font-bold">{plan.title}</h3>
-                  {plan.type === "premium" && (
+                  {plan.type === "PREMIUM" && (
                     <span className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">실시 필요</span>
                   )}
                 </div>
@@ -114,12 +114,12 @@ export default function PlanSelection() {
                 type="button"
                 onClick={() => handleSelectPlan(plan.type)}
                 className={`w-full py-3 px-4 rounded-lg border flex items-center justify-center mb-6 ${
-                  planType === plan.type
+                  platformPlan === plan.type
                     ? "border-main-color text-main-color"
                     : "border-gray-300 text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                선택하기 {planType === plan.type && <Check className="ml-2 h-5 w-5" />}
+                선택하기 {platformPlan === plan.type && <Check className="ml-2 h-5 w-5" />}
               </button>
 
               {/* 기능 목록 */}

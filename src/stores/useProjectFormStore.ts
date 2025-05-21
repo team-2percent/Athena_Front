@@ -32,8 +32,8 @@ export interface ApiResponse<T> {
   status: number
 }
 
-// planType 타입 추가
-export type PlanType = "basic" | "pro" | "premium"
+// planType 타입을 planName으로 변경하고 값을 대문자로 수정
+export type PlatformPlan = "BASIC" | "PRO" | "PREMIUM"
 
 // 카테고리 타입 추가
 export interface Category {
@@ -63,7 +63,8 @@ interface ProjectFormState {
 
   // 3단계 폼 데이터
   supportOptions: SupportOption[]
-  planType: PlanType
+  platformPlan: PlatformPlan // planName에서 platformPlan으로 변경
+  bankAccountId: number | null // 선택된 계좌 ID 추가
 
   // 로딩 및 에러 상태
   isLoading: boolean
@@ -106,8 +107,9 @@ const initialState = {
     "# 상품 상세 설명\n\n상품에 대한 자세한 설명을 작성해주세요.\n\n## 특징\n\n- 첫 번째 특징\n- 두 번째 특징\n- 세 번째 특징\n\n## 사용 방법\n\n1. 첫 번째 단계\n2. 두 번째 단계\n3. 세 번째 단계\n\n> 참고: 마크다운 문법을 사용하여 작성할 수 있습니다.",
 
   supportOptions: [],
-  planType: "basic" as PlanType,
+  platformPlan: "BASIC" as PlatformPlan, // planName에서 platformPlan으로 변경
 
+  bankAccountId: null,
   isLoading: false,
   isSubmitting: false,
   error: null,
@@ -256,7 +258,7 @@ export const submitProject = async (
     const projectData = {
       sellerId: userId || 0, // 로그인한 사용자 ID 사용
       categoryId: state.categoryId || 0, // 선택한 카테고리 ID 사용
-      bankAccountId: 0, // 임시 값, 실제로는 사용자의 은행 계좌 ID를 사용해야 함
+      bankAccountId: state.bankAccountId || 0, // 선택한 계좌 ID 사용
       imageGroupId: state.projectId,
       title: state.title,
       description: state.description,
@@ -266,7 +268,7 @@ export const submitProject = async (
       endAt: state.endDate.toISOString(),
       shippedAt: state.deliveryDate.toISOString(),
       imageUrls: allImageUrls, // 모든 이미지 URL 배열로 전송
-      planType: state.planType, // 선택한 플랜 타입
+      platformPlan: state.platformPlan, // planName에서 platformPlan으로 변경
       products: state.supportOptions.map((option) => ({
         name: option.name,
         description: option.description,
