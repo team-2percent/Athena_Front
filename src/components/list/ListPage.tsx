@@ -31,7 +31,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
     `${listType[type].apiUrl}${categoryId === 0 ? `${sort ? `?sortType=${sort}` : ""}` : `?categoryId=${categoryId}${sort ? `&sortType=${sort}` : ""}`}` : 
     `${listType[type].apiUrl}${sort ? `?${sortTypeParamName}=${sort}` : ""}${type === "search" && searchWord ? `${sort ? "&" : "?"}searchTerm=${searchWord}` : ""}`
   const morePage = lastProjectId !== null;
-  const nextPageQueryParam = morePage ? `&cursorValue=${cursorValue}&lastProjectId=${lastProjectId}` : "";
+  const nextPageQueryParam = morePage ? `&cursorValue=${cursorValue}&cursorId=${lastProjectId}` : "";
 
   const handleSortClick = (newSort: string) => {
       if(sort === newSort) return;
