@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { formatDateInAdmin } from "@/lib/utils";
-import clsx from "clsx";
 import Pagination from "@/components/common/Pagination";
+import EmptyMessage from "@/components/common/EmptyMessage";
 
 interface Project {
     projectId: number;
@@ -41,11 +41,13 @@ export default function ApprovalPage() {
     });
     const [totalPageCount, setTotalPageCount] = useState(1);
     const [pendingCount, setPendingCount] = useState(0);
+    const [loadError, setLoadError] = useState(false);
+    const isEmpty = totalPageCount === 0 && !isLoading && !loadError;
 
     const [search, setSearch] = useState("");
 
-    const baseUri = "/api/admin/projects"
-    const queryParamUri = `?page=${queryParams.page}&sort=${queryParams.sort}${queryParams.keyword.length ? `&keyword=${queryParams.keyword}` : ""}`
+    const baseUri = "/api/admin/project"
+    const queryParamUri = `?page=${queryParams.page}&direction=${queryParams.sort}${queryParams.keyword.length ? `&keyword=${queryParams.keyword}` : ""}`
     const url = `${baseUri}${queryParamUri ? `${queryParamUri}` : ""}`
     const loadProjects = () => {
         apiCall<Response>(url, "GET").then(({ data }) => {
@@ -65,7 +67,7 @@ export default function ApprovalPage() {
         setQueryParams({
             page: 0,
             keyword: queryParams.keyword,
-            sort: e.target.value as "old" | "new"
+            sort: e.target.value as "asc" | "desc"
         });
     }
 
@@ -147,6 +149,7 @@ export default function ApprovalPage() {
                     ))}
                 </tbody>
             </table>
+            {isEmpty && <EmptyMessage message="프로젝트가 없습니다." />}
             <Pagination totalPages={totalPageCount} currentPage={queryParams.page} onPageChange={handlePageChange} />
         </div>
     )

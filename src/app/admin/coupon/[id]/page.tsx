@@ -13,10 +13,10 @@ export default function ProjectApprovalDetailPage() {
     const { id } = useParams();
     const router = useRouter();
     const { isLoading, apiCall } = useApi();
-    const [coupon, setcoupon] = useState<CouponDetail | null>(null);
+    const [coupon, setCoupon] = useState<CouponDetail | null>(null);
     const loadData = () => {
-        apiCall<{ data: CouponDetail }>(`/api/coupon/${id}`, "GET").then(({ data }) => {
-            if (data !== null) setcoupon(data.data);
+        apiCall<CouponDetail>(`/api/admin/${id}`, "GET").then(({ data, error }) => {
+            setCoupon(data);
         })
     }
 
