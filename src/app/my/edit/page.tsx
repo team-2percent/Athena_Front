@@ -39,7 +39,7 @@ export default function EditPage() {
                 return null      
         }
     }
-    return <div className="w-full h-full">
+    return <div className="w-full h-full mt-8">
         <Menu menus={menus} currentMenu={currentMenu} onMenuChange={onMenuChange} />
         <div className="w-full mx-auto max-w-6xl pt-10 h-full">
             {renderContent()}
