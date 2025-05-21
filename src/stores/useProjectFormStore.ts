@@ -32,6 +32,15 @@ export interface ApiResponse<T> {
   status: number
 }
 
+// planType 타입 추가
+export type PlanType = "basic" | "pro" | "premium"
+
+// 카테고리 타입 추가
+export interface Category {
+  id: number
+  categoryName: string
+}
+
 // 프로젝트 폼 상태 타입
 interface ProjectFormState {
   // 프로젝트 기본 정보
@@ -41,6 +50,7 @@ interface ProjectFormState {
   // 1단계 폼 데이터
   targetAmount: string
   category: string
+  categoryId: number | null // 카테고리 ID 추가
   title: string
   description: string
   startDate: Date
@@ -53,6 +63,7 @@ interface ProjectFormState {
 
   // 3단계 폼 데이터
   supportOptions: SupportOption[]
+  planType: PlanType
 
   // 로딩 및 에러 상태
   isLoading: boolean
@@ -82,7 +93,8 @@ const initialState = {
   currentStep: 1,
 
   targetAmount: "",
-  category: "책",
+  category: "",
+  categoryId: null,
   title: "",
   description: "",
   startDate: new Date(),
@@ -94,6 +106,7 @@ const initialState = {
     "# 상품 상세 설명\n\n상품에 대한 자세한 설명을 작성해주세요.\n\n## 특징\n\n- 첫 번째 특징\n- 두 번째 특징\n- 세 번째 특징\n\n## 사용 방법\n\n1. 첫 번째 단계\n2. 두 번째 단계\n3. 세 번째 단계\n\n> 참고: 마크다운 문법을 사용하여 작성할 수 있습니다.",
 
   supportOptions: [],
+  planType: "basic" as PlanType,
 
   isLoading: false,
   isSubmitting: false,
@@ -169,7 +182,7 @@ export const fetchProjectId = async (
   setError(null)
 
   try {
-    const response = await apiCall<{ id: number }>("/api/projects", "GET")
+    const response = await apiCall<{ id: number }>("/api/project", "GET")
 
     if (response.error) {
       console.error("Error fetching project ID:", response.error)
@@ -236,8 +249,9 @@ export const submitProject = async (
 
     // 프로젝트 정보 등록
     const projectData = {
-      sellerId: 1, // 임시 값, 실제로는 로그인한 사용자 ID를 사용해야 함
-      categoryId: 1, // 임시 값, 실제로는 선택한 카테고리 ID를 사용해야 함
+      sellerId: 0, // 임시 값, 실제로는 로그인한 사용자 ID를 사용해야 함
+      categoryId: state.categoryId || 0, // 선택한 카테고리 ID 사용
+      bankAccountId: 0, // 임시 값, 실제로는 사용자의 은행 계좌 ID를 사용해야 함
       imageGroupId: state.projectId,
       title: state.title,
       description: state.description,
@@ -247,6 +261,7 @@ export const submitProject = async (
       endAt: state.endDate.toISOString(),
       shippedAt: state.deliveryDate.toISOString(),
       imageUrls: allImageUrls, // 모든 이미지 URL 배열로 전송
+      planType: state.planType, // 선택한 플랜 타입
       products: state.supportOptions.map((option) => ({
         name: option.name,
         description: option.description,
@@ -258,7 +273,7 @@ export const submitProject = async (
 
     console.log("Submitting project data:", projectData)
 
-    const response = await apiCall("/api/projects", "POST", projectData)
+    const response = await apiCall("/api/project", "POST", projectData)
 
     if (response.error) {
       console.error("Project submission failed:", response.error)
@@ -270,6 +285,7 @@ export const submitProject = async (
     console.log("Project submission response:", response.data)
     setSubmitting(false)
     return true
+    
   } catch (err) {
     console.error("Error during submission:", err)
     setError("프로젝트 등록 중 오류가 발생했습니다.")
