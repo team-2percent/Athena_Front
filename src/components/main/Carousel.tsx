@@ -55,7 +55,7 @@ const desserts = [
 ]
 
 export default function Carousel() {
-  const [currentIndex, setCurrentIndex] = useState(1) // Start with the middle image
+  const [currentIndex, setCurrentIndex] = useState(1)
   const [touchStart, setTouchStart] = useState(0)
   const [touchEnd, setTouchEnd] = useState(0)
   const carouselRef = useRef<HTMLDivElement>(null)
