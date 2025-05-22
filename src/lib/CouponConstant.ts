@@ -24,7 +24,7 @@ interface CouponListItem {
 }
 
 interface CouponListResponse {
-    data: CouponListItem[];
+    content: CouponListItem[];
     page: {
         size: number;
         number: number;

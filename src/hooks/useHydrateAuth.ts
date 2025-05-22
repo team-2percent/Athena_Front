@@ -3,21 +3,20 @@ import { jwtDecode } from "jwt-decode"
 import useAuthStore from "@/stores/auth"
 
 export function useHydrateAuth() {
-  const setLoggedIn = useAuthStore((s) => s.setLoggedIn)
-  const setRole = useAuthStore((s) => s.setRole)
-  const setUserId = useAuthStore((s) => s.setUserId)
-
+  const {setLoggedIn, setRole, setUserId} = useAuthStore();
   useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken")
-    const userId = localStorage.getItem("userId")
+    const accessToken = localStorage.getItem("accessToken");
+    const userId = localStorage.getItem("userId");
 
-    if (accessToken) {
-      setLoggedIn(true)
+    if (accessToken && userId) {
+      setLoggedIn(true);
       try {
-        const { role } = jwtDecode<{ role: "ROLE_ADMIN" | "ROLE_USER" }>(accessToken)
-        setRole(role)
+        const { role } = jwtDecode<{ role: "ROLE_ADMIN" | "ROLE_USER" }>(accessToken);
+        setRole(role);
+        setUserId(+userId);
       } catch {
-        setRole("")
+        setRole("");
+        setUserId(null);
       }
     } else {
       setLoggedIn(false)

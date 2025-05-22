@@ -8,6 +8,7 @@ import { useApi } from "@/hooks/useApi"
 import Spinner from "@/components/common/Spinner"
 import { formatDateInAdmin } from "@/lib/utils"
 import Pagination from "@/components/common/Pagination"
+import EmptyMessage from "@/components/common/EmptyMessage"
 
 export default function CouponPage() {
     const router = useRouter()
@@ -16,16 +17,15 @@ export default function CouponPage() {
     const [pageSize, setPageSize] = useState<number>(10)
     const [currentPage, setCurrentPage] = useState<number>(0)
     const [couponList, setCouponList] = useState<CouponListItem[]>([])
-    const [totalElements, setTotalElements] = useState<number>(0)
     const [totalPageCount, setTotalPageCount] = useState<number>(1)
-
-    const url = `/api/coupon?size=${pageSize}&page=${currentPage}${status !== "ALL" ? `&status=${status}` : ""}`
+    const [loadError, setLoadError] = useState(false);
+    const isEmpty = totalPageCount === 0 && !isLoading && !loadError;
+    const url = `/api/admin/${status !== "ALL" ? "/couponByStatus" : "couponList"}?size=${pageSize}&page=${currentPage}${status !== "ALL" ? `&status=${status}` : ""}`
     const loadCouponList = () => {
         apiCall<CouponListResponse>(url, "GET").then(({ data }) => {
             console.log(data);
-            if (data?.data) {
-                setCouponList(data.data);
-                setTotalElements(data.page.totalElements);  
+            if (data?.content) {
+                setCouponList(data.content);
                 setTotalPageCount(data.page.totalPages);
                 setCurrentPage(data.page.number);
             }
@@ -125,6 +125,7 @@ export default function CouponPage() {
                 )}
                 </tbody>
             </table>
+            {isEmpty && <EmptyMessage message="쿠폰이 없습니다." />}
             <Pagination totalPages={totalPageCount} currentPage={currentPage} onPageChange={handlePageChange}/>
         </div>
     )

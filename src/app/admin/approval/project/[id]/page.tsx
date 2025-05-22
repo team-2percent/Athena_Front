@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import clsx from "clsx"
 import ConfirmModal from "@/components/common/ConfirmModal"
 import { useRouter } from "next/navigation";
@@ -15,12 +14,10 @@ import { formatDateInAdmin } from "@/lib/utils"
 
 interface ApprovalProject {
     id: number,
-    category: {
-      id: number,
-      categoryName: string
-    },
+    category: string,
     title: string,
     description: string,
+    planName: string,
     goalAmount: number,
     totalAmount: number,
     markdown: string,
@@ -57,7 +54,7 @@ export default function ProjectApprovalDetailPage() {
     const disabled = approvalStatus === null;
 
     const handleConfirm = () => {
-        apiCall(`/api/admin/projects/${id}/approval`, "PATCH", {
+        apiCall(`/api/admin/project/${id}/approval`, "PATCH", {
             approve: approve,
             // comment: comment
         }).then(({ data }) => {
@@ -68,10 +65,17 @@ export default function ProjectApprovalDetailPage() {
     }
 
     const loadProject = () => {
-        apiCall<ApprovalProject>(`/api/admin/projects/${id}`, "GET").then(({ data }) => {
+        apiCall<ApprovalProject>(`/api/admin/project/${id}`, "GET").then(({ data }) => {
             setProject(data);
         })
     }
+
+    // 재고 상태에 따른 색상 결정
+    const getStockStatusColor = (stock: number) => {
+        if (stock <= 0) return "text-red-600 bg-red-50";
+        if (stock < 10) return "text-amber-600 bg-amber-50";
+        return "text-green-600 bg-green-50";
+    };
 
     useEffect(() => {
         loadProject();
@@ -105,13 +109,20 @@ export default function ProjectApprovalDetailPage() {
 
                 <div className="flex">
                     <span className="w-24 text-sub-gray">카테고리</span>
-                    <span className="flex-1">{project.category.categoryName}</span>
+                    <span className="flex-1">{project.category}</span>
                 </div>
 
                 <div className="flex">
                     <span className="w-24 text-sub-gray">설명</span>
                     <span className="flex-1">
                         {project.description}
+                    </span>
+                </div>
+
+                <div className="flex">
+                    <span className="w-24 text-sub-gray">요금제</span>
+                    <span className="flex-1">
+                        {project.planName}
                     </span>
                 </div>
 
@@ -137,6 +148,58 @@ export default function ProjectApprovalDetailPage() {
                 <h2 className="text-2xl font-medium border-b pb-2">상세 소개</h2>
                 <MarkdownRenderer content={project.markdown} />
             </div>
+
+            {/* 상품 정보 */}
+            <div className="flex flex-col gap-4 mb-6">
+                <h2 className="text-2xl font-medium border-b pb-2">상품 정보</h2>
+                <div className="flex flex-col">
+                    {project.productResponses.map((product, idx) => 
+                        <div key={product.id} className="border-b shadow-sm p-4 bg-white border-gray-border">
+                            <div className="flex justify-between items-start mb-3">
+                            <h3 className="text-lg font-semibold text-gray-900">{product.name}</h3>
+                            <span 
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${getStockStatusColor(product.stock)}`}
+                            >
+                                재고: {product.stock}개
+                            </span>
+                            </div>
+                            
+                            <div className="space-y-3">
+                            <div>
+                                <p className="text-sm text-gray-500 mb-1">상품 설명</p>
+                                <p className="text-sm text-gray-700">{product.description}</p>
+                            </div>
+                            
+                            <div>
+                                <p className="text-sm text-gray-500 mb-1">가격</p>
+                                <p className="text-base font-medium text-gray-900">
+                                {product.price.toLocaleString()}원
+                                </p>
+                            </div>
+                            
+                            {product.options && product.options.length > 0 ? (
+                                <div>
+                                <p className="text-sm text-gray-500 mb-1">옵션</p>
+                                <ul className="text-sm text-gray-700 space-y-1">
+                                    {product.options.map((option, index) => (
+                                    <li key={index} className="flex items-center">
+                                        <span>{JSON.stringify(option)}</span>
+                                    </li>
+                                    ))}
+                                </ul>
+                                </div>
+                            ) : (
+                                <div>
+                                <p className="text-sm text-gray-500 mb-1">옵션</p>
+                                <p className="text-sm text-gray-400 italic">옵션 없음</p>
+                                </div>
+                            )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
             {/* 판매자 정보 */}
             <div className="flex flex-col gap-4">
                 <h2 className="text-2xl font-medium border-b pb-2">판매자 정보</h2>

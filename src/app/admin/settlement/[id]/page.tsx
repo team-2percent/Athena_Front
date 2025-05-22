@@ -4,11 +4,11 @@ import { ArrowLeftIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import SettlementTag from "@/components/admin/SettlementTag"
-import Image from "next/image"
 import { useApi } from "@/hooks/useApi"
 import { useParams } from "next/navigation";
 import OverlaySpinner from "@/components/common/OverlaySpinner"
 import clsx from "clsx"
+import { formatDateInAdmin } from "@/lib/utils"
 
 interface SettlementInfo {
     "projectTitle": string,
@@ -16,8 +16,11 @@ interface SettlementInfo {
     "userId": number,
     "targetAmount": number,
     "totalSales": number,
-    "payoutAmount": number,
-    "platformFee": number,
+    "payOutAmount": number,
+    "platformFeeTotal": number,
+    "pgFeeTotal": number,
+    "vatTotal": number,
+    "planName": string
     "totalCount": number,
     "settledAt": string | null,
     "status": "COMPLETED" | "PENDING" | "FAILED",
@@ -34,24 +37,32 @@ interface SettlementProductSummaryItem {
     "totalQuantity": number,
     "totalPrice": number,
     "platformFee": number,
+    "pgFee": number,
+    "vat": number,
+    "payoutAmount": number
+}
+
+interface SettlementProductTotalSummary {
+    "totalQuantity": number,
+    "totalPrice": number,
+    "platformFee": number,
+    "pgFee": number,
+    "vat": number,
     "payoutAmount": number
 }
 
 interface SettlementProductSummary {
     "items": SettlementProductSummaryItem[],
-    "total": {
-        "totalQuantity": number,
-        "totalPrice": number,
-        "platformFee": number,
-        "payoutAmount": number
-    }
+    "total": SettlementProductTotalSummary
 }
 
 interface SettlementHistoryItem {
     "productName": string,
     "quantity": number,
     "totalPrice": number,
-    "fee": number,
+    "platformFee": number,
+    "pgFee": number,
+    "vat": number,
     "amount": number,
     "orderedAt": string
 }
@@ -64,7 +75,6 @@ interface SettlementHistory {
     }
 }
 
-
 export default function SettlementDetailPage() {
     const { id } = useParams();
     const router = useRouter()
@@ -74,12 +84,7 @@ export default function SettlementDetailPage() {
     const [totalPageCount, setTotalPageCount] = useState(0);
     const [info, setInfo] = useState<SettlementInfo | null>(null)
     const [productSummary, setProductSummary] = useState<SettlementProductSummaryItem[] | null>(null)
-    const [productSummaryTotal, setProductSummaryTotal] = useState<{
-        "totalQuantity": number,
-        "totalPrice": number,
-        "platformFee": number,
-        "payoutAmount": number
-    } | null>(null)
+    const [productSummaryTotal, setProductSummaryTotal] = useState<SettlementProductTotalSummary | null>(null)
     const [history, setHistory] = useState<SettlementHistoryItem[] | null>(null)
 
     const leftPageDisabled = currentPage === 0
@@ -96,23 +101,21 @@ export default function SettlementDetailPage() {
     }
 
     const loadSettlement = () => {
-        apiCall<SettlementInfo>(`/api/admin/settlements/${id}/info`, "GET").then(({ data }) => {
+        apiCall<SettlementInfo>(`/api/admin/settlement/${id}/info`, "GET").then(({ data }) => {
             setInfo(data)
         })
-        apiCall<SettlementProductSummary>(`/api/admin/settlements/${id}/product-summary`, "GET").then(({ data }) => {
+        apiCall<SettlementProductSummary>(`/api/admin/settlement/${id}/product-summary`, "GET").then(({ data }) => {
             if (data) {
                 setProductSummary(data.items)
                 setProductSummaryTotal(data.total)
             }
         })
-        apiCall<SettlementHistory>(`/api/admin/settlements/${id}/histories`, "GET").then(({ data }) => {
+        apiCall<SettlementHistory>(`/api/admin/settlement/${id}/history`, "GET").then(({ data }) => {
             if (data) {
                 setHistory(data.content)
                 setTotalPageCount(data.pageInfo.totalPages)
             }
         })
-        setIsModalOpen(false)
-        router.push("/admin/settlement")
     }
 
     const render = () => {
@@ -128,47 +131,59 @@ export default function SettlementDetailPage() {
                 <table className="w-full border-collapse text-left">
                     <tbody>
                         <tr>
-                            <td className="p-2 w-[10%] font-semibold">프로젝트명</td>
+                            <td className="p-2 w-[15%] font-semibold">프로젝트명</td>
                             <td className="p-2">{info.projectTitle}</td>
                         </tr>
                         <tr>
-                            <td className="p-2 w-[10%] font-semibold">목표 금액</td>
-                            <td className="p-2">{info.targetAmount.toLocaleString()} 원</td>
+                            <td className="p-2 w-[15%] font-semibold">목표 금액</td>
+                            <td className="p-2">{info.targetAmount} 원</td>
                         </tr>
                         <tr>
-                            <td className="p-2 w-[10%] font-semibold">펀딩 기간</td>
-                            <td className="p-2">{info.fundingStartDate} ~ {info.fundingEndDate}</td>
+                            <td className="p-2 w-[15%] font-semibold">펀딩 기간</td>
+                            <td className="p-2">{formatDateInAdmin(info.fundingStartDate)} ~ {formatDateInAdmin(info.fundingEndDate)}</td>
                         </tr>
                         <tr>
-                            <td className="p-2 w-[10%] font-semibold">총 판매 금액</td>
-                            <td className="p-2">{info.totalSales.toLocaleString()} 원</td>
+                            <td className="p-2 w-[15%] font-semibold">요금제</td>
+                            <td className="p-2">{info.planName}</td>
                         </tr>
                         <tr>
-                            <td className="p-2 w-[10%] font-semibold">수수료</td>
-                            <td className="p-2">{info.platformFee.toLocaleString()} 원</td>
+                            <td className="p-2 w-[15%] font-semibold">총 판매 금액</td>
+                            <td className="p-2">{info.totalSales} 원</td>
                         </tr>
                         <tr>
-                            <td className="p-2 w-[10%] font-semibold">지급 금액</td>
-                            <td className="p-2">{(info.totalSales - info.platformFee).toLocaleString()} 원</td>
+                            <td className="p-2 w-[15%] font-semibold">플랫폼 수수료</td>
+                            <td className="p-2">{info.platformFeeTotal} 원</td>
                         </tr>
                         <tr>
-                            <td className="p-2 w-[10%] font-semibold">총 판매 개수</td>
+                            <td className="p-2 w-[15%] font-semibold">PG 수수료</td>
+                            <td className="p-2">{info.pgFeeTotal} 원</td>
+                        </tr>
+                        <tr>
+                            <td className="p-2 w-[15%] font-semibold">부가세</td>
+                            <td className="p-2">{info.vatTotal} 원</td>
+                        </tr>
+                        <tr>
+                            <td className="p-2 w-[15%] font-semibold">정산 금액</td>
+                            <td className="p-2">{(info.payOutAmount)} 원</td>
+                        </tr>
+                        <tr>
+                            <td className="p-2 w-[15%] font-semibold">총 판매 개수</td>
                             <td className="p-2">{info.totalCount} 개</td>
                         </tr>
                         <tr>
-                            <td className="p-2 w-[10%] font-semibold">구매자</td>
+                            <td className="p-2 w-[15%] font-semibold">구매자</td>
                             <td className="p-2">{info.totalCount} 명</td>
                         </tr>
                         <tr>
-                            <td className="p-2 w-[10%] font-semibold">정산 일자</td>
+                            <td className="p-2 w-[15%] font-semibold">정산 일자</td>
                             <td className="p-2">{info.settledAt ? info.settledAt : "-"}</td>
                         </tr>
                         <tr>
-                            <td className="p-2 w-[10%] font-semibold">정산 상태</td>
+                            <td className="p-2 w-[15%] font-semibold">정산 상태</td>
                             <td className="p-2"><SettlementTag status={info.status} /></td>
                         </tr>
                         <tr>
-                            <td className="p-2 w-[10%] font-semibold">정산 계좌 정보</td>
+                            <td className="p-2 w-[15%] font-semibold">정산 계좌 정보</td>
                             <td className="p-2">
                                 <div className="flex gap-2">
                                     <span>{info.bankAccount.bankName} {info.bankAccount.accountNumber}</span>
@@ -216,23 +231,29 @@ export default function SettlementDetailPage() {
                             <th className="border-b p-4">상품</th>
                             <th className="border-b p-4">판매 개수</th>
                             <th className="border-b p-4">총 금액</th>
-                            <th className="border-b p-4">지급 금액</th>
-                            <th className="border-b p-4">수수료</th>
+                            <th className="border-b p-4">정산 금액</th>
+                            <th className="border-b p-4">플랫폼 수수료</th>
+                            <th className="border-b p-4">PG 수수료</th>
+                            <th className="border-b p-4">부가세</th>
                         </tr>
                         <tr className="text-sm">
                             <td className="border-b p-4">전체</td>
                             <td className="border-b p-4">{productSummaryTotal.totalQuantity}</td>
-                            <td className="border-b p-4">{productSummaryTotal.totalPrice.toLocaleString()}</td>
-                            <td className="border-b p-4">{productSummaryTotal.payoutAmount.toLocaleString()}</td>
-                            <td className="border-b p-4">{productSummaryTotal.platformFee.toLocaleString()}</td>
+                            <td className="border-b p-4">{productSummaryTotal.totalPrice}</td>
+                            <td className="border-b p-4">{productSummaryTotal.payoutAmount}</td>
+                            <td className="border-b p-4">{productSummaryTotal.platformFee}</td>
+                            <td className="border-b p-4">{productSummaryTotal.pgFee}</td>
+                            <td className="border-b p-4">{productSummaryTotal.vat}</td>
                         </tr>
-                        {productSummary.map((product) => (
-                            <tr key={product.productName} className="text-sm">
+                        {productSummary.map((product, idx) => (
+                            <tr key={product.productName + idx.toString} className="text-sm">
                                 <td className="border-b p-4">{product.productName}</td>
-                                <td className="border-b p-4">{product.totalQuantity.toLocaleString()}</td>
-                                <td className="border-b p-4">{product.totalPrice.toLocaleString()}</td>
-                                <td className="border-b p-4">{product.payoutAmount.toLocaleString()}</td>
-                                <td className="border-b p-4">{product.platformFee.toLocaleString()}</td>
+                                <td className="border-b p-4">{product.totalQuantity}</td>
+                                <td className="border-b p-4">{product.totalPrice}</td>
+                                <td className="border-b p-4">{product.payoutAmount}</td>
+                                <td className="border-b p-4">{product.platformFee}</td>
+                                <td className="border-b p-4">{productSummaryTotal.pgFee}</td>
+                                <td className="border-b p-4">{productSummaryTotal.vat}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -247,18 +268,22 @@ export default function SettlementDetailPage() {
                             <th className="border-b p-4">상품</th>
                             <th className="border-b p-4">판매 개수</th>
                             <th className="border-b p-4">총 금액</th>
-                            <th className="border-b p-4">수수료</th>
-                            <th className="border-b p-4">지급 금액</th>
+                            <th className="border-b p-4">플랫폼 수수료</th>
+                            <th className="border-b p-4">PG 수수료</th>
+                            <th className="border-b p-4">부가세</th>
+                            <th className="border-b p-4">정산 금액</th>
                             <th className="border-b p-4">정산 일자</th>
                         </tr>
-                        {history.map((item) => (
-                            <tr key={item.productName} className="text-sm">
+                        {history.map((item, idx) => (
+                            <tr key={item.productName + idx.toString()} className="text-sm">
                                 <td className="border-b p-4">{item.productName}</td>
-                                <td className="border-b p-4">{item.quantity.toLocaleString()}</td>
-                                <td className="border-b p-4">{item.totalPrice.toLocaleString()}</td>
-                                <td className="border-b p-4">{item.fee.toLocaleString()}</td>
-                                <td className="border-b p-4">{item.amount.toLocaleString()}</td>
-                                <td className="border-b p-4">{item.orderedAt}</td>
+                                <td className="border-b p-4">{item.quantity}</td>
+                                <td className="border-b p-4">{item.totalPrice}</td>
+                                <td className="border-b p-4">{item.platformFee}</td>
+                                <td className="border-b p-4">{item.pgFee}</td>
+                                <td className="border-b p-4">{item.vat}</td>
+                                <td className="border-b p-4">{item.amount}</td>
+                                <td className="border-b p-4">{formatDateInAdmin(item.orderedAt)}</td>
                             </tr>
                         ))}
                     </tbody>
