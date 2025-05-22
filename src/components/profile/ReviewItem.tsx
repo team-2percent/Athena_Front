@@ -1,8 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
-import { ThumbsUp, ThumbsDown, Heart } from "lucide-react"
 import { useRouter } from "next/navigation"
 import ReviewModal from "./ReviewModal"
 
@@ -13,7 +11,6 @@ interface ReviewItemProps {
   reviewDate: string
   reviewContent: string
   projectImage: string
-  likes: number
   projectId: number
 }
 
@@ -24,7 +21,6 @@ export default function ReviewItem({
   reviewDate,
   reviewContent,
   projectImage,
-  likes,
   projectId,
 }: ReviewItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -48,15 +44,6 @@ export default function ReviewItem({
                 className="w-full h-full object-cover rounded-lg"
               />
             </div>
-
-            {/* 하트 아이콘 */}
-            <button
-              type="button"
-              className="absolute bottom-3 right-3 bg-white p-1.5 rounded-full shadow-md"
-              aria-label="좋아요"
-            >
-              <Heart className="h-5 w-5 text-sub-gray" />
-            </button>
           </div>
 
           {/* 영역 2, 3: 후기 내용 */}
@@ -64,20 +51,13 @@ export default function ReviewItem({
             {/* 영역 2: 판매자/상품 정보, 날짜 및 좋아요/싫어요 */}
             <div className="mb-2">
               {/* 판매자 및 상품 정보 */}
-              <div className="mb-1 text-sub-gray">{sellerName}</div>
+              <div className="mb-1 text-sub-gray">{sellerName} 님의 상품</div>
               <h3 className="text-xl font-medium mb-1">{projectName}</h3>
             </div>
 
             <div className="flex items-center gap-4 mb-2">
-              <div className="text-gray-500">{reviewDate}</div>
+              <div className="text-gray-500">{reviewDate} 에 작성</div>
               <div className="flex items-center gap-4">
-                <button type="button" className="flex items-center gap-1">
-                  <ThumbsUp className="h-5 w-5" />
-                  <span>{likes}</span>
-                </button>
-                <button type="button">
-                  <ThumbsDown className="h-5 w-5" />
-                </button>
               </div>
             </div>
 
@@ -102,7 +82,6 @@ export default function ReviewItem({
           onClose={() => setIsModalOpen(false)}
           reviewContent={reviewContent}
           reviewDate={reviewDate}
-          likes={likes}
         />
       )}
     </>

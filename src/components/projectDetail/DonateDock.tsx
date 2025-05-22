@@ -666,8 +666,7 @@ const DonateDock = () => {
     }
   }
 
-  // 7. 결제 완료 모달 컴포넌트 수정
-  // PaymentCompleteModal 컴포넌트를 다음과 같이 수정합니다:
+  // 7. 결제 완료 모달 컴포넌트
   const PaymentCompleteModal = () => {
     if (!showPaymentCompleteModal) return null
 

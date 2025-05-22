@@ -30,6 +30,7 @@ interface MyProject {
   title: string
   isCompleted: boolean
   createdAt: string
+  endAt: string
   sellerName?: string
   description?: string
   imageUrl?: string
@@ -46,10 +47,13 @@ interface MyProjectsResponse {
 interface MyOrder {
   orderId: number
   productId: number
+  projectId: number
   productTitle: string
+  projectTitle: string
   sellerNickname: string
   thumbnailUrl: string | null
   orderedAt: string
+  endAt: string
   achievementRate: number
   hasReview?: boolean
 }
@@ -73,7 +77,6 @@ interface MyReview {
   createdAt: string
   projectName?: string
   projectImage?: string
-  likes?: number
   projectId?: number
 }
 
@@ -88,8 +91,8 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
 
   // 판매 상품 무한 스크롤을 위한 상태
   const [myProjects, setMyProjects] = useState<MyProject[]>([])
-  const [cursorValue, setCursorValue] = useState<string | null>(null)
-  const [lastProjectId, setLastProjectId] = useState<number | null>(null)
+  const [sellCursorValue, setSellCursorValue] = useState<string | null>(null)
+  const [nextProjectId, setNextProjectId] = useState<number | null>(null)
   const [isLoadingProjects, setIsLoadingProjects] = useState(false)
   const projectsLoader = useRef(null)
 
@@ -126,7 +129,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
     try {
       // 자신의 프로필이면 /api/my/projects, 다른 사용자의 프로필이면 /api/user/{userId}/projects
       const baseUrl = isMy ? "/api/my/project" : `/api/user/${userId}/project`
-      const url = `${baseUrl}${cursorValue && lastProjectId ? `?cursorValue=${cursorValue}&lastProjectId=${lastProjectId}` : ""}`
+      const url = `${baseUrl}${sellCursorValue && nextProjectId ? `?nextCursorValue=${sellCursorValue}&nextProjectId=${nextProjectId}` : ""}`
       const response = await apiCall(url, "GET")
 
       // API 응답 구조에 맞게 데이터 처리
@@ -138,8 +141,8 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
         setMyProjects((prev) => [...prev, ...responseData.content])
 
         // 다음 페이지 정보 설정
-        setCursorValue(responseData.nextCursorValue)
-        setLastProjectId(responseData.nextProjectId)
+        setSellCursorValue(responseData.nextCursorValue)
+        setNextProjectId(responseData.nextProjectId)
       }
     } catch (error) {
       console.error("판매 상품 조회에 실패했습니다.", error)
@@ -155,7 +158,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
     setIsLoadingOrders(true)
 
     try {
-      const url = `/api/my/order${orderCursorValue && lastOrderId ? `?cursorValue=${orderCursorValue}&lastOrderId=${lastOrderId}` : ""}`
+      const url = `/api/my/order${orderCursorValue && lastOrderId ? `?nextCursorValue=${orderCursorValue}&nextOrderId=${lastOrderId}` : ""}`
       const response = await apiCall(url, "GET")
 
       // API 응답 구조에 맞게 데이터 처리
@@ -184,7 +187,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
     setIsLoadingCoupons(true)
 
     try {
-      const url = `/api/my/coupon${nextCouponId ? `?nextCouponId=${nextCouponId}` : ""}`
+      const url = `/api/my/coupon${nextCouponId ? `?cursorId=${nextCouponId}` : ""}`
       const response = await apiCall(url, "GET")
 
       // API 응답 구조에 맞게 데이터 처리
@@ -274,8 +277,8 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
   useEffect(() => {
     if (activeTab === "판매 상품" && myProjects.length === 0) {
       setMyProjects([])
-      setCursorValue(null)
-      setLastProjectId(null)
+      setSellCursorValue(null)
+      setNextProjectId(null)
       loadMyProjects()
     } else if (activeTab === "구매 상품" && myOrders.length === 0) {
       setMyOrders([])
@@ -296,7 +299,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !isLoadingProjects && cursorValue !== null && lastProjectId !== null) {
+        if (entries[0].isIntersecting && !isLoadingProjects && sellCursorValue !== null && nextProjectId !== null) {
           loadMyProjects()
         }
       },
@@ -308,7 +311,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
     }
 
     return () => observer.disconnect()
-  }, [isLoadingProjects, cursorValue, lastProjectId])
+  }, [isLoadingProjects, sellCursorValue, nextProjectId])
 
   // 구매 상품 무한 스크롤 구현
   useEffect(() => {
@@ -414,7 +417,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
                     sellerName={project.sellerName || "내 상품"}
                     projectName={project.title}
                     description={project.description || "상품 설명이 여기에 표시됩니다."}
-                    imageUrl={project.imageUrl || "/placeholder.svg"}
+                    imageUrl={project.imageUrl || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"}
                     achievementRate={project.achievementRate || 100}
                     daysLeft={project.daysLeft}
                     isCompleted={project.isCompleted}
@@ -425,7 +428,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
                 ))}
 
                 {/* 무한 스크롤을 위한 로더 */}
-                {cursorValue !== null && lastProjectId !== null && (
+                {sellCursorValue !== null && nextProjectId !== null && (
                   <div className="w-full py-10 flex justify-center items-center" ref={projectsLoader}>
                     {isLoadingProjects && <Spinner message="더 불러오는 중입니다..." />}
                   </div>
@@ -443,18 +446,18 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
               <>
                 {myOrders.map((order) => (
                   <PurchasedProjectItem
-                    key={order.orderId}
-                    id={order.orderId}
+                    key={`${order.orderId}${order.projectId}${order.productId}`}
+                    orderId={order.orderId}
                     sellerName={order.sellerNickname}
-                    projectName={order.productTitle}
-                    description="상품 설명이 여기에 표시됩니다."
+                    productName={order.productTitle}
+                    projectName={order.projectTitle}
+                    orderedAt={formatDate(order.orderedAt)}
+                    endAt={formatDate(order.endAt)}
                     imageUrl={
                       order.thumbnailUrl || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"
                     }
                     achievementRate={order.achievementRate}
-                    daysLeft={null}
-                    isCompleted={true}
-                    projectId={order.productId}
+                    projectId={order.projectId}
                     hasReview={order.hasReview || false}
                   />
                 ))}
@@ -484,8 +487,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
                     projectName={review.projectName || "상품 이름"}
                     reviewDate={formatDate(review.createdAt)}
                     reviewContent={review.content}
-                    projectImage={review.projectImage || "/placeholder.svg"}
-                    likes={review.likes || 0}
+                    projectImage={review.projectImage || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"}
                     projectId={review.projectId || review.id}
                   />
                 ))}

@@ -1,9 +1,8 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Heart, Share2, ChevronLeft, ChevronRight } from "lucide-react"
+import { Share2, ChevronLeft, ChevronRight } from "lucide-react"
 import ProjectTabs from "./ProjectTabs"
-import clsx from "clsx"
 
 // 상단에 useApi 훅 import 추가
 import { useApi } from "@/hooks/useApi"
@@ -23,6 +22,7 @@ interface ProjectData {
   imageUrls: string[]
   sellerResponse: {
     id: number
+    nickname: string
     sellerIntroduction: string
     linkUrl: string
   }
@@ -38,7 +38,6 @@ interface ProjectData {
 
 const ProjectDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [isLiked, setIsLiked] = useState(false)
   const [visibleImages, setVisibleImages] = useState<number[]>([])
   const imageContainerRef = useRef<HTMLDivElement>(null)
   const metadataContainerRef = useRef<HTMLDivElement>(null)
@@ -116,10 +115,6 @@ const ProjectDetail = () => {
     // 표시할 이미지 인덱스 배열 생성
     const newVisibleImages = Array.from({ length: visibleCount }, (_, i) => startIdx + i)
     setVisibleImages(newVisibleImages)
-  }
-
-  const handleLikeClick = () => {
-    setIsLiked(!isLiked)
   }
 
   const nextImage = () => {
@@ -288,33 +283,23 @@ const ProjectDetail = () => {
               </div>
             </div>
 
-            {/* 찜, 공유, 후원하기 버튼을 같은 행에 배치 */}
-            <div className="mt-8 flex items-center justify-between">
-              <div className="flex space-x-12">
-                <button onClick={handleLikeClick} className="flex flex-col items-center">
-                  <Heart className={`h-8 w-8 ${isLiked ? "fill-point-color text-point-color" : "text-sub-gray"}`} />
-                  <span className={clsx("mt-2 text-lg font-medium", isLiked ? "text-point-color" : "text-sub-gray")}>
-                    867
-                  </span>
-                </button>
-                <button className="flex flex-col items-center">
-                  <Share2 className="h-8 w-8 text-sub-gray" />
-                  <span className="mt-2 text-lg font-medium text-sub-gray">238</span>
-                </button>
-              </div>
+            {/* 공유하기, 후원하기 버튼 영역 */}
+            <div className="mt-8 flex items-center justify-end space-x-4">
+              <button className="w-1/3 flex items-center space-x-2 rounded-xl border border-gray-300 bg-white px-6 py-4 text-gray-700 hover:bg-gray-50">
+                <Share2 className="h-5 w-5" />
+                <span className="font-medium">공유하기</span>
+              </button>
 
               {/* 후원하기 버튼 */}
-              <div className="w-2/3">
-                <button
-                  className="w-full rounded-xl bg-main-color py-4 text-center text-xl font-bold text-white hover:bg-secondary-color-dark"
-                  onClick={() => {
-                    const event = new CustomEvent("toggleDonateDock")
-                    window.dispatchEvent(event)
-                  }}
-                >
-                  후원하기
-                </button>
-              </div>
+              <button
+                className="w-2/3 rounded-xl bg-main-color px-8 py-4 text-center text-xl font-bold text-white hover:bg-secondary-color-dark"
+                onClick={() => {
+                  const event = new CustomEvent("toggleDonateDock")
+                  window.dispatchEvent(event)
+                }}
+              >
+                후원하기
+              </button>
             </div>
           </div>
         </div>

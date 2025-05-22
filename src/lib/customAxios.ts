@@ -2,7 +2,7 @@ import axios from "axios";
 import useAuthStore from "@/stores/auth"
 
 const customAxios = axios.create({
-baseURL: 'https://athena.i-am-jay.com',
+baseURL: 'https://athena-local.i-am-jay.com',
 headers: {
     "withCredentials": true,
 },
