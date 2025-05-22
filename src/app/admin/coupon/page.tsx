@@ -20,10 +20,9 @@ export default function CouponPage() {
     const [totalPageCount, setTotalPageCount] = useState<number>(1)
     const [loadError, setLoadError] = useState(false);
     const isEmpty = totalPageCount === 0 && !isLoading && !loadError;
-    const url = `/api/admin/${status !== "ALL" ? "/couponByStatus" : "couponList"}?size=${pageSize}&page=${currentPage}${status !== "ALL" ? `&status=${status}` : ""}`
+    const url = `/api/admin/${status !== "ALL" ? "couponByStatus" : "couponList"}?size=${pageSize}&page=${currentPage}${status !== "ALL" ? `&status=${status}` : ""}`
     const loadCouponList = () => {
         apiCall<CouponListResponse>(url, "GET").then(({ data }) => {
-            console.log(data);
             if (data?.content) {
                 setCouponList(data.content);
                 setTotalPageCount(data.page.totalPages);
@@ -50,6 +49,7 @@ export default function CouponPage() {
 
     useEffect(() => {
         setCurrentPage(0);
+        loadCouponList();
     }, [status, pageSize])
 
     useEffect(() => {
