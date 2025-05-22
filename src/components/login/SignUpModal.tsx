@@ -46,12 +46,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
     if (!(hasUppercase && hasLowercase && hasNumber && hasSpecialChar)) {
       return false
     }
-
-    // 10자리 이상 구성 여부 검사
-    if (password.length < 8) {
-      return false
-    }
-
+    
     return true
   }
 
