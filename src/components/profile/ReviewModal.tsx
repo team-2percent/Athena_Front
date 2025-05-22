@@ -12,12 +12,9 @@ interface ReviewModalProps {
 
 export default function ReviewModal({ isOpen, onClose, reviewContent, reviewDate }: ReviewModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg" closeOnOutsideClick closeOnEsc>
+    <Modal title="후기 상세 보기" isOpen={isOpen} onClose={onClose} size="lg" closeOnOutsideClick closeOnEsc>
       <div className="p-2">
-        <div className="flex justify-between items-center mb-4">
-          <div className="text-gray-500">{reviewDate}</div>
-        </div>
-
+        <div className="text-gray-500 mb-2">{reviewDate} 에 작성</div>
         <div className="whitespace-pre-wrap break-words">{reviewContent}</div>
       </div>
     </Modal>

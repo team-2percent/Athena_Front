@@ -115,7 +115,7 @@ export default function TopFive() {
               <p className="text-sm text-gray-600">{rank1Project.sellerName}</p>
               <h3 className="font-bold text-lg mt-1">{rank1Project.title}</h3>
               <p className="text-sm mt-1">{rank1Project.description}</p>
-              <p className="text-main-color font-bold mt-2">{rank1Project.achievementRate * 100} % 달성!</p>
+              <p className="text-main-color font-bold mt-2">{rank1Project.achievementRate} % 달성!</p>
             </div>
           </div>
         </div>}
@@ -144,7 +144,7 @@ export default function TopFive() {
                   <div className="p-2">
                     <p className="text-xs text-gray-600">{project.sellerName}</p>
                     <h3 className="font-bold text-sm">{project.title}</h3>
-                    <p className="text-main-color font-bold text-xs mt-1">{project.achievementRate * 100} % 달성!</p>
+                    <p className="text-main-color font-bold text-xs mt-1">{project.achievementRate} % 달성!</p>
                   </div>
                 </div>
               </div>

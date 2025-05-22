@@ -60,6 +60,8 @@ export default function MyProjectList({
           projectName={project.projectName}
           description={project.description}
           imageUrl={project.imageUrl}
+          createdAt={project.createdAt}
+          endAt={project.endAt}
           achievementRate={project.achievementRate}
           daysLeft={project.daysLeft}
           isCompleted={project.isCompleted}

@@ -348,7 +348,13 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
   // 계좌 추가 처리 - API 연동
   const handleAddAccount = async (account: Omit<BankAccount, "id" | "isDefault">) => {
     try {
-      const response = await apiCall<BankAccount>("/api/bankAccount", "POST", account)
+      const response = await apiCall<BankAccount>("/api/bankAccount", "POST", 
+        {
+          accountHolder: account.accountHolder,
+          bankName: account.bankName,
+          accountNumber: account.bankAccount,
+        },
+      )
 
       if (response.error) {
         console.error("계좌 추가 오류:", response.error)

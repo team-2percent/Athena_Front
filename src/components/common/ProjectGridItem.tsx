@@ -38,7 +38,7 @@ export default function ProjectCard({
   const [likedCheck, setLikedCheck] = useState(liked);
   const router = useRouter();
   const isSoldOut = daysLeft !== undefined && daysLeft <= 0;
-  const isOverAchieved = achievementRate * 100 > 100;
+  const isOverAchieved = achievementRate > 100;
   const handleLikedClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     // 좋아요 변경 api 호출
@@ -85,16 +85,16 @@ export default function ProjectCard({
           <div>
             <p
               className={cn("text-sm font-bold", isOverAchieved ? "text-point-color" : "text-main-color", showProgressBar ? "mt-8" : "mt-0", isSoldOut ? "text-sub-gray" : "text-main-color")}
-            >{achievementRate * 100}% 달성!</p>
+            >{achievementRate}% 달성!</p>
             {showProgressBar && (
               <div className="mt-1">
                 <div className="relative w-full h-3 bg-gray-border rounded-full overflow-hidden">
                   <div
                     className={cn(
-                      "text-sm font-bold h-full",
-                      isSoldOut ? "bg-sub-gray" : isOverAchieved ? "bg-gradient-to-r from-main-color to-point-color" : "text-point-color",
+                      "text-sm font-bold h-full rounded-full",
+                      isSoldOut ? "bg-sub-gray" : isOverAchieved ? "bg-gradient-to-r from-main-color to-point-color" : "bg-main-color",
                     )}
-                    style={{ width: `${isOverAchieved || isSoldOut ? 100 : achievementRate * 100}%` }} // 동적으로 width 설정
+                    style={{ width: `${isOverAchieved || isSoldOut ? 100 : achievementRate}%` }} // 동적으로 width 설정
                   />
                 </div>
                 <div className="flex justify-end mt-1">

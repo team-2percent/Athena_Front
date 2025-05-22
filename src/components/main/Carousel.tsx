@@ -102,7 +102,7 @@ export default function Carousel({ projects, isLoading }: {projects: MainProject
                   <h2 className="text-xl md:text-2xl font-bold">{projects[currentIndex].description}</h2>
                 )}
                 <span className="inline-block bg-[#fb6f92] text-white px-2 py-0.5 rounded-full text-xs font-medium">
-                    {projects[currentIndex].achievementRate * 100} % 달성
+                    {projects[currentIndex].achievementRate} % 달성
                   </span>
                 <p className="text-xs mt-1">{projects[currentIndex].description}</p>
               </div>

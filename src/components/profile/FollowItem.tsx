@@ -40,17 +40,6 @@ export default function FollowItem({ id, username, oneLinear, profileImage, isFo
           </div>
         </div>
 
-        {/* 팔로우 버튼 */}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            onFollow(id)
-          }}
-          className="px-6 py-3 bg-main-color text-white rounded-full font-medium hover:bg-secondary-color-dark transition-colors"
-        >
-          {isFollowing ? "팔로우 취소" : "팔로우 +"}
-        </button>
       </div>
       <div className="mt-6 border-b border-gray-border"></div>
     </div>

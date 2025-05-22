@@ -20,10 +20,10 @@ export default function DeleteModal({
 }: DeleteModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`${itemType} 삭제`} size="sm">
-      <div className="p-6">
+      <div className="">
         {!deleteError && !deleteSuccess ? (
           <>
-            <p className="text-center mb-6">정말로 이 {itemType}을 삭제하시겠습니까?</p>
+            <p className="text-gray-700 mb-6">정말로 이 {itemType}을 삭제하시겠습니까?</p>
             <div className="flex justify-center gap-4">
               <button
                 onClick={onClose}
@@ -41,7 +41,7 @@ export default function DeleteModal({
           </>
         ) : deleteError ? (
           <>
-            <p className="text-center text-red-500 mb-6">{itemType} 삭제에 실패했습니다.</p>
+            <p className="text-center text-gray-700 mb-6">{itemType} 삭제에 실패했습니다.</p>
             <div className="flex justify-center">
               <button
                 onClick={onClose}
