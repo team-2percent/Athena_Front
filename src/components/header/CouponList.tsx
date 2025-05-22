@@ -64,11 +64,11 @@ export default function CouponList() {
         <div className="flex items-center justify-between">
             <div className="flex flex-col">
             <div className="flex items-center gap-3">
-            <div className={clsx("flex h-10 w-10 items-center justify-center rounded-md text-white", coupon.userIssued ? "bg-disabled-background" : "bg-main-color")}>
+            <div className={clsx("flex h-10 w-10 items-center justify-center rounded-md text-white", coupon.userIssued || coupon.stock === 0 ? "bg-disabled-background" : "bg-main-color")}>
                 <Percent className="h-5 w-5" />
             </div>
             <div>
-                <div className={clsx("text-lg font-bold", coupon.userIssued ? "text-disabled-color" : "text-main-color")}>{coupon.price} 원</div>
+                <div className={clsx("text-lg font-bold", coupon.userIssued || coupon.stock === 0 ? "text-disabled-color" : "text-main-color")}>{coupon.price} 원</div>
                 <div className="text-sm font-medium">{coupon.title}</div>
             </div>
             </div>
@@ -78,10 +78,10 @@ export default function CouponList() {
             <div className="flex flex-col items-end">
             <button
                 type="button"
-                className={clsx("rounded-full w-fit px-4 py-1.5 text-sm font-medium", coupon.userIssued ? "pointer-events-none bg-disabled-background text-disabled-color" : "bg-main-color text-white")}
-                onClick={() => handleGetCoupon(coupon.id)}
+                className={clsx("rounded-full w-fit px-4 py-1.5 text-sm font-medium", coupon.userIssued || coupon.stock === 0? "pointer-events-none bg-disabled-background text-disabled-color" : "bg-main-color text-white")}
+                onClick={() => handleGetCoupon(coupon.couponId)}
             >
-                {coupon.userIssued ? "발급완료" : "발급받기"}
+                {coupon.userIssued ? "발급완료" : coupon.stock === 0 ? "발급종료" : "발급받기"}
             </button>
             <div className="mt-1 text-xs text-sub-gray">
                 {coupon.stock}개 남음
