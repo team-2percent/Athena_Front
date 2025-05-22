@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { useApi } from "@/hooks/useApi"
 import { MainProject } from "@/lib/projectInterface"
@@ -28,9 +27,8 @@ export default function TopFive() {
   const [categoryProjects, setCategoryProjects] = useState<{ [key: number]: MainProject[] }>({
     0: []
   })
-  const rank1Project = categoryProjects[activeTab][0];
-  const restProject = categoryProjects[activeTab].slice(1);
-  
+  const rank1Project = categoryProjects[activeTab] ? categoryProjects[activeTab][0] : null;
+  const restProject = categoryProjects[activeTab] ? categoryProjects[activeTab].slice(1) : [];
 
   const loadProjects = () => {
     apiCall<Response>("/api/project/categoryRankingView", "GET").then(({ data }) => {
@@ -42,6 +40,10 @@ export default function TopFive() {
         data.categoryTopView.map(categoryItem => {
           setCategories(prev => {
             prev[categoryItem.categoryId] = categoryItem.categoryName
+            return prev
+          })
+          setCategoryProjects(prev => {
+            prev[categoryItem.categoryId] = categoryItem.items
             return prev
           })
         })
@@ -83,6 +85,7 @@ export default function TopFive() {
               "px-4 py-2 rounded-full text-sm font-medium transition-colors",
               +categoryId === activeTab ? "bg-main-color text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300",
             )}
+            onClick={() => setActiveTab(+categoryId)}
           >
             {categories[+categoryId]}
           </button>

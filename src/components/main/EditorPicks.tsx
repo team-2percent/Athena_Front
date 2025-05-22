@@ -4,8 +4,10 @@ import { useState, useRef, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { MainProject } from "@/lib/projectInterface"
+import { useRouter } from "next/navigation"
 
 export default function EditorPicks({ projects, isLoading }: {projects: MainProject[], isLoading: boolean}) {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(0)
   const [itemsPerPage, setItemsPerPage] = useState(4) // Default to 4 items per page
   const totalPages = Math.ceil(projects.length / itemsPerPage)
@@ -85,6 +87,10 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
     return pages
   }
 
+  const moveToProjectPage = (projectId: number) => {
+    router.push(`/project/${projectId}`)
+  }
+  
   const pages = getPageData()
 
   if (projects === null || projects.length === 0) {
@@ -116,11 +122,15 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
                   {pageItems.map((item: any) => {
                     if (item?.isEmpty) {
                       // Empty placeholder to maintain grid layout
-                      return <div key={item.id} className="aspect-square invisible"></div>
+                      return <div key={new Date().toString()} className="aspect-square invisible"></div>
                     }
 
                     return (
-                      <div key={item.id} className="rounded-xl overflow-hidden bg-white">
+                      <div
+                        key={item.projectId}
+                        className="rounded-xl overflow-hidden bg-white"
+                        onClick={() => moveToProjectPage(item.projectId)}
+                      >
                         <div className="aspect-square relative overflow-hidden rounded-xl">
                           <img
                             src={item.image || "/placeholder.svg"}
