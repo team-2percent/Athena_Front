@@ -203,7 +203,7 @@ export default function AddressInfo() {
                                                     <span className="ml-2 px-2 py-0.5 bg-pink-100 text-secondary-color-dark text-xs rounded-full">기본</span>
                                                     :
                                                     <button
-                                                        className="border-box ml-2 px-2 py-0.5 text-xs text-main-color rounded-full border border-main-color"
+                                                        className="border-box ml-2 px-2 py-0.5 text-xs text-main-color underline"
                                                         onClick={() => handleClickSetDefaultButton(address.id)}
                                                     >기본 계좌로 설정</button>
                                                 }
