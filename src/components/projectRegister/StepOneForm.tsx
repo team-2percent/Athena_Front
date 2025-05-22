@@ -424,6 +424,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
             selectedDate={startDate}
             onChange={(date) => onUpdateFormData({ startDate: date })}
             position="top"
+            minDate={new Date()}
           />
           <span>부터</span>
           <DatePicker

@@ -237,7 +237,7 @@ export default function ProductEdit() {
   }
 
   return (
-    <div className="container mx-auto px-4">
+    <div className="container my-8 mx-auto px-4">
       <RegisterHeader currentStep={currentStep} onStepChange={setCurrentStep} title="상품 수정하기" />
 
       <div className="mt-8 mb-16">

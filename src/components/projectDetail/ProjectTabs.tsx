@@ -15,7 +15,6 @@ interface Review {
   userName: string
   content: string
   createdAt: string
-  likes?: number
   profileImage?: string
 }
 
@@ -164,12 +163,12 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
     const now = new Date()
     const diffTime = end.getTime() - now.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    return diffDays > 0 ? diffDays : 0
+    return diffDays
   }
 
   // 기본 마크다운 콘텐츠 (API 데이터가 없을 경우 사용)
   const defaultMarkdown = `
-  이 판매자는 물건을 팔 생각이 없어 보입니다.
+  작성된 내용이 없습니다.
   `
 
   return (
@@ -228,15 +227,28 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                   <div className="flex">
                     <div className="w-1/4 font-medium text-sub-gray">목표금액</div>
                     <div className="w-3/4 font-medium">
-                      {projectData?.goalAmount?.toLocaleString() || "10,000,000"}원
+                      {projectData?.goalAmount?.toLocaleString() || "?"}원
                     </div>
                   </div>
 
                   <div className="flex">
                     <div className="w-1/4 font-medium text-sub-gray">펀딩 기간</div>
                     <div className="w-3/4 font-medium">
-                      {formatDate(projectData?.startAt || "")} ~ {formatDate(projectData?.endAt || "")}(
-                      {calculateDaysLeft(projectData?.endAt || "")}일 남음)
+                      {projectData?.endAt ? (
+                        <>
+                          {formatDate(projectData?.startAt || "")} ~ {formatDate(projectData.endAt)}
+                          {" ("}
+                          {(() => {
+                            const daysLeft = calculateDaysLeft(projectData.endAt)
+                            if (daysLeft < 0) return "종료"
+                            if (daysLeft === 0) return "마감임박"
+                            return `${daysLeft}일 남음`
+                          })()}
+                          {")"}
+                        </>
+                      ) : projectData?.startAt ? null : (
+                        "알 수 없음"
+                      )}
                     </div>
                   </div>
 
@@ -315,21 +327,12 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                                 <div className="mt-3 whitespace-pre-line">{review.content}</div>
                               </div>
                             </div>
-                            <div className="flex items-center space-x-4">
-                              <button className="flex items-center space-x-1">
-                                <ThumbsUp className="h-6 w-6" />
-                                <span className="text-lg">{review.likes || 0}</span>
-                              </button>
-                              <button>
-                                <ThumbsDown className="h-6 w-6" />
-                              </button>
-                            </div>
                           </div>
                         </div>
                       ))
                     ) : (
                       <div className="flex justify-center py-8">
-                        <p className="text-sub-gray">아직 리뷰가 없습니다. 첫 리뷰를 작성해보세요!</p>
+                        <p className="text-sub-gray">아직 리뷰가 없습니다. 프로젝트를 후원하고 리뷰를 작성해 보세요!</p>
                       </div>
                     )}
                   </div>

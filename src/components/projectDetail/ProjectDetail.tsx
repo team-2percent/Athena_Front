@@ -1,9 +1,8 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Heart, Share2, ChevronLeft, ChevronRight } from "lucide-react"
+import { Share2, ChevronLeft, ChevronRight } from "lucide-react"
 import ProjectTabs from "./ProjectTabs"
-import clsx from "clsx"
 
 // 상단에 useApi 훅 import 추가
 import { useApi } from "@/hooks/useApi"
@@ -23,6 +22,7 @@ interface ProjectData {
   imageUrls: string[]
   sellerResponse: {
     id: number
+    nickname: string
     sellerIntroduction: string
     linkUrl: string
   }
@@ -38,7 +38,6 @@ interface ProjectData {
 
 const ProjectDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [isLiked, setIsLiked] = useState(false)
   const [visibleImages, setVisibleImages] = useState<number[]>([])
   const imageContainerRef = useRef<HTMLDivElement>(null)
   const metadataContainerRef = useRef<HTMLDivElement>(null)
@@ -118,10 +117,6 @@ const ProjectDetail = () => {
     setVisibleImages(newVisibleImages)
   }
 
-  const handleLikeClick = () => {
-    setIsLiked(!isLiked)
-  }
-
   const nextImage = () => {
     const newIndex = (currentImageIndex + 1) % images.length
     setCurrentImageIndex(newIndex)
@@ -152,7 +147,7 @@ const ProjectDetail = () => {
     const now = new Date()
     const diffTime = end.getTime() - now.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    return diffDays > 0 ? diffDays : 0
+    return diffDays
   }
 
   // 달성률 계산 함수
@@ -278,43 +273,42 @@ const ProjectDetail = () => {
               </div>
 
               <div className="mb-8">
-                <p className="mb-3 text-gray-700">펀딩 마감까지</p>
+                <p className="mb-3 text-gray-700">펀딩 마감까지 남은 시간</p>
                 <div className="flex items-baseline">
-                  <span className="text-5xl font-bold text-main-color">
-                    {calculateDaysLeft(projectData?.endAt || "")}일
-                  </span>
+                  {!projectData?.endAt ? (
+                    <span className="text-5xl font-bold text-main-color">알 수 없음</span>
+                  ) : (() => {
+                    const daysLeft = calculateDaysLeft(projectData.endAt)
+                    if (daysLeft > 0) {
+                      return <span className="text-5xl font-bold text-main-color">{daysLeft}일</span>
+                    } else if (daysLeft === 0) {
+                      return <span className="text-5xl font-bold text-main-color">마감임박!</span>
+                    } else {
+                      return <span className="text-5xl font-bold text-main-color">펀딩 종료</span>
+                    }
+                  })()}
                   <span className="ml-2 text-xl text-sub-gray">/ {formatDate(projectData?.endAt || "")}</span>
                 </div>
               </div>
             </div>
 
-            {/* 찜, 공유, 후원하기 버튼을 같은 행에 배치 */}
-            <div className="mt-8 flex items-center justify-between">
-              <div className="flex space-x-12">
-                <button onClick={handleLikeClick} className="flex flex-col items-center">
-                  <Heart className={`h-8 w-8 ${isLiked ? "fill-point-color text-point-color" : "text-sub-gray"}`} />
-                  <span className={clsx("mt-2 text-lg font-medium", isLiked ? "text-point-color" : "text-sub-gray")}>
-                    867
-                  </span>
-                </button>
-                <button className="flex flex-col items-center">
-                  <Share2 className="h-8 w-8 text-sub-gray" />
-                  <span className="mt-2 text-lg font-medium text-sub-gray">238</span>
-                </button>
-              </div>
+            {/* 공유하기, 후원하기 버튼 영역 */}
+            <div className="mt-8 flex items-center justify-end space-x-4">
+              <button className="w-1/3 flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white py-4 text-xl text-gray-700 hover:bg-gray-50">
+                <Share2 className="h-6 w-6"/>
+                공유하기
+              </button>
 
               {/* 후원하기 버튼 */}
-              <div className="w-2/3">
-                <button
-                  className="w-full rounded-xl bg-main-color py-4 text-center text-xl font-bold text-white hover:bg-secondary-color-dark"
-                  onClick={() => {
-                    const event = new CustomEvent("toggleDonateDock")
-                    window.dispatchEvent(event)
-                  }}
-                >
-                  후원하기
-                </button>
-              </div>
+              <button
+                className="w-2/3 rounded-xl bg-main-color px-8 py-4 text-center text-xl font-bold text-white hover:bg-secondary-color-dark"
+                onClick={() => {
+                  const event = new CustomEvent("toggleDonateDock")
+                  window.dispatchEvent(event)
+                }}
+              >
+                후원하기
+              </button>
             </div>
           </div>
         </div>

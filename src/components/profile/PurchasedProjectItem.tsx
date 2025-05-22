@@ -8,32 +8,35 @@ import ReviewForm from "./ReviewForm"
 import { cn } from "@/lib/utils"
 
 interface PurchasedProjectItemProps {
-  id: number
+  orderId: number
   sellerName: string
+  productName: string
   projectName: string
-  description: string
+  orderedAt: string
+  endAt: string
   imageUrl: string
   achievementRate: number
-  daysLeft: number | null // null인 경우 판매 종료
-  isCompleted: boolean
   projectId: number
   hasReview: boolean
 }
 
 export default function PurchasedProjectItem({
-  id,
+  orderId,
   sellerName,
+  productName,
   projectName,
-  description,
+  orderedAt,
+  endAt,
   imageUrl,
   achievementRate,
-  daysLeft,
-  isCompleted,
   projectId,
   hasReview,
 }: PurchasedProjectItemProps) {
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false)
   const router = useRouter()
+
+  const daysLeft = endAt ? Math.max(0, Math.ceil((new Date(endAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : null
+  const isCompleted = new Date(endAt) < new Date()
 
   const handleProjectClick = () => {
     router.push(`/project/${projectId}`)
@@ -64,15 +67,6 @@ export default function PurchasedProjectItem({
               />
             </div>
 
-            {/* 하트 아이콘 */}
-            <button
-              type="button"
-              className="absolute bottom-3 right-3 bg-white p-1.5 rounded-full shadow-md"
-              aria-label="좋아요"
-            >
-              <Heart className="h-5 w-5 text-sub-gray" />
-            </button>
-
             {/* 판매 완료 오버레이 */}
             {isCompleted && (
               <div
@@ -89,9 +83,9 @@ export default function PurchasedProjectItem({
 
           {/* 상품 정보 */}
           <div className="flex-1 flex flex-col w-64">
-            <div className="mb-1 text-sub-gray">{sellerName}</div>
-            <h3 className="text-xl font-medium mb-1">{projectName}</h3>
-            <p className="text-gray-700 mb-2 whitespace-pre-wrap break-words line-clamp-2">{description}</p>
+            <div className="mb-1 text-sub-gray">{sellerName} 님의 판매 상품</div>
+            <h3 className="text-xl font-medium mb-1">{productName || "상품 이름"}</h3>
+            <p className="text-gray-700 mb-2 whitespace-pre-wrap break-words line-clamp-2">{projectName} 에서 구매</p>
 
             {/* 달성률 게이지 */}
             <div className="mt-auto">

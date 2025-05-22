@@ -81,7 +81,7 @@ export default function ProjectRegister() {
   }
 
   return (
-    <div className="container mx-auto px-4">
+    <div className="container mx-auto my-8 px-4">
       <RegisterHeader currentStep={currentStep} onStepChange={setCurrentStep} />
 
       {error && (
