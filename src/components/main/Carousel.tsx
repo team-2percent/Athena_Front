@@ -76,7 +76,7 @@ export default function Carousel({ projects, isLoading }: {projects: MainProject
           projects[getPrevIndex(currentIndex)] && 
           <div className="relative w-1/2 h-[350px] md:h-[400px] opacity-70 transform transition-all duration-300 rounded-xl overflow-hidden shrink-0">
             <img
-              src={projects[getPrevIndex(currentIndex)].imageUrl || "/placeholder.svg"}
+              src={projects[getPrevIndex(currentIndex)].imageUrl || "/placeholder/project-placeholder.png"}
               alt={projects[getPrevIndex(currentIndex)].title}
               className="w-full h-full object-cover"
             />
@@ -89,7 +89,7 @@ export default function Carousel({ projects, isLoading }: {projects: MainProject
           onClick={() => moveToProjectPage(projects[currentIndex].projectId)}
         >
           <img
-            src={projects[currentIndex].imageUrl || "/placeholder.svg"}
+            src={projects[currentIndex].imageUrl || "/placeholder/project-placeholder.png"}
             alt={projects[currentIndex].title}
             className="w-full h-full object-cover"
           />
@@ -115,7 +115,7 @@ export default function Carousel({ projects, isLoading }: {projects: MainProject
           projects[getNextIndex(currentIndex)] && 
           <div className="relative w-1/2 h-[350px] md:h-[400px] opacity-70 transform transition-all duration-300 rounded-xl overflow-hidden shrink-0">
             <img
-              src={projects[getNextIndex(currentIndex)].imageUrl || "/placeholder.svg"}
+              src={projects[getNextIndex(currentIndex)].imageUrl || "/placeholder/project-placeholder.png"}
               alt={projects[getNextIndex(currentIndex)].title}
               className="w-full h-full object-cover"
             />
@@ -147,8 +147,8 @@ export default function Carousel({ projects, isLoading }: {projects: MainProject
             key={index}
             onClick={() => setCurrentIndex(index)}
             className={cn(
-              "w-2 h-2 rounded-full transition-all",
-              currentIndex === index ? "bg-[#fb6f92] w-4" : "bg-[#808080]/30",
+              "w-3 h-3 rounded-full transition-all",
+              currentIndex === index ? "bg-[#fb6f92] w-6" : "bg-[#808080]/30",
             )}
             aria-label={`${index + 1}번 이미지로 이동`}
           />
