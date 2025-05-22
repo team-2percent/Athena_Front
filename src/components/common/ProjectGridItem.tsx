@@ -73,7 +73,7 @@ export default function ProjectCard({
               <p className="text-sm">감사합니다.</p>
             </div>
           )}
-          <img src={image || "/placeholder.svg"} alt={projectName} className="rounded-lg object-cover w-full h-full" />
+          <img src={image || "/placeholder/project-placeholder.png"} alt={projectName} className="rounded-lg object-cover w-full h-full" />
         </div>
 
         <div className="flex flex-col flex-1 justify-between p-1 pt-2" style={{ width: size }}>
@@ -84,11 +84,11 @@ export default function ProjectCard({
           </div>
           <div>
             <p
-              className={cn("text-sm font-bold", isOverAchieved ? "text-point-color" : "text-main-color", showProgressBar ? "mt-8" : "mt-0")}
+              className={cn("text-sm font-bold", isOverAchieved ? "text-point-color" : "text-main-color", showProgressBar ? "mt-8" : "mt-0", isSoldOut ? "text-sub-gray" : "text-main-color")}
             >{achievementRate * 100}% 달성!</p>
             {showProgressBar && (
               <div className="mt-1">
-                <div className="relative w-full h-3 bg-sub-gray rounded-full overflow-hidden">
+                <div className="relative w-full h-3 bg-gray-border rounded-full overflow-hidden">
                   <div
                     className={cn(
                       "text-sm font-bold h-full",
