@@ -147,7 +147,7 @@ const ProjectDetail = () => {
     const now = new Date()
     const diffTime = end.getTime() - now.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    return diffDays > 0 ? diffDays : 0
+    return diffDays
   }
 
   // 달성률 계산 함수
@@ -273,11 +273,20 @@ const ProjectDetail = () => {
               </div>
 
               <div className="mb-8">
-                <p className="mb-3 text-gray-700">펀딩 마감까지</p>
+                <p className="mb-3 text-gray-700">펀딩 마감까지 남은 시간</p>
                 <div className="flex items-baseline">
-                  <span className="text-5xl font-bold text-main-color">
-                    {calculateDaysLeft(projectData?.endAt || "")}일
-                  </span>
+                  {!projectData?.endAt ? (
+                    <span className="text-5xl font-bold text-main-color">알 수 없음</span>
+                  ) : (() => {
+                    const daysLeft = calculateDaysLeft(projectData.endAt)
+                    if (daysLeft > 0) {
+                      return <span className="text-5xl font-bold text-main-color">{daysLeft}일</span>
+                    } else if (daysLeft === 0) {
+                      return <span className="text-5xl font-bold text-main-color">마감임박!</span>
+                    } else {
+                      return <span className="text-5xl font-bold text-main-color">펀딩 종료</span>
+                    }
+                  })()}
                   <span className="ml-2 text-xl text-sub-gray">/ {formatDate(projectData?.endAt || "")}</span>
                 </div>
               </div>
@@ -285,9 +294,9 @@ const ProjectDetail = () => {
 
             {/* 공유하기, 후원하기 버튼 영역 */}
             <div className="mt-8 flex items-center justify-end space-x-4">
-              <button className="w-1/3 flex items-center space-x-2 rounded-xl border border-gray-300 bg-white px-6 py-4 text-gray-700 hover:bg-gray-50">
-                <Share2 className="h-5 w-5" />
-                <span className="font-medium">공유하기</span>
+              <button className="w-1/3 flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white py-4 text-xl text-gray-700 hover:bg-gray-50">
+                <Share2 className="h-6 w-6"/>
+                공유하기
               </button>
 
               {/* 후원하기 버튼 */}

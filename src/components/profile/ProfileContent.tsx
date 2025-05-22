@@ -417,6 +417,8 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
                     sellerName={project.sellerName || "내 상품"}
                     projectName={project.title}
                     description={project.description || "상품 설명이 여기에 표시됩니다."}
+                    createdAt={formatDate(project.createdAt)}
+                    endAt={formatDate(project.endAt)}
                     imageUrl={project.imageUrl || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"}
                     achievementRate={project.achievementRate || 100}
                     daysLeft={project.daysLeft}
