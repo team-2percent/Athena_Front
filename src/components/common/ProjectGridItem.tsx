@@ -61,7 +61,7 @@ export default function ProjectCard({
       }
 
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-      <div onClick={handleCardClick} className="w-fit h-full flex flex-col rounded-lg overflow-hidden text-left">
+      <div onClick={handleCardClick} className="w-fit h-[416px] flex flex-col rounded-lg overflow-hidden text-left">
         <div className="relative" style={{ width: size, height: size, overflow: "hidden" }}>
           {/* 판매 완료 오버레이 */}
           {isSoldOut && (
@@ -73,22 +73,22 @@ export default function ProjectCard({
               <p className="text-sm">감사합니다.</p>
             </div>
           )}
-          <img src={image || "/placeholder.svg"} alt={projectName} className="rounded-lg object-cover w-full h-full" />
+          <img src={image || "/placeholder/project-placeholder.png"} alt={projectName} className="rounded-lg object-cover w-full h-full" />
         </div>
 
         <div className="flex flex-col flex-1 justify-between p-1 pt-2" style={{ width: size }}>
           <div>
             <p className="text-sm text-sub-gray">{sellerName}</p>
-            <p className="text-sm font-medium">{projectName}</p>
+            <p className="text-sm font-medium line-clamp-2">{projectName}</p>
             {description && <p className="text-xs text-sub-gray mt-1 line-clamp-2">{description}</p>}
           </div>
           <div>
             <p
-              className={cn("text-sm font-bold", isOverAchieved ? "text-point-color" : "text-main-color", showProgressBar ? "mt-8" : "mt-0")}
+              className={cn("text-sm font-bold", isOverAchieved ? "text-point-color" : "text-main-color", showProgressBar ? "mt-8" : "mt-0", isSoldOut ? "text-sub-gray" : "text-main-color")}
             >{achievementRate * 100}% 달성!</p>
             {showProgressBar && (
               <div className="mt-1">
-                <div className="relative w-full h-3 bg-sub-gray rounded-full overflow-hidden">
+                <div className="relative w-full h-3 bg-gray-border rounded-full overflow-hidden">
                   <div
                     className={cn(
                       "text-sm font-bold h-full",

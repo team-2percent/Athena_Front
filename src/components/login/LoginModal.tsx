@@ -109,15 +109,6 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
           <div className="flex-1 h-px bg-gray-300" />
         </div>
 
-        {/* Kakao Login Button */}
-        <button
-          type="button"
-          className="w-full py-4 bg-[#FEE500] text-[rgba(0, 0, 0, 0.85)] rounded-xl font-medium text-lg mb-4 flex items-center justify-center"
-        >
-          <img src="/kakao.svg" width={24} height={24} alt="카카오 로그인" className="mr-2" />
-          카카오 로그인
-        </button>
-
         {/* Sign Up Button */}
         <button
           type="button"

@@ -108,7 +108,7 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
       <div className="relative">
         <div ref={containerRef} className="overflow-hidden">
           <div
-            className={cn("flex transition-transform duration-500 ease-out", isTransitioning ? "" : "")}
+            className={cn("flex w-fit transition-transform duration-500 ease-out", isTransitioning ? "" : "")}
             style={{
               transform: `translateX(-${currentPage * 100}%)`,
             }}
@@ -119,10 +119,10 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
             {pages.map((pageItems, pageIndex) => (
               <div key={pageIndex} className="w-full flex-shrink-0">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {pageItems.map((item: any) => {
+                  {pageItems.map((item: any, index: number) => {
                     if (item?.isEmpty) {
                       // Empty placeholder to maintain grid layout
-                      return <div key={new Date().toString()} className="aspect-square invisible"></div>
+                      return <div key={index + pageItems.length} className="aspect-square invisible"></div>
                     }
 
                     return (
@@ -133,7 +133,7 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
                       >
                         <div className="aspect-square relative overflow-hidden rounded-xl">
                           <img
-                            src={item.image || "/placeholder.svg"}
+                            src={item.image || "/placeholder/project-placeholder.png"}
                             alt={item.title}
                             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                           />
@@ -171,14 +171,14 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
         </button>
 
         {/* Dots Indicator */}
-        <div className="flex justify-center gap-2 mt-6">
+        <div className="flex justify-center gap-2">
           {Array.from({ length: totalPages }).map((_, index) => (
             <button
               key={index}
               onClick={() => goToPage(index)}
               className={cn(
-                "w-2 h-2 rounded-full transition-all duration-300",
-                currentPage === index ? "bg-[#fb6f92] w-4" : "bg-[#808080]/30 hover:bg-[#808080]/50",
+                "w-3 h-3 rounded-full transition-all duration-300",
+                currentPage === index ? "bg-[#fb6f92] w-6" : "bg-[#808080]/30 hover:bg-[#808080]/50",
               )}
               aria-label={`${index + 1}페이지로 이동`}
             />

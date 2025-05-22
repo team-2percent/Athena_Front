@@ -106,7 +106,7 @@ export default function TopFive() {
             </div>
             <div className="relative aspect-square">
                 <img 
-                    src={rank1Project.imageUrl || "/placeholder.svg"} 
+                    src={rank1Project.imageUrl || "/placeholder/project-placeholder.png"} 
                     alt={rank1Project.title} 
                     className="w-full h-full object-cover"
                 />
@@ -129,14 +129,14 @@ export default function TopFive() {
                 onClick={() => moveToProjectPage(project.projectId)}
               >
                 <div className="relative">
-                    <div className="absolute top-2 left-2 z-10">
+                    <div className="absolute top-2 left-2 z-1">
                         <div className="bg-main-color text-white w-6 h-6 flex items-center justify-center rounded-sm font-bold text-sm">
                         {idx + 2}
                         </div>
                     </div>
                     <div className="relative aspect-square">
                     <img 
-                        src={project.imageUrl || "/placeholder.svg"} 
+                        src={project.imageUrl || "/placeholder/project-placeholder.png"} 
                         alt={project.title} 
                         className="w-full h-full object-cover"
                     />
