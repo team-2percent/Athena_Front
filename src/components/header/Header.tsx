@@ -20,6 +20,13 @@ const uris: Record<string, string> = {
   "신규": "new",
   "마감임박": "deadline",
 }
+
+interface HeaderResponse {
+  id: number
+  nickname: string
+  imageUrl: string
+}
+
 const Header = () => {
   const { isLoggedIn, role, logout } = useAuthStore();
   const isAdmin = role === "ROLE_ADMIN";
@@ -106,7 +113,7 @@ const Header = () => {
   // 유저 정보 조회
   const loadUserInfo = () => {
     setUserLoadError(false);
-    apiCall<{id: number, nickname: string, imageUrl: string}>("/api/user/Header", "GET").then(({ data, error }) => {
+    apiCall<HeaderResponse>("/api/user/Header", "GET").then(({ data, error }) => {
       if (error) {
         setUserLoadError(true)
       } else if (data !== null) setUser({
@@ -148,25 +155,24 @@ const Header = () => {
   const renderProfile = () => {
     if (isLoading) {
       return <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" onClick={handleProfileClick}/>
-    } else if (userLoadError) {
-      return <button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick}>
-                <Image
-                  src={"/abstract-profile.png"}
+    } 
+    return (<button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick}>
+              {
+                user?.imageUrl ?
+                <img
+                  src={user.imageUrl}
                   alt="프로필 이미지"
+                  className="h-full w-full object-cover"
+                /> :
+                <Image
+                  src={"/placeholder/profile-placeholder.png"}
+                  alt="프로필 플레이스홀더"
                   width={40}
                   height={40}
                   className="h-full w-full object-cover"
                 />
-              </button>
-    }
-    return (<button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick}>
-            <Image
-              src={user?.imageUrl || "/abstract-profile.png"}
-              alt="프로필 이미지"
-              width={40}
-              height={40}
-              className="h-full w-full object-cover"
-            />
+              }
+            
           </button>)
   }
 
