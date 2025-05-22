@@ -56,7 +56,7 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
         <div className="flex text-gray-500 font-normal">
                 {type === "search" && searchWord && <p><span className="text-main-color font-normal">{searchWord}</span>와 연관된&nbsp;</p>}
                 <p>
-                <span className="text-main-color font-normal">{count.toLocaleString()}</span>개의 상품이 있습니다.
+                <span className="text-main-color font-normal">{count}</span>개의 상품이 있습니다.
                 </p>
         </div>
 

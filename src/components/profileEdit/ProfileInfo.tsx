@@ -1,15 +1,16 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import Image from "next/image"
 import { Camera, Check, Pencil, Plus, X } from "lucide-react"
 import PasswordInput from "../common/PasswordInput"
 import clsx from "clsx"
+import { useApi } from "@/hooks/useApi"
+import useAuthStore from "@/stores/auth"
 
 interface Profile {
     name: string
     email: string
-    image: string | null
+    imageUrl: string | null
 }
 
 interface Intro {
@@ -17,38 +18,41 @@ interface Intro {
     urls: string[]
 }
 
+interface LoadResponse {
+    id: number
+    email: string
+    nickname: string
+    imageUrl: string | null
+    sellerDescription: string
+    linkUrl: string
+}
+
 export default function ProfileInfo() {
+    const { isLoading, apiCall } = useApi();
+    const userId = useAuthStore(s => s.userId)
+    console.log(userId);
     // 비밀번호 수정 모드
     const [editingPassword, setEditingPassword] = useState(false);
 
     const [addingUrl, setAddingUrl] = useState(false)
     // 불러온 프로필
     const [profile, setProfile] = useState<Profile>({
-        name: "홍길동",
-        email: "hong@gmail.com",
-        image: "/project-test.png",
+        name: "",
+        email: "",
+        imageUrl: null,
     })
     // 불러온 소개
     const [intro, setIntro] = useState<Intro>({
-        intro: "안녕하세요 홍길동입니다. 이메일은 hong@gmail.com입니다. 소개는 여기에 작성합니다.안녕하세요 홍길동입니다. 이메일은 hong@gmail.com입니다. 소개는 여기에 작성합니다.안녕하세요 홍길동입니다. 이메일은 hong@gmail.com입니다. 소개는 여기에 작성합니다.안녕하세요 홍길동입니다. 이메일은 hong@gmail.com입니다. 소개는 여기에 작성합니다.ㄴ",
-        urls: ["https://www.google.com", "https://www.naver.com"],
+        intro: "",
+        urls: [],
     })
     // 프로필 이미지 관련 상태
-    const [profileImage, setProfileImage] = useState<string | null>(profile.image)
+    const [profileImage, setProfileImage] = useState<string | null>(profile.imageUrl)
     
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     // 이름 수정 관련 상태
     const [newName, setNewName] = useState(profile.name)
-
-    // 비밀번호 관련 상태
-    const [password, setPassword] = useState("")
-    const [passwordConfirmed, setPasswordConfirmed] = useState(false);
-    const [passwordConfirmError, setPasswordConfirmError] = useState(false);
-    const [newPassword, setNewPassword] = useState("")
-    const [newPasswordConfirm, setNewPasswordConfirm] = useState("")
-    const [passwordConfirmNeedError, setPasswordConfirmNeedError] = useState(false);
-    const isMatchNewPassword = newPassword === newPasswordConfirm
 
     // 소개 관련 상태
     const [newIntroduction, setNewIntroduction] = useState(intro.intro)
@@ -58,7 +62,51 @@ export default function ProfileInfo() {
     const [newUrl, setNewUrl] = useState("");
 
     // 저장 가능 여부
-    const [saveable, setSaveable] = useState(false) 
+    const saveable = newName !== profile.name || 
+        profileImage !== profile.imageUrl || 
+        newIntroduction !== intro.intro || 
+        newUrls.join(",") !== intro.urls.join(",")
+
+    // 비밀번호 관련 상태
+    const [password, setPassword] = useState("")
+    const [passwordConfirmed, setPasswordConfirmed] = useState(false);
+    const [passwordConfirmError, setPasswordConfirmError] = useState(false);
+    const [newPassword, setNewPassword] = useState("")
+    const [newPasswordConfirm, setNewPasswordConfirm] = useState("")
+    const [passwordConfirmNeedError, setPasswordConfirmNeedError] = useState(false);
+    const isMatchNewPassword = newPassword === newPasswordConfirm
+    const [successEditPassword, setSuccessEditPassword] = useState(false);
+
+    // 정보 조회
+    const loadData = () => {
+        apiCall<LoadResponse>(`/api/user/${userId}`, "GET").then(({ data }) => {
+            if (data) {
+                setProfile({
+                    name: data.nickname,
+                    email: data.email,
+                    imageUrl: data.imageUrl ? data.imageUrl : ""
+                })
+
+                setIntro({
+                    intro: data.sellerDescription ? data.sellerDescription : "",
+                    urls: data.linkUrl ? data.linkUrl.split(",") : []
+                })
+            }
+        })
+    }
+
+    // 정보 저장
+    const saveData = () => {
+        apiCall("/api/user", "PUT", {
+            nickname: newName,
+            sellerIntroduction: newIntroduction,
+            linkUrl: newUrls ? newUrls.join(",") : ""
+        }).then(({ error }) => {
+            if (!error) {
+                loadData()
+            }
+        })
+    }
     
     // 프로필 이미지 업로드 핸들러
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,7 +120,7 @@ export default function ProfileInfo() {
           }
           reader.readAsDataURL(file)
         }
-        setProfile({...profile, image: profileImage})
+        setProfile({...profile, imageUrl: profileImage})
     }
     // 프로필 이미지 삭제 핸들러
     const handleRemoveImage = () => {
@@ -96,14 +144,12 @@ export default function ProfileInfo() {
     }
 
     const handleUrlRemove = (index: number) => {
-        setNewUrls(newUrls.filter((_, i) => i !== index))
+        if (newUrls) setNewUrls(newUrls.filter((_, i) => i !== index))
     }
     
     // 전체 저장 핸들러
     const handleSave = () => {
-        // 저장 api 호출
-        console.log("save")
-        setSaveable(false) // 저장 성공 후 저장 가능 여부 초기화
+        saveData();
     }
 
     // 비밀번호 입력 핸들러
@@ -112,16 +158,28 @@ export default function ProfileInfo() {
         setPasswordConfirmError(false)
     }
 
+    // 비밀번호 변경 상태 초기화
+    const initPasswords = () => {
+        setPassword("")
+        setNewPassword("")
+        setNewPasswordConfirm("")
+        setPasswordConfirmed(false)
+    }
+
     // 비밀번호 확인 핸들러
     const handlePasswordConfirm = () => {
         // 백엔드 요청 추가
-        if (false) {
-            setPasswordConfirmed(true)
-            console.log(`${password} confirmed`)
-        } else {
-            setPasswordConfirmError(true)
-            console.log(`${password} not confirmed`)
-        }
+        apiCall("/api/my/checkPassword", "POST", {
+            password: password
+        }).then(({ data, error }) => {
+            if (error || !data) {
+                setPasswordConfirmError(true)
+                console.log(`${password} not confirmed`)
+            } else {
+                setPasswordConfirmed(true)
+                console.log(`${password} confirmed`)
+            }
+        })
     }
 
     // 새 비밀번호 입력 핸들러
@@ -142,13 +200,37 @@ export default function ProfileInfo() {
             return
         }
         // 백엔드 요청 추가
-        console.log("new password applied")
+        else {
+            apiCall("/api/my/updatePassword", "POST", {
+                oldPassword: password,
+                newPassword: newPassword
+            }).then(({ error }) => {
+                if (!error) {
+                    initPasswords();
+                    setSuccessEditPassword(true)
+                }
+            })
+        }
     }
 
-    // 저장 가능 여부 확인 -> 변화가 있을 때만 저장 가능
     useEffect(() => {
-        setSaveable(newName !== profile.name || profileImage !== profile.image || newIntroduction !== intro.intro || newUrls.join(",") !== intro.urls.join(","))
-    }, [newName, profileImage, newIntroduction, newUrls])
+        if (userId) loadData();
+    }, [userId])
+
+    useEffect(() => {
+        initPasswords();
+        setSuccessEditPassword(false)
+    }, [editingPassword])
+
+    useEffect(() => {
+        setNewName(profile.name)
+        setProfileImage(profile.imageUrl)
+    }, [profile])
+
+    useEffect(() => {
+        setNewIntroduction(intro.intro)
+        setNewUrls(intro.urls)
+    }, [intro])
 
     return (
         <>
@@ -225,7 +307,7 @@ export default function ProfileInfo() {
                         {/* 소개란 */}
                         <textarea
                             className="w-full h-[150px] px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:border-2 focus:border-main-color text-sm resize-none"
-                            value={newIntroduction}
+                            value={newIntroduction ? newIntroduction : ""}
                             onChange={(e) => setNewIntroduction(e.target.value)}
                         />
                         {/* 링크란 */}
@@ -235,12 +317,15 @@ export default function ProfileInfo() {
                             </button>
                             {
                                 addingUrl &&
-                                <form className="flex gap-2 items-center">
-                                    <input type="url" className="w-full px-2 py-1 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color text-sm" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} />
-                                    <button onSubmit={handleUrlAdd}>
+                                <div className="flex gap-2 items-center">
+                                    <input
+                                        type="url"
+                                        className="w-full px-2 py-1 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color text-sm"
+                                        value={newUrl} onChange={(e) => setNewUrl(e.target.value)} />
+                                    <button onClick={handleUrlAdd}>
                                         <Check className="w-4 h-4" />
                                     </button>
-                                </form>
+                                </div>
                             }
                             {newUrls.map((url, index) => {
                                 return (
@@ -284,6 +369,7 @@ export default function ProfileInfo() {
                                     value={password}
                                     onChange={handlePasswordChange}
                                 />
+                                <div className="flex items-center">
                                 {
                                     passwordConfirmed ?
                                     <Check className="w-4 h-4 text-green-500" />
@@ -298,6 +384,7 @@ export default function ProfileInfo() {
                                         {passwordConfirmNeedError && <p className="text-red-500 text-sm">비밀번호 확인이 필요합니다.</p>}
                                     </div>
                                 }
+                                </div>
                             </div>
                         </div>
                         
@@ -326,7 +413,8 @@ export default function ProfileInfo() {
                             </div>}
                         </div>
                     </div>
-                    <div className="flex gap-2 justify-end">
+                    <div className="flex gap-2 justify-end items-center">
+                        {successEditPassword && <p className="text-sm text-sub-gray">비밀번호 변경이 완료되었습니다.</p>}
                         <button
                             className="w-fit bg-main-color text-white rounded-md hover:bg-secondary-color-dark text-sm px-3 py-2"
                             onClick={handleNewPasswordApply}
