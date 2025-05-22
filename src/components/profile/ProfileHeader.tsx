@@ -3,13 +3,11 @@ import Image from "next/image"
 
 interface ProfileHeaderProps {
   nickname: string
-  following: string
-  purchases: string
   profileImage: string
   buttons?: React.ReactNode
 }
 
-export default function ProfileHeader({ nickname, following, purchases, profileImage, buttons }: ProfileHeaderProps) {
+export default function ProfileHeader({ nickname, profileImage, buttons }: ProfileHeaderProps) {
   return (
     <div className="flex justify-between items-start mx-auto max-w-6xl mb-12 h-36">
       <div className="flex">
@@ -25,18 +23,6 @@ export default function ProfileHeader({ nickname, following, purchases, profileI
         {/* 프로필 텍스트 정보 */}
         <div className="flex flex-col justify-center h-36">
           <h1 className="text-3xl font-bold mb-4">{nickname}</h1>
-
-          <div className="flex space-x-16">
-            <div>
-              <div className="text-sub-gray mb-2">팔로잉</div>
-              <div className="text-xl font-medium">{following}</div>
-            </div>
-
-            <div>
-              <div className="text-sub-gray mb-2">구매 횟수</div>
-              <div className="text-xl font-medium">{purchases}</div>
-            </div>
-          </div>
         </div>
       </div>
 
