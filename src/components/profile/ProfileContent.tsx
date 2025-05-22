@@ -384,7 +384,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
       <div className="mx-auto max-w-6xl mt-8">
         {activeTab === "소개" && (
           <div className="mb-8">
-            <p className="text-sub-gray mb-8 whitespace-pre-wrap break-words">{userInfo.sellerIntroduction}</p>
+            <p className="text-sub-gray mb-8 whitespace-pre-wrap break-words">{userInfo.sellerIntroduction || "소개글이 없습니다."}</p>
 
             {/* 링크 목록 */}
             <div className="flex flex-wrap gap-4">

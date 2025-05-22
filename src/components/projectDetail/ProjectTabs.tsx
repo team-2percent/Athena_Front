@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
-import Image from "next/image"
 import { ThumbsUp, ThumbsDown } from "lucide-react"
 import FollowItem from "../profile/FollowItem"
 import { useApi } from "@/hooks/useApi"
@@ -34,6 +33,7 @@ interface ProjectData {
   imageUrls: string[]
   sellerResponse: {
     id: number
+    nickname: string
     sellerIntroduction: string
     linkUrl: string
   }
@@ -66,23 +66,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
     setActiveTab(tab)
   }
 
-  // 기본 판매자 정보 (API 데이터가 없을 경우 사용)
-  const defaultSeller = {
-    id: 101,
-    username: "가작가",
-    oneLinear: "어? 왜 지가 화를 내지?",
-    profileImage: "/abstract-profile.png",
-  }
-
-  // 판매자 정보 (API 데이터가 있으면 사용)
-  const seller = projectData?.sellerResponse
-    ? {
-        id: projectData.sellerResponse.id,
-        username: "가작가", // API에서 제공하지 않는 정보는 기본값 사용
-        oneLinear: projectData.sellerResponse.sellerIntroduction,
-        profileImage: "/abstract-profile.png", // API에서 제공하지 않는 정보는 기본값 사용
-      }
-    : defaultSeller
+  // 판매자 정보는 projectData.sellerResponse에서만 가져옴
 
   const handleFollow = (id: number) => {
     // 팔로우 로직 구현 예정
@@ -139,10 +123,10 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
     if (!reviewText.trim()) return
 
     try {
-      const { data, error, status } = await apiCall("/api/comment/create", "POST", {
-        projectId,
-        content: reviewText,
-      })
+      const { data, error, status } = await apiCall(
+        `/api/comment/create?projectId=${projectId}&content=${encodeURIComponent(reviewText)}`,
+        "POST",
+      )
 
       if (error) {
         setReviewsError(error)
@@ -182,7 +166,6 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     return diffDays > 0 ? diffDays : 0
   }
-
 
   // 기본 마크다운 콘텐츠 (API 데이터가 없을 경우 사용)
   const defaultMarkdown = `
@@ -274,21 +257,23 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                 <h2 className="mt-12 mb-6 text-3xl font-bold">판매자 정보</h2>
                 <hr className="border-gray-border mb-6" />
 
-                <FollowItem
-                  id={seller.id}
-                  username={seller.username}
-                  oneLinear={seller.oneLinear}
-                  profileImage={seller.profileImage}
-                  onFollow={handleFollow}
-                  isFollowing={false} // 팔로우 상태는 API에서 가져와야 함
-                />
-
+                {projectData?.sellerResponse ? (
+                  <FollowItem
+                    id={projectData.sellerResponse.id}
+                    username={projectData.sellerResponse.nickname}
+                    oneLinear={projectData.sellerResponse.sellerIntroduction || "판매자 소개가 없습니다."}
+                    profileImage="/abstract-profile.png" // API에서 제공하지 않는 정보는 기본값 사용
+                    onFollow={handleFollow}
+                    isFollowing={false} // 팔로우 상태는 API에서 가져와야 함
+                  />
+                ) : (
+                  <div className="py-4 text-sub-gray">판매자 정보를 불러올 수 없습니다.</div>
+                )}
               </div>
             )}
 
             {activeTab === "후기" && (
               <div className="space-y-6">
-
                 {/* 로딩 상태 표시 */}
                 {reviewsLoading && (
                   <div className="flex justify-center py-8">

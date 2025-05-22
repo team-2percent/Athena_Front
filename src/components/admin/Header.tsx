@@ -25,6 +25,7 @@ export default function AdminHeader() {
     const handleLogout = () => {
         apiCall("/api/user/logout", "POST").then(() => {
             logout();
+            router.push("/")
         })        
     }
 

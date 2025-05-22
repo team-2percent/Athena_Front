@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { useApi } from "@/hooks/useApi"
+import useAuthStore from "@/stores/auth"
 
 interface UserProfile {
   id: number
@@ -17,8 +18,9 @@ export default function ProfilePage() {
   const router = useRouter()
   const { apiCall, isLoading } = useApi()
   const [isOpenViewTransaction, setIsOpenViewTransaction] = useState(false)
+  const userId = useAuthStore((state) => state.userId)
   const [userProfile, setUserProfile] = useState<UserProfile>({
-    id: 9,
+    id: userId || 0,
     email: "",
     nickname: "사용자 닉네임", // 기본값
   })
@@ -33,8 +35,10 @@ export default function ProfilePage() {
   useEffect(() => {
     // 유저 프로필 정보 가져오기
     const fetchUserProfile = async () => {
+      if (!userId) return
+
       try {
-        const response = await apiCall("/api/user/9", "GET")
+        const response = await apiCall(`/api/user/${userId}`, "GET")
         if (response && response.data) {
           setUserProfile(response.data as UserProfile)
         }
@@ -44,7 +48,7 @@ export default function ProfilePage() {
     }
 
     fetchUserProfile()
-  }, [])
+  }, [userId])
 
   const handleClickEditProfile = () => {
     router.push("/my/edit")

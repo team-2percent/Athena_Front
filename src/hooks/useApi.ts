@@ -99,7 +99,7 @@ export function useApi() {
   
               return {
                 data: null,
-                error: err.response.data.message || "API request failed",
+                error: err.response.data || "API request failed",
                 isLoading: false,
                 status: err.response.status,
               };

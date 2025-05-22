@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import { Plus, Check, X, Trash2 } from "lucide-react"
 import { useProjectFormStore } from "@/stores/useProjectFormStore"
 import type { CompositionItem, SupportOption } from "@/stores/useProjectFormStore"
-
+import { useApi } from "@/hooks/useApi"
 // PlanSelection 컴포넌트 import 추가
 import PlanSelection from "./PlanSelection"
 
@@ -15,7 +15,7 @@ interface BankAccount {
   id: number
   accountHolder: string // 예금주
   bankName: string // 은행명
-  accountNumber: string // 계좌번호
+  bankAccount: string // 계좌번호 (키 이름 변경됨)
   isDefault?: boolean // 기본 계좌 여부
 }
 
@@ -55,7 +55,7 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
       onSave({
         accountHolder,
         bankName,
-        accountNumber,
+        bankAccount: accountNumber,
       })
 
       // 입력 필드 초기화
@@ -296,75 +296,106 @@ interface StepThreeFormProps {
 export default function StepThreeForm({ initialData }: StepThreeFormProps) {
   // Zustand 스토어에서 상태와 액션 가져오기
   const { supportOptions, updateFormData } = useProjectFormStore()
+  const { apiCall, isLoading } = useApi()
 
   // 계좌 관련 상태
   const [selectedAccountId, setSelectedAccountId] = useState<number | null>(null)
   const [useAccountNextTime, setUseAccountNextTime] = useState(false)
   const [isAddAccountModalOpen, setIsAddAccountModalOpen] = useState(false)
+  const [accounts, setAccounts] = useState<BankAccount[]>([])
+  const [accountsLoading, setAccountsLoading] = useState(false)
+  const [accountError, setAccountError] = useState<string | null>(null)
 
   // 후원 상품 관련 상태
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [compositionDialogOpen, setCompositionDialogOpen] = useState(false)
   const [currentOptionId, setCurrentOptionId] = useState<number | null>(null)
 
-  // 샘플 계좌 목록 (실제로는 API에서 가져올 데이터)
-  const [accounts, setAccounts] = useState<BankAccount[]>([
-    {
-      id: 1,
-      accountHolder: "홍길동",
-      bankName: "신한은행",
-      accountNumber: "110123456789",
-      isDefault: true,
-    },
-    {
-      id: 2,
-      accountHolder: "김철수",
-      bankName: "국민은행",
-      accountNumber: "45612378910",
-      isDefault: false,
-    },
-  ])
+  // 계좌 목록 조회 API 호출
+  const fetchAccounts = async () => {
+    setAccountsLoading(true)
+    setAccountError(null)
 
-  // 초기 계좌 선택
-  useEffect(() => {
-    // 기본 계좌가 있으면 선택
-    const defaultAccount = accounts.find((account) => account.isDefault)
-    if (defaultAccount) {
-      setSelectedAccountId(defaultAccount.id)
-    } else if (accounts.length > 0) {
-      // 기본 계좌가 없으면 첫 번째 계좌 선택
-      setSelectedAccountId(accounts[0].id)
+    try {
+      const response = await apiCall<BankAccount[]>("/api/bankAccount", "GET")
+
+      if (response.error) {
+        setAccountError(response.error)
+      } else if (response.data) {
+        setAccounts(response.data)
+
+        // 기본 계좌 선택
+        const defaultAccount = response.data.find((account) => account.isDefault)
+        if (defaultAccount) {
+          setSelectedAccountId(defaultAccount.id)
+        } else if (response.data.length > 0) {
+          setSelectedAccountId(response.data[0].id)
+        }
+      }
+    } catch (error) {
+      setAccountError("계좌 정보를 불러오는데 실패했습니다.")
+      console.error("계좌 정보 조회 오류:", error)
+    } finally {
+      setAccountsLoading(false)
     }
+  }
+
+  // 컴포넌트 마운트 시 계좌 목록 조회
+  useEffect(() => {
+    fetchAccounts()
   }, [])
 
-  // 계좌 추가 처리
-  const handleAddAccount = (account: Omit<BankAccount, "id" | "isDefault">) => {
-    const newAccount: BankAccount = {
-      ...account,
-      id: accounts.length > 0 ? Math.max(...accounts.map((a) => a.id)) + 1 : 1,
-      isDefault: false,
-    }
+  // 계좌 추가 처리 - API 연동
+  const handleAddAccount = async (account: Omit<BankAccount, "id" | "isDefault">) => {
+    try {
+      const response = await apiCall<BankAccount>("/api/bankAccount", "POST", account)
 
-    setAccounts([...accounts, newAccount])
-    setSelectedAccountId(newAccount.id) // 새로 추가한 계좌 선택
+      if (response.error) {
+        console.error("계좌 추가 오류:", response.error)
+        return
+      }
+
+      if (response.data) {
+        // API 응답으로 받은 새 계좌 정보를 목록에 추가
+        setAccounts((prev) => [...prev, response.data as BankAccount])
+        setSelectedAccountId(response.data.id) // 새로 추가한 계좌 선택
+      }
+
+      // 계좌 목록 새로고침
+      fetchAccounts()
+    } catch (error) {
+      console.error("계좌 추가 오류:", error)
+    }
+  }
+
+  // 계좌 삭제 처리 - API 연동
+  const handleDeleteAccount = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation() // 이벤트 버블링 방지
+
+    try {
+      const response = await apiCall(`/api/bankAccount?bankAccountId=${id}`, "DELETE")
+
+      if (response.error) {
+        console.error("계좌 삭제 오류:", response.error)
+        return
+      }
+
+      // 선택된 계좌를 삭제하는 경우 선택 상태 초기화
+      if (selectedAccountId === id) {
+        setSelectedAccountId(null)
+        setUseAccountNextTime(false)
+      }
+
+      // 계좌 목록에서 삭제된 계좌 제거
+      setAccounts(accounts.filter((account) => account.id !== id))
+    } catch (error) {
+      console.error("계좌 삭제 오류:", error)
+    }
   }
 
   // 계좌 선택 처리
   const handleSelectAccount = (id: number) => {
     setSelectedAccountId(id)
-  }
-
-  // 계좌 삭제 처리
-  const handleDeleteAccount = (id: number, e: React.MouseEvent) => {
-    e.stopPropagation() // 이벤트 버블링 방지
-
-    // 선택된 계좌를 삭제하는 경우 선택 상태 초기화
-    if (selectedAccountId === id) {
-      setSelectedAccountId(null)
-      setUseAccountNextTime(false)
-    }
-
-    setAccounts(accounts.filter((account) => account.id !== id))
   }
 
   // 후원 옵션 추가
@@ -420,6 +451,13 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
     const updatedOptions = supportOptions.filter((option) => option.id !== id)
     updateFormData({ supportOptions: updatedOptions })
   }
+
+  // 선택된 계좌 ID가 변경될 때마다 Zustand 스토어에 저장하는 useEffect 추가
+  useEffect(() => {
+    if (selectedAccountId !== null) {
+      updateFormData({ bankAccountId: selectedAccountId })
+    }
+  }, [selectedAccountId, updateFormData])
 
   return (
     <div className="space-y-8">
@@ -587,46 +625,52 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
 
         {/* 계좌 목록 */}
         <div className="space-y-3 mb-4">
-          {accounts.map((account) => (
-            <div
-              key={account.id}
-              onClick={() => handleSelectAccount(account.id)}
-              className={`rounded-xl border p-4 cursor-pointer transition-colors ${
-                selectedAccountId === account.id
-                  ? "border-main-color bg-secondary-color"
-                  : "border-gray-300 hover:bg-gray-50"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {/* 라디오 버튼 추가 */}
-                  <div className="flex items-center justify-center">
-                    <div
-                      className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                        selectedAccountId === account.id ? "border-main-color" : "border-gray-300"
-                      }`}
-                    >
-                      {selectedAccountId === account.id && <div className="w-3 h-3 rounded-full bg-main-color"></div>}
+          {accountsLoading ? (
+            <div>계좌 정보를 불러오는 중...</div>
+          ) : accountError ? (
+            <div>{accountError}</div>
+          ) : (
+            accounts.map((account) => (
+              <div
+                key={account.id}
+                onClick={() => handleSelectAccount(account.id)}
+                className={`rounded-xl border p-4 cursor-pointer transition-colors ${
+                  selectedAccountId === account.id
+                    ? "border-main-color bg-secondary-color"
+                    : "border-gray-300 hover:bg-gray-50"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {/* 라디오 버튼 추가 */}
+                    <div className="flex items-center justify-center">
+                      <div
+                        className={`w-5 h-5 rounded-full border flex items-center justify-center ${
+                          selectedAccountId === account.id ? "border-main-color" : "border-gray-300"
+                        }`}
+                      >
+                        {selectedAccountId === account.id && <div className="w-3 h-3 rounded-full bg-main-color"></div>}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-medium">{account.bankName}</div>
+                      <div className="text-sm text-gray-600">
+                        {account.bankAccount} ({account.accountHolder})
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <div className="text-lg font-medium">{account.bankName}</div>
-                    <div className="text-sm text-gray-600">
-                      {account.accountNumber} ({account.accountHolder})
-                    </div>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => handleDeleteAccount(account.id, e)}
+                    className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-gray-100"
+                    aria-label="계좌 삭제"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={(e) => handleDeleteAccount(account.id, e)}
-                  className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-gray-100"
-                  aria-label="계좌 삭제"
-                >
-                  <X className="h-4 w-4" />
-                </button>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         {/* 계좌 추가 버튼 */}

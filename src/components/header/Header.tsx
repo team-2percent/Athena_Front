@@ -120,6 +120,7 @@ const Header = () => {
   const handleLogout = () => {
     apiCall("/api/user/logout", "POST").then(() => {
       logout();
+      router.push("/")
     })
   }
 
@@ -301,7 +302,7 @@ const Header = () => {
               </button>
             ))}
           </nav>
-          <PopularSearch onSearchChange={handleSearchChange} onSearch={moveToSearchPage}/>
+          {/* <PopularSearch onSearchChange={handleSearchChange} onSearch={moveToSearchPage}/> */}
         </div>
       </div>
 

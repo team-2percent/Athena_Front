@@ -1,7 +1,7 @@
-import { create } from "zustand";
-import { jwtDecode } from "jwt-decode";
+import { create } from "zustand"
+import { jwtDecode } from "jwt-decode"
 
-export type UserRole = "ROLE_ADMIN" | "ROLE_USER" | "";
+export type UserRole = "ROLE_ADMIN" | "ROLE_USER" | ""
 
 interface AuthStore {
   isLoggedIn: boolean;
@@ -34,11 +34,12 @@ const useAuthStore = create<AuthStore>((set) => ({
     },
   logout: () => {
     if (typeof window !== "undefined") {
-      localStorage.removeItem("accessToken");
+      localStorage.removeItem("accessToken")
+      localStorage.removeItem("userId")
     }
-    set({ isLoggedIn: false, role: "" });
+    set({ isLoggedIn: false, role: "", userId: null })
   },
   setHydrated: (hydrated) => set({ hydrated }),
-}));
+}))
 
-export default useAuthStore;
+export default useAuthStore
