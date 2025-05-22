@@ -1,142 +1,147 @@
 "use client"
 
 import { Plus, Search, Trash2 } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import AddressModal from "./AddressModal"
-import clsx from "clsx"
+import { useApi } from "@/hooks/useApi"
+import ConfirmModal from "../common/ConfirmModal"
 
 interface AddressInfo {
-    id: string
-    name: string
+    id: number
+    name?: string
     address: string
     detailAddress: string
-    zipCode: string
+    zipcode: string
     isDefault: boolean
-}
-  
-interface AddressAddInfo {
-    name: string
-    address: string
-    detailAddress: string
-    zipCode: string
 }
 
 export default function AddressInfo() {
-    // 배송지 검색 모달 상태
+    const { isLoading, apiCall } = useApi();
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isDefaultModalOpen, setIsDefaultModalOpen] = useState(false); 
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
 
-    // 배송지 정보 상태
-    const [addresses, setAddresses] = useState<AddressInfo[]>([
-        {
-        id: "1",
-        name: "집",
-        address: "서울특별시 강남구 테헤란로 123",
-        detailAddress: "456동 789호",
-        zipCode: "06234",
-        isDefault: true,
-        },
-    ])
+    const [deleteId, setDeleteId] = useState<number | null>(null);
+    const [defaultId, setDefaultId] = useState<number | null>(null);
 
-    const [newAddress, setNewAddress] = useState<Omit<AddressInfo, "id" | "isDefault">>({
-        name: "",
-        address: "",
-        detailAddress: "",
-        zipCode: "",
+    // 배송지 정보 상태
+    const [addresses, setAddresses] = useState<AddressInfo[]>([])
+
+    // 새 배송지
+    const [newAddress, setNewAddress] = useState({
+        isDefault: false,
+        address: '',
+        detailAddress: '',
+        zipcode: ''
     })
 
-    // 저장 가능 여부
-    const [saveable, setSaveable] = useState(false)
+    const initNewAddress = () => {
+        setNewAddress({
+            isDefault: false,
+            address: '',
+            detailAddress: '',
+            zipcode: ''
+        })
+    }
+
+    const loadData = () => {
+        apiCall<AddressInfo[]>("/api/delivery/delivery-info", "GET").then(({ data }) => {
+            if (data) setAddresses(data)
+        })
+    }
+
+    const deleteDelivery = () => {
+        if (deleteId === null) return;
+        apiCall(`/api/delivery/delivery-info/${deleteId}`, "DELETE").then(({ error }) => {
+            if (!error) {
+                loadData();
+                setIsDeleteModalOpen(false)
+            } else {
+                console.log("삭제 실패")
+            }
+        })
+    }
+
+    const setDefaultDelivery = () => {
+        if (defaultId === null) return;
+        apiCall(`api/delivery/delivery-info/${defaultId}/default`, "PATCH").then(({ error }) => {
+            if (!error) {
+                loadData();
+                setIsDefaultModalOpen(false)
+            } else {
+                console.log("기본 배송지 설정 실패")
+            }
+        })
+    }
 
     // 배송지 추가 모달 열기 핸들러
     const handleOpenAddressModal = () => {
         setIsAddressModalOpen(true)
     }
 
-    // 배송지 삭제 핸들러
-    const handleRemoveAddress = (id: string) => {
-        const updatedAddresses = addresses.filter((address) => address.id !== id)
-
-        // 기본 배송지 설정 확인
-        if (updatedAddresses.length > 0 && addresses.find((a) => a.id === id)?.isDefault) {
-        updatedAddresses[0].isDefault = true
-        }
-
-        setAddresses(updatedAddresses)
-        setSaveable(true);
-    }
-
-    // 기본 배송지 설정 핸들러
-    const handleSetDefaultAddress = (id: string) => {
-        setAddresses(
-        addresses.map((address) => ({
-            ...address,
-            isDefault: address.id === id,
-        })),
-        )
-        setSaveable(true);
-    }
-
     // 주소 추가 핸들러
     const handleAddAddress = () => {
-        if (!newAddress.name || !newAddress.address || !newAddress.detailAddress) {
+        if (!newAddress.address || !newAddress.detailAddress || !newAddress.zipcode) {
             alert("배송지명, 주소, 상세주소를 모두 입력해주세요.")
             return
         }
-        setAddresses([...addresses, 
-            {
-                id: Date.now().toString(),
-                name: newAddress.name,
-                address: newAddress.address,
-                detailAddress: newAddress.detailAddress,
-                zipCode: newAddress.zipCode,
-                isDefault: addresses.length === 0,
-                }
-        ])
+
+        apiCall("/api/delivery/delivery-info", "POST", {
+            zipcode: newAddress.zipcode,
+            address: newAddress.address,
+            detailAddress: newAddress.detailAddress,
+            isDefault: newAddress.isDefault
+        }).then(({ error }) => {
+            if (!error) {
+                loadData()
+                initNewAddress()
+            } else {
+                console.log("배송지 추가 실패")
+            }
+        })
     }
 
     const handleComplete = (data: any) => {
         setNewAddress({
             ...newAddress,
             address: data.address,
-            zipCode: data.zonecode,
+            zipcode: data.zonecode,
             detailAddress: "",
         })
         setIsAddressModalOpen(false)
     }
 
-    const handleSave = () => {
-        // 저장 api 호출
-        setSaveable(false);
+    // 삭제 버튼 핸들러
+    const handleClickDeleteButton = (accountId: number) => {
+        setDeleteId(accountId)
+        setIsDeleteModalOpen(true)
     }
+
+    // 기본 설정 버튼 핸들러
+    const handleClickSetDefaultButton = (accountId: number) => {
+        setDefaultId(accountId)
+        setIsDefaultModalOpen(true)
+    }
+
+    useEffect(() => {
+        loadData()
+    }, [])
 
     return (
         <div className="flex gap-4">
+            <ConfirmModal isOpen={isDefaultModalOpen} message={"기본 계좌로 설정할까요?"} onConfirm={setDefaultDelivery} onClose={() => setIsDefaultModalOpen(false)} />
+            <ConfirmModal isOpen={isDeleteModalOpen} message={"계좌를 삭제할까요?"} onConfirm={deleteDelivery} onClose={() => setIsDeleteModalOpen(false)} />
             <div className="flex-1 bg-white rounded-lg shadow py-6 px-10">
                 <h3 className="text-lg font-medium mb-6">배송지 추가</h3>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            배송지명
-                        </label>
-                        <input
-                            type="text"
-                            value={newAddress.name}
-                            onChange={(e) => setNewAddress({
-                                ...newAddress,
-                                name: e.target.value,
-                            })}
-                            className="w-full flex-1 px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
-                        />
-                    </div>
-                    
                     <div className="flex w-full my-3 gap-2 justify-between items-center my-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             주소
                         </label>
-                        <p className="block text-sm font-medium text-gray-700">{ newAddress.address.length > 0 && `[${newAddress.zipCode}] ${newAddress.address}`}</p>
+                        <p className="block text-sm font-medium text-gray-700">{ newAddress.address.length > 0 && `[${newAddress.zipcode}] ${newAddress.address}`}</p>
                         <button
                             type="button"
                             onClick={handleOpenAddressModal}
-                            className="bg-pink-500 text-white px-2 py-2 rounded-md hover:bg-secondary-color-dark"
+                            className="bg-main-color text-white px-2 py-2 rounded-md hover:bg-secondary-color-dark"
                         >
                             <Search className="w-4 h-4" />
                         </button>
@@ -159,11 +164,23 @@ export default function AddressInfo() {
                             <button
                                 type="button"
                                 onClick={handleAddAddress}
-                                className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-secondary-color-dark text-sm flex items-center"
+                                className="px-4 py-2 bg-main-color text-white rounded-md hover:bg-secondary-color-dark text-sm flex items-center"
                             >
                                 <Plus className="w-4 h-4 mr-1" /> 배송지 추가
                             </button>
                         </div>
+                    </div>
+                    <div className="flex gap-2 items-center">
+                        <input
+                            type="checkBox"
+                            onChange={(e) => setNewAddress({
+                                ...newAddress,
+                                isDefault: e.target.checked,
+                            })}
+                        />
+                        <label className="block text-sm font-medium text-gray-700">
+                            기본 배송지로 설정
+                        </label>
                     </div>
             </div>
 
@@ -179,30 +196,26 @@ export default function AddressInfo() {
                                 <div key={address.id} className="border rounded-md p-4 relative">
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-start">
-                                            <input
-                                                type="radio"
-                                                id={`default-address-${address.id}`}
-                                                name="default-address"
-                                                checked={address.isDefault}
-                                                onChange={() => handleSetDefaultAddress(address.id)}
-                                                className="w-4 h-4 text-pink-500 border-gray-300 focus:ring-main-color mt-1 mr-3"
-                                            />
                                             <div>
                                                 <div className="flex items-center">
-                                                    <p className="font-medium">{address.name}</p>
-                                                {address.isDefault && 
+                                                    <p className="font-medium">{address.address}</p>
+                                                {address.isDefault ? 
                                                     <span className="ml-2 px-2 py-0.5 bg-pink-100 text-secondary-color-dark text-xs rounded-full">기본</span>
+                                                    :
+                                                    <button
+                                                        className="border-box ml-2 px-2 py-0.5 text-xs text-main-color rounded-full border border-main-color"
+                                                        onClick={() => handleClickSetDefaultButton(address.id)}
+                                                    >기본 계좌로 설정</button>
                                                 }
                                                 </div>
                                                 <p className="text-sm text-gray-500 mt-1">
-                                                [{address.zipCode}] {address.address}
+                                                [{address.zipcode}] {address.detailAddress && <p className="text-sm text-gray-500">{address.detailAddress}</p>}
                                                 </p>
-                                                {address.detailAddress && <p className="text-sm text-gray-500">{address.detailAddress}</p>}
                                             </div>
                                         </div>
                                         <button
                                         type="button"
-                                            onClick={() => handleRemoveAddress(address.id)}
+                                            onClick={() => handleClickDeleteButton(address.id)}
                                             className="text-gray-400 hover:text-red-500"
                                         >
                                             <Trash2 className="w-4 h-4" />
@@ -212,16 +225,6 @@ export default function AddressInfo() {
                             ))}
                         </div>
                     }
-                </div>
-                <div className="flex gap-2 justify-end items-end flex-wrap mt-4">
-                    <p className="text-sm font-medium text-gray-400">※ 저장하지 않고 페이지를 나갈 시 변경사항이 저장되지 않습니다.</p>
-                    <button
-                        disabled={!saveable}
-                        className={clsx("text-white rounded-md text-sm px-4 py-2", saveable ? "bg-pink-500 hover:bg-secondary-color-dark": "bg-gray-300")}
-                        onClick={handleSave}
-                    >
-                        저장
-                    </button>
                 </div>
             </div>
             {/* 배송지 주소 모달 */}
