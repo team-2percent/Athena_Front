@@ -20,35 +20,14 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   const [confirmPassword, setConfirmPassword] = useState("")
   // const [agreeToMarketing, setAgreeToMarketing] = useState(false)
   const [focusedField, setFocusedField] = useState<string | null>(null)
-  const [isEmailValid, setIsEmailValid] = useState(true)
   const [isPasswordMatch, setIsPasswordMatch] = useState(true)
-  const [isPasswordValid, setIsPasswordValid] = useState(true)
   const [isError, setIsError] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
   const [disabled, setDisabled] = useState(true)
 
-  // 이메일 유효성 검사
-  const checkEmail = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-
-  // 비밀번호 유효성 검사
-  const checkPassword = () => {
-    // 비밀번호 길이 검사 (최소 8자리)
-    if (password.length < 8) {
-      return false
-    }
-
-    // 영문 대소문자, 숫자, 특수문자 포함 여부 검사
-    const hasUppercase = /[A-Z]/.test(password)
-    const hasLowercase = /[a-z]/.test(password)
-    const hasNumber = /\d/.test(password)
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password)
-
-    if (!(hasUppercase && hasLowercase && hasNumber && hasSpecialChar)) {
-      return false
-    }
-    
-    return true
-  }
+  // 이메일, 비밀번호 유효성 검사
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  const isPasswordValid = password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password) && /[!@#$%^&*(),.?":{}|<>]/.test(password)
 
   // 회원가입 로직
   const handleSubmit = (e: React.FormEvent) => {
@@ -58,16 +37,6 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
       onClose()
     })
   }
-
-  // 이메일 양식 확인
-  useEffect(() => {
-    setIsEmailValid(checkEmail() || email === "")
-  }, [email])
-
-  // 비밀번호 양식 확인
-  useEffect(() => {
-    setIsPasswordValid(checkPassword() || password === "")
-  }, [password])
 
   // 비밀번호 일치 확인
   useEffect(() => {
@@ -127,7 +96,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
               onBlur={() => setFocusedField(null)}
             />
             {/* 이메일 확인 문구 */}
-            {!isEmailValid && (
+            {email !== "" && !isEmailValid && (
               <p className="absolute bottom-0 translate-y-full text-red-500 text-xs pt-1">이메일 형식이 아닙니다.</p>
             )}
           </div>
@@ -157,7 +126,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
               onBlur={() => setFocusedField(null)}
             />
             {/* 패스워드 확인 문구 */}
-            {!isPasswordValid && (
+            {password !== "" && !isPasswordValid && (
               <p className="absolute bottom-0 translate-y-full text-red-500 text-xs pt-1">
                 최소 8자리 이상, 영문 대소문자, 숫자, 특수문자를 섞어 구성해야 합니다.
               </p>
