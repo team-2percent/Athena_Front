@@ -109,11 +109,10 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
         </button>
       </div>
 
-      {/* Dropdown */}
-      {isOpen && (
+      {/* {isOpen && (
         <div className="absolute w-full mt-2 bg-white rounded-3xl border border-gray-300 shadow-lg z-30">
           <div className="p-4">
-            {/* Auto-complete section */}
+            
             <div className="mb-4">
               <h3 className="text-lg font-bold mb-2">자동 완성</h3>
               <div className="flex flex-col">
@@ -130,7 +129,7 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
               </div>
             </div>
 
-            {/* Recent searches section */}
+            
             {isLogin &&
               <div>
               <h3 className="text-lg font-bold mb-2">최근 검색어</h3>
@@ -163,7 +162,7 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
             
           </div>
         </div>
-      )}
+      )} */}
     </div>
   )
 }

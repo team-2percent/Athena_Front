@@ -33,10 +33,10 @@ export default function ReviewForm({ isOpen, onClose, projectId, projectName, se
     if (!reviewContent.trim()) return
 
     try {
-      const { data, error, status } = await apiCall("/api/comment/create", "POST", {
-        projectId,
-        content: reviewContent,
-      })
+      const { data, error, status } = await apiCall(
+        `/api/comment/create?projectId=${projectId}&content=${encodeURIComponent(reviewContent)}`,
+        "POST",
+      )
 
       if (error) {
         setReviewsError(error)

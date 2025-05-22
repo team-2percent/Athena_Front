@@ -123,10 +123,10 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
     if (!reviewText.trim()) return
 
     try {
-      const { data, error, status } = await apiCall("/api/comment/create", "POST", {
-        projectId,
-        content: reviewText,
-      })
+      const { data, error, status } = await apiCall(
+        `/api/comment/create?projectId=${projectId}&content=${encodeURIComponent(reviewText)}`,
+        "POST",
+      )
 
       if (error) {
         setReviewsError(error)
