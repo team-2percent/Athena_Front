@@ -64,8 +64,6 @@ export default function ProfilePage() {
         {/* 프로필 상단 영역 */}
         <ProfileHeader
           nickname={userProfile.nickname}
-          following={profileData.following}
-          purchases={profileData.purchases}
           profileImage={profileData.profileImage}
           buttons={
             <div className="flex flex-col gap-2">
