@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useEffect, useState, useRef } from "react"
 import Link from "next/link"
-import ProfileTabs from "./ProfileTabs"
 import ProjectListItem from "./ProjectListItem"
 import PurchasedProjectItem from "./PurchasedProjectItem"
 import ReviewItem from "./ReviewItem"
@@ -14,6 +13,7 @@ import CouponList from "./CouponList"
 import Spinner from "../common/Spinner"
 import EmptyMessage from "../common/EmptyMessage"
 import DeleteModal from "./DeleteModal"
+import MenuTab from "../common/MenuTab"
 
 interface ProfileContentProps {
   isMy?: boolean
@@ -273,6 +273,10 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
     }
   }
 
+  const onClickTab = (tab: string) => {
+    setActiveTab(tab)
+  }
+
   // 탭 변경 시 데이터 초기화 및 로드
   useEffect(() => {
     if (activeTab === "판매 상품" && myProjects.length === 0) {
@@ -381,7 +385,13 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
       )}
 
       {/* 탭 메뉴 */}
-      <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} isMy={isMy} />
+      <MenuTab
+        size="lg"
+        tabs={isMy ? ["소개", "쿠폰", "판매 상품", "구매 상품", "내가 쓴 후기"] : ["소개", "판매 상품", "후기"]}
+        activeTab={activeTab}
+        onClickTab={onClickTab}
+        className="border-b border-gray-border"
+      />
 
       {/* 탭 내용 */}
       <div className="mx-auto max-w-6xl mt-8">
