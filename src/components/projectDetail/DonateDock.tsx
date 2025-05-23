@@ -395,11 +395,13 @@ const DonateDock = () => {
       // 선택되지 않은 상품이면 선택 추가
       setSelectedOptions([...selectedOptions, optionId])
 
-      // 수량 정보에 추가 (기본값 1)
-      setQuantities({
-        ...quantities,
-        [optionId]: { quantity: 1 },
-      })
+      // 수량 정보에 추가 (기존 수량이 있으면 유지, 없으면 기본값 1)
+      if (!quantities[optionId]) {
+        setQuantities({
+          ...quantities,
+          [optionId]: { quantity: 1 },
+        })
+      }
     }
   }
 
@@ -681,6 +683,47 @@ const DonateDock = () => {
     }
   }
 
+  // 수량 직접 입력 핸들러를 수정하여 빈 값을 허용하도록 변경
+  const handleQuantityInputChange = (e: React.ChangeEvent<HTMLInputElement>, optionId: string) => {
+    e.stopPropagation()
+    const value = e.target.value
+
+    // 빈 문자열이면 그대로 허용
+    if (value === "") {
+      setQuantities({
+        ...quantities,
+        [optionId]: { quantity: 0 }, // 임시로 0 설정
+      })
+      return
+    }
+
+    const newValue = Number.parseInt(value, 10)
+    const remaining = getProductRemaining(optionId)
+
+    if (!isNaN(newValue)) {
+      // 최소값은 1, 최대값은 남은 수량으로 제한
+      const validValue = Math.min(newValue, remaining)
+
+      setQuantities({
+        ...quantities,
+        [optionId]: { quantity: validValue },
+      })
+    }
+  }
+
+  // 포커스가 벗어날 때 기본값을 적용하는 함수 추가
+  const handleQuantityInputBlur = (optionId: string) => {
+    const currentQuantity = quantities[optionId]?.quantity || 0
+
+    // 수량이 0이거나 없으면 기본값 1로 설정
+    if (currentQuantity <= 0) {
+      setQuantities({
+        ...quantities,
+        [optionId]: { quantity: 1 },
+      })
+    }
+  }
+
   // 7. 결제 완료 모달 컴포넌트
   const PaymentCompleteModal = () => {
     if (!showPaymentCompleteModal) return null
@@ -824,7 +867,16 @@ const DonateDock = () => {
                                       >
                                         -
                                       </button>
-                                      <span className="mx-4 text-lg">{quantities[option.id]?.quantity || 0}</span>
+                                      <input
+                                        type="text"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        value={quantities[option.id]?.quantity || ""}
+                                        onChange={(e) => handleQuantityInputChange(e, option.id)}
+                                        onBlur={() => handleQuantityInputBlur(option.id)}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="mx-2 w-12 text-center border border-gray-border rounded-md"
+                                      />
                                       <button
                                         onClick={(e) => {
                                           e.stopPropagation()
