@@ -282,13 +282,14 @@ interface StepThreeFormProps {
   initialData?: {
     supportOptions?: SupportOption[]
   }
+  isEditMode?: boolean
 }
 
 // StepThreeForm 함수 내부에서 return문 수정
 // 기존 return문의 최상위 div 내부 맨 위에 PlanSelection 컴포넌트 추가
-export default function StepThreeForm({ initialData }: StepThreeFormProps) {
+export default function StepThreeForm({ initialData, isEditMode = false }: StepThreeFormProps) {
   // Zustand 스토어에서 상태와 액션 가져오기
-  const { supportOptions, updateFormData } = useProjectFormStore()
+  const { supportOptions, updateFormData, platformPlan } = useProjectFormStore()
   const { apiCall, isLoading } = useApi()
 
   // 계좌 관련 상태
@@ -622,7 +623,21 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
       </div>
 
       {/* 플랜 선택 섹션 추가 */}
-      <PlanSelection />
+      {!isEditMode ? (
+        <PlanSelection />
+      ) : (
+        <div className="mt-8 mb-4">
+          <h3 className="text-xl font-bold mb-2">후원 플랜 선택</h3>
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-lg font-medium text-gray-800">{platformPlan} 플랜 적용 중 입니다.</p>
+                <p className="text-sm text-gray-600 mt-1">프로젝트 수정 화면에서는 플랜 변경이 불가능합니다.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 후원 받을 계좌 정보 */}
       <div className="flex flex-col mt-8">

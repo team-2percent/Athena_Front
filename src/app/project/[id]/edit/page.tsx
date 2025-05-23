@@ -257,8 +257,10 @@ export default function ProductEdit() {
       <div className="mt-8 mb-16">
         {/* 단계별 폼 컴포넌트 */}
         {currentStep === 1 && <StepOneForm onUpdateFormData={updateFormData} />}
-        {currentStep === 2 && <StepTwoForm onUpdateMarkdown={(markdown) => updateFormData({ markdown })} />}
-        {currentStep === 3 && <StepThreeForm />}
+        {currentStep === 2 && (
+          <StepTwoForm onUpdateMarkdown={(markdown) => updateFormData({ markdown })} isEditMode={true} />
+        )}
+        {currentStep === 3 && <StepThreeForm isEditMode={true} />}
       </div>
 
       {/* 단계별 버튼 */}
