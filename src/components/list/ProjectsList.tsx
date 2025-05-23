@@ -1,6 +1,6 @@
 import EmptyMessage from "../common/EmptyMessage"
+import ProjectCard from "../common/ProjectGridItem"
 import Spinner from "../common/Spinner"
-import ListProject from "./ListProjectCard"
 
 export default function ProjectsList({ projects, isLoading }: {
     projects: {
@@ -24,16 +24,17 @@ export default function ProjectsList({ projects, isLoading }: {
         return (
             <div className="w-fit grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-20 gap-x-[10px] justify-items-center">
                 {projects.map((project) => (
-                <ListProject 
-                    key={project.id}
+                    <ProjectCard
+                    className="w-[220px] h-[420px]"
                     id={project.id}
-                    image={project.imageUrl}
+                    imageUrl={project.imageUrl}
                     sellerName={project.sellerName}
                     projectName={project.title}
                     achievementRate={project.achievementRate}
                     description={project.description}
-                    liked={false}
-                    daysLeft={project.daysLeft} />
+                    daysLeft={project.daysLeft}
+                    showProgressBar={true}
+                  />
                 ))}
             </div>
         )
