@@ -8,12 +8,17 @@ import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import useAuthStore from "@/stores/auth"
 import { useApi } from "@/hooks/useApi"
+import MenuTab from "../common/MenuTab";
 
-const uris: Record<string, string> = {
+const nameToPath: Record<string, string> = {
     "프로젝트 승인 관리": "approval",
     "쿠폰 관리": "coupon",
     "정산 관리": "settlement",
 }
+
+const pathToName = Object.fromEntries(
+    Object.entries(nameToPath).map(([k, v]) => [v, k])
+  ) as Record<string, keyof typeof nameToPath>;
 
 export default function AdminHeader() {
     const pathname = usePathname().split("/")[2];
@@ -80,23 +85,11 @@ export default function AdminHeader() {
 
             {/* 하단 네비게이션 탭 */}
             <div className="mt-4 flex justify-between items-center">
-            <nav className="flex space-x-8">
-                {
-                    Object.keys(uris).map((tab) => 
-                        <button
-                            type="button"
-                            key={tab}
-                            className={`relative pb-1 text-base font-medium ${
-                                pathname === uris[tab] ? "text-main-color" : "text-sub-grays"
-                            }`}
-                            onClick={() => handleTabClick(tab)}
-                        >
-                            {tab}
-                            {pathname === uris[tab] && <span className="absolute bottom-0 left-0 h-0.5 w-full bg-main-color" />}
-                        </button>
-                    )
-                }
-            </nav>
+                <MenuTab
+                    tabs={Object.keys(nameToPath)}
+                    activeTab={pathToName[pathname]}
+                    onClickTab={handleTabClick}
+                />
             </div>
         </div>
         </header>

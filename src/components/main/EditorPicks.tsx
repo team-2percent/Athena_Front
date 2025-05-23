@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { MainProject } from "@/lib/projectInterface"
 import { useRouter } from "next/navigation"
+import ProjectGridItem from "../common/ProjectGridItem"
 
 export default function EditorPicks({ projects, isLoading }: {projects: MainProject[], isLoading: boolean}) {
   const router = useRouter();
@@ -86,10 +87,6 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
 
     return pages
   }
-
-  const moveToProjectPage = (projectId: number) => {
-    router.push(`/project/${projectId}`)
-  }
   
   const pages = getPageData()
 
@@ -113,43 +110,30 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
               transform: `translateX(-${currentPage * 100}%)`,
             }}
           >
-
-
-            {/* Pages Container */}
-            {pages.map((pageItems, pageIndex) => (
+            {pages.map((pageItems, pageIndex) => 
               <div key={pageIndex} className="w-full flex-shrink-0">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {pageItems.map((item: any, index: number) => {
+                  {pageItems.map((item: any, index:number) => {
                     if (item?.isEmpty) {
-                      // Empty placeholder to maintain grid layout
-                      return <div key={index + pageItems.length} className="aspect-square invisible"></div>
+                      return <div key={index + pageItems.length} className="aspect-square invisible" />
                     }
 
                     return (
-                      <div
+                      <ProjectGridItem
                         key={item.projectId}
-                        className="rounded-xl overflow-hidden bg-white"
-                        onClick={() => moveToProjectPage(item.projectId)}
-                      >
-                        <div className="aspect-square relative overflow-hidden rounded-xl">
-                          <img
-                            src={item.image || "/placeholder/project-placeholder.png"}
-                            alt={item.title}
-                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                          />
-                        </div>
-                        <div className="p-4">
-                          <p className="text-gray-500 text-sm">{item.sellerName}</p>
-                          <h3 className="font-bold text-lg mt-1">{item.title}</h3>
-                          <p className="text-sm mt-1 text-gray-700">{item.description}</p>
-                          <p className="text-[#fb6f92] font-bold mt-2">{item.achievement}</p>
-                        </div>
-                      </div>
+                        className="w-full"
+                        id={item.projectId}
+                        imageUrl={item.imageUrl}
+                        sellerName={item.sellerName}
+                        projectName={item.title}
+                        achievementRate={item.achievementRate}
+                        description={item.description}                        
+                      />
                     )
                   })}
                 </div>
               </div>
-            ))}
+            )}
           </div>
         </div>
 

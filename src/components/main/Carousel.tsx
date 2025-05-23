@@ -74,7 +74,7 @@ export default function Carousel({ projects, isLoading }: {projects: MainProject
         {/* Previous Slide (Left Side) */}
         {
           projects[getPrevIndex(currentIndex)] && 
-          <div className="relative w-1/2 h-[350px] md:h-[400px] opacity-70 transform transition-all duration-300 rounded-xl overflow-hidden shrink-0">
+          <div className="relative w-1/3 h-[350px] md:h-[400px] opacity-70 transform transition-all duration-300 rounded-xl overflow-hidden shrink-0">
             <img
               src={projects[getPrevIndex(currentIndex)].imageUrl || "/placeholder/project-placeholder.png"}
               alt={projects[getPrevIndex(currentIndex)].title}
@@ -85,7 +85,7 @@ export default function Carousel({ projects, isLoading }: {projects: MainProject
 
         {/* Current Slide (Center) */}
         {projects[currentIndex] && <div
-          className="relative w-1/2 h-[350px] md:h-[400px] transition-all duration-300 rounded-xl overflow-hidden shrink-0"
+          className="relative w-2/3 h-[350px] md:h-[400px] transition-all duration-300 rounded-xl overflow-hidden shrink-0"
           onClick={() => moveToProjectPage(projects[currentIndex].projectId)}
         >
           <img
@@ -113,7 +113,7 @@ export default function Carousel({ projects, isLoading }: {projects: MainProject
         {/* Next Slide (Right Side) */}
         {
           projects[getNextIndex(currentIndex)] && 
-          <div className="relative w-1/2 h-[350px] md:h-[400px] opacity-70 transform transition-all duration-300 rounded-xl overflow-hidden shrink-0">
+          <div className="relative w-1/3 h-[350px] md:h-[400px] opacity-70 transform transition-all duration-300 rounded-xl overflow-hidden shrink-0">
             <img
               src={projects[getNextIndex(currentIndex)].imageUrl || "/placeholder/project-placeholder.png"}
               alt={projects[getNextIndex(currentIndex)].title}

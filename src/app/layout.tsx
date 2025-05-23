@@ -29,10 +29,10 @@ export default function RootLayout({
       >
         <AuthProvider>
           <HeaderLoader />
-          <main className="flex-1 bg-white m-none">
-            <div>
+          <main className="flex-1 bg-white m-none w-full">
+            <div className="flex justify-center">
             {children}
-          </div>
+            </div>
             <RegisterPageButtonLoader />
           </main>
         </AuthProvider>

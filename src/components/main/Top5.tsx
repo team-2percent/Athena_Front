@@ -5,6 +5,7 @@ import { useApi } from "@/hooks/useApi"
 import { MainProject } from "@/lib/projectInterface"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation";
+import ProjectGridItem from "../common/ProjectGridItem"
 
 interface Response {
   allTopView: MainProject[],
@@ -94,61 +95,34 @@ export default function TopFive() {
 
       {/* Top projects grid - revised layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        { rank1Project && <div
-          className="bg-white rounded-lg overflow-hidden"
-          onClick={() => moveToProjectPage(rank1Project.projectId)}
-        >
-          <div className="relative">
-            <div className="absolute top-2 left-2 z-10">
-              <div className="bg-main-color text-white w-8 h-8 flex items-center justify-center rounded-sm font-bold">
-                1
-              </div>
-            </div>
-            <div className="relative aspect-square">
-                <img 
-                    src={rank1Project.imageUrl || "/placeholder/project-placeholder.png"} 
-                    alt={rank1Project.title} 
-                    className="w-full h-full object-cover"
-                />
-            </div>
-            <div className="p-4">
-              <p className="text-sm text-gray-600">{rank1Project.sellerName}</p>
-              <h3 className="font-bold text-lg mt-1">{rank1Project.title}</h3>
-              <p className="text-sm mt-1">{rank1Project.description}</p>
-              <p className="text-main-color font-bold mt-2">{rank1Project.achievementRate} % 달성!</p>
-            </div>
-          </div>
-        </div>}
+        { rank1Project && 
+          <ProjectGridItem
+            key={rank1Project.projectId}
+            size="xl"
+            className="w-full"
+            id={rank1Project.projectId}
+            imageUrl={rank1Project.imageUrl}
+            sellerName={rank1Project.sellerName}
+            projectName={rank1Project.title}
+            achievementRate={rank1Project.achievementRate}
+            description={rank1Project.description}                        
+          />
+        }
 
         {/* Regular projects (smaller) - takes up the other half in a 2x2 grid */}
         {restProject && <div className="grid grid-cols-2 grid-rows-2 gap-4">
-          {restProject
-            .map((project, idx) => (
-              <div
-                key={project.projectId} className="bg-white rounded-lg overflow-hidden"
-                onClick={() => moveToProjectPage(project.projectId)}
-              >
-                <div className="relative">
-                    <div className="absolute top-2 left-2 z-1">
-                        <div className="bg-main-color text-white w-6 h-6 flex items-center justify-center rounded-sm font-bold text-sm">
-                        {idx + 2}
-                        </div>
-                    </div>
-                    <div className="relative aspect-square">
-                    <img 
-                        src={project.imageUrl || "/placeholder/project-placeholder.png"} 
-                        alt={project.title} 
-                        className="w-full h-full object-cover"
-                    />
-                    </div>
-                  <div className="p-2">
-                    <p className="text-xs text-gray-600">{project.sellerName}</p>
-                    <h3 className="font-bold text-sm">{project.title}</h3>
-                    <p className="text-main-color font-bold text-xs mt-1">{project.achievementRate} % 달성!</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+          {restProject.map((project, idx) => 
+            <ProjectGridItem
+            key={project.projectId}
+            className="w-full"
+            id={project.projectId}
+            imageUrl={project.imageUrl}
+            sellerName={project.sellerName}
+            projectName={project.title}
+            achievementRate={project.achievementRate}
+            description={project.description}                        
+          />
+          )}
         </div>}
       </div>
 

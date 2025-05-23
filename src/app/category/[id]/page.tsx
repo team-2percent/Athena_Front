@@ -8,7 +8,7 @@ export default function CategoryPage() {
     const params = useParams<{ id: string }>()
     const categoryId = parseInt(params.id)
     return (
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center w-[var(--content-width)]">
             {/* 카테고리 메뉴 */}
             <CategoryMenu categoryId={categoryId} />
             <ListPage type="category" categoryId={categoryId} />

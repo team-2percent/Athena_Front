@@ -13,13 +13,18 @@ import SignupModal from "../login/SignUpModal"
 import useAuthStore from "@/stores/auth"
 import { usePathname } from 'next/navigation';
 import { useApi } from "@/hooks/useApi";
+import MenuTab from "../common/MenuTab"
 
-const uris: Record<string, string> = {
+const nameToPath: Record<string, string> = {
   "전체": "",
   "카테고리": "category",
   "신규": "new",
   "마감임박": "deadline",
 }
+
+const pathToName = Object.fromEntries(
+  Object.entries(nameToPath).map(([k, v]) => [v, k])
+) as Record<string, keyof typeof nameToPath>;
 
 interface HeaderResponse {
   id: number
@@ -42,6 +47,7 @@ const Header = () => {
   const authMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname().split("/")[1];
+  const activeTab = pathToName[pathname]
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -293,21 +299,11 @@ const Header = () => {
 
         {/* 하단 네비게이션 탭 */}
         <div className="mt-4 flex justify-between items-center">
-          <nav className="flex space-x-8">
-            {["전체", "카테고리", "신규", "마감임박"].map((tab) => (
-              <button
-                type="button"
-                key={tab}
-                className={`relative pb-1 text-base font-medium ${
-                  pathname === uris[tab] ? "text-main-color" : "text-sub-gray"
-                }`}
-                onClick={() => handleTabClick(tab)}
-              >
-                {tab}
-                {pathname === uris[tab] && <span className="absolute bottom-0 left-0 h-0.5 w-full bg-main-color" />}
-              </button>
-            ))}
-          </nav>
+          <MenuTab
+            tabs={["전체", "카테고리", "신규", "마감임박"]}
+            activeTab={activeTab}
+            onClickTab={handleTabClick}
+          />
           {/* <PopularSearch onSearchChange={handleSearchChange} onSearch={moveToSearchPage}/> */}
         </div>
       </div>
