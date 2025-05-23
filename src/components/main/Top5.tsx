@@ -98,7 +98,7 @@ export default function TopFive() {
         { rank1Project && 
           <ProjectGridItem
             key={rank1Project.projectId}
-            size="lg"
+            size="xl"
             className="w-full"
             id={rank1Project.projectId}
             imageUrl={rank1Project.imageUrl}

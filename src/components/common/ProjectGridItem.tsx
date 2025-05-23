@@ -8,7 +8,7 @@ import clsx from "clsx"
 
 interface ProjectCardProps {
   id: number
-  size?: "base" | "lg"
+  size?: "base" | "xl"
   imageUrl: string
   sellerName: string
   projectName: string
@@ -22,19 +22,19 @@ interface ProjectCardProps {
 const sizeDesign = {
   "sellerName": {
     "base": "text-sm",
-    "lg": "text-lg"
+    "xl": "text-xl"
   },
   "projectName": {
     "base": "text-sm",
-    "lg": "text-lg"
+    "xl": "text-xl"
   },
   "description": {
     "base": "text-xs",
-    "lg": "text-sm"
+    "xl": "text-lg"
   },
   "achievement": {
     "base": "text-xs",
-    "lg": "text-sm"
+    "xl": "text-lg"
   }
 }
 
