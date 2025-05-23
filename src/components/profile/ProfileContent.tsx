@@ -430,7 +430,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
                     createdAt={formatDate(project.createdAt)}
                     endAt={formatDate(project.endAt)}
                     imageUrl={project.imageUrl || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"}
-                    achievementRate={project.achievementRate || 100}
+                    achievementRate={project.achievementRate || 0}
                     daysLeft={project.daysLeft}
                     isCompleted={project.isCompleted}
                     projectId={project.projectId}
