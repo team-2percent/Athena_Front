@@ -2,7 +2,9 @@ import clsx from "clsx"
 import { Plus, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useApi } from "@/hooks/useApi"
+
 import ConfirmModal from "../common/ConfirmModal"
+import AlertModal from "../common/AlertModal"
 
 interface AccountInfo {
     id: number
@@ -29,6 +31,10 @@ export default function AccountInfo() {
   const [defaultId, setDefaultId] = useState<number | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
+  // 2. 컴포넌트 내부에 AlertModal 상태 추가 (useState 선언 부분 근처에 추가)
+  const [alertMessage, setAlertMessage] = useState<string>("")
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
+
   const loadAccounts = () => {
     apiCall<AccountInfo[]>("/api/bankAccount", "GET").then(({ data }) => {
       if (data) {
@@ -45,7 +51,9 @@ export default function AccountInfo() {
         setDeleteId(null);
         setIsDeleteModalOpen(false)
       } else if (status === 409) {
-        alert("기본 계좌는 삭제할 수 없습니다!")
+        // 3. alert 호출 부분 수정 (기본 계좌 삭제 시도 시)
+        setAlertMessage("기본 계좌는 삭제할 수 없습니다!")
+        setIsAlertOpen(true)
       } else {
         console.log("삭제 실패")
       }
@@ -77,7 +85,8 @@ export default function AccountInfo() {
   // 계좌 추가 핸들러
   const handleAddAccount = () => {
     if (!newAccount.bankName || !newAccount.bankAccount) {
-        alert("은행명과 계좌번호를 모두 입력해주세요.")
+        setAlertMessage("은행명과 계좌번호를 모두 입력해주세요.")
+        setIsAlertOpen(true)
         return
     }
 
@@ -111,6 +120,8 @@ export default function AccountInfo() {
 
 
     return <div className="flex gap-4">
+      {/* 5. 컴포넌트 return 문 내부 최상단에 AlertModal 컴포넌트 추가 */}
+      <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={() => setIsAlertOpen(false)} />
       <ConfirmModal isOpen={isDefaultModalOpen} message={"기본 계좌로 설정할까요?"} onConfirm={setDefaultAccount} onClose={() => setIsDefaultModalOpen(false)} />
       <ConfirmModal isOpen={isDeleteModalOpen} message={"계좌를 삭제할까요?"} onConfirm={deleteAccount} onClose={() => setIsDeleteModalOpen(false)} />
         {/* 계좌 추가 폼 */}

@@ -16,13 +16,9 @@ export default function CouponModal({ isOpen, onClose }: CouponProps) {
       </div>
 
       <div className="mt-4 flex justify-end">
-        <button
-          type="button"
-          onClick={onClose}
-          className="rounded-full px-6 py-2 text-sm font-medium text-main-color border border-main-color hover:bg-secondary-color"
-        >
+        <Modal.Button variant="outline" onClick={onClose}>
           닫기
-        </button>
+        </Modal.Button>
       </div>
     </Modal>
   )

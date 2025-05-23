@@ -11,6 +11,7 @@ import { useProjectFormStore } from "@/stores/useProjectFormStore"
 import Spinner from "@/components/common/Spinner"
 import { useApi } from "@/hooks/useApi"
 import { useImageUpload } from "@/hooks/useImageUpload"
+import AlertModal from "@/components/common/AlertModal"
 
 export default function ProductEdit() {
   const [isLoading, setIsLoading] = useState(true)
@@ -18,6 +19,9 @@ export default function ProductEdit() {
   const pathname = usePathname()
   const { apiCall } = useApi()
   const { uploadImages } = useImageUpload()
+
+  const [alertMessage, setAlertMessage] = useState("")
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
 
   // Zustand 스토어에서 상태와 액션 가져오기
   const { currentStep, setCurrentStep, updateFormData, resetForm, setLoading, setProjectId } = useProjectFormStore()
@@ -141,11 +145,8 @@ export default function ProductEdit() {
 
   // 취소 처리
   const handleCancel = () => {
-    // 취소 시 홈으로 이동하거나 다른 처리
-    if (confirm("상품 수정을 취소하시겠습니까?")) {
-      resetForm()
-      router.push("/my")
-    }
+    resetForm()
+    router.push("/my")
   }
 
   // 수정 완료 처리
@@ -154,8 +155,18 @@ export default function ProductEdit() {
     const success = await submitProject(apiCall, uploadImages)
 
     if (success) {
-      alert("상품이 성공적으로 수정되었습니다.")
+      setAlertMessage("상품이 성공적으로 수정되었습니다.")
+      setIsAlertOpen(true)
       resetForm()
+      router.push("/my")
+    }
+  }
+
+  // AlertModal 닫기 핸들러 추가
+  const handleAlertClose = () => {
+    setIsAlertOpen(false)
+    // 알림 닫은 후 페이지 이동
+    if (alertMessage.includes("성공적으로 수정")) {
       router.push("/my")
     }
   }
@@ -213,7 +224,8 @@ export default function ProductEdit() {
 
       if (response.error) {
         console.error("프로젝트 수정 실패:", response.error)
-        alert(`프로젝트 수정 실패: ${response.error}`)
+        setAlertMessage(`프로젝트 수정 실패: ${response.error}`)
+        setIsAlertOpen(true)
         setLoading(false)
         return false
       }
@@ -222,7 +234,8 @@ export default function ProductEdit() {
       return true
     } catch (error) {
       console.error("프로젝트 수정 중 오류 발생:", error)
-      alert("프로젝트 수정 중 오류가 발생했습니다.")
+      setAlertMessage("프로젝트 수정 중 오류가 발생했습니다.")
+      setIsAlertOpen(true)
       setLoading(false)
       return false
     }
@@ -238,6 +251,7 @@ export default function ProductEdit() {
 
   return (
     <div className="container my-8 mx-auto px-4">
+      <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={handleAlertClose} />
       <RegisterHeader currentStep={currentStep} onStepChange={setCurrentStep} title="상품 수정하기" />
 
       <div className="mt-8 mb-16">

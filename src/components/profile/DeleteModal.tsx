@@ -23,44 +23,38 @@ export default function DeleteModal({
       <div className="">
         {!deleteError && !deleteSuccess ? (
           <>
-            <p className="text-gray-700 mb-6">정말로 이 {itemType}을 삭제하시겠습니까?</p>
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={onClose}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
-              >
+            <Modal.Text variant="body" className="mb-6">
+              정말로 이 {itemType}을 삭제하시겠습니까?
+            </Modal.Text>
+            <div className="flex justify-end gap-4">
+              <Modal.Button variant="secondary" onClick={onClose}>
                 취소
-              </button>
-              <button
-                onClick={onConfirm}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-              >
+              </Modal.Button>
+              <Modal.Button variant="danger" onClick={onConfirm}>
                 삭제
-              </button>
+              </Modal.Button>
             </div>
           </>
         ) : deleteError ? (
           <>
-            <p className="text-center text-gray-700 mb-6">{itemType} 삭제에 실패했습니다.</p>
-            <div className="flex justify-center">
-              <button
-                onClick={onClose}
-                className="px-4 py-2 bg-main-color text-white rounded-lg hover:bg-secondary-color-dark transition-colors"
-              >
+            <Modal.Text variant="body" className="text-center mb-6">
+              {itemType} 삭제에 실패했습니다.
+            </Modal.Text>
+            <div className="flex justify-end">
+              <Modal.Button variant="primary" onClick={onClose}>
                 확인
-              </button>
+              </Modal.Button>
             </div>
           </>
         ) : (
           <>
-            <p className="text-center text-green-500 mb-6">{itemType}이 성공적으로 삭제되었습니다.</p>
-            <div className="flex justify-center">
-              <button
-                onClick={onClose}
-                className="px-4 py-2 bg-main-color text-white rounded-lg hover:bg-secondary-color-dark transition-colors"
-              >
+            <Modal.Text variant="body" className="mb-6">
+              {itemType}이 성공적으로 삭제되었습니다.
+            </Modal.Text>
+            <div className="flex justify-end">
+              <Modal.Button variant="primary" onClick={onClose}>
                 확인
-              </button>
+              </Modal.Button>
             </div>
           </>
         )}

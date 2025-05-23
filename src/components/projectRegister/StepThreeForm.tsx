@@ -9,6 +9,8 @@ import type { CompositionItem, SupportOption } from "@/stores/useProjectFormStor
 import { useApi } from "@/hooks/useApi"
 // PlanSelection 컴포넌트 import 추가
 import PlanSelection from "./PlanSelection"
+// 1. 상단에 AlertModal import 추가
+import AlertModal from "../common/AlertModal"
 
 // 계좌 정보 타입 정의
 interface BankAccount {
@@ -36,51 +38,30 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
     bankName: false,
     accountNumber: false,
   })
+  // 2. AddAccountModal 컴포넌트 내부에 AlertModal 상태 추가
+  const [alertMessage, setAlertMessage] = useState("")
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
 
   if (!isOpen) return null
 
-  const validateForm = () => {
-    const newErrors = {
-      accountHolder: accountHolder.trim() === "",
-      bankName: bankName.trim() === "",
-      accountNumber: accountNumber.trim() === "",
-    }
-
-    setErrors(newErrors)
-    return !Object.values(newErrors).some(Boolean)
-  }
-
-  const handleSubmit = () => {
-    if (validateForm()) {
-      onSave({
-        accountHolder,
-        bankName,
-        bankAccount: accountNumber,
-      })
-
-      // 입력 필드 초기화
-      setAccountHolder("")
-      setBankName("")
-      setAccountNumber("")
-      setErrors({
-        accountHolder: false,
-        bankName: false,
-        accountNumber: false,
-      })
-
-      onClose()
-    }
-  }
-
-  // 계좌번호 입력 처리 함수 추가 (AddAccountModal 컴포넌트 내부)
+  // 계좌번호 입력 처리 함수 추가
   const handleAccountNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // 숫자만 입력 가능하도록 처리
     const value = e.target.value.replace(/[^0-9]/g, "")
     setAccountNumber(value)
   }
 
+  // 폼 제출 처리 함수 추가
+  const handleSubmit = () => {
+    if (validateForm()) {
+      onSave({ accountHolder, bankName, bankAccount: accountNumber })
+      onClose()
+    }
+  }
+
+  // 4. AddAccountModal 컴포넌트 return 문 내부 최상단에 AlertModal 컴포넌트 추가
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={() => setIsAlertOpen(false)} />
       {/* 오버레이 */}
       <div className="fixed inset-0 bg-black/60" onClick={onClose} />
 
@@ -176,6 +157,18 @@ const AddAccountModal = ({ isOpen, onClose, onSave }: AddAccountModalProps) => {
       </div>
     </div>
   )
+
+  // 3. validateForm 함수 내 alert 호출 부분 수정
+  function validateForm() {
+    const newErrors = {
+      accountHolder: accountHolder.trim() === "",
+      bankName: bankName.trim() === "",
+      accountNumber: accountNumber.trim() === "",
+    }
+
+    setErrors(newErrors)
+    return !Object.values(newErrors).some(Boolean)
+  }
 }
 
 // 구성 다이얼로그 컴포넌트
@@ -305,11 +298,20 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
   const [accounts, setAccounts] = useState<BankAccount[]>([])
   const [accountsLoading, setAccountsLoading] = useState(false)
   const [accountError, setAccountError] = useState<string | null>(null)
+  // 5. StepThreeForm 컴포넌트 내부에 AlertModal 상태 추가
+  const [alertMessage, setAlertMessage] = useState("")
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
 
   // 후원 상품 관련 상태
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [compositionDialogOpen, setCompositionDialogOpen] = useState(false)
   const [currentOptionId, setCurrentOptionId] = useState<number | null>(null)
+  // 새 배송지 관련 상태 추가
+  const [newAddress, setNewAddress] = useState({
+    name: "",
+    address: "",
+    detailAddress: "",
+  })
 
   // 계좌 목록 조회 API 호출
   const fetchAccounts = async () => {
@@ -348,13 +350,11 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
   // 계좌 추가 처리 - API 연동
   const handleAddAccount = async (account: Omit<BankAccount, "id" | "isDefault">) => {
     try {
-      const response = await apiCall<BankAccount>("/api/bankAccount", "POST", 
-        {
-          accountHolder: account.accountHolder,
-          bankName: account.bankName,
-          accountNumber: account.bankAccount,
-        },
-      )
+      const response = await apiCall<BankAccount>("/api/bankAccount", "POST", {
+        accountHolder: account.accountHolder,
+        bankName: account.bankName,
+        accountNumber: account.bankAccount,
+      })
 
       if (response.error) {
         console.error("계좌 추가 오류:", response.error)
@@ -465,8 +465,10 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
     }
   }, [selectedAccountId, updateFormData])
 
+  // 7. StepThreeForm 컴포넌트 return 문 내부 최상단에 AlertModal 컴포넌트 추가
   return (
     <div className="space-y-8">
+      <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={() => setIsAlertOpen(false)} />
       {/* 후원 상품 설정 */}
       <div className="flex flex-col">
         <div className="mb-4">
@@ -734,4 +736,14 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
       )}
     </div>
   )
+
+  // 6. 새 배송지 저장 함수의 alert 호출 부분 수정
+  function saveNewAddress() {
+    // 필수 입력값 검증
+    if (!newAddress.name || !newAddress.address || !newAddress.detailAddress) {
+      setAlertMessage("배송지명, 주소, 상세 주소를 모두 입력해주세요.")
+      setIsAlertOpen(true)
+      return
+    }
+  }
 }

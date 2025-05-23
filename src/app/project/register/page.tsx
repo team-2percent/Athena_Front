@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import RegisterHeader from "@/components/projectRegister/RegisterHeader"
 import StepButtons from "@/components/projectRegister/StepButtons"
 import StepOneForm from "@/components/projectRegister/StepOneForm"
@@ -11,11 +11,16 @@ import { useProjectFormStore, fetchProjectId, submitProject } from "@/stores/use
 import { useApi } from "@/hooks/useApi"
 import { useImageUpload } from "@/hooks/useImageUpload"
 import Spinner from "@/components/common/Spinner"
+import AlertModal from "@/components/common/AlertModal"
 
 export default function ProjectRegister() {
   const router = useRouter()
   const { apiCall } = useApi()
   const { uploadImages } = useImageUpload()
+
+  // AlertModal 상태 추가
+  const [alertMessage, setAlertMessage] = useState("")
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
 
   // Zustand 스토어에서 상태와 액션 가져오기
   const {
@@ -29,7 +34,6 @@ export default function ProjectRegister() {
     updateFormData,
     resetForm,
   } = useProjectFormStore()
-  
 
   // 페이지 로드 시 프로젝트 ID 가져오기
   useEffect(() => {
@@ -61,11 +65,8 @@ export default function ProjectRegister() {
 
   // 취소 처리
   const handleCancel = () => {
-    // 취소 시 홈으로 이동하거나 다른 처리
-    if (confirm("상품 등록을 취소하시겠습니까?")) {
-      resetForm()
-      router.push("/")
-    }
+    resetForm()
+    router.push("/my")
   }
 
   // 등록 처리
@@ -73,15 +74,22 @@ export default function ProjectRegister() {
     const success = await submitProject(apiCall, uploadImages)
 
     if (success) {
-      // 성공 시 홈으로 이동
-      alert("상품이 성공적으로 등록되었습니다.")
+      // alert를 AlertModal로 대체
+      setAlertMessage("상품이 성공적으로 등록되었습니다.")
+      setIsAlertOpen(true)
       resetForm()
       router.push("/my")
     }
   }
 
+  // AlertModal 닫기 핸들러 추가
+  const handleAlertClose = () => {
+    setIsAlertOpen(false)
+  }
+
   return (
     <div className="container mx-auto my-8 px-4">
+      <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={handleAlertClose} />
       <RegisterHeader currentStep={currentStep} onStepChange={setCurrentStep} />
 
       {error && (
@@ -117,7 +125,6 @@ export default function ProjectRegister() {
           </div>
         </div>
       )}
-
     </div>
   )
 }

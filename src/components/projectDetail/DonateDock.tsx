@@ -8,6 +8,9 @@ import AddressModal from "../profileEdit/AddressModal"
 import { useParams } from "next/navigation"
 import { useApi } from "@/hooks/useApi"
 
+// 1. 상단에 AlertModal import 추가
+import AlertModal from "../common/AlertModal"
+
 interface AddressInfo {
   id: string
   name: string
@@ -97,6 +100,10 @@ const DonateDock = () => {
   // 현재 단계 (1: 상품 선택, 2: 결제 및 배송지 정보)
   const [step, setStep] = useState(1)
   const [isOpen, setIsOpen] = useState(false)
+
+  // 2. 컴포넌트 내부에 AlertModal 상태 추가 (useState 선언 부분 근처에 추가)
+  const [alertMessage, setAlertMessage] = useState<string>("")
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
 
   // 단일 선택에서 복수 선택으로 변경
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
@@ -484,7 +491,9 @@ const DonateDock = () => {
   const saveNewAddress = () => {
     // 필수 입력값 검증
     if (!newAddress.name || !newAddress.address || !newAddress.detailAddress) {
-      alert("배송지명, 주소, 상세 주소를 모두 입력해주세요.")
+      // 3. 새 배송지 저장 함수의 alert 호출 부분 수정
+      setAlertMessage("배송지명, 주소, 상세 주소를 모두 입력해주세요.")
+      setIsAlertOpen(true)
       return
     }
 
@@ -510,9 +519,11 @@ const DonateDock = () => {
   }
 
   const goToNextStep = () => {
+    // 4. 다음 단계로 진행 함수의 alert 호출 부분 수정
     // 선택된 상품이 없으면 다음 단계로 진행하지 않음
     if (selectedOptions.length === 0) {
-      alert("최소 1개 이상의 상품을 선택해주세요.")
+      setAlertMessage("최소 1개 이상의 상품을 선택해주세요.")
+      setIsAlertOpen(true)
       return
     }
     setStep(2)
@@ -582,17 +593,20 @@ const DonateDock = () => {
   const handlePayment = async () => {
     // 필수 입력값 검증
     if (!selectedAddress) {
-      alert("배송지를 선택해주세요.")
+      setAlertMessage("배송지를 선택해주세요.")
+      setIsAlertOpen(true)
       return
     }
 
     if (!selectedPay) {
-      alert("결제 수단을 선택해주세요.")
+      setAlertMessage("결제 수단을 선택해주세요.")
+      setIsAlertOpen(true)
       return
     }
 
     if (selectedOptions.length === 0) {
-      alert("최소 1개 이상의 상품을 선택해주세요.")
+      setAlertMessage("최소 1개 이상의 상품을 선택해주세요.")
+      setIsAlertOpen(true)
       return
     }
 
@@ -653,7 +667,8 @@ const DonateDock = () => {
 
       // 팝업 창이 차단되었는지 확인
       if (!paymentWindow || paymentWindow.closed || typeof paymentWindow.closed === "undefined") {
-        alert("팝업 창이 차단되었습니다. 팝업 차단을 해제해주세요.")
+        setAlertMessage("팝업 창이 차단되었습니다. 팝업 차단을 해제해주세요.")
+        setIsAlertOpen(true)
       }
 
       // 4. 독 닫기
@@ -702,6 +717,7 @@ const DonateDock = () => {
   // 결제 완료 모달 렌더링 부분을 return 문 내부 마지막에 추가
   return (
     <>
+      <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={() => setIsAlertOpen(false)} />
       {/* 고정된 후원하기 버튼 */}
       <div className="fixed bottom-0 left-0 z-20 w-full">
         <div className="mx-auto max-w-6xl px-4">

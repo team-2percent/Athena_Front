@@ -4,6 +4,59 @@ import { useEffect, useRef, type ReactNode } from "react"
 import { X } from "lucide-react"
 import clsx from "clsx"
 
+// 버튼 타입 정의 추가
+type ButtonVariant = "primary" | "secondary" | "danger" | "outline"
+
+// 버튼 컴포넌트 추가
+interface ModalButtonProps {
+  onClick: () => void
+  variant?: ButtonVariant
+  children: ReactNode
+  className?: string
+  disabled?: boolean
+}
+
+// 텍스트 스타일 컴포넌트 추가
+interface ModalTextProps {
+  children: ReactNode
+  variant?: "title" | "subtitle" | "body" | "caption"
+  className?: string
+}
+
+// Modal 컴포넌트 내부에 다음 컴포넌트들을 추가합니다 (export default function Modal 위에 추가)
+function ModalButton({ onClick, variant = "primary", children, className = "", disabled = false }: ModalButtonProps) {
+  const baseStyles = "px-4 py-2 rounded-lg font-medium transition-colors"
+
+  const variantStyles = {
+    primary: "bg-main-color text-white hover:bg-secondary-color-dark",
+    secondary: "bg-gray-200 text-gray-700 hover:bg-gray-300",
+    danger: "bg-red-500 text-white hover:bg-red-600",
+    outline: "border border-main-color text-main-color hover:bg-secondary-color/10",
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={clsx(baseStyles, variantStyles[variant], disabled && "opacity-50 cursor-not-allowed", className)}
+    >
+      {children}
+    </button>
+  )
+}
+
+function ModalText({ children, variant = "body", className = "" }: ModalTextProps) {
+  const variantStyles = {
+    title: "text-xl font-bold",
+    subtitle: "text-lg font-medium",
+    body: "text-base",
+    caption: "text-sm text-gray-500",
+  }
+
+  return <div className={clsx(variantStyles[variant], className)}>{children}</div>
+}
+
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
@@ -126,3 +179,11 @@ export default function Modal({
     </>
   )
 }
+
+// Modal 인터페이스에 static 속성 추가 (export default function Modal 아래에 추가)
+// 파일 맨 마지막에 다음 코드 추가
+Modal.Button = ModalButton
+Modal.Text = ModalText
+
+// 타입 정의를 위한 코드 추가
+export type { ButtonVariant, ModalButtonProps, ModalTextProps }

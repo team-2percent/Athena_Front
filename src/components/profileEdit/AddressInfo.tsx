@@ -4,7 +4,9 @@ import { Plus, Search, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import AddressModal from "./AddressModal"
 import { useApi } from "@/hooks/useApi"
+
 import ConfirmModal from "../common/ConfirmModal"
+import AlertModal from "../common/AlertModal"
 
 interface AddressInfo {
     id: number
@@ -19,10 +21,13 @@ export default function AddressInfo() {
     const { isLoading, apiCall } = useApi();
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isDefaultModalOpen, setIsDefaultModalOpen] = useState(false); 
-    const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
+    const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
 
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [defaultId, setDefaultId] = useState<number | null>(null);
+
+    const [alertMessage, setAlertMessage] = useState<string>("")
+    const [isAlertOpen, setIsAlertOpen] = useState(false)
 
     // 배송지 정보 상태
     const [addresses, setAddresses] = useState<AddressInfo[]>([])
@@ -82,7 +87,8 @@ export default function AddressInfo() {
     // 주소 추가 핸들러
     const handleAddAddress = () => {
         if (!newAddress.address || !newAddress.detailAddress || !newAddress.zipcode) {
-            alert("배송지명, 주소, 상세주소를 모두 입력해주세요.")
+            setAlertMessage("배송지명, 주소, 상세주소를 모두 입력해주세요.")
+            setIsAlertOpen(true)
             return
         }
 
@@ -129,6 +135,7 @@ export default function AddressInfo() {
 
     return (
         <div className="flex gap-4">
+            <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={() => setIsAlertOpen(false)} />
             <ConfirmModal isOpen={isDefaultModalOpen} message={"기본 계좌로 설정할까요?"} onConfirm={setDefaultDelivery} onClose={() => setIsDefaultModalOpen(false)} />
             <ConfirmModal isOpen={isDeleteModalOpen} message={"계좌를 삭제할까요?"} onConfirm={deleteDelivery} onClose={() => setIsDeleteModalOpen(false)} />
             <div className="flex-1 bg-white rounded-lg shadow py-6 px-10">

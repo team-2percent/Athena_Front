@@ -11,7 +11,7 @@ interface AddressModalProps {
 
 export default function AddressModal({ isOpen, onClose, onComplete }: AddressModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md" showCloseButton={false}>
+    <Modal isOpen={isOpen} onClose={onClose} size="md" showCloseButton={false} title="주소 검색">
       <DaumPostcode onComplete={onComplete} />
     </Modal>
   )
