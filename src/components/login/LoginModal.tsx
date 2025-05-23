@@ -7,6 +7,7 @@ import clsx from "clsx"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
 import Modal from "@/components/common/Modal"
+import { Button, SecondaryButton } from "../common/Button"
 
 interface LoginModalProps {
   isOpen: boolean
@@ -103,9 +104,9 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
         </form>
 
         {/* Divider */}
-        <div className="flex items-center mb-8">
+        <div className="flex items-center mb-4">
           <div className="flex-1 h-px bg-gray-300" />
-          <span className="px-4 text-gray-400">아니면</span>
+          <span className="px-4 text-gray-400">계정이 없다면?</span>
           <div className="flex-1 h-px bg-gray-300" />
         </div>
 
@@ -113,7 +114,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
         <button
           type="button"
           onClick={moveToSignupModal}
-          className="w-full py-4 bg-gray-200 text-gray-800 rounded-xl font-medium text-lg"
+          className="w-full py-4 bg-white border border-main-color hover:bg-secondary-color text-main-color rounded-xl font-medium text-lg"
         >
           회원가입
         </button>
