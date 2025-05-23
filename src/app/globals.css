@@ -26,6 +26,8 @@ body {
   --color-disabled-background: oklch(87.2% 0.01 258.338);
   --color-cancel-background: oklch(70.7% 0.022 261.325);
   --color-cancel-background-dark: oklch(55.1% 0.027 264.364);
+
+  --content-width: 80vw;
 }
 
 @theme inline {

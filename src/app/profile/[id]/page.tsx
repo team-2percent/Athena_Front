@@ -60,7 +60,7 @@ export default function ProfilePage() {
 
   return (
     <main className="min-h-screen bg-white w-[var(--content-width)]">
-      <div className="container my-8 mx-auto px-4">
+      <div className="container my-8">
         {/* 프로필 상단 영역 */}
         <ProfileHeader
           nickname={userProfile.nickname}

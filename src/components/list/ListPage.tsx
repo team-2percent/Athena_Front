@@ -88,7 +88,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
   }, [sort])
 
   return (
-    <div className="w-full">
+    <div className="w-full w-[var(--content-width)]">
         <ListHeader
             type={type}
             count={totalCount}

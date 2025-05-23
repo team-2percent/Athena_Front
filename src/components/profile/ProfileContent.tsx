@@ -390,7 +390,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
         tabs={isMy ? ["소개", "쿠폰", "판매 상품", "구매 상품", "내가 쓴 후기"] : ["소개", "판매 상품", "후기"]}
         activeTab={activeTab}
         onClickTab={onClickTab}
-        className="border-b border-gray-border"
+        className="border-b border-gray-border max-w-6xl mx-auto"
       />
 
       {/* 탭 내용 */}

@@ -25,7 +25,7 @@ export default function ProjectsList({ projects, isLoading }: {
             <div className="w-fit grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-20 gap-x-[10px] justify-items-center">
                 {projects.map((project) => (
                     <ProjectCard
-                    className="w-[220px] h-[420px]"
+                    className="w-full"
                     id={project.id}
                     imageUrl={project.imageUrl}
                     sellerName={project.sellerName}
@@ -40,7 +40,7 @@ export default function ProjectsList({ projects, isLoading }: {
         )
     }
   return (
-    <div className="max-w-7xl mx-auto px-4 flex flex-col items-center">
+    <div className="flex flex-col items-center">
         {
             renderList()
         }

@@ -88,7 +88,7 @@ export default function ProjectRegister() {
   }
 
   return (
-    <div className="container mx-auto my-8 px-4">
+    <div className="container mx-auto my-8 px-4 w-[var(--content-width)]">
       <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={handleAlertClose} />
       <RegisterHeader currentStep={currentStep} onStepChange={setCurrentStep} />
 

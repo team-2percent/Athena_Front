@@ -27,7 +27,7 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
     }
 
     return (
-        <div className="max-w-7xl w-full mx-0 py-4">
+        <div className="w-full mx-0 py-4">
         {isLoading ?
             <Spinner message="카테고리를 불러오는 중입니다..." />
         : (

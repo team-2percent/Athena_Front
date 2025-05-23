@@ -51,7 +51,7 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
   }, [])
 
   return (
-    <div className="flex justify-between items-center w-full max-w-7xl mx-auto py-3 border-b border-gray-100 mb-8">
+    <div className="flex justify-between items-center w-full py-3 border-b border-gray-100 mb-8">
         {/* 상품 개수 표시 */}
         <div className="flex text-gray-500 font-normal">
                 {type === "search" && searchWord && <p><span className="text-main-color font-normal">{searchWord}</span>와 연관된&nbsp;</p>}

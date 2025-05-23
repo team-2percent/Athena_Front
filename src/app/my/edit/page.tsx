@@ -4,44 +4,30 @@ import { useState } from "react"
 import ProfileInfo from "@/components/profileEdit/ProfileInfo"
 import AccountInfo from "@/components/profileEdit/AccountInfo"
 import AddressInfo from "@/components/profileEdit/AddressInfo"
-import Menu from "@/components/profileEdit/Menu"
-
-const menus = [{
-    id: 1,
-    state: "profile",
-    name: "프로필"
-}, {
-    id: 2,
-    state: "account",
-    name: "계좌"
-}, {
-    id: 3,
-    state: "address",
-    name: "배송지"
-}]
+import MenuTab from "@/components/common/MenuTab"
 
 export default function EditPage() {
-    const [currentMenu, setCurrentMenu] = useState("profile")
+    const [activeTab, setActiveTab] = useState("프로필")
 
-    const onMenuChange = (menu: string) => {
-        setCurrentMenu(menu)
+    const onMenuChange = (tab: string) => {
+        setActiveTab(tab)
     }
 
     const renderContent = () => {
-        switch (currentMenu) {
-            case "profile":
+        switch (activeTab) {
+            case "프로필":
                 return <ProfileInfo />
-            case "account":
+            case "계좌":
                 return <AccountInfo />
-            case "address":
+            case "배송지":
                 return <AddressInfo />
             default:
                 return null      
         }
     }
-    return <div className="w-full h-full mt-8">
-        <Menu menus={menus} currentMenu={currentMenu} onMenuChange={onMenuChange} />
-        <div className="w-full mx-auto max-w-6xl pt-10 h-full">
+    return <div className="h-full mt-8 w-[var(--content-width)] max-w-6xl mx-auto">
+        <MenuTab tabs={["프로필", "계좌", "배송지"]} activeTab={activeTab} onClickTab={onMenuChange} className="border-b border-gray-border"/>
+        <div className="w-full ax-w-6xl pt-10 h-full">
             {renderContent()}
         </div>
     </div>
