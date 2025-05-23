@@ -382,10 +382,10 @@ const DonateDock = () => {
       // 이미 선택된 상품이면 선택 해제
       setSelectedOptions(selectedOptions.filter((id) => id !== optionId))
 
-      // 수량 정보에서도 제거
-      const newQuantities = { ...quantities }
-      delete newQuantities[optionId]
-      setQuantities(newQuantities)
+      // 주석을 풀면 수량 정보도 제거
+      // const newQuantities = { ...quantities }
+      // delete newQuantities[optionId]
+      // setQuantities(newQuantities)
 
       // 펼쳐진 상품이 선택 해제되면 펼쳐진 상태도 초기화
       if (expandedProductId === optionId) {
