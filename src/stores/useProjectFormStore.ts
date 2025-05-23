@@ -41,6 +41,33 @@ export interface Category {
   categoryName: string
 }
 
+// 한국 시간 기준으로 오늘로부터 8일째 되는 날 계산 (오늘 + 7일)
+const getDefaultStartDate = () => {
+  const today = new Date()
+  const koreaToday = new Date(today.getTime() + 9 * 60 * 60 * 1000)
+  const defaultStartDate = new Date(koreaToday)
+  defaultStartDate.setDate(defaultStartDate.getDate() + 7) // 오늘 + 7일 = 8일째
+
+  // UTC로 다시 변환
+  return new Date(defaultStartDate.getTime() - 9 * 60 * 60 * 1000)
+}
+
+// 시작일로부터 30일 후의 종료일 계산
+const getDefaultEndDate = () => {
+  const startDate = getDefaultStartDate()
+  const endDate = new Date(startDate)
+  endDate.setDate(endDate.getDate() + 30) // 시작일 + 30일
+  return endDate
+}
+
+// 종료일로부터 7일 후의 배송일 계산
+const getDefaultDeliveryDate = () => {
+  const endDate = getDefaultEndDate()
+  const deliveryDate = new Date(endDate)
+  deliveryDate.setDate(deliveryDate.getDate() + 7) // 종료일 + 7일
+  return deliveryDate
+}
+
 // 프로젝트 폼 상태 타입
 interface ProjectFormState {
   // 프로젝트 기본 정보
@@ -98,9 +125,9 @@ const initialState = {
   categoryId: null,
   title: "",
   description: "",
-  startDate: new Date(),
-  endDate: new Date(new Date().setDate(new Date().getDate() + 21)),
-  deliveryDate: new Date(new Date().setDate(new Date().getDate() + 28)),
+  startDate: getDefaultStartDate(), // 오늘로부터 8일째 되는 날
+  endDate: getDefaultEndDate(), // 시작일로부터 30일 후
+  deliveryDate: getDefaultDeliveryDate(), // 종료일로부터 7일 후
   images: [],
 
   markdown:

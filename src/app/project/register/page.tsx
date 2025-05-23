@@ -21,6 +21,7 @@ export default function ProjectRegister() {
   // AlertModal 상태 추가
   const [alertMessage, setAlertMessage] = useState("")
   const [isAlertOpen, setIsAlertOpen] = useState(false)
+  const [shouldRedirect, setShouldRedirect] = useState(false) // 리디렉션 여부 상태 추가
 
   // Zustand 스토어에서 상태와 액션 가져오기
   const {
@@ -74,21 +75,27 @@ export default function ProjectRegister() {
     const success = await submitProject(apiCall, uploadImages)
 
     if (success) {
-      // alert를 AlertModal로 대체
+      // 성공 시 모달만 표시하고 리디렉션은 하지 않음
       setAlertMessage("상품이 성공적으로 등록되었습니다.")
       setIsAlertOpen(true)
+      setShouldRedirect(true) // 리디렉션 플래그 설정
       resetForm()
+    }
+  }
+
+  // AlertModal 닫기 핸들러 - 확인 버튼을 눌렀을 때 리디렉션
+  const handleAlertClose = () => {
+    setIsAlertOpen(false)
+
+    // 성공 모달이었다면 마이페이지로 리디렉션
+    if (shouldRedirect) {
+      setShouldRedirect(false)
       router.push("/my")
     }
   }
 
-  // AlertModal 닫기 핸들러 추가
-  const handleAlertClose = () => {
-    setIsAlertOpen(false)
-  }
-
   return (
-    <div className="container mx-auto my-8 px-4 w-[var(--content-width)]">
+    <div className="container mx-auto my-8 px-4">
       <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={handleAlertClose} />
       <RegisterHeader currentStep={currentStep} onStepChange={setCurrentStep} />
 

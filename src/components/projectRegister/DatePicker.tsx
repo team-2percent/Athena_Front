@@ -15,18 +15,20 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const datePickerRef = useRef<HTMLDivElement>(null)
 
-  // 날짜를 YYYY년 MM월 DD일 형식으로 포맷팅
+  // 날짜를 YYYY년 MM월 DD일 형식으로 포맷팅 (한국 시간 기준)
   const formatDate = (date: Date): string => {
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, "0")
-    const day = String(date.getDate()).padStart(2, "0")
+    const koreaDate = new Date(date.getTime() + 9 * 60 * 60 * 1000)
+    const year = koreaDate.getUTCFullYear()
+    const month = String(koreaDate.getUTCMonth() + 1).padStart(2, "0")
+    const day = String(koreaDate.getUTCDate()).padStart(2, "0")
     return `${year}. ${month}. ${day}.`
   }
 
-  // 월 이름 포맷팅 (예: 2025년 5월)
+  // 월 이름 포맷팅 (예: 2025년 5월) - 한국 시간 기준
   const formatMonthYear = (date: Date): string => {
-    const year = date.getFullYear()
-    const month = date.getMonth() + 1
+    const koreaDate = new Date(date.getTime() + 9 * 60 * 60 * 1000)
+    const year = koreaDate.getUTCFullYear()
+    const month = koreaDate.getUTCMonth() + 1
     return `${year}년 ${month}월`
   }
 
@@ -46,35 +48,36 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
     return date < new Date(minDate.setHours(0, 0, 0, 0))
   }
 
-  // 달력에 표시할 날짜 배열 생성
+  // 달력에 표시할 날짜 배열 생성 (한국 시간 기준)
   const getDaysInMonth = () => {
-    const year = currentMonth.getFullYear()
-    const month = currentMonth.getMonth()
+    const koreaCurrentMonth = new Date(currentMonth.getTime() + 9 * 60 * 60 * 1000)
+    const year = koreaCurrentMonth.getUTCFullYear()
+    const month = koreaCurrentMonth.getUTCMonth()
 
-    // 현재 달의 첫 날과 마지막 날
-    const firstDay = new Date(year, month, 1)
-    const lastDay = new Date(year, month + 1, 0)
+    // 현재 달의 첫 날과 마지막 날 (한국 시간 기준)
+    const firstDay = new Date(Date.UTC(year, month, 1))
+    const lastDay = new Date(Date.UTC(year, month + 1, 0))
 
     // 첫 날의 요일 (0: 일요일, 1: 월요일, ...)
-    const firstDayOfWeek = firstDay.getDay()
+    const firstDayOfWeek = firstDay.getUTCDay()
 
     // 이전 달의 마지막 날
-    const prevMonthLastDay = new Date(year, month, 0).getDate()
+    const prevMonthLastDay = new Date(Date.UTC(year, month, 0)).getUTCDate()
 
     const days = []
 
     // 이전 달의 날짜 추가
     for (let i = firstDayOfWeek - 1; i >= 0; i--) {
       days.push({
-        date: new Date(year, month - 1, prevMonthLastDay - i),
+        date: new Date(Date.UTC(year, month - 1, prevMonthLastDay - i)),
         isCurrentMonth: false,
       })
     }
 
     // 현재 달의 날짜 추가
-    for (let i = 1; i <= lastDay.getDate(); i++) {
+    for (let i = 1; i <= lastDay.getUTCDate(); i++) {
       days.push({
-        date: new Date(year, month, i),
+        date: new Date(Date.UTC(year, month, i)),
         isCurrentMonth: true,
       })
     }
@@ -83,7 +86,7 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
     const remainingDays = 42 - days.length
     for (let i = 1; i <= remainingDays; i++) {
       days.push({
-        date: new Date(year, month + 1, i),
+        date: new Date(Date.UTC(year, month + 1, i)),
         isCurrentMonth: false,
       })
     }
@@ -100,22 +103,26 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
     setIsOpen(false)
   }
 
-  // 날짜가 오늘인지 확인
+  // 날짜가 오늘인지 확인 (한국 시간 기준)
   const isToday = (date: Date): boolean => {
     const today = new Date()
+    const koreaToday = new Date(today.getTime() + 9 * 60 * 60 * 1000)
+    const koreaDate = new Date(date.getTime() + 9 * 60 * 60 * 1000)
     return (
-      date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear()
+      koreaDate.getUTCDate() === koreaToday.getUTCDate() &&
+      koreaDate.getUTCMonth() === koreaToday.getUTCMonth() &&
+      koreaDate.getUTCFullYear() === koreaToday.getUTCFullYear()
     )
   }
 
-  // 날짜가 선택된 날짜인지 확인
+  // 날짜가 선택된 날짜인지 확인 (한국 시간 기준)
   const isSelected = (date: Date): boolean => {
+    const koreaSelectedDate = new Date(selectedDate.getTime() + 9 * 60 * 60 * 1000)
+    const koreaDate = new Date(date.getTime() + 9 * 60 * 60 * 1000)
     return (
-      date.getDate() === selectedDate.getDate() &&
-      date.getMonth() === selectedDate.getMonth() &&
-      date.getFullYear() === selectedDate.getFullYear()
+      koreaDate.getUTCDate() === koreaSelectedDate.getUTCDate() &&
+      koreaDate.getUTCMonth() === koreaSelectedDate.getUTCMonth() &&
+      koreaDate.getUTCFullYear() === koreaSelectedDate.getUTCFullYear()
     )
   }
 

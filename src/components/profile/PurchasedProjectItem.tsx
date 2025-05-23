@@ -17,7 +17,7 @@ interface PurchasedProjectItemProps {
   imageUrl: string
   achievementRate: number
   projectId: number
-  hasReview: boolean
+  hasCommented: boolean
 }
 
 export default function PurchasedProjectItem({
@@ -30,7 +30,7 @@ export default function PurchasedProjectItem({
   imageUrl,
   achievementRate,
   projectId,
-  hasReview,
+  hasCommented,
 }: PurchasedProjectItemProps) {
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false)
   const router = useRouter()
@@ -44,7 +44,7 @@ export default function PurchasedProjectItem({
 
   const handleReviewClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
-    if (!hasReview) {
+    if (!hasCommented) {
       setIsReviewFormOpen(true)
     }
   }
@@ -116,15 +116,15 @@ export default function PurchasedProjectItem({
                 <button
                   className={cn(
                     "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors w-full justify-center",
-                    hasReview
+                    hasCommented
                       ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                       : "bg-main-color text-white hover:bg-secondary-color-dark",
                   )}
                   onClick={handleReviewClick}
-                  disabled={hasReview}
+                  disabled={hasCommented}
                 >
                   <MessageSquare className="h-5 w-5" />
-                  <span>{hasReview ? "후기 작성 완료" : "후기 작성"}</span>
+                  <span>{hasCommented ? "후기 작성 완료" : "후기 작성"}</span>
                 </button>
               </div>
             </div>

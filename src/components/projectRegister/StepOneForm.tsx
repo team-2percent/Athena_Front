@@ -25,7 +25,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false)
   const [targetAmountError, setTargetAmountError] = useState("")
   const [minDeliveryDate, setMinDeliveryDate] = useState(() => {
-    // 최소 배송일: 펀딩 종료일 + 7일
+    // 최소 배송일: 펀딩 종료일 + 7일 (한국 시간 기준)
     const date = new Date(endDate)
     date.setDate(date.getDate() + 7)
     return date
@@ -35,6 +35,17 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
   const [categoriesLoading, setCategoriesLoading] = useState(false)
   const dragCounter = useRef(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // 최소 펀딩 시작일: 오늘로부터 8일째 되는 날 (한국 시간 기준)
+  const getMinStartDate = () => {
+    const today = new Date()
+    const koreaToday = new Date(today.getTime() + 9 * 60 * 60 * 1000)
+    const minStartDate = new Date(koreaToday)
+    minStartDate.setDate(minStartDate.getDate() + 7) // 오늘 + 7일 = 8일째
+
+    // UTC로 다시 변환
+    return new Date(minStartDate.getTime() - 9 * 60 * 60 * 1000)
+  }
 
   // 카테고리 목록 가져오기
   useEffect(() => {
@@ -96,15 +107,21 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
     return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
   }
 
-  // 펀딩 종료일이 변경될 때 최소 배송일 업데이트
+  // 펀딩 종료일이 변경될 때 최소 배송일 업데이트 (한국 시간 기준)
   useEffect(() => {
-    const newMinDeliveryDate = new Date(endDate)
+    // 한국 시간 기준으로 종료일 + 7일 계산
+    const koreaEndDate = new Date(endDate.getTime() + 9 * 60 * 60 * 1000)
+    const newMinDeliveryDate = new Date(koreaEndDate)
     newMinDeliveryDate.setDate(newMinDeliveryDate.getDate() + 7)
-    setMinDeliveryDate(newMinDeliveryDate)
+
+    // UTC로 다시 변환하여 저장
+    const utcMinDeliveryDate = new Date(newMinDeliveryDate.getTime() - 9 * 60 * 60 * 1000)
+    setMinDeliveryDate(utcMinDeliveryDate)
 
     // 현재 배송일이 새로운 최소 배송일보다 이전이면 최소 배송일로 설정
-    if (deliveryDate < newMinDeliveryDate) {
-      onUpdateFormData({ deliveryDate: newMinDeliveryDate })
+    const koreaDeliveryDate = new Date(deliveryDate.getTime() + 9 * 60 * 60 * 1000)
+    if (koreaDeliveryDate < newMinDeliveryDate) {
+      onUpdateFormData({ deliveryDate: utcMinDeliveryDate })
     }
   }, [endDate, deliveryDate, onUpdateFormData])
 
@@ -285,9 +302,9 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
 
       {/* 대표 이미지 - 세로 배치로 변경 */}
       <div className="flex flex-col">
-        <label htmlFor="image" className="text-xl font-bold mb-4">
-          대표 이미지 <span className="text-sm text-gray-500 font-normal">(최대 5개까지 업로드 가능)</span>
-        </label>
+        <div className="flex items-center mb-4">
+          <h3 className="text-xl font-bold">대표 이미지</h3>
+        </div>
         <div className="w-full">
           <div className="rounded-3xl border border-gray-300 p-6">
             {/* 드래그 앤 드롭 영역 */}
@@ -396,8 +413,8 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       {/* 목표 금액 - 세로 배치로 변경 */}
       <div className="flex flex-col">
         <div className="flex items-center mb-4">
-          <h3 className="text-xl font-bold mr-8">목표 금액</h3>
-          <span className="text-sm text-gray-500 ml-4">* 최대 100억원까지 입력 가능합니다.</span>
+          <h3 className="text-xl font-bold">목표 금액</h3>
+          <span className="text-sm text-gray-500 ml-4">* 최대 100억 원까지 입력 가능합니다.</span>
         </div>
 
         <div className="w-full max-w-md flex items-center">
@@ -416,15 +433,16 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
 
       {/* 펀딩 일정 - 세로 배치로 변경 */}
       <div className="flex flex-col">
-        <label htmlFor="fundingPeriod" className="text-xl font-bold mb-4">
-          펀딩 일정
-        </label>
+        <div className="flex items-center mb-4">
+          <h3 className="text-xl font-bold">펀딩 일정</h3>
+          <span className="text-sm text-gray-500 ml-4">* 펀딩 시작일은 오늘의 일주일 뒤부터 선택 가능합니다.</span>
+        </div>
         <div className="flex items-center gap-4">
           <DatePicker
             selectedDate={startDate}
             onChange={(date) => onUpdateFormData({ startDate: date })}
             position="top"
-            minDate={new Date()}
+            minDate={getMinStartDate()}
           />
           <span>부터</span>
           <DatePicker
@@ -441,7 +459,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       <div className="flex flex-col">
         <div className="flex items-center mb-4">
           <h3 className="text-xl font-bold">배송 예정일</h3>
-          <span className="text-sm text-gray-500 ml-4">* 펀딩 종료일의 7일째 되는 날부터 선택 가능합니다.</span>
+          <span className="text-sm text-gray-500 ml-4">* 펀딩 종료일의 일주일 뒤부터 선택 가능합니다.</span>
         </div>
         <div className="flex items-center gap-4">
           <DatePicker
