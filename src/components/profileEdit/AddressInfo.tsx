@@ -69,7 +69,9 @@ export default function AddressInfo() {
 
     const setDefaultDelivery = () => {
         if (defaultId === null) return;
-        apiCall(`api/delivery/delivery-info/${defaultId}/default`, "PATCH").then(({ error }) => {
+        apiCall(`api/delivery/state`, "PUT", {
+            deliveryInfoId: defaultId
+        }).then(({ error }) => {
             if (!error) {
                 loadData();
                 setIsDefaultModalOpen(false)
@@ -96,7 +98,6 @@ export default function AddressInfo() {
             zipcode: newAddress.zipcode,
             address: newAddress.address,
             detailAddress: newAddress.detailAddress,
-            isDefault: newAddress.isDefault
         }).then(({ error }) => {
             if (!error) {
                 loadData()
@@ -176,18 +177,6 @@ export default function AddressInfo() {
                                 <Plus className="w-4 h-4 mr-1" /> 배송지 추가
                             </button>
                         </div>
-                    </div>
-                    <div className="flex gap-2 items-center">
-                        <input
-                            type="checkBox"
-                            onChange={(e) => setNewAddress({
-                                ...newAddress,
-                                isDefault: e.target.checked,
-                            })}
-                        />
-                        <label className="block text-sm font-medium text-gray-700">
-                            기본 배송지로 설정
-                        </label>
                     </div>
             </div>
 
