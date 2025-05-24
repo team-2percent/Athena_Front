@@ -49,7 +49,7 @@ export default function ProjectCard({
   description,
   className,
 }: ProjectCardProps) {
-  const isDeadlineSoon = daysLeft !== undefined && daysLeft <= 3 && daysLeft > 0; // 마감 임박 여부 확인 추후 수정
+  const isDeadlineSoon = daysLeft !== undefined && daysLeft <= 7 && daysLeft > 0; // 마감 임박 여부 확인 추후 수정
   const router = useRouter();
   const isSoldOut = daysLeft !== undefined && daysLeft <= 0;
   const isOverAchieved = achievementRate > 100;

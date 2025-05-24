@@ -31,6 +31,7 @@ const useAuthStore = create<AuthStore>((set) => ({
     }
     const { role } = jwtDecode<{ role: UserRole }>(accessToken);
     set({ isLoggedIn: true, role, userId })
+    window.location.reload()
     },
   logout: () => {
     if (typeof window !== "undefined") {

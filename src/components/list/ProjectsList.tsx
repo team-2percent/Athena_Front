@@ -26,6 +26,7 @@ export default function ProjectsList({ projects, isLoading }: {
                 {projects.map((project) => (
                     <ProjectCard
                     className="w-full"
+                    key={project.id}
                     id={project.id}
                     imageUrl={project.imageUrl}
                     sellerName={project.sellerName}
