@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation";
 import ProjectGridItem from "../common/ProjectGridItem"
 import ProjectOverlayItem from "../common/ProjectOverlayItem"
+import { SecondaryButton } from "../common/Button"
 
 interface Response {
   allTopView: MainProject[],
@@ -79,7 +80,8 @@ export default function TopFive() {
       </div>
 
       {/* Category filters */}
-      <div className="flex flex-wrap gap-2 mb-8">
+      <div className="flex justify-between mb-8">
+      <div className="flex flex-wrap gap-2">
         {Object.keys(categories).map((categoryId) => (
           <button
             key={categoryId}
@@ -93,6 +95,14 @@ export default function TopFive() {
           </button>
         ))}
       </div>
+      <SecondaryButton
+          onClick={() => moveToPage(activeTab)}
+          // className="inline-flex items-center px-4 py-2 border border-main-color text-main-color rounded hover:bg-pink-50 transition-colors"
+        >
+          프로젝트 전체보기 →
+        </SecondaryButton>
+      </div>
+      
 
       {/* Top projects grid - revised layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -128,12 +138,7 @@ export default function TopFive() {
 
       {/* View all projects button */}
       <div className="flex justify-end mt-8">
-        <button
-          onClick={() => moveToPage(activeTab)}
-          className="inline-flex items-center px-4 py-2 border border-main-color text-main-color rounded hover:bg-pink-50 transition-colors"
-        >
-          프로젝트 전체보기 →
-        </button>
+        
       </div>
     </div>
   )
