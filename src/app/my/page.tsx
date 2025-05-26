@@ -7,6 +7,7 @@ import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
+import { SecondaryButton } from "@/components/common/Button"
 
 interface UserProfile {
   id: number
@@ -68,16 +69,12 @@ export default function ProfilePage() {
           profileImage={profileData.profileImage}
           buttons={
             <div className="flex flex-col gap-2">
-              <button
-                className={cn(
-                  "px-8 py-3 rounded-lg border-2 border-main-color text-main-color font-medium text-center transition-colors",
-                  "hover:bg-secondary-color active:bg-secondary-color",
-                  "focus:outline-none focus:ring-2 focus:ring-main-color focus:ring-offset-2",
-                )}
+              <SecondaryButton
                 onClick={handleClickEditProfile}
+                className="px-8 py-3"
               >
                 프로필 편집
-              </button>
+              </SecondaryButton>
             </div>
           }
         />

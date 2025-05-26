@@ -52,13 +52,13 @@ export const Button = ({
 
   // variant에 따른 스타일 클래스
   const variantClasses = {
-    primary: "bg-theme-primary hover:bg-theme-primary-dark text-white border-transparent",
-    secondary: "bg-theme-secondary hover:bg-theme-secondary-dark text-white border-transparent",
-    cancel: "bg-theme-error hover:bg-theme-error-dark text-white border-transparent",
-    "primary-disabled": "bg-theme-primary bg-opacity-50 text-white cursor-not-allowed border-transparent",
-    "secondary-disabled": "bg-theme-secondary bg-opacity-50 text-white cursor-not-allowed border-transparent",
-    outline: "bg-transparent hover:bg-theme-background text-theme-text border-theme-border",
-    ghost: "bg-transparent hover:bg-theme-background text-theme-text border-transparent",
+    primary: "bg-primary hover:bg-primary-hover text-white border-transparent",
+    secondary: "box-border bg-secondary border border-secondary-foreground text-secondary-foreground hover:bg-secondary-hover",
+    cancel: "bg-error hover:bg-error-hover text-white border-transparent",
+    "primary-disabled": "bg-primary-disabled text-primary-disabled-foreground cursor-not-allowed border-transparent",
+    "secondary-disabled": "bg-secondary-disabled text-secondary-disabled-foreground cursor-not-allowed border-transparent",
+    outline: "bg-transparent hover:bg-background text-text border-border",
+    ghost: "bg-transparent hover:bg-background text-text border-transparent",
   }
 
   // size에 따른 스타일 클래스
@@ -76,7 +76,7 @@ export const Button = ({
 
   // 최종 클래스 이름 생성
   const buttonClasses = cn(
-    "font-medium border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-theme-primary",
+    "font-medium border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary",
     variantClasses[finalVariant as keyof typeof variantClasses],
     sizeClasses[size],
     widthClasses[width],

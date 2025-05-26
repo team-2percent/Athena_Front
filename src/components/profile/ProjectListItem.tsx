@@ -5,6 +5,7 @@ import type React from "react"
 import Image from "next/image"
 import { Heart, Check, Pencil, Trash } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { PrimaryButton, SecondaryButton } from "../common/Button"
 
 interface ProjectItemProps {
   id: number
@@ -114,20 +115,20 @@ export default function ProjectItem({
             {/* 수정 및 삭제 버튼 - 아래로 이동 */}
             {isMy && (
               <div className="flex gap-4 mt-4 justify-end">
-                <button
-                  className="flex items-center gap-2 px-4 py-2 bg-main-color text-white rounded-lg hover:bg-secondary-color-dark transition-colors w-full justify-center"
+                <PrimaryButton
+                  className="flex w-full items-center justify-center gap-2 px-4 py-2"
                   onClick={handleEditClick}
                 >
                   <Pencil className="h-5 w-5" />
                   <span>수정</span>
-                </button>
-                <button
-                  className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-sub-gray rounded-lg hover:bg-gray-100 transition-colors w-full justify-center"
+                </PrimaryButton>
+                <SecondaryButton
+                  className="flex w-full items-center justify-center gap-2 px-4 py-2"
                   onClick={(e) => onClickDelete?.(e, id)}
                 >
                   <Trash className="h-5 w-5" />
                   <span>삭제</span>
-                </button>
+                </SecondaryButton>
               </div>
             )}
 

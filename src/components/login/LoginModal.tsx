@@ -7,7 +7,7 @@ import clsx from "clsx"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
 import Modal from "@/components/common/Modal"
-import { Button, SecondaryButton } from "../common/Button"
+import { Button, PrimaryButton, SecondaryButton } from "../common/Button"
 
 interface LoginModalProps {
   isOpen: boolean
@@ -35,8 +35,10 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
         setErrorMessage("로그인에 실패했습니다.")
         return;
       }
-      if (data.accessToken && data.userId) login(data.accessToken, data.userId)
-      onClose()
+      if (data.accessToken && data.userId) {
+        login(data.accessToken, data.userId)
+        window.location.reload()
+      }
     })
   }
 
@@ -94,16 +96,12 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
           </div>
 
           {/* Login Button */}
-          <button
+          <PrimaryButton
             type="submit"
             disabled={disabled}
-            className={clsx(
-              "w-full py-4 rounded-xl font-medium text-lg mb-8",
-              disabled ? "text-gray-400 bg-gray-200 cursor-not-allowed" : "bg-main-color text-white",
-            )}
-          >
-            로그인
-          </button>
+            className="w-full py-4 mb-8"
+            size="lg"
+          >로그인</PrimaryButton>
           <span className="absolute bottom-2 left-0 w-full text-center text-red-500 text-sm">{errorMessage}</span>
         </form>
 
@@ -115,13 +113,12 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
         </div>
 
         {/* Sign Up Button */}
-        <button
-          type="button"
+        <SecondaryButton
+          type="submit"
           onClick={moveToSignupModal}
-          className="w-full py-4 bg-white border border-main-color hover:bg-secondary-color text-main-color rounded-xl font-medium text-lg"
-        >
-          회원가입
-        </button>
+          className="w-full py-4"
+          size="lg"
+        >회원가입</SecondaryButton>
       </div>
     </Modal>
   )

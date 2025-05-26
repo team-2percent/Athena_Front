@@ -7,6 +7,7 @@ import { useApi } from "@/hooks/useApi"
 
 import ConfirmModal from "../common/ConfirmModal"
 import AlertModal from "../common/AlertModal"
+import { PrimaryButton } from "../common/Button"
 
 interface AddressInfo {
     id: number
@@ -146,13 +147,13 @@ export default function AddressInfo() {
                             주소
                         </label>
                         <p className="block text-sm font-medium text-gray-700">{ newAddress.address.length > 0 && `[${newAddress.zipcode}] ${newAddress.address}`}</p>
-                        <button
+                        <PrimaryButton
                             type="button"
                             onClick={handleOpenAddressModal}
-                            className="bg-main-color text-white px-2 py-2 rounded-md hover:bg-secondary-color-dark"
+                            className="px-2 py-2"
                         >
                             <Search className="w-4 h-4" />
-                        </button>
+                        </PrimaryButton>
                     </div>
                     
                     <div className="space-y-4">
@@ -169,13 +170,13 @@ export default function AddressInfo() {
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
                         />
                         <div className="mt-4 flex justify-end">
-                            <button
+                            <PrimaryButton
                                 type="button"
                                 onClick={handleAddAddress}
-                                className="px-4 py-2 bg-main-color text-white rounded-md hover:bg-secondary-color-dark text-sm flex items-center"
+                                className="flex items-center"
                             >
                                 <Plus className="w-4 h-4 mr-1" /> 배송지 추가
-                            </button>
+                            </PrimaryButton>
                         </div>
                     </div>
             </div>

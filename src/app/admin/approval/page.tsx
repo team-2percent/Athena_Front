@@ -6,6 +6,7 @@ import { useApi } from "@/hooks/useApi";
 import { formatDateInAdmin } from "@/lib/utils";
 import Pagination from "@/components/common/Pagination";
 import EmptyMessage from "@/components/common/EmptyMessage";
+import { PrimaryButton } from "@/components/common/Button";
 
 interface Project {
     projectId: number;
@@ -115,10 +116,9 @@ export default function ApprovalPage() {
                         className="border flex-1 p-2 border rounded text-left text-sub-gray min-w-[350px] h-10"
                         onChange={handleSearchChange}
                     />
-                    <button
+                    <PrimaryButton
                         onClick={handleSearchClick}
-                        className="border bg-main-color text-white px-4 py-2 rounded h-10 hover:bg-secondary-color-dark"
-                    >검색</button>
+                    >검색</PrimaryButton>
                 </div>
                 <div className="flex gap-4">
                     <select className="border rounded px-4 py-2 h-10" onChange={handleSortChange}>

@@ -9,6 +9,7 @@ import Spinner from "@/components/common/Spinner"
 import { formatDateInAdmin } from "@/lib/utils"
 import Pagination from "@/components/common/Pagination"
 import EmptyMessage from "@/components/common/EmptyMessage"
+import { PrimaryButton } from "@/components/common/Button"
 
 export default function CouponPage() {
     const router = useRouter()
@@ -77,12 +78,11 @@ export default function CouponPage() {
             </div>
 
             <div className="flex justify-end mb-6">
-                <button
-                    className="px-4 py-2 rounded-md text-main-color"
+                <PrimaryButton
                     onClick={() => router.push("/admin/coupon/register")}
                 >
                     + 쿠폰 등록
-                </button>
+                </PrimaryButton>
             </div>
 
             <table className="w-full text-center">
