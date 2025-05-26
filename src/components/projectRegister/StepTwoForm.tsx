@@ -96,11 +96,9 @@ const ScheduleDetailsDialog = ({ isOpen, onClose, details, onSave, scheduleIndex
 
 // 날짜를 YYYY. MM. DD. 형식으로 포맷팅 (한국 시간 기준)
 const formatDate = (date: Date): string => {
-  // 한국 시간으로 변환
-  const koreaDate = new Date(date.getTime() + 9 * 60 * 60 * 1000)
-  const year = koreaDate.getUTCFullYear()
-  const month = String(koreaDate.getUTCMonth() + 1).padStart(2, "0")
-  const day = String(koreaDate.getUTCDate()).padStart(2, "0")
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
   return `${year}. ${month}. ${day}.`
 }
 
@@ -162,13 +160,12 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown, isEdi
   // 일정 추가
   const addSchedule = () => {
     const newId = schedules.length > 0 ? Math.max(...schedules.map((schedule) => schedule.id)) + 1 : 1
-    // 한국 시간 기준으로 오늘 날짜 설정
+    // 오늘 날짜 설정
     const today = new Date()
-    const koreaToday = new Date(today.getTime() + 9 * 60 * 60 * 1000)
-    const threeWeeksLater = new Date(koreaToday)
-    threeWeeksLater.setDate(koreaToday.getDate() + 21)
+    const threeWeeksLater = new Date(today)
+    threeWeeksLater.setDate(today.getDate() + 21)
 
-    setSchedules([...schedules, { id: newId, startDate: koreaToday, endDate: threeWeeksLater }])
+    setSchedules([...schedules, { id: newId, startDate: today, endDate: threeWeeksLater }])
   }
 
   // 일정 삭제

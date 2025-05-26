@@ -231,7 +231,12 @@ const CompositionDialog = ({ isOpen, onClose, composition, onSave }: Composition
                   id={`item-content-${item.id}`}
                   type="text"
                   value={item.content}
-                  onChange={(e) => updateItem(item.id, e.target.value)}
+                  onChange={(e) => {
+                    // 100자 제한
+                    if (e.target.value.length <= 100) {
+                      updateItem(item.id, e.target.value)
+                    }
+                  }}
                   placeholder="구성 세부 내용을 입력하세요"
                   className={`w-full p-2 border-b ${
                     focusedField === `item-content-${item.id}` ? "border-secondary-color-dark" : "border-gray-300"
@@ -437,13 +442,31 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
   // 가격 입력 처리 (천 단위 콤마 포맷팅)
   const handlePriceChange = (id: number, value: string) => {
     const numericValue = value.replace(/[^0-9]/g, "")
+    const numericNumber = Number(numericValue)
+
+    // 10억 원 제한 - 초과 시 최댓값으로 설정
+    if (numericNumber > 1000000000) {
+      const formattedValue = formatNumber("1000000000")
+      updateSupportOption(id, "price", formattedValue)
+      return
+    }
+
     const formattedValue = numericValue ? formatNumber(numericValue) : ""
     updateSupportOption(id, "price", formattedValue)
   }
 
-  // 재고 입력 처리 (천 단위 콤마 포맷팅)
+  // 재고 입력 처리 (천 단위 콤마 포맷팅, 1만 개 제한)
   const handleStockChange = (id: number, value: string) => {
     const numericValue = value.replace(/[^0-9]/g, "")
+    const numericNumber = Number(numericValue)
+
+    // 1만 개 제한 - 초과 시 최댓값으로 설정
+    if (numericNumber > 10000) {
+      const formattedValue = formatNumber("10000")
+      updateSupportOption(id, "stock", formattedValue)
+      return
+    }
+
     const formattedValue = numericValue ? formatNumber(numericValue) : ""
     updateSupportOption(id, "stock", formattedValue)
   }
@@ -506,7 +529,12 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
                     id={`option-name-${option.id}`}
                     type="text"
                     value={option.name}
-                    onChange={(e) => updateSupportOption(option.id, "name", e.target.value)}
+                    onChange={(e) => {
+                      // 25자 제한
+                      if (e.target.value.length <= 25) {
+                        updateSupportOption(option.id, "name", e.target.value)
+                      }
+                    }}
                     placeholder="상품 이름을 지어주세요."
                     className={`w-full p-1 border-b ${
                       focusedField === `option-name-${option.id}` ? "border-secondary-color-dark" : "border-gray-300"
@@ -528,7 +556,12 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
                     id={`option-desc-${option.id}`}
                     type="text"
                     value={option.description}
-                    onChange={(e) => updateSupportOption(option.id, "description", e.target.value)}
+                    onChange={(e) => {
+                      // 50자 제한
+                      if (e.target.value.length <= 50) {
+                        updateSupportOption(option.id, "description", e.target.value)
+                      }
+                    }}
                     placeholder="해당 옵션을 자세히 설명해 주세요."
                     className={`w-full p-1 border-b ${
                       focusedField === `option-desc-${option.id}` ? "border-secondary-color-dark" : "border-gray-300"

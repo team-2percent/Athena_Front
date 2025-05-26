@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react"
 
 interface DatePickerProps {
-  selectedDate: Date
+  selectedDate: Date | null
   onChange: (date: Date) => void
   position?: "top" | "bottom"
   minDate?: Date // 최소 선택 가능 날짜 추가
@@ -16,19 +16,18 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
   const datePickerRef = useRef<HTMLDivElement>(null)
 
   // 날짜를 YYYY년 MM월 DD일 형식으로 포맷팅 (한국 시간 기준)
-  const formatDate = (date: Date): string => {
-    const koreaDate = new Date(date.getTime() + 9 * 60 * 60 * 1000)
-    const year = koreaDate.getUTCFullYear()
-    const month = String(koreaDate.getUTCMonth() + 1).padStart(2, "0")
-    const day = String(koreaDate.getUTCDate()).padStart(2, "0")
+  const formatDate = (date: Date | null): string => {
+    if (!date) return "날짜 선택..."
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    const day = String(date.getDate()).padStart(2, "0")
     return `${year}. ${month}. ${day}.`
   }
 
   // 월 이름 포맷팅 (예: 2025년 5월) - 한국 시간 기준
   const formatMonthYear = (date: Date): string => {
-    const koreaDate = new Date(date.getTime() + 9 * 60 * 60 * 1000)
-    const year = koreaDate.getUTCFullYear()
-    const month = koreaDate.getUTCMonth() + 1
+    const year = date.getFullYear()
+    const month = date.getMonth() + 1
     return `${year}년 ${month}월`
   }
 
@@ -45,39 +44,40 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
   // 날짜가 최소 날짜보다 이전인지 확인
   const isBeforeMinDate = (date: Date): boolean => {
     if (!minDate) return false
-    return date < new Date(minDate.setHours(0, 0, 0, 0))
+    const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+    const minDateOnly = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate())
+    return dateOnly < minDateOnly
   }
 
   // 달력에 표시할 날짜 배열 생성 (한국 시간 기준)
   const getDaysInMonth = () => {
-    const koreaCurrentMonth = new Date(currentMonth.getTime() + 9 * 60 * 60 * 1000)
-    const year = koreaCurrentMonth.getUTCFullYear()
-    const month = koreaCurrentMonth.getUTCMonth()
+    const year = currentMonth.getFullYear()
+    const month = currentMonth.getMonth()
 
-    // 현재 달의 첫 날과 마지막 날 (한국 시간 기준)
-    const firstDay = new Date(Date.UTC(year, month, 1))
-    const lastDay = new Date(Date.UTC(year, month + 1, 0))
+    // 현재 달의 첫 날과 마지막 날
+    const firstDay = new Date(year, month, 1)
+    const lastDay = new Date(year, month + 1, 0)
 
     // 첫 날의 요일 (0: 일요일, 1: 월요일, ...)
-    const firstDayOfWeek = firstDay.getUTCDay()
+    const firstDayOfWeek = firstDay.getDay()
 
     // 이전 달의 마지막 날
-    const prevMonthLastDay = new Date(Date.UTC(year, month, 0)).getUTCDate()
+    const prevMonthLastDay = new Date(year, month, 0).getDate()
 
     const days = []
 
     // 이전 달의 날짜 추가
     for (let i = firstDayOfWeek - 1; i >= 0; i--) {
       days.push({
-        date: new Date(Date.UTC(year, month - 1, prevMonthLastDay - i)),
+        date: new Date(year, month - 1, prevMonthLastDay - i),
         isCurrentMonth: false,
       })
     }
 
     // 현재 달의 날짜 추가
-    for (let i = 1; i <= lastDay.getUTCDate(); i++) {
+    for (let i = 1; i <= lastDay.getDate(); i++) {
       days.push({
-        date: new Date(Date.UTC(year, month, i)),
+        date: new Date(year, month, i),
         isCurrentMonth: true,
       })
     }
@@ -86,7 +86,7 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
     const remainingDays = 42 - days.length
     for (let i = 1; i <= remainingDays; i++) {
       days.push({
-        date: new Date(Date.UTC(year, month + 1, i)),
+        date: new Date(year, month + 1, i),
         isCurrentMonth: false,
       })
     }
@@ -106,23 +106,20 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
   // 날짜가 오늘인지 확인 (한국 시간 기준)
   const isToday = (date: Date): boolean => {
     const today = new Date()
-    const koreaToday = new Date(today.getTime() + 9 * 60 * 60 * 1000)
-    const koreaDate = new Date(date.getTime() + 9 * 60 * 60 * 1000)
     return (
-      koreaDate.getUTCDate() === koreaToday.getUTCDate() &&
-      koreaDate.getUTCMonth() === koreaToday.getUTCMonth() &&
-      koreaDate.getUTCFullYear() === koreaToday.getUTCFullYear()
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
     )
   }
 
   // 날짜가 선택된 날짜인지 확인 (한국 시간 기준)
   const isSelected = (date: Date): boolean => {
-    const koreaSelectedDate = new Date(selectedDate.getTime() + 9 * 60 * 60 * 1000)
-    const koreaDate = new Date(date.getTime() + 9 * 60 * 60 * 1000)
+    if (!selectedDate) return false
     return (
-      koreaDate.getUTCDate() === koreaSelectedDate.getUTCDate() &&
-      koreaDate.getUTCMonth() === koreaSelectedDate.getUTCMonth() &&
-      koreaDate.getUTCFullYear() === koreaSelectedDate.getUTCFullYear()
+      date.getDate() === selectedDate.getDate() &&
+      date.getMonth() === selectedDate.getMonth() &&
+      date.getFullYear() === selectedDate.getFullYear()
     )
   }
 
@@ -140,12 +137,18 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
     }
   }, [])
 
-  // 달력 열릴 때 현재 선택된 날짜의 월로 설정
+  // 달력 열릴 때 현재 선택된 날짜의 월로 설정, 선택된 날짜가 없으면 minDate 기준으로 설정
   useEffect(() => {
     if (isOpen) {
-      setCurrentMonth(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1))
+      if (selectedDate) {
+        setCurrentMonth(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1))
+      } else if (minDate) {
+        setCurrentMonth(new Date(minDate.getFullYear(), minDate.getMonth(), 1))
+      } else {
+        setCurrentMonth(new Date())
+      }
     }
-  }, [isOpen, selectedDate])
+  }, [isOpen, selectedDate, minDate])
 
   return (
     <div className="relative" ref={datePickerRef}>
@@ -154,7 +157,9 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
           type="text"
           value={formatDate(selectedDate)}
           readOnly
-          className="w-44 rounded-full border border-gray-300 px-4 py-3 pr-10 focus:border-main-color focus:outline-none cursor-pointer"
+          className={`w-44 rounded-full border border-gray-300 px-4 py-3 pr-10 focus:border-main-color focus:outline-none cursor-pointer ${
+            !selectedDate ? "text-gray-400" : ""
+          }`}
           onClick={() => setIsOpen(!isOpen)}
         />
         <Calendar className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500 pointer-events-none" />

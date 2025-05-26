@@ -1,4 +1,6 @@
 import { create } from "zustand"
+import { stepOneSchema, stepThreeSchema } from "@/lib/validationSchemas"
+import z from "zod"
 
 // 이미지 파일 타입 확장 - URL 형태의 이미지도 처리할 수 있도록
 export interface ImageFile {
@@ -41,31 +43,19 @@ export interface Category {
   categoryName: string
 }
 
-// 한국 시간 기준으로 오늘로부터 8일째 되는 날 계산 (오늘 + 7일)
-const getDefaultStartDate = () => {
-  const today = new Date()
-  const koreaToday = new Date(today.getTime() + 9 * 60 * 60 * 1000)
-  const defaultStartDate = new Date(koreaToday)
-  defaultStartDate.setDate(defaultStartDate.getDate() + 7) // 오늘 + 7일 = 8일째
-
-  // UTC로 다시 변환
-  return new Date(defaultStartDate.getTime() - 9 * 60 * 60 * 1000)
+// 유효성 검사 에러 타입
+export interface ValidationErrors {
+  [key: string]: string[]
 }
 
-// 시작일로부터 30일 후의 종료일 계산
-const getDefaultEndDate = () => {
-  const startDate = getDefaultStartDate()
-  const endDate = new Date(startDate)
-  endDate.setDate(endDate.getDate() + 30) // 시작일 + 30일
-  return endDate
-}
+// 날짜를 UTC 기준 00:00:00으로 변환하는 헬퍼 함수
+const toUTCDateString = (date: Date | null): string => {
+  if (!date) return ""
 
-// 종료일로부터 7일 후의 배송일 계산
-const getDefaultDeliveryDate = () => {
-  const endDate = getDefaultEndDate()
-  const deliveryDate = new Date(endDate)
-  deliveryDate.setDate(deliveryDate.getDate() + 7) // 종료일 + 7일
-  return deliveryDate
+  // 선택된 날짜를 UTC 기준 00:00:00으로 설정
+  const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0))
+
+  return utcDate.toISOString()
 }
 
 // 프로젝트 폼 상태 타입
@@ -74,15 +64,15 @@ interface ProjectFormState {
   projectId: number | null
   currentStep: number
 
-  // 1단계 폼 데이터
+  // 1단계 폼 데이터 - 날짜를 null로 초기화
   targetAmount: string
   category: string
-  categoryId: number | null // 카테고리 ID 추가
+  categoryId: number | null
   title: string
   description: string
-  startDate: Date
-  endDate: Date
-  deliveryDate: Date
+  startDate: Date | null
+  endDate: Date | null
+  deliveryDate: Date | null
   images: ImageFile[]
 
   // 2단계 폼 데이터
@@ -90,8 +80,11 @@ interface ProjectFormState {
 
   // 3단계 폼 데이터
   supportOptions: SupportOption[]
-  platformPlan: PlatformPlan // planName에서 platformPlan으로 변경
-  bankAccountId: number | null // 선택된 계좌 ID 추가
+  platformPlan: PlatformPlan | null // null로 변경
+  bankAccountId: number | null
+
+  // 유효성 검사 관련
+  validationErrors: ValidationErrors
 
   // 로딩 및 에러 상태
   isLoading: boolean
@@ -104,7 +97,16 @@ interface ProjectFormState {
     data: Partial<
       Omit<
         ProjectFormState,
-        "setCurrentStep" | "updateFormData" | "resetForm" | "setProjectId" | "setError" | "setLoading" | "setSubmitting"
+        | "setCurrentStep"
+        | "updateFormData"
+        | "resetForm"
+        | "setProjectId"
+        | "setError"
+        | "setLoading"
+        | "setSubmitting"
+        | "validateStepOne"
+        | "validateStepThree"
+        | "setValidationErrors"
       >
     >,
   ) => void
@@ -113,30 +115,34 @@ interface ProjectFormState {
   setError: (error: string | null) => void
   setLoading: (isLoading: boolean) => void
   setSubmitting: (isSubmitting: boolean) => void
+  validateStepOne: () => boolean
+  validateStepThree: () => boolean
+  setValidationErrors: (errors: ValidationErrors) => void
 }
 
-// 초기 상태
+// 초기 상태 - 날짜를 null로 변경, platformPlan을 null로 변경
 const initialState = {
   projectId: null,
   currentStep: 1,
 
+  // 기본값을 빈 값으로 변경, 날짜는 null로 설정
   targetAmount: "",
   category: "",
   categoryId: null,
   title: "",
   description: "",
-  startDate: getDefaultStartDate(), // 오늘로부터 8일째 되는 날
-  endDate: getDefaultEndDate(), // 시작일로부터 30일 후
-  deliveryDate: getDefaultDeliveryDate(), // 종료일로부터 7일 후
+  startDate: null,
+  endDate: null,
+  deliveryDate: null,
   images: [],
 
   markdown:
     "# 상품 상세 설명\n\n상품에 대한 자세한 설명을 작성해주세요.\n\n## 특징\n\n- 첫 번째 특징\n- 두 번째 특징\n- 세 번째 특징\n\n## 사용 방법\n\n1. 첫 번째 단계\n2. 두 번째 단계\n3. 세 번째 단계\n\n> 참고: 마크다운 문법을 사용하여 작성할 수 있습니다.",
 
   supportOptions: [],
-  platformPlan: "BASIC" as PlatformPlan, // planName에서 platformPlan으로 변경
-
+  platformPlan: null, // null로 변경
   bankAccountId: null,
+  validationErrors: {},
   isLoading: false,
   isSubmitting: false,
   error: null,
@@ -199,6 +205,72 @@ export const useProjectFormStore = create<ProjectFormState>()((set, get) => ({
 
   // 제출 상태 설정
   setSubmitting: (isSubmitting) => set({ isSubmitting }),
+
+  // 유효성 검사 에러 설정
+  setValidationErrors: (errors) => set({ validationErrors: errors }),
+
+  // 1단계 유효성 검사
+  validateStepOne: () => {
+    const state = get()
+    const formData = {
+      categoryId: state.categoryId,
+      title: state.title,
+      description: state.description,
+      images: state.images,
+      targetAmount: state.targetAmount,
+      startDate: state.startDate,
+      endDate: state.endDate,
+      deliveryDate: state.deliveryDate,
+    }
+
+    try {
+      stepOneSchema.parse(formData)
+      set({ validationErrors: {} })
+      return true
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: ValidationErrors = {}
+        error.errors.forEach((err) => {
+          const path = err.path.join(".")
+          if (!errors[path]) {
+            errors[path] = []
+          }
+          errors[path].push(err.message)
+        })
+        set({ validationErrors: errors })
+      }
+      return false
+    }
+  },
+
+  // 3단계 유효성 검사
+  validateStepThree: () => {
+    const state = get()
+    const formData = {
+      supportOptions: state.supportOptions,
+      platformPlan: state.platformPlan,
+      bankAccountId: state.bankAccountId,
+    }
+
+    try {
+      stepThreeSchema.parse(formData)
+      set({ validationErrors: {} })
+      return true
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: ValidationErrors = {}
+        error.errors.forEach((err) => {
+          const path = err.path.join(".")
+          if (!errors[path]) {
+            errors[path] = []
+          }
+          errors[path].push(err.message)
+        })
+        set({ validationErrors: errors })
+      }
+      return false
+    }
+  },
 }))
 
 // 프로젝트 ID 가져오기 함수 (컴포넌트에서 호출)
@@ -291,15 +363,15 @@ export const submitProject = async (
       description: state.description,
       goalAmount: Number.parseInt(state.targetAmount.replace(/,/g, ""), 10),
       contentMarkdown: state.markdown,
-      startAt: state.startDate.toISOString(),
-      endAt: state.endDate.toISOString(),
-      shippedAt: state.deliveryDate.toISOString(),
+      startAt: toUTCDateString(state.startDate),
+      endAt: toUTCDateString(state.endDate),
+      shippedAt: toUTCDateString(state.deliveryDate),
       imageUrls: allImageUrls, // 모든 이미지 URL 배열로 전송
       platformPlan: state.platformPlan, // planName에서 platformPlan으로 변경
       products: state.supportOptions.map((option) => ({
         name: option.name,
-        description: option.description,
         price: Number.parseInt(option.price.replace(/,/g, ""), 10),
+        description: option.description,
         stock: Number.parseInt(option.stock.replace(/,/g, ""), 10),
         options: option.composition ? option.composition.map((item) => item.content) : [],
       })),

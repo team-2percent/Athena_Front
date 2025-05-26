@@ -97,9 +97,9 @@ export default function RegisterHeader({
     switch (step) {
       case 1: {
         // 1단계 필수 항목: 카테고리, 제목, 요약, 목표금액, 펀딩일정, 배송예정일
-        // (대표 이미지는 필수가 아니므로 제외)
+        // 대표 이미지는 1개라도 있으면 카운팅되지만 필수는 아님
         const requiredFields = [
-          formData.category,
+          formData.categoryId,
           formData.title,
           formData.description,
           formData.targetAmount,
@@ -108,13 +108,19 @@ export default function RegisterHeader({
           formData.deliveryDate,
         ]
 
-        const completed = requiredFields.filter((field) => {
+        let completed = requiredFields.filter((field) => {
           if (typeof field === "string") return field.trim() !== ""
-          if (field instanceof Date) return true // 날짜는 기본값이 있으므로 항상 완료
+          if (field instanceof Date) return true
+          if (typeof field === "number") return field > 0
           return Boolean(field)
         }).length
 
-        return { completed, total: requiredFields.length }
+        // 이미지가 1개라도 있으면 추가 카운팅 (필수는 아니지만 있으면 카운팅)
+        if (formData.images && formData.images.length > 0) {
+          completed += 1
+        }
+
+        return { completed, total: requiredFields.length + 1 } // 이미지 포함하여 총 8개
       }
 
       case 2: {
