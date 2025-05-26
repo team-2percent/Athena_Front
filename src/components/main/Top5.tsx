@@ -6,6 +6,7 @@ import { MainProject } from "@/lib/projectInterface"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation";
 import ProjectGridItem from "../common/ProjectGridItem"
+import ProjectOverlayItem from "../common/ProjectOverlayItem"
 
 interface Response {
   allTopView: MainProject[],
@@ -96,9 +97,8 @@ export default function TopFive() {
       {/* Top projects grid - revised layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         { rank1Project && 
-          <ProjectGridItem
+          <ProjectOverlayItem
             key={rank1Project.projectId}
-            size="xl"
             className="w-full"
             id={rank1Project.projectId}
             imageUrl={rank1Project.imageUrl}
@@ -112,7 +112,7 @@ export default function TopFive() {
         {/* Regular projects (smaller) - takes up the other half in a 2x2 grid */}
         {restProject && <div className="grid grid-cols-2 grid-rows-2 gap-4">
           {restProject.map((project, idx) => 
-            <ProjectGridItem
+            <ProjectOverlayItem
             key={project.projectId}
             className="w-full"
             id={project.projectId}
