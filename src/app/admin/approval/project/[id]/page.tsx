@@ -11,6 +11,7 @@ import { useParams } from "next/navigation";
 import OverlaySpinner from "@/components/common/OverlaySpinner"
 import { useEffect } from "react";
 import { formatDateInAdmin } from "@/lib/utils"
+import { PrimaryButton } from "@/components/common/Button";
 
 interface ApprovalProject {
     id: number,
@@ -279,14 +280,10 @@ export default function ProjectApprovalDetailPage() {
                 /> */}
 
                 <div className="flex justify-end space-x-4">
-                    <button
+                    <PrimaryButton
                         disabled={disabled}
-                        className={clsx(
-                            "px-8 py-2 rounded-md",
-                            disabled ? "bg-disabled-background text-disabled-text pointer-events-none" : "bg-main-color hover:bg-secondary-color-dark text-white"
-                        )}
                         onClick={() => setIsModalOpen(true)}
-                    >저장</button>
+                    >저장</PrimaryButton>
                 </div>
                 </div>
             </div>)}

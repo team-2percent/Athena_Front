@@ -9,6 +9,7 @@ import ConfirmModal from "@/components/common/ConfirmModal"
 import { useApi } from "@/hooks/useApi"
 import TimePicker from "@/components/common/TimePicker"
 import OverlaySpinner from "@/components/common/OverlaySpinner"
+import { PrimaryButton } from "@/components/common/Button"
 export default function CouponRegisterPage() {
     const router = useRouter();
     const { apiCall } = useApi();
@@ -194,13 +195,12 @@ export default function CouponRegisterPage() {
                         </div>
                     </div>
                     <div className="flex justify-end">
-                        <button
-                            className={clsx("px-8 p-4 rounded-md", disabled ? "bg-gray-100 text-sub-gray cursor-not-allowed" : "bg-main-color text-white hover:bg-secondary-color-dark")}
+                        <PrimaryButton
                             disabled={disabled}
                             onClick={handleModalOpen}
                         >
                             등록
-                        </button>
+                        </PrimaryButton>
                     </div>
                 </div>
                 {
