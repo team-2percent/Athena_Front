@@ -5,6 +5,7 @@ import { useApi } from "@/hooks/useApi"
 
 import ConfirmModal from "../common/ConfirmModal"
 import AlertModal from "../common/AlertModal"
+import { PrimaryButton } from "../common/Button"
 
 interface AccountInfo {
     id: number
@@ -163,13 +164,13 @@ export default function AccountInfo() {
               </div>
             </div>
             <div className="mt-4 flex justify-end">
-              <button
+              <PrimaryButton
                 type="button"
                 onClick={handleAddAccount}
-                className="px-4 py-2 bg-main-color text-white rounded-md hover:bg-secondary-color-dark text-sm flex items-center appearance-none"
+                className="flex items-center appearance-none"
               >
                 <Plus className="w-4 h-4 mr-1" /> 계좌 추가
-              </button>
+              </PrimaryButton>
             </div>
           </div>
         {/* 계좌 목록 */}
