@@ -231,7 +231,12 @@ const CompositionDialog = ({ isOpen, onClose, composition, onSave }: Composition
                   id={`item-content-${item.id}`}
                   type="text"
                   value={item.content}
-                  onChange={(e) => updateItem(item.id, e.target.value)}
+                  onChange={(e) => {
+                    // 100자 제한
+                    if (e.target.value.length <= 100) {
+                      updateItem(item.id, e.target.value)
+                    }
+                  }}
                   placeholder="구성 세부 내용을 입력하세요"
                   className={`w-full p-2 border-b ${
                     focusedField === `item-content-${item.id}` ? "border-secondary-color-dark" : "border-gray-300"
@@ -282,13 +287,14 @@ interface StepThreeFormProps {
   initialData?: {
     supportOptions?: SupportOption[]
   }
+  isEditMode?: boolean
 }
 
 // StepThreeForm 함수 내부에서 return문 수정
 // 기존 return문의 최상위 div 내부 맨 위에 PlanSelection 컴포넌트 추가
-export default function StepThreeForm({ initialData }: StepThreeFormProps) {
+export default function StepThreeForm({ initialData, isEditMode = false }: StepThreeFormProps) {
   // Zustand 스토어에서 상태와 액션 가져오기
-  const { supportOptions, updateFormData } = useProjectFormStore()
+  const { supportOptions, updateFormData, platformPlan } = useProjectFormStore()
   const { apiCall, isLoading } = useApi()
 
   // 계좌 관련 상태
@@ -436,13 +442,31 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
   // 가격 입력 처리 (천 단위 콤마 포맷팅)
   const handlePriceChange = (id: number, value: string) => {
     const numericValue = value.replace(/[^0-9]/g, "")
+    const numericNumber = Number(numericValue)
+
+    // 10억 원 제한 - 초과 시 최댓값으로 설정
+    if (numericNumber > 1000000000) {
+      const formattedValue = formatNumber("1000000000")
+      updateSupportOption(id, "price", formattedValue)
+      return
+    }
+
     const formattedValue = numericValue ? formatNumber(numericValue) : ""
     updateSupportOption(id, "price", formattedValue)
   }
 
-  // 재고 입력 처리 (천 단위 콤마 포맷팅)
+  // 재고 입력 처리 (천 단위 콤마 포맷팅, 1만 개 제한)
   const handleStockChange = (id: number, value: string) => {
     const numericValue = value.replace(/[^0-9]/g, "")
+    const numericNumber = Number(numericValue)
+
+    // 1만 개 제한 - 초과 시 최댓값으로 설정
+    if (numericNumber > 10000) {
+      const formattedValue = formatNumber("10000")
+      updateSupportOption(id, "stock", formattedValue)
+      return
+    }
+
     const formattedValue = numericValue ? formatNumber(numericValue) : ""
     updateSupportOption(id, "stock", formattedValue)
   }
@@ -505,7 +529,12 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
                     id={`option-name-${option.id}`}
                     type="text"
                     value={option.name}
-                    onChange={(e) => updateSupportOption(option.id, "name", e.target.value)}
+                    onChange={(e) => {
+                      // 25자 제한
+                      if (e.target.value.length <= 25) {
+                        updateSupportOption(option.id, "name", e.target.value)
+                      }
+                    }}
                     placeholder="상품 이름을 지어주세요."
                     className={`w-full p-1 border-b ${
                       focusedField === `option-name-${option.id}` ? "border-secondary-color-dark" : "border-gray-300"
@@ -527,7 +556,12 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
                     id={`option-desc-${option.id}`}
                     type="text"
                     value={option.description}
-                    onChange={(e) => updateSupportOption(option.id, "description", e.target.value)}
+                    onChange={(e) => {
+                      // 50자 제한
+                      if (e.target.value.length <= 50) {
+                        updateSupportOption(option.id, "description", e.target.value)
+                      }
+                    }}
                     placeholder="해당 옵션을 자세히 설명해 주세요."
                     className={`w-full p-1 border-b ${
                       focusedField === `option-desc-${option.id}` ? "border-secondary-color-dark" : "border-gray-300"
@@ -622,7 +656,21 @@ export default function StepThreeForm({ initialData }: StepThreeFormProps) {
       </div>
 
       {/* 플랜 선택 섹션 추가 */}
-      <PlanSelection />
+      {!isEditMode ? (
+        <PlanSelection />
+      ) : (
+        <div className="mt-8 mb-4">
+          <h3 className="text-xl font-bold mb-2">후원 플랜 선택</h3>
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-lg font-medium text-gray-800">{platformPlan} 플랜 적용 중 입니다.</p>
+                <p className="text-sm text-gray-600 mt-1">프로젝트 수정 화면에서는 플랜 변경이 불가능합니다.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 후원 받을 계좌 정보 */}
       <div className="flex flex-col mt-8">

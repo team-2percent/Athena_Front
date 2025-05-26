@@ -26,6 +26,16 @@ export default function ProductEdit() {
   // Zustand 스토어에서 상태와 액션 가져오기
   const { currentStep, setCurrentStep, updateFormData, resetForm, setLoading, setProjectId } = useProjectFormStore()
 
+  // 날짜를 UTC 기준 00:00:00으로 변환하는 헬퍼 함수
+  const toUTCDateString = (date: Date | null): string => {
+    if (!date) return ""
+
+    // 선택된 날짜를 UTC 기준 00:00:00으로 설정
+    const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0))
+
+    return utcDate.toISOString()
+  }
+
   // 데이터 로드 (실제로는 API 호출)
   useEffect(() => {
     const loadProjectData = async () => {
@@ -93,9 +103,9 @@ export default function ProductEdit() {
           categoryId: data.category?.id || null,
           title: data.title || "",
           description: data.description || "",
-          startDate: data.startAt ? new Date(data.startAt) : new Date(),
-          endDate: data.endAt ? new Date(data.endAt) : new Date(),
-          deliveryDate: data.shippedAt ? new Date(data.shippedAt) : new Date(),
+          startDate: data.startAt ? new Date(data.startAt) : null,
+          endDate: data.endAt ? new Date(data.endAt) : null,
+          deliveryDate: data.shippedAt ? new Date(data.shippedAt) : null,
           images: processedImages,
           markdown: data.markdown || "", // contentMarkdown 필드 사용
           supportOptions: processedOptions,
@@ -201,9 +211,9 @@ export default function ProductEdit() {
         description: state.description,
         goalAmount: Number.parseInt(state.targetAmount.replace(/,/g, ""), 10),
         contentMarkdown: state.markdown,
-        startAt: state.startDate.toISOString(),
-        endAt: state.endDate.toISOString(),
-        shippedAt: state.deliveryDate.toISOString(),
+        startAt: toUTCDateString(state.startDate),
+        endAt: toUTCDateString(state.endDate),
+        shippedAt: toUTCDateString(state.deliveryDate),
         categoryId: state.categoryId,
         bankAccountId: state.bankAccountId || 0, // 선택한 계좌 ID 사용
         images: imageData, // URL과 File 객체 모두 포함
@@ -257,8 +267,10 @@ export default function ProductEdit() {
       <div className="mt-8 mb-16">
         {/* 단계별 폼 컴포넌트 */}
         {currentStep === 1 && <StepOneForm onUpdateFormData={updateFormData} />}
-        {currentStep === 2 && <StepTwoForm onUpdateMarkdown={(markdown) => updateFormData({ markdown })} />}
-        {currentStep === 3 && <StepThreeForm />}
+        {currentStep === 2 && (
+          <StepTwoForm onUpdateMarkdown={(markdown) => updateFormData({ markdown })} isEditMode={true} />
+        )}
+        {currentStep === 3 && <StepThreeForm isEditMode={true} />}
       </div>
 
       {/* 단계별 버튼 */}

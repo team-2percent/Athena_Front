@@ -45,17 +45,17 @@ interface MyProjectsResponse {
 }
 
 interface MyOrder {
-  orderId: number
   productId: number
-  projectId: number
-  productTitle: string
-  projectTitle: string
-  sellerNickname: string
-  thumbnailUrl: string | null
+  productName: string
+  orderId: number
   orderedAt: string
+  projectId: number
+  projectName: string
+  sellerName: string
+  thumbnailUrl: string | null
   endAt: string
   achievementRate: number
-  hasReview?: boolean
+  hasCommented?: boolean
 }
 
 interface MyOrdersResponse {
@@ -460,9 +460,9 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
                   <PurchasedProjectItem
                     key={`${order.orderId}${order.projectId}${order.productId}`}
                     orderId={order.orderId}
-                    sellerName={order.sellerNickname}
-                    productName={order.productTitle}
-                    projectName={order.projectTitle}
+                    sellerName={order.sellerName}
+                    productName={order.productName}
+                    projectName={order.projectName}
                     orderedAt={formatDate(order.orderedAt)}
                     endAt={formatDate(order.endAt)}
                     imageUrl={
@@ -470,7 +470,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
                     }
                     achievementRate={order.achievementRate}
                     projectId={order.projectId}
-                    hasReview={order.hasReview || false}
+                    hasCommented={order.hasCommented || false}
                   />
                 ))}
 

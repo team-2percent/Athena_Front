@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react"
 
 interface DatePickerProps {
-  selectedDate: Date
+  selectedDate: Date | null
   onChange: (date: Date) => void
   position?: "top" | "bottom"
   minDate?: Date // 최소 선택 가능 날짜 추가
@@ -15,15 +15,16 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const datePickerRef = useRef<HTMLDivElement>(null)
 
-  // 날짜를 YYYY년 MM월 DD일 형식으로 포맷팅
-  const formatDate = (date: Date): string => {
+  // 날짜를 YYYY년 MM월 DD일 형식으로 포맷팅 (한국 시간 기준)
+  const formatDate = (date: Date | null): string => {
+    if (!date) return "날짜 선택..."
     const year = date.getFullYear()
     const month = String(date.getMonth() + 1).padStart(2, "0")
     const day = String(date.getDate()).padStart(2, "0")
     return `${year}. ${month}. ${day}.`
   }
 
-  // 월 이름 포맷팅 (예: 2025년 5월)
+  // 월 이름 포맷팅 (예: 2025년 5월) - 한국 시간 기준
   const formatMonthYear = (date: Date): string => {
     const year = date.getFullYear()
     const month = date.getMonth() + 1
@@ -43,10 +44,12 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
   // 날짜가 최소 날짜보다 이전인지 확인
   const isBeforeMinDate = (date: Date): boolean => {
     if (!minDate) return false
-    return date < new Date(minDate.setHours(0, 0, 0, 0))
+    const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+    const minDateOnly = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate())
+    return dateOnly < minDateOnly
   }
 
-  // 달력에 표시할 날짜 배열 생성
+  // 달력에 표시할 날짜 배열 생성 (한국 시간 기준)
   const getDaysInMonth = () => {
     const year = currentMonth.getFullYear()
     const month = currentMonth.getMonth()
@@ -100,7 +103,7 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
     setIsOpen(false)
   }
 
-  // 날짜가 오늘인지 확인
+  // 날짜가 오늘인지 확인 (한국 시간 기준)
   const isToday = (date: Date): boolean => {
     const today = new Date()
     return (
@@ -110,8 +113,9 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
     )
   }
 
-  // 날짜가 선택된 날짜인지 확인
+  // 날짜가 선택된 날짜인지 확인 (한국 시간 기준)
   const isSelected = (date: Date): boolean => {
+    if (!selectedDate) return false
     return (
       date.getDate() === selectedDate.getDate() &&
       date.getMonth() === selectedDate.getMonth() &&
@@ -133,12 +137,18 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
     }
   }, [])
 
-  // 달력 열릴 때 현재 선택된 날짜의 월로 설정
+  // 달력 열릴 때 현재 선택된 날짜의 월로 설정, 선택된 날짜가 없으면 minDate 기준으로 설정
   useEffect(() => {
     if (isOpen) {
-      setCurrentMonth(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1))
+      if (selectedDate) {
+        setCurrentMonth(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1))
+      } else if (minDate) {
+        setCurrentMonth(new Date(minDate.getFullYear(), minDate.getMonth(), 1))
+      } else {
+        setCurrentMonth(new Date())
+      }
     }
-  }, [isOpen, selectedDate])
+  }, [isOpen, selectedDate, minDate])
 
   return (
     <div className="relative" ref={datePickerRef}>
@@ -147,7 +157,9 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
           type="text"
           value={formatDate(selectedDate)}
           readOnly
-          className="w-44 rounded-full border border-gray-300 px-4 py-3 pr-10 focus:border-main-color focus:outline-none cursor-pointer"
+          className={`w-44 rounded-full border border-gray-300 px-4 py-3 pr-10 focus:border-main-color focus:outline-none cursor-pointer ${
+            !selectedDate ? "text-gray-400" : ""
+          }`}
           onClick={() => setIsOpen(!isOpen)}
         />
         <Calendar className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500 pointer-events-none" />
