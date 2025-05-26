@@ -137,6 +137,11 @@ const Header = () => {
     })
   }
 
+  const handleClickMyPage = () => {
+    router.push("/my")
+    setShowAuthMenu(false);
+  }
+
   const notifications = [
     {
       id: 1,
@@ -262,7 +267,7 @@ const Header = () => {
                       }
                       <button
                         type="button"
-                        onClick={() => router.push("/my")}
+                        onClick={handleClickMyPage}
                         className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
                       >
                         <User className="h-4 w-4" />

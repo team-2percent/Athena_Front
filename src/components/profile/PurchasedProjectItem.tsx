@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import ReviewForm from "./ReviewForm"
 import { cn } from "@/lib/utils"
+import { PrimaryButton } from "../common/Button"
 
 interface PurchasedProjectItemProps {
   orderId: number
@@ -113,19 +114,14 @@ export default function PurchasedProjectItem({
 
               {/* 후기 작성 버튼 */}
               <div className="flex justify-end mt-4">
-                <button
-                  className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors w-full justify-center",
-                    hasCommented
-                      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                      : "bg-main-color text-white hover:bg-secondary-color-dark",
-                  )}
-                  onClick={handleReviewClick}
+                <PrimaryButton
+                  className="flex items-center gap-2 px-4 py-2 transition-colors w-full justify-center"
                   disabled={hasCommented}
+                  onClick={handleReviewClick}
                 >
                   <MessageSquare className="h-5 w-5" />
                   <span>{hasCommented ? "후기 작성 완료" : "후기 작성"}</span>
-                </button>
+                </PrimaryButton>
               </div>
             </div>
           </div>

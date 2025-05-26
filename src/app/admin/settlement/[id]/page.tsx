@@ -9,6 +9,8 @@ import { useParams } from "next/navigation";
 import OverlaySpinner from "@/components/common/OverlaySpinner"
 import clsx from "clsx"
 import { formatDateInAdmin } from "@/lib/utils"
+import { SecondaryButton } from "@/components/common/Button"
+import Pagination from "@/components/common/Pagination"
 
 interface SettlementInfo {
     "projectTitle": string,
@@ -118,6 +120,10 @@ export default function SettlementDetailPage() {
         })
     }
 
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    }
+
     const render = () => {
         if (isLoading) return <OverlaySpinner message="정산 정보를 불러오고 있습니다." />
         if (!info || !productSummary || !productSummaryTotal || !history) return null
@@ -214,10 +220,10 @@ export default function SettlementDetailPage() {
                     </div>
                     
                     <div className="flex flex-col gap-2">
-                        <button
-                            className="ml-auto px-4 py-2 text-sm border rounded-md"
+                        <SecondaryButton
+                            className="ml-auto"
                             onClick={() => router.push(`/profile/${info.userId}`)}
-                        >프로필보기</button>
+                        >프로필보기</SecondaryButton>
                         <p className="text-sm text-gray-500">* 기존 프로필 페이지로 이동합니다.</p>
                     </div>
                 </div>
@@ -288,11 +294,7 @@ export default function SettlementDetailPage() {
                         ))}
                     </tbody>
                 </table>
-                <div className="flex justify-center gap-2">
-                    <button className={clsx("px-3 py-2", leftPageDisabled ? "text-gray-300" : "text-main-color")} disabled={leftPageDisabled} onClick={handlePrevPage}>◀</button>
-                    <button className="px-3 py-2 text-main-color">{currentPage + 1}</button>
-                    <button className={clsx("px-3 py-2", rightPageDisabled ? "text-gray-300" : "text-main-color")} disabled={rightPageDisabled} onClick={handleNextPage}>▶</button>
-                </div>
+                <Pagination totalPages={totalPageCount} currentPage={currentPage} onPageChange={handlePageChange}/>
             </div>
             </div>
         )

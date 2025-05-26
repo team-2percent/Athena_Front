@@ -6,6 +6,7 @@ import PasswordInput from "../common/PasswordInput"
 import clsx from "clsx"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
+import { CancelButton, PrimaryButton } from "../common/Button"
 
 interface Profile {
     name: string
@@ -273,7 +274,12 @@ export default function ProfileInfo() {
                             <label htmlFor="profile-image" className="cursor-pointer text-main-color font-medium hover:text-secondary-color-dark">
                                 프로필 사진 {profileImage ? "변경" : "업로드"}
                             </label>
-
+                            <PrimaryButton
+                                className=""
+                                disabled
+                            >
+                                저장
+                            </PrimaryButton>
                         </div>
                         
                         {/* 이름, 이메일 란 */}
@@ -292,12 +298,12 @@ export default function ProfileInfo() {
                                 <span className="text-sm font-medium text-sub-gray">이메일</span>
                                 <span className="text-sm font-medium">{profile.email}</span>
                             </div>
-                            <button
-                                className="w-fit bg-main-color text-white rounded-md hover:bg-secondary-color-dark text-sm px-3 py-2"
+                            <PrimaryButton
                                 onClick={() => setEditingPassword(true)}
+                                className="w-fit"
                             >
                                 비밀번호 변경
-                            </button>
+                            </PrimaryButton>
                         </div>   
                     </div>
 
@@ -344,13 +350,12 @@ export default function ProfileInfo() {
                     </div> 
                     <div className="flex gap-2 justify-end items-end flex-wrap">
                         <p className="text-sm font-medium text-sub-gray">※ 저장하지 않고 페이지를 나갈 시 변경사항이 저장되지 않습니다.</p>
-                        <button
+                        <PrimaryButton
                             disabled={!saveable}
-                            className={clsx("text-white rounded-md text-sm px-4 py-2", saveable ? "bg-main-color hover:bg-secondary-color-dark": "bg-gray-border")}
                             onClick={handleSave}
                         >
                             저장
-                        </button>
+                        </PrimaryButton>
                     </div>  
                 </div>
             ) : (
@@ -375,11 +380,11 @@ export default function ProfileInfo() {
                                     <Check className="w-4 h-4 text-green-500" />
                                     :
                                     <div className="flex gap-2 items-center">
-                                        <button
+                                        <PrimaryButton
                                             type="submit"
                                             onClick={handlePasswordConfirm}
-                                            className="w-fit bg-main-color text-white rounded-md hover:bg-secondary-color-dark text-sm px-3 py-2"
-                                        >확인</button>
+                                            className="px-3 py-2"
+                                        >확인</PrimaryButton>
                                         {passwordConfirmError && <p className="text-red-500 text-sm">비밀번호가 일치하지 않습니다.</p>}
                                         {passwordConfirmNeedError && <p className="text-red-500 text-sm">비밀번호 확인이 필요합니다.</p>}
                                     </div>
@@ -415,18 +420,18 @@ export default function ProfileInfo() {
                     </div>
                     <div className="flex gap-2 justify-end items-center">
                         {successEditPassword && <p className="text-sm text-sub-gray">비밀번호 변경이 완료되었습니다.</p>}
-                        <button
-                            className="w-fit bg-main-color text-white rounded-md hover:bg-secondary-color-dark text-sm px-3 py-2"
+                        <PrimaryButton
+                            className="w-fit"
                             onClick={handleNewPasswordApply}
                         >
                             저장
-                        </button>
-                        <button
-                            className="w-fit bg-cancel-background text-white rounded-md hover:bg-cancel-background-dark text-sm px-3 py-2"
+                        </PrimaryButton>
+                        <CancelButton
+                            className="w-fit"
                             onClick={() => setEditingPassword(false)}
                         >
                             취소
-                        </button>
+                        </CancelButton>
                     </div>
                 </div>
                 </div>

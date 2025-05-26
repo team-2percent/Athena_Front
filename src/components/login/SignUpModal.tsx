@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import clsx from "clsx"
 import { useApi } from "@/hooks/useApi"
 import Modal from "@/components/common/Modal"
+import { PrimaryButton } from "../common/Button"
 
 interface SignupModalProps {
   isOpen: boolean
@@ -166,15 +167,13 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
           </div>
 
           {/* Signup Button */}
-          <button
+          <PrimaryButton
             type="submit"
-            className={clsx(
-              "relative w-full py-4 rounded-xl font-medium text-lg mb-1",
-              disabled ? "text-gray-400 bg-gray-200 cursor-not-allowed" : "bg-main-color text-white",
-            )}
+            className="relative w-full py-4 mb-1"
+            disabled={disabled}
           >
             가입하기
-          </button>
+          </PrimaryButton>
           {isError && (
             <p className="absolute bottom-3 left-0 text-red-500 text-sm pt-1 w-full text-center">{errorMessage}</p>
           )}
