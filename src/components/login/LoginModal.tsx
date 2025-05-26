@@ -35,8 +35,10 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
         setErrorMessage("로그인에 실패했습니다.")
         return;
       }
-      if (data.accessToken && data.userId) login(data.accessToken, data.userId)
-      onClose()
+      if (data.accessToken && data.userId) {
+        login(data.accessToken, data.userId)
+        window.location.reload()
+      }
     })
   }
 
