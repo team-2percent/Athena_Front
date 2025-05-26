@@ -36,7 +36,7 @@ export default function CouponRegisterPage() {
         // 쿠폰 등록 추가
         setIsModalOpen(false);
         setIsLoading(true)
-        apiCall("/api/couponEvent/create", "POST", {
+        apiCall("/api/coupon/create", "POST", {
             title: couponName,
             content: couponDescription,
             price: couponPrice,

@@ -39,7 +39,7 @@ export default function CouponList() {
     }
 
     const loadCoupons = () => {
-        apiCall("/api/couponEvent/getActives", "GET").then(({ data, error, status }) => {
+        apiCall("/api/coupon/getInProgress", "GET").then(({ data, error, status }) => {
             if (error && status === 500) {
                 setServerError(ServerErrorType.GET_COUPON_LIST);
             } else if (data) {
