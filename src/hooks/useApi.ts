@@ -51,10 +51,18 @@ export function useApi() {
             };
           }
 
-          const responseData = await response.json();
+          const responseText = await response.text();
+          if (responseText === "") {
+            return {
+              data: null,
+              error: null,
+              isLoading: false,
+              status: response.status,
+            };
+          }
 
           return {
-            data: responseData,
+            data: JSON.parse(responseText),
             error: null,
             isLoading: false,
             status: response.status,

@@ -69,7 +69,7 @@ export default function AddressInfo() {
 
     const setDefaultDelivery = () => {
         if (defaultId === null) return;
-        apiCall(`api/delivery/state`, "PUT", {
+        apiCall(`/api/delivery/state`, "PUT", {
             deliveryInfoId: defaultId
         }).then(({ error }) => {
             if (!error) {
