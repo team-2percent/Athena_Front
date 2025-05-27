@@ -1,5 +1,8 @@
 "use client"
 import MarkdownRenderer from "./MarkdownRenderer"
+import type React from "react"
+
+import { useProjectFormStore, type MarkdownImageFile } from "@/stores/useProjectFormStore"
 
 interface MarkdownEditorProps {
   value: string
@@ -7,6 +10,65 @@ interface MarkdownEditorProps {
 }
 
 export default function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
+  const { markdownImages, updateFormData } = useProjectFormStore()
+
+  // 이미지 붙여넣기 처리
+  const handlePaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = e.clipboardData?.items
+    if (!items) return
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]
+
+      // 이미지 파일인지 확인
+      if (item.type.indexOf("image") !== -1) {
+        e.preventDefault()
+
+        const file = item.getAsFile()
+        if (!file) continue
+
+        // 고유 ID 생성
+        const imageId = `markdown-img-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
+        // 미리보기 URL 생성
+        const preview = URL.createObjectURL(file)
+
+        // 마크다운 이미지 객체 생성
+        const markdownImage: MarkdownImageFile = {
+          id: imageId,
+          file,
+          preview,
+        }
+
+        // 스토어에 이미지 추가
+        const newMarkdownImages = [...markdownImages, markdownImage]
+        updateFormData({ markdownImages: newMarkdownImages })
+
+        // 마크다운 텍스트에 이미지 삽입 (자체 라우팅 URL 사용)
+        const textarea = e.target as HTMLTextAreaElement
+        const start = textarea.selectionStart
+        const end = textarea.selectionEnd
+        const text = textarea.value
+        const before = text.substring(0, start)
+        const after = text.substring(end)
+
+        // 자체 라우팅 URL로 이미지 삽입
+        const imageMarkdown = `![이미지](/markdown-image/${imageId})`
+        const newText = before + imageMarkdown + after
+
+        onChange(newText)
+
+        // 커서 위치 조정
+        setTimeout(() => {
+          textarea.focus()
+          textarea.setSelectionRange(start + imageMarkdown.length, start + imageMarkdown.length)
+        }, 0)
+
+        break // 첫 번째 이미지만 처리
+      }
+    }
+  }
+
   return (
     <div className="border rounded-xl overflow-hidden">
       <div className="bg-gray-100 p-2 border-b">
@@ -340,12 +402,14 @@ export default function MarkdownEditor({ value, onChange }: MarkdownEditorProps)
           <textarea
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            onPaste={handlePaste}
             className="w-full h-full resize-none focus:outline-none font-mono"
+            placeholder="마크다운을 입력하세요. Ctrl+V로 이미지를 붙여넣을 수 있습니다."
           />
         </div>
         <div className="w-1/2 p-4 overflow-auto">
           {/* 커스텀 마크다운 렌더러 사용 */}
-          <MarkdownRenderer content={value} />
+          <MarkdownRenderer content={value} markdownImages={markdownImages} />
         </div>
       </div>
     </div>

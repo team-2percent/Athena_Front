@@ -8,6 +8,8 @@ import ProjectTabs from "./ProjectTabs"
 import { useApi } from "@/hooks/useApi"
 import { useParams } from "next/navigation"
 
+import { OutlineButton, PrimaryButton } from "../common/Button"
+
 // ProjectData 인터페이스 추가
 interface ProjectData {
   id: number
@@ -50,6 +52,17 @@ const ProjectDetail = () => {
 
   // URL에서 프로젝트 ID 가져오기
   const { id: projectId } = useParams()
+
+  // 후원 가능 여부 확인 함수
+  const canDonate = (projectData: ProjectData | null): boolean => {
+    if (!projectData?.productResponses || projectData.productResponses.length === 0) {
+      return false
+    }
+
+    // 모든 상품의 재고가 0인지 확인
+    const hasAvailableStock = projectData.productResponses.some((product) => product.stock > 0)
+    return hasAvailableStock
+  }
 
   // 프로젝트 데이터 가져오기
   useEffect(() => {
@@ -277,16 +290,18 @@ const ProjectDetail = () => {
                 <div className="flex items-baseline">
                   {!projectData?.endAt ? (
                     <span className="text-5xl font-bold text-main-color">알 수 없음</span>
-                  ) : (() => {
-                    const daysLeft = calculateDaysLeft(projectData.endAt)
-                    if (daysLeft > 0) {
-                      return <span className="text-5xl font-bold text-main-color">{daysLeft}일</span>
-                    } else if (daysLeft === 0) {
-                      return <span className="text-5xl font-bold text-main-color">마감임박!</span>
-                    } else {
-                      return <span className="text-5xl font-bold text-main-color">펀딩 종료</span>
-                    }
-                  })()}
+                  ) : (
+                    (() => {
+                      const daysLeft = calculateDaysLeft(projectData.endAt)
+                      if (daysLeft > 0) {
+                        return <span className="text-5xl font-bold text-main-color">{daysLeft}일</span>
+                      } else if (daysLeft === 0) {
+                        return <span className="text-5xl font-bold text-main-color">마감임박!</span>
+                      } else {
+                        return <span className="text-5xl font-bold text-main-color">펀딩 종료</span>
+                      }
+                    })()
+                  )}
                   <span className="ml-2 text-xl text-sub-gray">/ {formatDate(projectData?.endAt || "")}</span>
                 </div>
               </div>
@@ -294,21 +309,27 @@ const ProjectDetail = () => {
 
             {/* 공유하기, 후원하기 버튼 영역 */}
             <div className="mt-8 flex items-center justify-end space-x-4">
-              <button className="w-1/3 flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white py-4 text-xl text-gray-700 hover:bg-gray-50">
-                <Share2 className="h-6 w-6"/>
+              <OutlineButton className="w-1/3 flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white py-4 text-xl text-gray-700 hover:bg-gray-50">
+                <Share2 className="h-6 w-6" />
                 공유하기
-              </button>
+              </OutlineButton>
 
-              {/* 후원하기 버튼 */}
-              <button
-                className="w-2/3 rounded-xl bg-main-color px-8 py-4 text-center text-xl font-bold text-white hover:bg-secondary-color-dark"
-                onClick={() => {
-                  const event = new CustomEvent("toggleDonateDock")
-                  window.dispatchEvent(event)
-                }}
-              >
-                후원하기
-              </button>
+              {/* 후원하기 버튼 - 상품이 없거나 모든 재고가 0이면 비활성화 */}
+              {canDonate(projectData) ? (
+                <PrimaryButton
+                  className="w-2/3 rounded-xl bg-main-color px-8 py-4 text-center text-xl font-bold text-white hover:bg-secondary-color-dark"
+                  onClick={() => {
+                    const event = new CustomEvent("toggleDonateDock")
+                    window.dispatchEvent(event)
+                  }}
+                >
+                  후원하기
+                </PrimaryButton>
+              ) : (
+                <div className="w-2/3 rounded-xl bg-gray-300 px-8 py-4 text-center text-xl font-bold text-gray-500 cursor-not-allowed">
+                  후원 불가
+                </div>
+              )}
             </div>
           </div>
         </div>

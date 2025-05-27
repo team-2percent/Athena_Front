@@ -5,6 +5,7 @@ import { Plus, Trash2, X, ChevronDown, ChevronUp } from "lucide-react"
 import MarkdownEditor from "./MarkdownEditor"
 import DatePicker from "./DatePicker"
 import { useProjectFormStore } from "@/stores/useProjectFormStore"
+import { PrimaryButton } from "../common/Button"
 
 // 예산 항목 타입
 interface BudgetItem {
@@ -81,13 +82,13 @@ const ScheduleDetailsDialog = ({ isOpen, onClose, details, onSave, scheduleIndex
         </div>
 
         <div className="flex justify-end">
-          <button
+          <PrimaryButton
             type="button"
             onClick={handleSave}
             className="bg-main-color text-white font-bold py-2 px-6 rounded-full"
           >
             저장
-          </button>
+          </PrimaryButton>
         </div>
       </div>
     </div>
@@ -298,14 +299,14 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown, isEdi
               <h2 className="text-xl font-bold">자동 채우기</h2>
               <span className="ml-3 text-gray-500 text-sm">* 상품 상세 설명에 내용을 자동으로 채웁니다.</span>
             </div>
-            <button
+            <PrimaryButton
               type="button"
               onClick={toggleAutofillPanel}
               className="bg-main-color hover:bg-secondary-color-dark text-white font-medium py-2 px-4 rounded-full text-sm flex items-center"
             >
               사용해 보기{" "}
               {isAutofillExpanded ? <ChevronUp className="ml-1 w-4 h-4" /> : <ChevronDown className="ml-1 w-4 h-4" />}
-            </button>
+            </PrimaryButton>
           </div>
 
           {isAutofillExpanded && (
@@ -566,13 +567,13 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown, isEdi
 
               {/* 마크다운에 적용 버튼 */}
               <div className="flex justify-center mt-8">
-                <button
+                <PrimaryButton
                   type="button"
                   onClick={updateMarkdown}
                   className="bg-main-color hover:bg-secondary-color-dark text-white font-bold py-3 px-8 rounded-full"
                 >
                   선택 내용 자동 채우기
-                </button>
+                </PrimaryButton>
               </div>
             </div>
           )}

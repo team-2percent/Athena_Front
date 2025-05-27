@@ -11,6 +11,13 @@ export interface ImageFile {
   isExisting?: boolean // 기존 이미지인지 여부
 }
 
+// 마크다운 이미지 파일 타입
+export interface MarkdownImageFile {
+  id: string
+  file: File
+  preview: string // blob URL
+}
+
 // 구성 항목 타입
 export interface CompositionItem {
   id: number
@@ -77,6 +84,7 @@ interface ProjectFormState {
 
   // 2단계 폼 데이터
   markdown: string
+  markdownImages: MarkdownImageFile[] // 마크다운에 붙여넣은 이미지들
 
   // 3단계 폼 데이터
   supportOptions: SupportOption[]
@@ -138,6 +146,7 @@ const initialState = {
 
   markdown:
     "# 상품 상세 설명\n\n상품에 대한 자세한 설명을 작성해주세요.\n\n## 특징\n\n- 첫 번째 특징\n- 두 번째 특징\n- 세 번째 특징\n\n## 사용 방법\n\n1. 첫 번째 단계\n2. 두 번째 단계\n3. 세 번째 단계\n\n> 참고: 마크다운 문법을 사용하여 작성할 수 있습니다.",
+  markdownImages: [],
 
   supportOptions: [],
   platformPlan: null, // null로 변경
@@ -188,6 +197,16 @@ export const useProjectFormStore = create<ProjectFormState>()((set, get) => ({
         } catch (e) {
           console.error("Failed to revoke object URL:", e)
         }
+      }
+    })
+
+    // 마크다운 이미지 URL 해제
+    const currentMarkdownImages = get().markdownImages
+    currentMarkdownImages.forEach((img) => {
+      try {
+        URL.revokeObjectURL(img.preview)
+      } catch (e) {
+        console.error("Failed to revoke markdown image URL:", e)
       }
     })
 
@@ -379,7 +398,24 @@ export const submitProject = async (
 
     console.log("Submitting project data:", projectData)
 
-    const response = await apiCall("/api/project", "POST", projectData)
+    // FormData 생성
+    const formData = new FormData()
+    formData.append("request", new Blob([JSON.stringify(projectData)], { type: "application/json" }))
+
+    // 마크다운 이미지 파일들 추가
+    state.markdownImages.forEach((markdownImage, index) => {
+      formData.append("markdownFiles", markdownImage.file)
+    })
+
+    // (이미지 파일은 별도 업로드를 이미 했으므로, 여기서는 projectData만 전송)
+    const response = await fetch("https://athena-local.i-am-jay.com/api/project", {
+      method: "POST",
+      body: formData,
+    }).then(async (res) => ({
+      data: await res.json(),
+      error: res.ok ? null : "서버 오류",
+      status: res.status,
+    }))
 
     if (response.error) {
       console.error("Project submission failed:", response.error)

@@ -2,6 +2,7 @@
 import { Check } from "lucide-react"
 import { useProjectFormStore } from "@/stores/useProjectFormStore"
 import type { PlatformPlan } from "@/stores/useProjectFormStore"
+import { OutlineButton } from "@/components/common/Button"
 
 interface PlanFeature {
   text: string
@@ -97,8 +98,8 @@ export default function PlanSelection() {
               <div className="mb-6">
                 <div className="flex items-center justify-between">
                   <h3 className="text-2xl font-bold">{plan.title}</h3>
-                  {plan.type === "PREMIUM" && (
-                    <span className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">실시 필요</span>
+                  {plan.type === "PRO" && (
+                    <span className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">강력 추천!</span>
                   )}
                 </div>
 
@@ -110,7 +111,7 @@ export default function PlanSelection() {
               </div>
 
               {/* 선택 버튼 */}
-              <button
+              <OutlineButton
                 type="button"
                 onClick={() => handleSelectPlan(plan.type)}
                 className={`w-full py-3 px-4 rounded-lg border flex items-center justify-center mb-6 ${
@@ -120,7 +121,7 @@ export default function PlanSelection() {
                 }`}
               >
                 선택하기 {platformPlan === plan.type && <Check className="ml-2 h-5 w-5" />}
-              </button>
+              </OutlineButton>
 
               {/* 기능 목록 */}
               <div className="space-y-3 mt-auto">
