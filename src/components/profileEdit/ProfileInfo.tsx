@@ -31,7 +31,6 @@ interface LoadResponse {
 export default function ProfileInfo() {
     const { isLoading, apiCall } = useApi();
     const userId = useAuthStore(s => s.userId)
-    console.log(userId);
     // 비밀번호 수정 모드
     const [editingPassword, setEditingPassword] = useState(false);
 
@@ -97,15 +96,23 @@ export default function ProfileInfo() {
     }
 
     // 정보 저장
-    const saveData = () => {
-        apiCall("/api/user", "PUT", {
-            nickname: newName,
-            sellerIntroduction: newIntroduction,
-            linkUrl: newUrls ? newUrls.join(",") : ""
-        }).then(({ error }) => {
-            if (!error) {
-                loadData()
-            }
+    const saveData = async () => {
+        const data = {
+            request: {
+                nickname: newName,
+                sellerIntroduction: newIntroduction,
+                linkUrl: newUrls ? newUrls.join(",") : ""
+            },
+            files: profileImage
+        }
+
+        const formData = new FormData()
+        formData.append("request", new Blob([JSON.stringify(data)], { type: "application/json" }))
+        console.log(formData);
+
+        await fetch("https://athena-local.i-am-jay.com/api/user", {
+            method: "PUT",
+            body: formData,
         })
     }
     
@@ -121,7 +128,6 @@ export default function ProfileInfo() {
           }
           reader.readAsDataURL(file)
         }
-        setProfile({...profile, imageUrl: profileImage})
     }
     // 프로필 이미지 삭제 핸들러
     const handleRemoveImage = () => {
@@ -274,12 +280,6 @@ export default function ProfileInfo() {
                             <label htmlFor="profile-image" className="cursor-pointer text-main-color font-medium hover:text-secondary-color-dark">
                                 프로필 사진 {profileImage ? "변경" : "업로드"}
                             </label>
-                            <PrimaryButton
-                                className=""
-                                disabled
-                            >
-                                저장
-                            </PrimaryButton>
                         </div>
                         
                         {/* 이름, 이메일 란 */}
