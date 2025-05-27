@@ -2,61 +2,51 @@
 
 import ProfileHeader from "@/components/profile/ProfileHeader"
 import ProfileContent from "@/components/profile/ProfileContent"
-import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
-import { cn } from "@/lib/utils"
 import { useApi } from "@/hooks/useApi"
-import { useParams } from "next/navigation"
-
-interface UserProfile {
-  id: number
-  email: string
-  nickname: string
-}
+import { redirect, useParams } from "next/navigation"
+import useAuthStore from "@/stores/auth"
+import { UserInfo, UserProfile, UserResponse } from "@/lib/userInterface"
 
 export default function ProfilePage() {
-  const router = useRouter()
+  // URL에서 프로젝트 ID 가져오기
+  const { id } = useParams()
+  const userId = useAuthStore(s => s.userId)
   const { apiCall, isLoading } = useApi()
-  const [isOpenViewTransaction, setIsOpenViewTransaction] = useState(false)
   const [userProfile, setUserProfile] = useState<UserProfile>({
-    id: 9,
     email: "",
-    nickname: "사용자 닉네임", // 기본값
+    nickname: "",
+    imageUrl: ""
+  })
+  const [userInfo, setUserInfo] = useState<UserInfo>({
+    sellerDescription: "",
+    linkUrl: "",
   })
 
-  // URL에서 프로젝트 ID 가져오기
-  const { id: userId } = useParams()
+  if (id && +id === userId) {
+    redirect("/my")
+  }
 
-  // 프로필 데이터 (실제로는 API에서 가져올 데이터)
-  const profileData = {
-    following: "-",
-    purchases: "-",
-    profileImage: "/abstract-profile.png",
+  // 유저 정보 가져오기
+  const loadUserInfo = () => {
+    apiCall<UserResponse>(`/api/user/${id}`, "GET").then(({ data }) => {
+      if (data) {
+        setUserProfile({
+          email: data.email,
+          nickname: data.nickname,
+          imageUrl: data.imageUrl
+        })
+        setUserInfo({
+          sellerDescription: data.sellerDescription,
+          linkUrl: data.linkUrl
+        })
+      }
+    })
   }
 
   useEffect(() => {
-    // 유저 프로필 정보 가져오기
-    const fetchUserProfile = async () => {
-      try {
-        const response = await apiCall(`/api/user/${userId}`, "GET")
-        if (response && response.data) {
-          setUserProfile(response.data as UserProfile)
-        }
-      } catch (error) {
-        console.error("프로필 정보를 가져오는데 실패했습니다.", error)
-      }
-    }
-
-    fetchUserProfile()
+    loadUserInfo();
   }, [])
-
-  const handleClickEditProfile = () => {
-    router.push("/my/edit")
-  }
-
-  const handleClickViewTransaction = () => {
-    setIsOpenViewTransaction(true)
-  }
 
   return (
     <main className="min-h-screen bg-white w-[var(--content-width)]">
@@ -64,25 +54,15 @@ export default function ProfilePage() {
         {/* 프로필 상단 영역 */}
         <ProfileHeader
           nickname={userProfile.nickname}
-          profileImage={profileData.profileImage}
-          buttons={
-            <div className="flex flex-col gap-2">
-              <button
-                className={cn(
-                  "px-8 py-3 rounded-lg border-2 border-main-color text-main-color font-medium text-center transition-colors",
-                  "hover:bg-secondary-color active:bg-secondary-color",
-                  "focus:outline-none focus:ring-2 focus:ring-main-color focus:ring-offset-2",
-                )}
-                onClick={handleClickEditProfile}
-              >
-                프로필 편집
-              </button>
-            </div>
-          }
+          profileImage={userProfile.imageUrl}
         />
 
         {/* 프로필 콘텐츠 영역 */}
-        <ProfileContent isMy={false} />
+        <ProfileContent
+          isMy={false}
+          sellerDescription={userInfo.sellerDescription}
+          linkUrl={userInfo.linkUrl}
+        />
       </div>
     </main>
   )

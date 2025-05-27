@@ -14,7 +14,7 @@ export default function ProfileHeader({ nickname, profileImage, buttons }: Profi
         {/* 프로필 이미지 */}
         <div className="w-36 h-36 rounded-full bg-gray-200 overflow-hidden mr-8 flex-shrink-0">
           <img
-            src={profileImage || "/placeholder.svg"}
+            src={profileImage || "/placeholder/profile-placeholder.png"}
             alt="프로필 이미지"
             className="w-full h-full object-cover"
           />

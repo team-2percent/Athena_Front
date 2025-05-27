@@ -18,11 +18,8 @@ import MenuTab from "../common/MenuTab"
 interface ProfileContentProps {
   isMy?: boolean
   userId?: number
-}
-
-interface UserInfo {
-  sellerIntroduction: string
-  LinkUrl: string
+  sellerDescription: string,
+  linkUrl: string
 }
 
 interface MyProject {
@@ -81,13 +78,10 @@ interface MyReview {
 }
 
 // ProfileContent 함수 선언부 수정
-export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
+export default function ProfileContent({ isMy, userId, sellerDescription, linkUrl }: ProfileContentProps) {
   const { isLoading, apiCall } = useApi()
   const [activeTab, setActiveTab] = useState("소개")
-  const [userInfo, setUserInfo] = useState<UserInfo>({
-    sellerIntroduction: "",
-    LinkUrl: "",
-  })
+  
 
   // 판매 상품 무한 스크롤을 위한 상태
   const [myProjects, setMyProjects] = useState<MyProject[]>([])
@@ -258,21 +252,6 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
     }
   }
 
-  // 유저 정보 가져오기
-  const loadUserInfo = async () => {
-    try {
-      // 자신의 프로필이면 /api/my/info, 다른 사용자의 프로필이면 /api/user/{userId}/info
-      const url = isMy ? "/api/my/info" : `/api/user/${userId}/info`
-      const response = await apiCall(url, "GET")
-      if (response && response.data) {
-        console.log("유저 정보 데이터:", response.data)
-        setUserInfo(response.data as UserInfo)
-      }
-    } catch (error) {
-      console.error("유저 정보를 가져오는데 실패했습니다.", error)
-    }
-  }
-
   const onClickTab = (tab: string) => {
     setActiveTab(tab)
   }
@@ -353,11 +332,6 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
     return () => observer.disconnect()
   }, [isLoadingCoupons, nextCouponId])
 
-  // 컴포넌트 마운트 시 유저 정보 로드
-  useEffect(() => {
-    loadUserInfo()
-  }, [userId, isMy])
-
   // 날짜 포맷 함수
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -397,17 +371,17 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
       <div className="mx-auto max-w-6xl mt-8">
         {activeTab === "소개" && (
           <div className="mb-8">
-            <p className="text-sub-gray mb-8 whitespace-pre-wrap break-words">{userInfo.sellerIntroduction || "소개글이 없습니다."}</p>
+            <p className="text-sub-gray mb-8 whitespace-pre-wrap break-words">{sellerDescription || "소개글이 없습니다."}</p>
 
             {/* 링크 목록 */}
             <div className="flex flex-wrap gap-4">
-              {userInfo.LinkUrl && (
+              {linkUrl && (
                 <Link
-                  href={`https://${userInfo.LinkUrl}`}
+                  href={`https://${linkUrl}`}
                   target="_blank"
                   className="px-6 py-3 border border-main-color text-main-color rounded-full hover:bg-secondary-color transition-colors"
                 >
-                  {userInfo.LinkUrl}
+                  {linkUrl}
                 </Link>
               )}
             </div>
