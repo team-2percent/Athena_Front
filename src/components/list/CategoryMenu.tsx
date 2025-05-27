@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import clsx from "clsx"
 import Spinner from "../common/Spinner"
@@ -10,6 +10,9 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
     const [categories, setCategories] = useState<{id: number, categoryName: string}[]>([])
     const router = useRouter()
     const { isLoading, apiCall } = useApi()
+
+    const containerRef = useRef<HTMLDivElement | null>(null)
+    const itemRefs = useRef<Record<number, HTMLDivElement | null>>({})
 
     const loadCategories = () => {
         apiCall<{id: number, categoryName: string}[]>("/api/category", "GET").then(({data}) => {
@@ -21,6 +24,17 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
         loadCategories()
     }, []);
 
+    useEffect(() => {
+        const target = itemRefs.current[categoryId]
+        const container = containerRef.current
+        if (target && container) {
+            const containerRect = container.getBoundingClientRect()
+            const targetRect = target.getBoundingClientRect()
+            const scrollLeft = container.scrollLeft + (targetRect.left - containerRect.left) - 16 // 16px 여유
+            container.scrollTo({ left: scrollLeft, behavior: "smooth" })
+        }
+    }, [categories, categoryId])
+
     const handleCategoryClick = (id: number) => {
         if (id === 0) router.push("/category")
         else router.push(`/category/${id}`)
@@ -31,10 +45,16 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
         {isLoading ?
             <Spinner message="카테고리를 불러오는 중입니다..." />
         : (
-        <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-4 justify-items-center">
+        <div
+            className="flex overflow-x-auto gap-4 justify-items-center [&::-webkit-scrollbar]:hidden"
+            ref={containerRef}
+        >
             <div
                 key={0}
-                className={clsx("w-full flex flex-col items-center cursor-pointer p-3 border-b-2 border-gray-border rounded-lg rounded-lg w-23 hover:bg-gray-50", categoryId === 0 && "bg-secondary-color border-main-color")}
+                ref={(el: HTMLDivElement | null) => {
+                    itemRefs.current[0] = el
+                }}
+                className={clsx("flex flex-col whitespace-nowrap items-center cursor-pointer p-3 border-b-2 border-gray-border rounded-lg rounded-lg w-20 min-w-20 hover:bg-gray-50", categoryId === 0 && "bg-secondary-color border-main-color")}
                 onClick={() => handleCategoryClick(0)}
             >
                 <span className={clsx("text-sm text-center text-gray-500", categoryId === 0 && "text-main-color")}>
@@ -44,7 +64,10 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
             {categories.map((category) => (
                 <div
                 key={category.id}
-                className={clsx("w-full flex flex-col items-center cursor-pointer p-3 border-b-2 border-gray-border rounded-lg w-23 hover:bg-gray-50", categoryId === category.id && "bg-secondary-color border-main-color")}
+                ref={(el: HTMLDivElement | null) => {
+                    itemRefs.current[category.id] = el
+                }}
+                className={clsx("flex flex-col whitespace-nowrap items-center cursor-pointer p-3 border-b-2 border-gray-border rounded-lg w-20 min-w-20 hover:bg-gray-50", categoryId === category.id && "bg-secondary-color border-main-color")}
                 onClick={() => handleCategoryClick(category.id)}
             >
                 {/* <div
