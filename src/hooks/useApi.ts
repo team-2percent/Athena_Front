@@ -18,7 +18,7 @@ export function useApi() {
     async <T>(
       url: string,
       method: string,
-      body: object | null = null
+      body: FormData | object | null = null
     ): Promise<ApiResponse<T>> => {
       setIsLoading(true);
       try {
@@ -32,7 +32,7 @@ export function useApi() {
               "Content-Type": "application/json",
               ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
-            ...(body ? { body: JSON.stringify(body) } : {}),
+            ...(body ? (body instanceof FormData ? { body: body } : { body: JSON.stringify(body) }) : {}),
           });
 
           if (response.status === 204) {

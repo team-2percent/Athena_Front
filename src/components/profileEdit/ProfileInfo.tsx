@@ -110,10 +110,15 @@ export default function ProfileInfo() {
         formData.append("request", new Blob([JSON.stringify(data)], { type: "application/json" }))
         console.log(formData);
 
-        await fetch("https://athena-local.i-am-jay.com/api/user", {
-            method: "PUT",
-            body: formData,
+        apiCall("/api/user", "PUT", formData).then(({ error }) => {
+            console.log(error);
         })
+
+        // await fetch("https://athena-local.i-am-jay.com/api/user", {
+        //     method: "PUT",
+        //     body: formData,
+        //     headers: {Authorization: `Bearer ${localStorage.getItem('accessToken')}`}
+        // })
     }
     
     // 프로필 이미지 업로드 핸들러
