@@ -7,21 +7,21 @@ import StepOneForm from "@/components/projectRegister/StepOneForm"
 import StepTwoForm from "@/components/projectRegister/StepTwoForm"
 import StepThreeForm from "@/components/projectRegister/StepThreeForm"
 import { useRouter, usePathname } from "next/navigation"
-import { useProjectFormStore } from "@/stores/useProjectFormStore"
+import { useProjectFormStore, type Category } from "@/stores/useProjectFormStore"
 import Spinner from "@/components/common/Spinner"
 import { useApi } from "@/hooks/useApi"
-import { useImageUpload } from "@/hooks/useImageUpload"
 import AlertModal from "@/components/common/AlertModal"
+import useAuthStore from "@/stores/auth"
 
 export default function ProductEdit() {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
   const pathname = usePathname()
   const { apiCall } = useApi()
-  const { uploadImages } = useImageUpload()
 
   const [alertMessage, setAlertMessage] = useState("")
   const [isAlertOpen, setIsAlertOpen] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
 
   // Zustand 스토어에서 상태와 액션 가져오기
   const { currentStep, setCurrentStep, updateFormData, resetForm, setLoading, setProjectId } = useProjectFormStore()
@@ -36,6 +36,24 @@ export default function ProductEdit() {
     return utcDate.toISOString()
   }
 
+  // 카테고리 목록 가져오기
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await apiCall<Category[]>("/api/category", "GET")
+        if (response.data) {
+          setCategories(response.data)
+        } else {
+          console.error("카테고리 목록을 가져오는데 실패했습니다:", response.error)
+        }
+      } catch (error) {
+        console.error("카테고리 API 호출 중 오류 발생:", error)
+      }
+    }
+
+    fetchCategories()
+  }, [apiCall])
+
   // 데이터 로드 (실제로는 API 호출)
   useEffect(() => {
     const loadProjectData = async () => {
@@ -48,6 +66,11 @@ export default function ProductEdit() {
         if (!id) {
           console.error("프로젝트 ID를 찾을 수 없습니다.")
           setIsLoading(false)
+          return
+        }
+
+        // 카테고리 목록이 로드될 때까지 대기
+        if (categories.length === 0) {
           return
         }
 
@@ -96,11 +119,36 @@ export default function ProductEdit() {
             })),
           })) || []
 
+        // 카테고리 처리 - 카테고리 이름으로 ID 찾기
+        let categoryName = ""
+        let categoryId = null
+
+        if (data.category) {
+          if (typeof data.category === "string") {
+            // 카테고리가 문자열로 제공되는 경우
+            categoryName = data.category
+            const foundCategory = categories.find((cat) => cat.categoryName === data.category)
+            categoryId = foundCategory?.id || null
+          } else if (data.category.categoryName) {
+            // 카테고리가 객체로 제공되는 경우
+            categoryName = data.category.categoryName
+            categoryId = data.category.id || null
+
+            // ID가 없는 경우 이름으로 찾기
+            if (!categoryId) {
+              const foundCategory = categories.find((cat) => cat.categoryName === data.category.categoryName)
+              categoryId = foundCategory?.id || null
+            }
+          }
+        }
+
+        console.log("카테고리 처리 결과:", { categoryName, categoryId, originalCategory: data.category })
+
         // 폼 데이터 업데이트
         updateFormData({
           targetAmount: data.goalAmount?.toString() || "",
-          category: data.category?.categoryName || "",
-          categoryId: data.category?.id || null,
+          category: categoryName,
+          categoryId: categoryId,
           title: data.title || "",
           description: data.description || "",
           startDate: data.startAt ? new Date(data.startAt) : null,
@@ -128,7 +176,7 @@ export default function ProductEdit() {
         resetForm()
       }
     }
-  }, [updateFormData, setProjectId, pathname, resetForm, apiCall])
+  }, [updateFormData, setProjectId, pathname, resetForm, apiCall, categories])
 
   // 단계가 변경될 때 화면 맨 위로 스크롤
   useEffect(() => {
@@ -162,7 +210,7 @@ export default function ProductEdit() {
   // 수정 완료 처리
   const handleSubmit = async () => {
     // 상품 수정 로직 구현 (API 호출)
-    const success = await submitProject(apiCall, uploadImages)
+    const success = await submitProjectEdit()
 
     if (success) {
       setAlertMessage("상품이 성공적으로 수정되었습니다.")
@@ -181,32 +229,24 @@ export default function ProductEdit() {
     }
   }
 
-  // 프로젝트 제출 함수
-  const submitProject = async (
-    apiCall: <T>(url: string, method: string, body?: any) => Promise<any>,
-    uploadImages: (imageGroupId: number, files: File[]) => Promise<any>,
-  ) => {
+  // 프로젝트 수정 함수 - 등록과 동일한 방식으로 변경
+  const submitProjectEdit = async () => {
     const state = useProjectFormStore.getState()
+    const userId = useAuthStore.getState().userId
     setLoading(true)
 
     try {
-      // 이미지 처리 - 기존 이미지(URL)와 새 이미지(File)를 함께 처리
-      const imageData = state.images
-        .map((img) => {
-          // 기존 이미지는 URL을 그대로 전송
-          if (img.url) {
-            return { url: img.url }
-          }
-          // 새 이미지는 File 객체 전송
-          else if (img.file) {
-            return { file: img.file }
-          }
-          return null
-        })
-        .filter(Boolean)
+      if (!state.projectId) {
+        setAlertMessage("프로젝트 ID가 없습니다.")
+        setIsAlertOpen(true)
+        setLoading(false)
+        return false
+      }
 
       // 프로젝트 데이터 준비
       const projectData = {
+        categoryId: state.categoryId || 0,
+        bankAccountId: state.bankAccountId || 0,
         title: state.title,
         description: state.description,
         goalAmount: Number.parseInt(state.targetAmount.replace(/,/g, ""), 10),
@@ -214,11 +254,7 @@ export default function ProductEdit() {
         startAt: toUTCDateString(state.startDate),
         endAt: toUTCDateString(state.endDate),
         shippedAt: toUTCDateString(state.deliveryDate),
-        categoryId: state.categoryId,
-        bankAccountId: state.bankAccountId || 0, // 선택한 계좌 ID 사용
-        images: imageData, // URL과 File 객체 모두 포함
         products: state.supportOptions.map((option) => ({
-          id: option.id, // 기존 옵션의 ID 포함
           name: option.name,
           description: option.description,
           price: Number.parseInt(option.price.replace(/,/g, ""), 10),
@@ -229,8 +265,31 @@ export default function ProductEdit() {
 
       console.log("프로젝트 수정 데이터:", projectData)
 
-      // 실제 API 호출
-      const response = await apiCall(`/api/project/${state.projectId}`, "PUT", projectData)
+      // FormData 생성
+      const formData = new FormData()
+      formData.append("request", new Blob([JSON.stringify(projectData)], { type: "application/json" }))
+
+      // 대표 이미지 파일들 추가 (File 객체만)
+      state.images.forEach((image) => {
+        if (image.file) {
+          formData.append("files", image.file)
+        }
+      })
+
+      // 마크다운 이미지 파일들 추가
+      state.markdownImages.forEach((markdownImage) => {
+        formData.append("markdownFiles", markdownImage.file)
+      })
+
+      // 프로젝트 수정 API 호출
+      const response = await fetch(`https://athena-local.i-am-jay.com/api/project/${state.projectId}`, {
+        method: "PUT",
+        body: formData,
+      }).then(async (res) => ({
+        data: await res.json(),
+        error: res.ok ? null : "서버 오류",
+        status: res.status,
+      }))
 
       if (response.error) {
         console.error("프로젝트 수정 실패:", response.error)
@@ -240,6 +299,7 @@ export default function ProductEdit() {
         return false
       }
 
+      console.log("프로젝트 수정 응답:", response.data)
       setLoading(false)
       return true
     } catch (error) {
