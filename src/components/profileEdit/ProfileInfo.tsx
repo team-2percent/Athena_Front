@@ -1,9 +1,8 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Camera, Check, Pencil, Plus, X } from "lucide-react"
+import { Camera, Check, Plus, X } from "lucide-react"
 import PasswordInput from "../common/PasswordInput"
-import clsx from "clsx"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
 import { CancelButton, PrimaryButton } from "../common/Button"
@@ -128,8 +127,9 @@ export default function ProfileInfo() {
     // 프로필 이미지 삭제 핸들러
     const handleRemoveImage = () => {
         setProfileImage(null)
+        setProfileImageFile(null)
         if (fileInputRef.current) {
-        fileInputRef.current.value = ""
+            fileInputRef.current.value = ""
         }
     }
     
@@ -242,28 +242,24 @@ export default function ProfileInfo() {
                     <div className="flex gap-5 flex-wrap justify-center">
                         {/* 프로필 이미지 섹션 */}
                         <div className="flex flex-col items-center bg-white rounded-lg shadow py-6 px-10 space-y-4">
-                            <h3 className="text-lg font-medium">프로필 이미지</h3>
-                            <div className="relative w-32 h-32 overflow-hidden rounded-full mb-4">
-                                {profileImage ? (
-                                <>
+                            <h3 className="text-lg font-medium">프로필 이미지</h3>                            
+                            <div className="relative w-fit">
+                                <button className="bg-red-500 p-1 rounded-full absolute top-0 right-0">
+                                    <X className="h-3 w-3 text-white" onClick={handleRemoveImage} />
+                                </button>
+                                <div className="relative w-32 h-32 overflow-hidden rounded-full mb-4">
+                                    {profileImage ? (
                                     <img
                                     src={profileImage || "/placeholder.svg"}
                                     alt="프로필 이미지"
                                     className="w-full h-full object-cover"
                                     />
-                                    <button
-                                    type="button"
-                                    onClick={handleRemoveImage}
-                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
-                                    >
-                                    <X className="w-4 h-4" />
-                                    </button>
-                                </>
-                                ) : (
-                                <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
-                                    <Camera className="w-10 h-10 text-sub-gray" />
+                                    ) : (
+                                    <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
+                                        <Camera className="w-10 h-10 text-sub-gray" />
+                                    </div>
+                                    )}
                                 </div>
-                                )}
                             </div>
                             <input
                                 type="file"
