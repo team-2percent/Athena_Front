@@ -27,7 +27,7 @@ export function useImageUpload() {
 
       const accessToken = localStorage.getItem("accessToken")
 
-      const response = await fetch("https://athena.i-am-jay.com/api/image", {
+      const response = await fetch("https://athena-local.i-am-jay.com/api/image", {
         method: "POST",
         headers: {
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
@@ -35,8 +35,7 @@ export function useImageUpload() {
         body: formData,
       })
 
-      const responseData = await response.json()
-
+      // 응답 상태 코드만 확인하고 데이터는 파싱하지 않음
       if (!response.ok) {
         if (response.status === 401) {
           // 인증 실패 시 에러 반환
@@ -47,17 +46,26 @@ export function useImageUpload() {
           }
         }
 
+        let errorMessage = "Image upload failed"
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorMessage
+        } catch (e) {
+          // JSON 파싱 실패 시 기본 에러 메시지 사용
+        }
+
         return {
           success: false,
-          error: responseData.message || "Image upload failed",
-          data: responseData,
+          error: errorMessage,
+          data: null,
         }
       }
 
+      // 성공 시 응답 데이터 없이 성공 상태만 반환
       return {
         success: true,
         error: null,
-        data: responseData,
+        data: { imageGroupId }, // 업로드에 사용된 imageGroupId만 반환
       }
     } catch (error) {
       console.error("Image upload error:", error)

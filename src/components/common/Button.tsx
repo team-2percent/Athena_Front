@@ -9,6 +9,7 @@ export type ButtonVariant =
   | "primary-disabled"
   | "secondary-disabled"
   | "outline"
+  | "danger"
   | "ghost"
 
 // 버튼 크기(size) 타입 정의
@@ -54,11 +55,12 @@ export const Button = ({
   const variantClasses = {
     primary: "bg-primary hover:bg-primary-hover text-white border-transparent",
     secondary: "box-border bg-secondary border border-secondary-foreground text-secondary-foreground hover:bg-secondary-hover",
-    cancel: "bg-error hover:bg-error-hover text-white border-transparent",
+    cancel: "bg-error hover:bg-error-hover/50 text-white border-transparent",
     "primary-disabled": "bg-primary-disabled text-primary-disabled-foreground cursor-not-allowed border-transparent",
     "secondary-disabled": "bg-secondary-disabled text-secondary-disabled-foreground cursor-not-allowed border-transparent",
     outline: "bg-transparent hover:bg-background text-text border-border",
     ghost: "bg-transparent hover:bg-background text-text border-transparent",
+    danger: "bg-red-500 text-white hover:bg-red-600",
   }
 
   // size에 따른 스타일 클래스
@@ -76,7 +78,7 @@ export const Button = ({
 
   // 최종 클래스 이름 생성
   const buttonClasses = cn(
-    "font-medium border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary",
+    "font-medium border transition-colors duration-200",
     variantClasses[finalVariant as keyof typeof variantClasses],
     sizeClasses[size],
     widthClasses[width],
@@ -131,6 +133,11 @@ export const OutlineButton = (props: Omit<ButtonProps, "variant">) => {
 // Ghost 버튼
 export const GhostButton = (props: Omit<ButtonProps, "variant">) => {
   return <Button variant="ghost" {...props} />
+}
+
+// Danger 버튼
+export const DangerButton = (props: Omit<ButtonProps, "variant">) => {
+  return <Button variant="danger" {...props} />
 }
 
 // Primary Disabled 버튼

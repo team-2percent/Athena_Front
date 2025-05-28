@@ -100,7 +100,7 @@ const CircularProgress = ({
 export default function RegisterHeader({
   currentStep = 1,
   onStepChange,
-  title = "상품 입력하기",
+  title = "프로젝트 입력하기",
 }: RegisterHeaderProps) {
   // Zustand 스토어에서 폼 데이터 가져오기
   const formData = useProjectFormStore()

@@ -1,12 +1,14 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Share2, ChevronLeft, ChevronRight } from "lucide-react"
+import { Share2, ChevronLeft, ChevronRight, X, Copy, Check } from "lucide-react"
 import ProjectTabs from "./ProjectTabs"
 
 // 상단에 useApi 훅 import 추가
 import { useApi } from "@/hooks/useApi"
 import { useParams } from "next/navigation"
+
+import { OutlineButton, PrimaryButton } from "../common/Button"
 
 // ProjectData 인터페이스 추가
 interface ProjectData {
@@ -50,6 +52,20 @@ const ProjectDetail = () => {
 
   // URL에서 프로젝트 ID 가져오기
   const { id: projectId } = useParams()
+
+  // 후원 가능 여부 확인 함수
+  const canDonate = (projectData: ProjectData | null): boolean => {
+    if (!projectData?.productResponses || projectData.productResponses.length === 0) {
+      return false
+    }
+
+    // 모든 상품의 재고가 0인지 확인
+    const hasAvailableStock = projectData.productResponses.some((product) => product.stock > 0)
+    return hasAvailableStock
+  }
+
+  const [showSharePopover, setShowSharePopover] = useState(false)
+  const [copySuccess, setCopySuccess] = useState(false)
 
   // 프로젝트 데이터 가져오기
   useEffect(() => {
@@ -155,6 +171,51 @@ const ProjectDetail = () => {
     if (!goal || goal === 0) return 0
     return Math.floor((current / goal) * 100)
   }
+
+  // URL 복사 함수
+  const copyToClipboard = async () => {
+    try {
+      const currentUrl = window.location.href
+      await navigator.clipboard.writeText(currentUrl)
+      setCopySuccess(true)
+      setTimeout(() => {
+        setCopySuccess(false)
+        setShowSharePopover(false)
+      }, 2000)
+    } catch (err) {
+      console.error("URL 복사 실패:", err)
+      // fallback for older browsers
+      const textArea = document.createElement("textarea")
+      textArea.value = window.location.href
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand("copy")
+      document.body.removeChild(textArea)
+      setCopySuccess(true)
+      setTimeout(() => {
+        setCopySuccess(false)
+        setShowSharePopover(false)
+      }, 2000)
+    }
+  }
+
+  // 팝오버 외부 클릭 시 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element
+      if (showSharePopover && !target.closest(".relative")) {
+        setShowSharePopover(false)
+      }
+    }
+
+    if (showSharePopover) {
+      document.addEventListener("mousedown", handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [showSharePopover])
 
   return (
     <div className="mx-auto max-w-6xl pb-20">
@@ -277,16 +338,18 @@ const ProjectDetail = () => {
                 <div className="flex items-baseline">
                   {!projectData?.endAt ? (
                     <span className="text-5xl font-bold text-main-color">알 수 없음</span>
-                  ) : (() => {
-                    const daysLeft = calculateDaysLeft(projectData.endAt)
-                    if (daysLeft > 0) {
-                      return <span className="text-5xl font-bold text-main-color">{daysLeft}일</span>
-                    } else if (daysLeft === 0) {
-                      return <span className="text-5xl font-bold text-main-color">마감임박!</span>
-                    } else {
-                      return <span className="text-5xl font-bold text-main-color">펀딩 종료</span>
-                    }
-                  })()}
+                  ) : (
+                    (() => {
+                      const daysLeft = calculateDaysLeft(projectData.endAt)
+                      if (daysLeft > 0) {
+                        return <span className="text-5xl font-bold text-main-color">{daysLeft}일</span>
+                      } else if (daysLeft === 0) {
+                        return <span className="text-5xl font-bold text-main-color">마감임박!</span>
+                      } else {
+                        return <span className="text-5xl font-bold text-main-color">펀딩 종료</span>
+                      }
+                    })()
+                  )}
                   <span className="ml-2 text-xl text-sub-gray">/ {formatDate(projectData?.endAt || "")}</span>
                 </div>
               </div>
@@ -294,21 +357,71 @@ const ProjectDetail = () => {
 
             {/* 공유하기, 후원하기 버튼 영역 */}
             <div className="mt-8 flex items-center justify-end space-x-4">
-              <button className="w-1/3 flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white py-4 text-xl text-gray-700 hover:bg-gray-50">
-                <Share2 className="h-6 w-6"/>
-                공유하기
-              </button>
+              {/* 공유하기 버튼을 relative 컨테이너로 감싸기 */}
+              <div className="relative w-1/3">
+                <OutlineButton
+                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white py-4 text-xl text-gray-700 hover:bg-gray-50"
+                  onClick={() => setShowSharePopover(!showSharePopover)}
+                >
+                  <Share2 className="h-6 w-6" />
+                  공유하기
+                </OutlineButton>
 
-              {/* 후원하기 버튼 */}
-              <button
-                className="w-2/3 rounded-xl bg-main-color px-8 py-4 text-center text-xl font-bold text-white hover:bg-secondary-color-dark"
-                onClick={() => {
-                  const event = new CustomEvent("toggleDonateDock")
-                  window.dispatchEvent(event)
-                }}
-              >
-                후원하기
-              </button>
+                {/* 공유하기 팝오버 - 버튼 바로 아래에 위치 */}
+                {showSharePopover && (
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-10">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-medium text-gray-900">프로젝트 공유하기</h3>
+                      <button onClick={() => setShowSharePopover(false)} className="text-gray-400 hover:text-gray-600">
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 p-2 bg-gray-50 rounded border text-sm text-gray-600">
+                        <span className="flex-1 truncate">
+                          {typeof window !== "undefined" ? window.location.href : ""}
+                        </span>
+                      </div>
+
+                      <button
+                        onClick={copyToClipboard}
+                        className="w-full flex items-center justify-center gap-2 bg-main-color text-white py-2 px-4 rounded-lg hover:bg-secondary-color-dark transition-colors"
+                        disabled={copySuccess}
+                      >
+                        {copySuccess ? (
+                          <>
+                            <Check className="h-4 w-4" />
+                            복사 완료!
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-4 w-4" />
+                            URL 복사하기
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* 후원하기 버튼 - 상품이 없거나 모든 재고가 0이면 비활성화 */}
+              {canDonate(projectData) ? (
+                <PrimaryButton
+                  className="w-2/3 rounded-xl bg-main-color px-8 py-4 text-center text-xl font-bold text-white hover:bg-secondary-color-dark"
+                  onClick={() => {
+                    const event = new CustomEvent("toggleDonateDock")
+                    window.dispatchEvent(event)
+                  }}
+                >
+                  후원하기
+                </PrimaryButton>
+              ) : (
+                <div className="w-2/3 rounded-xl bg-gray-300 px-8 py-4 text-center text-xl font-bold text-gray-500 cursor-not-allowed">
+                  후원 불가
+                </div>
+              )}
             </div>
           </div>
         </div>

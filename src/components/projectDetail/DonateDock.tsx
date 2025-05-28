@@ -10,13 +10,13 @@ import { useApi } from "@/hooks/useApi"
 
 // 1. 상단에 AlertModal import 추가
 import AlertModal from "../common/AlertModal"
+import { CancelButton, PrimaryButton, SecondaryButton } from "../common/Button"
 
 interface AddressInfo {
   id: string
-  name: string
   address: string
   detailAddress: string
-  zipCode: string
+  zipcode: string
   isDefault: boolean
 }
 
@@ -121,14 +121,14 @@ const DonateDock = () => {
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
 
   // 상태 관리 부분에 팝오버 관련 상태 추가
-  const [showAddressPopover, setShowAddressPopover] = useState(false)
+  const [showAddressAddModal, setShowAddressAddModal] = useState(false)
 
   // 주문 요약 더보기 팝오버 상태 추가
   const [showOrderSummaryPopover, setShowOrderSummaryPopover] = useState(false)
   const [orderSummaryPopoverPosition, setOrderSummaryPopoverPosition] = useState({ top: 0, left: 0 })
 
   // 팝오버 위치 계산을 위한 상태
-  const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 })
+  // const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 })
 
   // 결제 관련 상태 추가
   const [isProcessingPayment, setIsProcessingPayment] = useState(false)
@@ -140,10 +140,9 @@ const DonateDock = () => {
 
   // 새 배송지 정보를 객체로 관리
   const [newAddress, setNewAddress] = useState<Omit<AddressInfo, "id" | "isDefault">>({
-    name: "",
     address: "",
     detailAddress: "",
-    zipCode: "",
+    zipcode: "",
   })
 
   // API 관련 상태 추가
@@ -155,6 +154,17 @@ const DonateDock = () => {
 
   // URL에서 프로젝트 ID 가져오기
   const { id: projectId } = useParams()
+
+  // 후원 가능 여부 확인 함수
+  const canDonate = (projectData: ProjectData | null): boolean => {
+    if (!projectData?.productResponses || projectData.productResponses.length === 0) {
+      return false
+    }
+
+    // 모든 상품의 재고가 0인지 확인
+    const hasAvailableStock = projectData.productResponses.some((product) => product.stock > 0)
+    return hasAvailableStock
+  }
 
   // 프로젝트 데이터 가져오기
   useEffect(() => {
@@ -224,56 +234,38 @@ const DonateDock = () => {
   ]
 
   // 배송지 데이터 - 더 많은 데이터 추가
-  const [addresses, setAddresses] = useState<AddressInfo[]>([
-    {
-      id: "1",
-      name: "집",
-      address: "서울시 강남구 테헤란로 123",
-      detailAddress: "101호",
-      zipCode: "06133",
-      isDefault: true,
-    },
-    {
-      id: "2",
-      name: "회사",
-      address: "서울시 서초구 서초대로 456",
-      detailAddress: "20층",
-      zipCode: "06611",
-      isDefault: false,
-    },
-    {
-      id: "3",
-      name: "부모님",
-      address: "경기도 고양시 일산동구 중앙로 789",
-      detailAddress: "3층",
-      zipCode: "10401",
-      isDefault: false,
-    },
-    {
-      id: "4",
-      name: "친구집",
-      address: "서울시 마포구 홍대입구로 101",
-      detailAddress: "502호",
-      zipCode: "04066",
-      isDefault: false,
-    },
-    {
-      id: "5",
-      name: "별장",
-      address: "강원도 평창군 대관령면 올림픽로 555",
-      detailAddress: "별채",
-      zipCode: "25342",
-      isDefault: false,
-    },
-    {
-      id: "6",
-      name: "투자사무실",
-      address: "서울시 영등포구 여의도동 63로 50",
-      detailAddress: "15층",
-      zipCode: "07345",
-      isDefault: false,
-    },
-  ])
+  const [addresses, setAddresses] = useState<AddressInfo[]>([])
+
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      try {
+        const { data, error } = await apiCall<AddressInfo[]>("/api/delivery/delivery-info", "GET")
+
+        if (error) {
+          console.error("배송지 정보 불러오기 오류:", error)
+          return
+        }
+
+        if (data) {
+          setAddresses(data)
+          // 기본 배송지가 있으면 선택
+          const defaultAddress = data.find((addr) => addr.isDefault)
+          if (defaultAddress) {
+            setSelectedAddress(defaultAddress.id)
+          } else if (data.length > 0) {
+            // 기본 배송지가 없으면 첫 번째 배송지 선택
+            setSelectedAddress(data[0].id)
+          }
+        }
+      } catch (err) {
+        console.error("배송지 정보 불러오기 오류:", err)
+      }
+    }
+
+    if (isOpen && step === 2) {
+      fetchAddresses()
+    }
+  }, [isOpen, step, apiCall, setSelectedAddress])
 
   // useEffect 훅에서 스크롤 방지 로직 추가
   useEffect(() => {
@@ -331,10 +323,10 @@ const DonateDock = () => {
   // 팝오버 외부 클릭 시 닫기
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (showAddressPopover) {
+      if (showAddressAddModal) {
         const popoverElement = document.getElementById("address-popover")
         if (popoverElement && !popoverElement.contains(event.target as Node)) {
-          setShowAddressPopover(false)
+          setShowAddressAddModal(false)
         }
       }
 
@@ -350,7 +342,7 @@ const DonateDock = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [showAddressPopover, showOrderSummaryPopover])
+  }, [showAddressAddModal, showOrderSummaryPopover])
 
   // 선택된 상품의 남은 수량 가져오기
   const getProductRemaining = (optionId: string): number => {
@@ -437,25 +429,15 @@ const DonateDock = () => {
     })
   }
 
-  const addNewAddress = (e: React.MouseEvent) => {
-    // 클릭한 버튼의 위치 정보 가져오기
-    const buttonRect = e.currentTarget.getBoundingClientRect()
-
-    // 팝오버 위치 계산 (버튼 왼쪽, 상단 정렬)
-    setPopoverPosition({
-      top: buttonRect.top,
-      left: buttonRect.left - 320, // 팝오버 너비(300px) + 여백(20px)
-    })
-
-    // 팝오버 표시
-    setShowAddressPopover(true)
+  const addNewAddress = () => {
+    // 모달 표시
+    setShowAddressAddModal(true)
 
     // 입력 필드 초기화
     setNewAddress({
-      name: "",
       address: "",
       detailAddress: "",
-      zipCode: "",
+      zipcode: "",
     })
   }
 
@@ -484,7 +466,7 @@ const DonateDock = () => {
     setNewAddress({
       ...newAddress,
       address: data.address,
-      zipCode: data.zonecode,
+      zipcode: data.zonecode,
     })
     setIsAddressModalOpen(false)
   }
@@ -492,27 +474,38 @@ const DonateDock = () => {
   // 새 배송지 저장 함수
   const saveNewAddress = () => {
     // 필수 입력값 검증
-    if (!newAddress.name || !newAddress.address || !newAddress.detailAddress) {
-      // 3. 새 배송지 저장 함수의 alert 호출 부분 수정
-      setAlertMessage("배송지명, 주소, 상세 주소를 모두 입력해주세요.")
+    if (!newAddress.address || !newAddress.detailAddress) {
+      setAlertMessage("주소와 상세 주소를 모두 입력해주세요.")
       setIsAlertOpen(true)
       return
     }
 
-    // 새 배송지 추가
-    const addressToAdd = {
-      id: Date.now().toString(),
-      ...newAddress,
-      isDefault: addresses.length === 0,
-    }
+    // 새 배송지 추가 API 호출
+    apiCall("/api/delivery/delivery-info", "POST", {
+      zipcode: newAddress.zipcode,
+      address: newAddress.address,
+      detailAddress: newAddress.detailAddress,
+    }).then(({ data, error }) => {
+      if (error) {
+        setAlertMessage("배송지 추가에 실패했습니다.")
+        setIsAlertOpen(true)
+        return
+      }
 
-    setAddresses([...addresses, addressToAdd])
+      // 배송지 목록 다시 불러오기
+      apiCall<AddressInfo[]>("/api/delivery/delivery-info", "GET").then(({ data }) => {
+        if (data) {
+          setAddresses(data)
+          // 새로 추가된 배송지가 있으면 선택
+          if (data.length > 0) {
+            setSelectedAddress(data[data.length - 1].id)
+          }
+        }
+      })
 
-    // 새로 추가된 배송지 선택
-    setSelectedAddress(addressToAdd.id)
-
-    // 팝오버 닫기
-    setShowAddressPopover(false)
+      // 팝오버 닫기
+      setShowAddressAddModal(false)
+    })
   }
 
   // 배송지 추가 모달 열기 핸들러
@@ -761,19 +754,21 @@ const DonateDock = () => {
   return (
     <>
       <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={() => setIsAlertOpen(false)} />
-      {/* 고정된 후원하기 버튼 */}
-      <div className="fixed bottom-0 left-0 z-20 w-full">
-        <div className="mx-auto max-w-6xl px-4">
-          <button
-            onClick={toggleDock}
-            className="mx-auto flex w-40 items-center justify-center rounded-t-xl bg-white py-3 shadow-lg"
-            aria-label="후원하기"
-          >
-            <ChevronUp className="mr-2 h-6 w-6 text-sub-gray" />
-            <span className="text-lg font-medium text-gray-800">후원하기</span>
-          </button>
+      {/* 고정된 후원하기 버튼 - 상품이 있고 재고가 있을 때만 표시 */}
+      {canDonate(projectData) && (
+        <div className="fixed bottom-0 left-0 z-20 w-full">
+          <div className="mx-auto max-w-6xl px-4">
+            <button
+              onClick={toggleDock}
+              className="mx-auto flex w-40 items-center justify-center rounded-t-xl bg-white py-3 shadow-lg"
+              aria-label="후원하기"
+            >
+              <ChevronUp className="mr-2 h-6 w-6 text-sub-gray" />
+              <span className="text-lg font-medium text-gray-800">후원하기</span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 독이 열려있을 때만 오버레이 표시 */}
       {isOpen && <div className="fixed inset-0 z-25" onClick={handleOverlayClick} aria-hidden="true" />}
@@ -987,7 +982,7 @@ const DonateDock = () => {
                     {/* 다음 단계 버튼 */}
                     <div className="mt-8 bg-white pb-8">
                       <div className="flex justify-end">
-                        <button
+                        <PrimaryButton
                           className={`rounded-xl px-8 py-3 font-medium ${
                             selectedOptions.length > 0
                               ? "bg-main-color text-white hover:bg-secondary-color-dark"
@@ -997,7 +992,7 @@ const DonateDock = () => {
                           disabled={selectedOptions.length === 0}
                         >
                           다음 단계
-                        </button>
+                        </PrimaryButton>
                       </div>
                     </div>
                   </div>
@@ -1037,7 +1032,7 @@ const DonateDock = () => {
                             >
                               <div className="flex items-center justify-between mb-2 overflow-hidden">
                                 <h4 className="font-bold line-clamp-1 whitespace-pre-wrap break-words">
-                                  {address.name}
+                                  {address.zipcode}
                                 </h4>
                                 {address.isDefault && (
                                   <span className="text-xs bg-gray-100 text-sub-gray px-2 py-1 rounded-full">
@@ -1047,7 +1042,7 @@ const DonateDock = () => {
                               </div>
                               <div className="overflow-hidden">
                                 <p className="line-clamp-2 text-sub-gray whitespace-pre-wrap break-words">
-                                  [{address.zipCode}] {address.address} {address.detailAddress}
+                                  {address.address} {address.detailAddress}
                                 </p>
                               </div>
                             </div>
@@ -1056,10 +1051,7 @@ const DonateDock = () => {
                           {/* 배송지 추가 버튼 */}
                           <div
                             className="flex-shrink-0 w-60 border border-dashed border-gray-border rounded-xl p-4 flex items-center justify-center cursor-pointer hover:bg-gray-50 relative"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              addNewAddress(e)
-                            }}
+                            onClick={() => addNewAddress()}
                           >
                             <div className="flex flex-col items-center text-sub-gray">
                               <Plus className="w-10 h-10 mb-2" />
@@ -1116,7 +1108,7 @@ const DonateDock = () => {
                     <div className="mt-8 bg-white pb-8">
                       {/* 버튼 영역 */}
                       <div className="flex justify-end space-x-4">
-                        <button
+                        <PrimaryButton
                           className={`rounded-xl bg-main-color px-8 py-3 font-medium text-white hover:bg-secondary-color-dark ${
                             isProcessingPayment ? "opacity-70 cursor-not-allowed" : ""
                           }`}
@@ -1124,14 +1116,14 @@ const DonateDock = () => {
                           disabled={isProcessingPayment}
                         >
                           {isProcessingPayment ? "처리 중..." : "후원하기"}
-                        </button>
-                        <button
+                        </PrimaryButton>
+                        <CancelButton
                           className="rounded-xl bg-cancel-background px-8 py-3 font-medium text-white hover:bg-cancel-background-dark"
                           onClick={goToPreviousStep}
                           disabled={isProcessingPayment}
                         >
                           이전
-                        </button>
+                        </CancelButton>
                       </div>
                     </div>
                   </div>
@@ -1142,86 +1134,76 @@ const DonateDock = () => {
         </div>
       </div>
 
-      {/* 배송지 추가 팝오버 */}
-      {showAddressPopover && (
-        <div
-          id="address-popover"
-          className="fixed bg-white rounded-xl border border-gray-border p-4 shadow-lg z-40 w-80"
-          style={{
-            top: `${popoverPosition.top}px`,
-            left: `${popoverPosition.left}px`,
-          }}
-        >
-          <h4 className="text-lg font-medium mb-4">새 배송지 추가</h4>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-sub-gray mb-1">배송지명</label>
-              <input
-                type="text"
-                className="w-full p-2 border border-gray-border rounded-lg"
-                placeholder="배송지명 입력"
-                value={newAddress.name}
-                onChange={(e) => handleInputChange(e, "name")}
-              />
+      {/* 배송지 추가 모달 */}
+      {showAddressAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <div className="mb-6 flex items-center justify-between">
+              <h4 className="text-xl font-bold">새 배송지 추가</h4>
+              <button onClick={() => setShowAddressAddModal(false)} className="rounded-full p-1 hover:bg-gray-100">
+                <X className="h-6 w-6" />
+              </button>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-sub-gray mb-1">주소</label>
-              <div className="flex space-x-2">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-sub-gray mb-2">주소</label>
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    className="flex-1 p-3 border border-gray-border rounded-lg"
+                    placeholder="'찾기'를 눌러서 주소 입력"
+                    value={newAddress.address}
+                    readOnly
+                  />
+                  <SecondaryButton
+                    type="button"
+                    className="px-4 py-3 rounded-lg"
+                    onClick={() => setIsAddressModalOpen(true)}
+                  >
+                    찾기
+                  </SecondaryButton>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-sub-gray mb-2">상세 주소</label>
                 <input
                   type="text"
-                  className="flex-1 p-2 border border-gray-border rounded-lg"
-                  placeholder="'찾기'를 눌러서 주소 입력"
-                  value={newAddress.address}
-                  readOnly
+                  className="w-full p-3 border border-gray-border rounded-lg"
+                  placeholder="상세 주소 입력"
+                  value={newAddress.detailAddress}
+                  onChange={(e) => handleInputChange(e, "detailAddress")}
                 />
-                <button
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <CancelButton
                   type="button"
-                  className="px-3 py-2 bg-gray-border rounded-lg text-sm"
-                  onClick={() => setIsAddressModalOpen(true)}
+                  className="px-6 py-3 rounded-lg"
+                  onClick={() => setShowAddressAddModal(false)}
                 >
-                  찾기
-                </button>
+                  취소
+                </CancelButton>
+                <PrimaryButton
+                  type="button"
+                  className="px-6 py-3 bg-main-color text-white rounded-lg"
+                  onClick={saveNewAddress}
+                >
+                  저장
+                </PrimaryButton>
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-sub-gray mb-1">상세 주소</label>
-              <input
-                type="text"
-                className="w-full p-2 border border-gray-border rounded-lg"
-                placeholder="상세 주소 입력"
-                value={newAddress.detailAddress}
-                onChange={(e) => handleInputChange(e, "detailAddress")}
+            {/* 배송지 주소 검색 모달 */}
+            {isAddressModalOpen && (
+              <AddressModal
+                isOpen={isAddressModalOpen}
+                onClose={() => setIsAddressModalOpen(false)}
+                onComplete={handleComplete}
               />
-            </div>
-
-            <div className="flex justify-end space-x-2 pt-2">
-              <button
-                type="button"
-                className="px-4 py-2 bg-gray-border rounded-lg text-sm"
-                onClick={() => setShowAddressPopover(false)}
-              >
-                취소
-              </button>
-              <button
-                type="button"
-                className="px-4 py-2 bg-main-color text-white rounded-lg text-sm"
-                onClick={saveNewAddress}
-              >
-                저장
-              </button>
-            </div>
+            )}
           </div>
-          {/* 배송지 주소 모달 */}
-          {isAddressModalOpen && (
-            <AddressModal
-              isOpen={isAddressModalOpen}
-              onClose={() => setIsAddressModalOpen(false)}
-              onComplete={handleComplete}
-            />
-          )}
         </div>
       )}
 

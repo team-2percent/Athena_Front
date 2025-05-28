@@ -7,9 +7,8 @@ import { Plus, Check, X, Trash2 } from "lucide-react"
 import { useProjectFormStore } from "@/stores/useProjectFormStore"
 import type { CompositionItem, SupportOption } from "@/stores/useProjectFormStore"
 import { useApi } from "@/hooks/useApi"
-// PlanSelection 컴포넌트 import 추가
+import { PrimaryButton } from "../common/Button"
 import PlanSelection from "./PlanSelection"
-// 1. 상단에 AlertModal import 추가
 import AlertModal from "../common/AlertModal"
 
 // 계좌 정보 타입 정의
@@ -225,7 +224,7 @@ const CompositionDialog = ({ isOpen, onClose, composition, onSave }: Composition
                   htmlFor={`item-content-${item.id}`}
                   className={`text-sm ${focusedField === `item-content-${item.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
                 >
-                  구성 세부 내용
+                  구성 세부 내용 (100자 이하)
                 </label>
                 <input
                   id={`item-content-${item.id}`}
@@ -270,13 +269,13 @@ const CompositionDialog = ({ isOpen, onClose, composition, onSave }: Composition
         </div>
 
         <div className="mt-6 flex justify-end">
-          <button
+          <PrimaryButton
             type="button"
             onClick={handleSave}
             className="bg-main-color text-white font-bold py-2 px-6 rounded-full"
           >
             저장
-          </button>
+          </PrimaryButton>
         </div>
       </div>
     </div>
@@ -441,7 +440,13 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
 
   // 가격 입력 처리 (천 단위 콤마 포맷팅)
   const handlePriceChange = (id: number, value: string) => {
-    const numericValue = value.replace(/[^0-9]/g, "")
+    let numericValue = value.replace(/[^0-9]/g, "")
+
+    // 앞자리 0 제거 (단, "0" 하나만 있는 경우는 유지)
+    if (numericValue.length > 1 && numericValue.startsWith("0")) {
+      numericValue = numericValue.replace(/^0+/, "")
+    }
+
     const numericNumber = Number(numericValue)
 
     // 10억 원 제한 - 초과 시 최댓값으로 설정
@@ -457,7 +462,13 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
 
   // 재고 입력 처리 (천 단위 콤마 포맷팅, 1만 개 제한)
   const handleStockChange = (id: number, value: string) => {
-    const numericValue = value.replace(/[^0-9]/g, "")
+    let numericValue = value.replace(/[^0-9]/g, "")
+
+    // 앞자리 0 제거 (단, "0" 하나만 있는 경우는 유지)
+    if (numericValue.length > 1 && numericValue.startsWith("0")) {
+      numericValue = numericValue.replace(/^0+/, "")
+    }
+    
     const numericNumber = Number(numericValue)
 
     // 1만 개 제한 - 초과 시 최댓값으로 설정
@@ -523,7 +534,7 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
                     htmlFor={`option-name-${option.id}`}
                     className={`text-sm ${focusedField === `option-name-${option.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
                   >
-                    상품 이름
+                    상품 이름 (25자 이하)
                   </label>
                   <input
                     id={`option-name-${option.id}`}
@@ -550,7 +561,7 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
                     htmlFor={`option-desc-${option.id}`}
                     className={`text-sm ${focusedField === `option-desc-${option.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
                   >
-                    상품 설명
+                    상품 설명 (50자 이하)
                   </label>
                   <input
                     id={`option-desc-${option.id}`}
@@ -599,7 +610,7 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
                     htmlFor={`option-price-${option.id}`}
                     className={`text-sm ${focusedField === `option-price-${option.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
                   >
-                    가격
+                    가격 (10억 원 이하)
                   </label>
                   <div className="flex items-center border-b border-gray-300 focus-within:border-secondary-color-dark">
                     <input
@@ -622,7 +633,7 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
                     htmlFor={`option-stock-${option.id}`}
                     className={`text-sm ${focusedField === `option-stock-${option.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
                   >
-                    수량
+                    수량 (1만 개 이하)
                   </label>
                   <div className="flex items-center border-b border-gray-300 focus-within:border-secondary-color-dark">
                     <input

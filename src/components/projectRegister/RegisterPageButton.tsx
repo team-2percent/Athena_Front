@@ -15,7 +15,7 @@ export default function RegisterPageButton() {
     return (
         <PrimaryButton
             onClick={() => router.push('/project/register')}
-            className="fixed bottom-8 right-8 w-20 h-20 shadow-lg flex items-center justify-center transition-colors duration-200"
+            className="fixed bottom-8 right-8 w-20 h-20 shadow-lg flex items-center rounded-full justify-center transition-colors duration-200"
             aria-label="프로젝트 등록"
         >
             <svg 

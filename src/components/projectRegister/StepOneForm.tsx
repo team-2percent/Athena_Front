@@ -103,7 +103,13 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
 
   // 숫자만 입력 가능하도록 처리
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^0-9]/g, "")
+    let value = e.target.value.replace(/[^0-9]/g, "")
+
+    // 앞자리 0 제거 (단, "0" 하나만 있는 경우는 유지)
+    if (value.length > 1 && value.startsWith("0")) {
+      value = value.replace(/^0+/, "")
+    }
+
     handleFieldTouch("targetAmount")
 
     // 10억 제한 검사 (기존 100억에서 10억으로 변경)

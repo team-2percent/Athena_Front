@@ -2,6 +2,7 @@
 
 import { Check, X, AlertCircle } from "lucide-react"
 import { useProjectFormStore } from "@/stores/useProjectFormStore"
+import { CancelButton, PrimaryDisabledButton, PrimaryButton } from "../common/Button"
 
 interface ValidationModalProps {
   isOpen: boolean
@@ -165,7 +166,7 @@ export default function ValidationModal({ isOpen, onClose, onConfirm }: Validati
 
         {/* 1단계 항목들 */}
         <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-3 text-main-color">1단계 - 기본 정보</h3>
+          <h3 className="text-lg font-semibold mb-3 text-main-color">기본 정보</h3>
           <div className="space-y-2">
             {step1Items.map((item, index) => (
               <div key={index} className="flex items-center justify-between py-2">
@@ -213,7 +214,7 @@ export default function ValidationModal({ isOpen, onClose, onConfirm }: Validati
 
         {/* 2단계 항목들 */}
         <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-3 text-main-color">2단계 - 상세 설명</h3>
+          <h3 className="text-lg font-semibold mb-3 text-main-color">상세 설명</h3>
           <div className="space-y-2">
             {step2Items.map((item, index) => (
               <div key={index} className="flex items-center justify-between py-2">
@@ -238,7 +239,7 @@ export default function ValidationModal({ isOpen, onClose, onConfirm }: Validati
 
         {/* 3단계 항목들 */}
         <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-3 text-main-color">3단계 - 후원 설정</h3>
+          <h3 className="text-lg font-semibold mb-3 text-main-color">후원 설정</h3>
           <div className="space-y-2">
             {step3Items.map((item, index) => (
               <div key={index} className="flex items-center justify-between py-2">
@@ -263,14 +264,14 @@ export default function ValidationModal({ isOpen, onClose, onConfirm }: Validati
 
         {/* 버튼 영역 */}
         <div className="flex gap-3 mt-6">
-          <button
+          <CancelButton
             type="button"
             onClick={onClose}
             className="flex-1 bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-full hover:bg-gray-300 transition-colors"
           >
             취소
-          </button>
-          <button
+          </CancelButton>
+          <PrimaryButton
             type="button"
             onClick={onConfirm}
             disabled={!allValid}
@@ -281,7 +282,7 @@ export default function ValidationModal({ isOpen, onClose, onConfirm }: Validati
             }`}
           >
             {allValid ? "등록하기" : "미완료 항목 있음"}
-          </button>
+          </PrimaryButton>
         </div>
 
         {!allValid && (
