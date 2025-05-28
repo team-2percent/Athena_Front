@@ -364,11 +364,11 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
         tabs={isMy ? ["소개", "쿠폰", "판매 상품", "구매 상품", "내가 쓴 후기"] : ["소개", "판매 상품", "후기"]}
         activeTab={activeTab}
         onClickTab={onClickTab}
-        className="border-b border-gray-border max-w-6xl mx-auto"
+        className="border-b border-gray-border mx-auto"
       />
 
       {/* 탭 내용 */}
-      <div className="mx-auto max-w-6xl mt-8">
+      <div className="mx-auto mt-8">
         {activeTab === "소개" && (
           <div className="mb-8">
             <p className="text-sub-gray mb-8 whitespace-pre-wrap break-words">{sellerDescription || "소개글이 없습니다."}</p>

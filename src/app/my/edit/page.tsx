@@ -25,7 +25,7 @@ export default function EditPage() {
                 return null      
         }
     }
-    return <div className="h-full mt-8 w-[var(--content-width)] max-w-6xl mx-auto">
+    return <div className="h-full mt-8 w-[var(--content-width)] mx-auto">
         <MenuTab tabs={["프로필", "계좌", "배송지"]} activeTab={activeTab} onClickTab={onMenuChange} className="border-b border-gray-border"/>
         <div className="w-full ax-w-6xl pt-10 h-full">
             {renderContent()}

@@ -9,7 +9,7 @@ interface ProfileHeaderProps {
 
 export default function ProfileHeader({ nickname, profileImage, buttons }: ProfileHeaderProps) {
   return (
-    <div className="flex justify-between items-start mx-auto max-w-6xl mb-12 h-36">
+    <div className="flex justify-between items-start mx-auto mb-12 h-36">
       <div className="flex">
         {/* 프로필 이미지 */}
         <div className="w-36 h-36 rounded-full bg-gray-200 overflow-hidden mr-8 flex-shrink-0">
