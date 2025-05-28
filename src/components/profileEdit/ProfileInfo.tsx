@@ -107,6 +107,9 @@ export default function ProfileInfo() {
 
         apiCall("/api/user", "PUT", formData).then(({ error }) => {
             console.log(error);
+            if (!error) {
+                window.location.reload();
+            }
         })
     }
     
