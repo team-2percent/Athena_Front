@@ -84,6 +84,14 @@ export default function ApprovalPage() {
         setSearch(e.target.value);
     }
 
+    // 엔터키로 검색
+    const activeEnter = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            handleSearchClick();
+        }
+    }
+
     const handleSearchClick = () => {
         setQueryParams({
             page: 0,
@@ -106,7 +114,7 @@ export default function ApprovalPage() {
 
 
     return (
-        <div className="flex flex-col mx-auto max-w-6xl w-full p-8">
+        <div className="flex flex-col mx-auto py-8 w-[var(--content-width)]">
             <h3 className="text-xl font-medium mb-8">확인해야할 상품이 {pendingCount}건 있습니다.</h3>
             <div className="flex items-center mb-8 gap-4">
                 <div className="flex flex-1 gap-2">
@@ -115,6 +123,7 @@ export default function ApprovalPage() {
                         placeholder="상품명으로 검색"
                         className="border flex-1 p-2 border rounded text-left text-sub-gray min-w-[350px] h-10"
                         onChange={handleSearchChange}
+                        onKeyDown={(e) => activeEnter(e)}
                     />
                     <PrimaryButton
                         onClick={handleSearchClick}

@@ -58,7 +58,7 @@ export default function CouponPage() {
     }, [currentPage])
 
     return (
-        <div className="flex flex-col mx-auto w-full p-8">
+        <div className="flex flex-col mx-auto w-[var(--content-width)] py-8">
             <div className="flex justify-between items-center mb-8 border-b pb-2">
                 <h2 className="text-2xl font-medium">쿠폰 목록</h2>
                 <div className="flex gap-4">

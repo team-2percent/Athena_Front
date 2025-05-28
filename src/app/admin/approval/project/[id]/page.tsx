@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import clsx from "clsx"
 import ConfirmModal from "@/components/common/ConfirmModal"
 import { useRouter } from "next/navigation";
 import { ArrowLeftIcon } from "lucide-react"
@@ -230,7 +229,7 @@ export default function ProjectApprovalDetailPage() {
     }
 
     return (
-        <div className="flex flex-col mx-auto w-full p-8 gap-6">
+        <div className="flex flex-col gap-6 mx-auto w-[var(--content-width)] py-8">
             {isLoading && <OverlaySpinner message="처리 중입니다."/>}
             <div className="flex w-full">
             <button className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.back()}>

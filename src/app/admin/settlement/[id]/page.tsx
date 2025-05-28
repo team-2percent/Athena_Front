@@ -7,7 +7,6 @@ import SettlementTag from "@/components/admin/SettlementTag"
 import { useApi } from "@/hooks/useApi"
 import { useParams } from "next/navigation";
 import OverlaySpinner from "@/components/common/OverlaySpinner"
-import clsx from "clsx"
 import { formatDateInAdmin } from "@/lib/utils"
 import { SecondaryButton } from "@/components/common/Button"
 import Pagination from "@/components/common/Pagination"
@@ -131,8 +130,7 @@ export default function SettlementDetailPage() {
         return (
             <div>
                 {/* 프로젝트 기본 정보 */}
-
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 py-6">
                 <h2 className="text-2xl font-medium border-b pb-2">프로젝트 기본 정보</h2>
                 <table className="w-full border-collapse text-left">
                     <tbody>
@@ -200,7 +198,7 @@ export default function SettlementDetailPage() {
                 </table>
             </div>
             {/* 판매자 정보 */}
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 py-6">
                 <h2 className="text-2xl font-medium border-b pb-2">판매자 정보</h2>
                 <div className="flex items-center mt-4 justify-between">
                     <div className="flex items-center gap-4">
@@ -229,7 +227,7 @@ export default function SettlementDetailPage() {
                 </div>
             </div>
             {/* 프로젝트 상품 별 정보 */}
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 py-6">
                 <h2 className="text-2xl font-medium border-b pb-2">프로젝트 상품 별 정보</h2>
                 <table className="w-full border-collapse text-center">
                     <tbody>
@@ -266,7 +264,7 @@ export default function SettlementDetailPage() {
                 </table>
             </div>
             {/* 정산 기록 */}
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 py-6">
                 <h2 className="text-2xl font-medium border-b pb-2">정산 기록</h2>
                 <table className="w-full border-collapse text-center">
                     <tbody>
@@ -310,7 +308,7 @@ export default function SettlementDetailPage() {
     }, [currentPage])
 
     return (
-        <div className="flex flex-col mx-auto w-full p-8 gap-6">
+        <div className="flex flex-col mx-auto w-[var(--content-width)] py-8 gap-6">
             <div className="flex w-full">
                 <button 
                     className="text-sm text-gray-500 flex items-center gap-2" 

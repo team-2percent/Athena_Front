@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import DatePicker from "@/components/projectRegister/DatePicker"
-import clsx from "clsx"
 import { ArrowLeftIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import ConfirmModal from "@/components/common/ConfirmModal"
@@ -119,7 +118,7 @@ export default function CouponRegisterPage() {
     }, [couponEndDateTime])
 
     return (
-        <div className="flex flex-col mx-auto w-full p-8 gap-6">
+        <div className="flex flex-col mx-auto w-[var(--content-width)] py-8 gap-6">
             {
                 isLoading && <OverlaySpinner message="쿠폰 등록 중입니다." />
             }

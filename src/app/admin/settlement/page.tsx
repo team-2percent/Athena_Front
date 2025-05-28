@@ -114,7 +114,7 @@ export default function SettlementPage() {
     }, [queryParams.status, queryParams.year, queryParams.month, queryParams.page])
 
     return (
-        <div className="flex flex-col mx-auto w-full p-8 gap-6">
+        <div className="flex flex-col mx-auto w-[var(--content-width)] py-8 gap-6">
             <h3 className="text-xl font-medium mb-8">정산 내역</h3>
             <div className="flex gap-4">
                 <div className="relative">
