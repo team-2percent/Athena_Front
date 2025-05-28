@@ -47,7 +47,8 @@ export default function ProfileInfo() {
         urls: [],
     })
     // 프로필 이미지 관련 상태
-    const [profileImage, setProfileImage] = useState<string | null>(profile.imageUrl)
+    const [profileImage, setProfileImage] = useState<string | null>(null)
+    const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
     
     const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -97,34 +98,24 @@ export default function ProfileInfo() {
 
     // 정보 저장
     const saveData = async () => {
-        const data = {
-            request: {
-                nickname: newName,
-                sellerIntroduction: newIntroduction,
-                linkUrl: newUrls ? newUrls.join(",") : ""
-            },
-            files: profileImage
-        }
-
         const formData = new FormData()
-        formData.append("request", new Blob([JSON.stringify(data)], { type: "application/json" }))
-        console.log(formData);
+        formData.append("request", new Blob([JSON.stringify({
+            nickname: newName,
+            sellerIntroduction: newIntroduction,
+            linkUrl: newUrls ? newUrls.join(",") : ""
+        })], { type: "application/json" }))
+        if (profileImageFile !== null) formData.append("files", new Blob([profileImageFile]))
 
         apiCall("/api/user", "PUT", formData).then(({ error }) => {
             console.log(error);
         })
-
-        // await fetch("https://athena-local.i-am-jay.com/api/user", {
-        //     method: "PUT",
-        //     body: formData,
-        //     headers: {Authorization: `Bearer ${localStorage.getItem('accessToken')}`}
-        // })
     }
     
     // 프로필 이미지 업로드 핸들러
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (file) {
+            setProfileImageFile(file)
           const reader = new FileReader()
           reader.onload = (e) => {
             if (e.target?.result) {

@@ -18,7 +18,7 @@ export function useApi() {
     async <T>(
       url: string,
       method: string,
-      body: FormData | object | null = null
+      body: object | null = null
     ): Promise<ApiResponse<T>> => {
       setIsLoading(true);
       try {
@@ -26,13 +26,14 @@ export function useApi() {
         const makeRequest = async (
           token: string | null
         ): Promise<ApiResponse<T>> => {
+          const isFormData = body instanceof FormData;
           const response = await fetch(api_base + url, {
             method, // 여기서 전달받은 method를 사용합니다.
             headers: {
-              "Content-Type": "application/json",
+              ...(isFormData ? {} : {"Content-Type": "application/json"}),
               ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
-            ...(body ? (body instanceof FormData ? { body: body } : { body: JSON.stringify(body) }) : {}),
+            ...(body ? (isFormData ? { body: body } : { body: JSON.stringify(body) }) : {}),
           });
 
           if (response.status === 204) {
