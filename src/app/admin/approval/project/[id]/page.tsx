@@ -25,7 +25,7 @@ interface ApprovalProject {
     startAt: string,
     endAt: string,
     shippedAt: string,
-    approvalStatus: string,
+    isApproved: string,
     createdAt: string,
     imageUrls: string[],
     sellerResponse: {
@@ -242,7 +242,7 @@ export default function ProjectApprovalDetailPage() {
             {renderProject()}
 
             {/* 승인 반려 란 */}
-            {project?.approvalStatus === "PENDING" && (
+            {project?.isApproved === "PENDING" && (
             <div className="flex flex-col gap-4">
                 <h2 className="text-2xl font-medium border-b pb-2">프로젝트 승인 여부</h2>
                 <div className="flex justify-between">

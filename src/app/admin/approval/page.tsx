@@ -13,7 +13,7 @@ interface Project {
     title: string;
     createdAt: string;
     sellerName: string;
-    approvalStatus: "PENDING" | "APPROVED" | "REJECTED";
+    isApproved: "PENDING" | "APPROVED" | "REJECTED";
 }
 
 interface Response {
@@ -144,7 +144,7 @@ export default function ApprovalPage() {
                             <td className="text-center p-4 truncate max-w-0">{project.title}</td>
                             <td className="text-center p-4 whitespace-nowrap">{formatDateInAdmin(project.createdAt)}</td>
                             <td className="text-center p-4 truncate max-w-0">{project.sellerName}</td>
-                            <td className="text-center p-4 whitespace-nowrap">{approvalStatus[project.approvalStatus]}</td>
+                            <td className="text-center p-4 whitespace-nowrap">{approvalStatus[project.isApproved]}</td>
                         </tr>
                     ))}
                 </tbody>
