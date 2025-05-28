@@ -25,7 +25,7 @@ export default function ProjectApprovalDetailPage() {
     }, []);
 
     return (
-        <div className="flex flex-col mx-auto w-full p-8 gap-6">
+        <div className="flex flex-col mx-auto w-[var(--content-width)] py-8 gap-6">
             <div className="flex w-full">
             <button className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.push("/admin/coupon")}>
                 <ArrowLeftIcon className="w-4 h-4" />

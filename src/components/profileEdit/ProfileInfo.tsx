@@ -1,9 +1,8 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Camera, Check, Pencil, Plus, X } from "lucide-react"
+import { Camera, Check, Plus, X } from "lucide-react"
 import PasswordInput from "../common/PasswordInput"
-import clsx from "clsx"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
 import { CancelButton, PrimaryButton } from "../common/Button"
@@ -31,7 +30,6 @@ interface LoadResponse {
 export default function ProfileInfo() {
     const { isLoading, apiCall } = useApi();
     const userId = useAuthStore(s => s.userId)
-    console.log(userId);
     // 비밀번호 수정 모드
     const [editingPassword, setEditingPassword] = useState(false);
 
@@ -48,7 +46,8 @@ export default function ProfileInfo() {
         urls: [],
     })
     // 프로필 이미지 관련 상태
-    const [profileImage, setProfileImage] = useState<string | null>(profile.imageUrl)
+    const [profileImage, setProfileImage] = useState<string | null>(null)
+    const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
     
     const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -97,14 +96,19 @@ export default function ProfileInfo() {
     }
 
     // 정보 저장
-    const saveData = () => {
-        apiCall("/api/user", "PUT", {
+    const saveData = async () => {
+        const formData = new FormData()
+        formData.append("request", new Blob([JSON.stringify({
             nickname: newName,
             sellerIntroduction: newIntroduction,
             linkUrl: newUrls ? newUrls.join(",") : ""
-        }).then(({ error }) => {
+        })], { type: "application/json" }))
+        if (profileImageFile !== null) formData.append("files", profileImageFile)
+
+        apiCall("/api/user", "PUT", formData).then(({ error }) => {
+            console.log(error);
             if (!error) {
-                loadData()
+                window.location.reload();
             }
         })
     }
@@ -113,6 +117,7 @@ export default function ProfileInfo() {
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (file) {
+            setProfileImageFile(file)
           const reader = new FileReader()
           reader.onload = (e) => {
             if (e.target?.result) {
@@ -121,13 +126,13 @@ export default function ProfileInfo() {
           }
           reader.readAsDataURL(file)
         }
-        setProfile({...profile, imageUrl: profileImage})
     }
     // 프로필 이미지 삭제 핸들러
     const handleRemoveImage = () => {
         setProfileImage(null)
+        setProfileImageFile(null)
         if (fileInputRef.current) {
-        fileInputRef.current.value = ""
+            fileInputRef.current.value = ""
         }
     }
     
@@ -240,28 +245,24 @@ export default function ProfileInfo() {
                     <div className="flex gap-5 flex-wrap justify-center">
                         {/* 프로필 이미지 섹션 */}
                         <div className="flex flex-col items-center bg-white rounded-lg shadow py-6 px-10 space-y-4">
-                            <h3 className="text-lg font-medium">프로필 이미지</h3>
-                            <div className="relative w-32 h-32 overflow-hidden rounded-full mb-4">
-                                {profileImage ? (
-                                <>
+                            <h3 className="text-lg font-medium">프로필 이미지</h3>                            
+                            <div className="relative w-fit">
+                                <button className="bg-red-500 p-1 rounded-full absolute top-0 right-0">
+                                    <X className="h-3 w-3 text-white" onClick={handleRemoveImage} />
+                                </button>
+                                <div className="relative w-32 h-32 overflow-hidden rounded-full mb-4">
+                                    {profileImage ? (
                                     <img
                                     src={profileImage || "/placeholder.svg"}
                                     alt="프로필 이미지"
                                     className="w-full h-full object-cover"
                                     />
-                                    <button
-                                    type="button"
-                                    onClick={handleRemoveImage}
-                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
-                                    >
-                                    <X className="w-4 h-4" />
-                                    </button>
-                                </>
-                                ) : (
-                                <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
-                                    <Camera className="w-10 h-10 text-sub-gray" />
+                                    ) : (
+                                    <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
+                                        <Camera className="w-10 h-10 text-sub-gray" />
+                                    </div>
+                                    )}
                                 </div>
-                                )}
                             </div>
                             <input
                                 type="file"
@@ -274,12 +275,6 @@ export default function ProfileInfo() {
                             <label htmlFor="profile-image" className="cursor-pointer text-main-color font-medium hover:text-secondary-color-dark">
                                 프로필 사진 {profileImage ? "변경" : "업로드"}
                             </label>
-                            <PrimaryButton
-                                className=""
-                                disabled
-                            >
-                                저장
-                            </PrimaryButton>
                         </div>
                         
                         {/* 이름, 이메일 란 */}

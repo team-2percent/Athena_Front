@@ -26,13 +26,14 @@ export function useApi() {
         const makeRequest = async (
           token: string | null
         ): Promise<ApiResponse<T>> => {
+          const isFormData = body instanceof FormData;
           const response = await fetch(api_base + url, {
             method, // 여기서 전달받은 method를 사용합니다.
             headers: {
-              "Content-Type": "application/json",
+              ...(isFormData ? {} : {"Content-Type": "application/json"}),
               ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
-            ...(body ? { body: JSON.stringify(body) } : {}),
+            ...(body ? (isFormData ? { body: body } : { body: JSON.stringify(body) }) : {}),
           });
 
           if (response.status === 204) {
@@ -52,17 +53,9 @@ export function useApi() {
           }
 
           const responseText = await response.text();
-          if (responseText === "") {
-            return {
-              data: null,
-              error: null,
-              isLoading: false,
-              status: response.status,
-            };
-          }
 
           return {
-            data: JSON.parse(responseText),
+            data: IsJsonString(responseText) ? JSON.parse(responseText) : responseText,
             error: null,
             isLoading: false,
             status: response.status,
@@ -109,4 +102,13 @@ export function useApi() {
   );
 
   return { apiCall, isLoading };
+}
+
+function IsJsonString(str: string) {
+  try {
+    var json = JSON.parse(str);
+    return (typeof json === 'object');
+  } catch (e) {
+    return false;
+  }
 }

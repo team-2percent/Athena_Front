@@ -30,7 +30,7 @@ export default function RootLayout({
         <AuthProvider>
           <HeaderLoader />
           <main className="flex-1 bg-white m-none w-full">
-            <div className="flex justify-center">
+            <div className="flex justify-center mx-auto">
             {children}
             </div>
             <RegisterPageButtonLoader />
