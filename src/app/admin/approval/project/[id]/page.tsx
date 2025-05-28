@@ -47,20 +47,23 @@ export default function ProjectApprovalDetailPage() {
     const router = useRouter();
     const { isLoading, apiCall } = useApi();
     // const [comment, setComment] = useState("")
-    const [approvalStatus, setApprovalStatus] = useState<"approve" | "reject" | null>(null)
+    const [isApproved, setIsApproved] = useState<"approve" | "reject" | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [project, setProject] = useState<ApprovalProject | null>(null);
-    const approve = approvalStatus === "approve" ? true : approvalStatus === "reject" ? false : null;
-    const disabled = approvalStatus === null;
+    const approve = isApproved === "approve" ? true : isApproved === "reject" ? false : null;
+    const disabled = isApproved === null;
 
     const handleConfirm = () => {
         apiCall(`/api/admin/project/${id}/approval`, "PATCH", {
             approve: approve,
             // comment: comment
-        }).then(({ data }) => {
-            console.log(data);
-            setIsModalOpen(false);
-            router.push("/admin/approval/project");
+        }).then(({ error }) => {
+            if (error) {
+                setIsModalOpen(false);
+            } else {
+                setIsModalOpen(false);
+                window.location.reload();
+            }
         })
     }
 
@@ -251,8 +254,8 @@ export default function ProjectApprovalDetailPage() {
                             type="radio"
                             name="approval"
                             value="approve"
-                            checked={approvalStatus === "approve"}
-                            onChange={(e) => setApprovalStatus(e.target.value as "approve")}
+                            checked={isApproved === "approve"}
+                            onChange={(e) => setIsApproved(e.target.value as "approve")}
                             className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
                         />
                         <span>승인</span>
@@ -262,8 +265,8 @@ export default function ProjectApprovalDetailPage() {
                             type="radio"
                             name="approval"
                             value="reject"
-                            checked={approvalStatus === "reject"}
-                            onChange={(e) => setApprovalStatus(e.target.value as "reject")}
+                            checked={isApproved === "reject"}
+                            onChange={(e) => setIsApproved(e.target.value as "reject")}
                             className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
                         />
                         <span>반려</span>
@@ -291,7 +294,7 @@ export default function ProjectApprovalDetailPage() {
                 isModalOpen &&
                 <ConfirmModal
                     isOpen={isModalOpen}
-                    message={`${approvalStatus === "approve" ? "승인" : "반려"} 하시겠습니까?`}
+                    message={`${isApproved === "approve" ? "승인" : "반려"} 하시겠습니까?`}
                     onConfirm={handleConfirm}
                     onClose={() => setIsModalOpen(false)}
                 />
