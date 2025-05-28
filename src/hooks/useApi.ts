@@ -53,17 +53,9 @@ export function useApi() {
           }
 
           const responseText = await response.text();
-          if (responseText === "") {
-            return {
-              data: null,
-              error: null,
-              isLoading: false,
-              status: response.status,
-            };
-          }
 
           return {
-            data: JSON.parse(responseText),
+            data: IsJsonString(responseText) ? JSON.parse(responseText) : responseText,
             error: null,
             isLoading: false,
             status: response.status,
@@ -110,4 +102,13 @@ export function useApi() {
   );
 
   return { apiCall, isLoading };
+}
+
+function IsJsonString(str: string) {
+  try {
+    var json = JSON.parse(str);
+    return (typeof json === 'object');
+  } catch (e) {
+    return false;
+  }
 }

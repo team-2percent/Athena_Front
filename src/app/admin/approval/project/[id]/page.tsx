@@ -58,10 +58,10 @@ export default function ProjectApprovalDetailPage() {
             approve: approve,
             // comment: comment
         }).then(({ error }) => {
+            console.log(error);
             if (error) {
                 setIsModalOpen(false);
             } else {
-                setIsModalOpen(false);
                 window.location.reload();
             }
         })
