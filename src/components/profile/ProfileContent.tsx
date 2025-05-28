@@ -375,15 +375,15 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
 
             {/* 링크 목록 */}
             <div className="flex flex-wrap gap-4">
-              {linkUrl && (
+              {linkUrl && linkUrl.split(",").map(url => (
                 <Link
-                  href={`https://${linkUrl}`}
+                  href={`${url}`}
                   target="_blank"
                   className="px-6 py-3 border border-main-color text-main-color rounded-full hover:bg-secondary-color transition-colors"
                 >
-                  {linkUrl}
+                  {url}
                 </Link>
-              )}
+              ))}
             </div>
           </div>
         )}
