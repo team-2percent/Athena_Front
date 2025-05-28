@@ -10,7 +10,7 @@ import { useParams } from "next/navigation";
 import OverlaySpinner from "@/components/common/OverlaySpinner"
 import { useEffect } from "react";
 import { formatDateInAdmin } from "@/lib/utils"
-import { PrimaryButton } from "@/components/common/Button";
+import { PrimaryButton, SecondaryButton } from "@/components/common/Button";
 
 interface ApprovalProject {
     id: number,
@@ -222,7 +222,10 @@ export default function ProjectApprovalDetailPage() {
                     </div>
                     
                     <div className="flex flex-col gap-2">
-                        <button className="ml-auto px-4 py-2 text-sm border rounded-md">프로필보기</button>
+                        <SecondaryButton
+                            className="ml-auto"
+                            onClick={() => router.push(`/profile/${project.sellerResponse.id}`)}
+                        >프로필보기</SecondaryButton>
                         <p className="text-sm text-gray-500">* 기존 프로필 페이지로 이동합니다.</p>
                     </div>
                 </div>
