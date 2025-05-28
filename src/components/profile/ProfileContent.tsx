@@ -76,7 +76,7 @@ interface MyReview {
   content: string
   createdAt: string
   projectName?: string
-  projectImage?: string
+  imageUrl?: string
   projectId?: number
 }
 
@@ -499,7 +499,7 @@ export default function ProfileContent({ isMy, userId }: ProfileContentProps) {
                     projectName={review.projectName || "상품 이름"}
                     reviewDate={formatDate(review.createdAt)}
                     reviewContent={review.content}
-                    projectImage={review.projectImage || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"}
+                    imageUrl={review.imageUrl || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"}
                     projectId={review.projectId || review.id}
                   />
                 ))}

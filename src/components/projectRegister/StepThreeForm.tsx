@@ -440,7 +440,13 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
 
   // 가격 입력 처리 (천 단위 콤마 포맷팅)
   const handlePriceChange = (id: number, value: string) => {
-    const numericValue = value.replace(/[^0-9]/g, "")
+    let numericValue = value.replace(/[^0-9]/g, "")
+
+    // 앞자리 0 제거 (단, "0" 하나만 있는 경우는 유지)
+    if (numericValue.length > 1 && numericValue.startsWith("0")) {
+      numericValue = numericValue.replace(/^0+/, "")
+    }
+
     const numericNumber = Number(numericValue)
 
     // 10억 원 제한 - 초과 시 최댓값으로 설정
@@ -456,7 +462,13 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
 
   // 재고 입력 처리 (천 단위 콤마 포맷팅, 1만 개 제한)
   const handleStockChange = (id: number, value: string) => {
-    const numericValue = value.replace(/[^0-9]/g, "")
+    let numericValue = value.replace(/[^0-9]/g, "")
+
+    // 앞자리 0 제거 (단, "0" 하나만 있는 경우는 유지)
+    if (numericValue.length > 1 && numericValue.startsWith("0")) {
+      numericValue = numericValue.replace(/^0+/, "")
+    }
+    
     const numericNumber = Number(numericValue)
 
     // 1만 개 제한 - 초과 시 최댓값으로 설정

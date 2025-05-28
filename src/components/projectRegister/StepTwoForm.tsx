@@ -583,13 +583,7 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown, isEdi
       {/* 마크다운 에디터 */}
       <div className="flex flex-col mt-8">
         <h2 className="text-xl font-bold mb-4">상품 상세 설명</h2>
-        {isEditMode ? (
-          <div className="p-6 border border-gray-300 rounded-xl bg-gray-50">
-            <p className="text-gray-500 text-center">프로젝트 수정 화면에서는 상품 상세 설명을 수정할 수 없습니다.</p>
-          </div>
-        ) : (
           <MarkdownEditor value={markdown} onChange={handleMarkdownChange} />
-        )}
       </div>
 
       {/* 일정 내용 다이얼로그 */}

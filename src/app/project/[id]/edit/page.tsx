@@ -229,7 +229,39 @@ export default function ProductEdit() {
     }
   }
 
-  // 프로젝트 수정 함수 - 등록과 동일한 방식으로 변경
+  // URL을 Blob으로 변환하는 함수
+  const urlToBlob = async (url: string): Promise<Blob | null> => {
+    try {
+      const response = await fetch(url)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`)
+      }
+      return await response.blob()
+    } catch (error) {
+      console.error("이미지 URL을 Blob으로 변환 중 오류:", error)
+      return null
+    }
+  }
+
+  // 마크다운에서 이미지 URL을 추출하는 함수
+  const extractImageUrlsFromMarkdown = (markdown: string): string[] => {
+    const imageRegex = /!\[.*?\]\((https?:\/\/[^\s)]+)\)/g
+    const urls: string[] = []
+    let match
+
+    while ((match = imageRegex.exec(markdown)) !== null) {
+      const url = match[1]
+      // 로컬 이미지 참조(/markdown-image/)는 제외
+      if (!url.includes("/markdown-image/") && !urls.includes(url)) {
+        urls.push(url)
+      }
+    }
+
+    console.log("정규식 매칭 결과:", urls)
+    return urls
+  }
+
+  // 프로젝트 수정 함수
   const submitProjectEdit = async () => {
     const state = useProjectFormStore.getState()
     const userId = useAuthStore.getState().userId
@@ -269,27 +301,65 @@ export default function ProductEdit() {
       const formData = new FormData()
       formData.append("request", new Blob([JSON.stringify(projectData)], { type: "application/json" }))
 
-      // 대표 이미지 파일들 추가 (File 객체만)
-      state.images.forEach((image) => {
+      // 새 이미지 파일들 추가
+      const newImages = state.images.filter((image) => image.file)
+      for (const image of newImages) {
         if (image.file) {
           formData.append("files", image.file)
         }
-      })
+      }
 
-      // 마크다운 이미지 파일들 추가
+      // 기존 이미지 URL을 Blob으로 변환하여 추가
+      const existingImages = state.images.filter((image) => image.isExisting && image.url)
+      for (let i = 0; i < existingImages.length; i++) {
+        const image = existingImages[i]
+        if (image.url) {
+          const blob = await urlToBlob(image.url)
+          if (blob) {
+            // URL에서 파일 이름과 확장자 추출
+            const fileName = image.url.split("/").pop() || `image-${i}.jpg`
+            const file = new File([blob], fileName, { type: blob.type || "image/jpeg" })
+            formData.append("files", file)
+          }
+        }
+      }
+
+      // 새로운 마크다운 이미지 파일들 추가
       state.markdownImages.forEach((markdownImage) => {
         formData.append("markdownFiles", markdownImage.file)
       })
+
+      // 마크다운에서 기존 이미지 URL 추출 및 추가
+      const markdownImageUrls = extractImageUrlsFromMarkdown(state.markdown)
+      console.log("마크다운에서 추출한 이미지 URLs:", markdownImageUrls)
+      console.log("마크다운 내용:", state.markdown)
+
+      for (let i = 0; i < markdownImageUrls.length; i++) {
+        const imageUrl = markdownImageUrls[i]
+        console.log(`마크다운 이미지 ${i + 1} 처리 중:`, imageUrl)
+        const blob = await urlToBlob(imageUrl)
+        if (blob) {
+          console.log(`마크다운 이미지 ${i + 1} Blob 변환 성공:`, blob.type, blob.size)
+          // URL에서 파일 이름과 확장자 추출
+          const fileName = imageUrl.split("/").pop() || `markdown-image-${i}.jpg`
+          const file = new File([blob], fileName, { type: blob.type || "image/jpeg" })
+          formData.append("markdownFiles", file)
+        } else {
+          console.error(`마크다운 이미지 ${i + 1} Blob 변환 실패:`, imageUrl)
+        }
+      }
 
       // 프로젝트 수정 API 호출
       const response = await fetch(`https://athena-local.i-am-jay.com/api/project/${state.projectId}`, {
         method: "PUT",
         body: formData,
       }).then(async (res) => ({
-        data: await res.json(),
+        // data: await res.json(),
         error: res.ok ? null : "서버 오류",
         status: res.status,
       }))
+
+      console.log(response.error)
 
       if (response.error) {
         console.error("프로젝트 수정 실패:", response.error)
@@ -299,7 +369,6 @@ export default function ProductEdit() {
         return false
       }
 
-      console.log("프로젝트 수정 응답:", response.data)
       setLoading(false)
       return true
     } catch (error) {

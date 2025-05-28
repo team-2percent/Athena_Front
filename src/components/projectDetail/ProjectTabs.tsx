@@ -15,7 +15,7 @@ interface Review {
   userName: string
   content: string
   createdAt: string
-  profileImage?: string
+  imageUrl?: string
 }
 
 // ProjectData 인터페이스 추가
@@ -90,6 +90,8 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
 
       const { data, error, status } = await apiCall<Review[]>(`/api/comment/${projectId}`, "GET")
 
+      console.log(data)
+
       if (error) {
         throw new Error(error)
       }
@@ -101,8 +103,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
           userName: review.userName,
           content: review.content,
           createdAt: review.createdAt,
-          likes: 0, // 기본값 설정
-          profileImage: "/abstract-profile.png", // 기본 프로필 이미지 설정
+          imageUrl: review.imageUrl,
         }))
 
         setReviews(formattedReviews)
@@ -314,7 +315,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                               {/* 리뷰 작성자 프로필 사진 */}
                               <div className="h-16 w-16 overflow-hidden rounded-full">
                                 <img
-                                  src={review.profileImage || "/placeholder.svg"}
+                                  src={review.imageUrl}
                                   alt={`${review.userName} 프로필`}
                                   className="h-full w-full object-cover"
                                 />

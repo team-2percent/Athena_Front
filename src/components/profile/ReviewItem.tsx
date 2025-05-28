@@ -10,7 +10,7 @@ interface ReviewItemProps {
   projectName: string
   reviewDate: string
   reviewContent: string
-  projectImage: string
+  imageUrl: string
   projectId: number
 }
 
@@ -20,7 +20,7 @@ export default function ReviewItem({
   projectName,
   reviewDate,
   reviewContent,
-  projectImage,
+  imageUrl,
   projectId,
 }: ReviewItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -39,7 +39,7 @@ export default function ReviewItem({
             {/* 상품 이미지 클릭 시 상품 상세 페이지로 이동 */}
             <div className="w-full h-full cursor-pointer" onClick={handleProjectClick}>
               <img
-                src={projectImage || "/placeholder.svg"}
+                src={imageUrl || "/placeholder.svg"}
                 alt={projectName}
                 className="w-full h-full object-cover rounded-lg"
               />
