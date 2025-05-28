@@ -104,7 +104,7 @@ export default function ProfileInfo() {
             sellerIntroduction: newIntroduction,
             linkUrl: newUrls ? newUrls.join(",") : ""
         })], { type: "application/json" }))
-        if (profileImageFile !== null) formData.append("files", new Blob([profileImageFile]))
+        if (profileImageFile !== null) formData.append("files", profileImageFile)
 
         apiCall("/api/user", "PUT", formData).then(({ error }) => {
             console.log(error);
