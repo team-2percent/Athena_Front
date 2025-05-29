@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import { ChevronUp, ChevronDown, Plus, Check, ChevronRight, X } from "lucide-react"
+import { ChevronUp, ChevronDown, Plus, Check, ChevronRight, X, Search } from "lucide-react"
 import AddressModal from "../profileEdit/AddressModal"
 import { useParams } from "next/navigation"
 import { useApi } from "@/hooks/useApi"
@@ -11,6 +11,8 @@ import { useApi } from "@/hooks/useApi"
 // 1. 상단에 AlertModal import 추가
 import AlertModal from "../common/AlertModal"
 import { CancelButton, PrimaryButton, SecondaryButton } from "../common/Button"
+import { TextInput } from "../common/Input"
+import { ADDRESS_DETAIL_MAX_LENGTH, ADDRESS_DETAIL_MIN_LENGTH } from "@/lib/ValidationConstants"
 
 interface AddressInfo {
   id: string
@@ -1136,7 +1138,7 @@ const DonateDock = () => {
 
       {/* 배송지 추가 모달 */}
       {showAddressAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
             <div className="mb-6 flex items-center justify-between">
               <h4 className="text-xl font-bold">새 배송지 추가</h4>
@@ -1148,32 +1150,33 @@ const DonateDock = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-sub-gray mb-2">주소</label>
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    className="flex-1 p-3 border border-gray-border rounded-lg"
-                    placeholder="'찾기'를 눌러서 주소 입력"
-                    value={newAddress.address}
-                    readOnly
-                  />
-                  <SecondaryButton
-                    type="button"
-                    className="px-4 py-3 rounded-lg"
-                    onClick={() => setIsAddressModalOpen(true)}
+                <div className="flex space-x-2 justify-between items-center">
+                  <p className="block text-sm font-medium text-gray-700">{ newAddress.address.length > 0 ? `[${newAddress.zipcode}] ${newAddress.address}` : "주소를 입력해주세요"}</p>
+                  <PrimaryButton
+                      type="button"
+                      onClick={handleOpenAddressModal}
+                      className="px-2 py-2"
                   >
-                    찾기
-                  </SecondaryButton>
+                      <Search className="w-4 h-4" />
+                  </PrimaryButton>
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-sub-gray mb-2">상세 주소</label>
-                <input
-                  type="text"
-                  className="w-full p-3 border border-gray-border rounded-lg"
+                <TextInput
+                  className="w-full"
                   placeholder="상세 주소 입력"
                   value={newAddress.detailAddress}
                   onChange={(e) => handleInputChange(e, "detailAddress")}
+                  maxLength={ADDRESS_DETAIL_MAX_LENGTH}
+                  minLength={ADDRESS_DETAIL_MIN_LENGTH}
+                  validationRules={[
+                    {
+                      validate: (e) => newAddress.address.length > 0,
+                      errorMessage: "먼저 주소를 찾아주세요.",
+                    },
+                  ]}
                 />
               </div>
 

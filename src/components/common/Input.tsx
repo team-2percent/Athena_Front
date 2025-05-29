@@ -50,7 +50,7 @@ export function Input({
   const design = designType === "outline" ? "rounded border" : "border-b"
   const charCount = typeof value === "string" ? value.length : 0
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>  {
     setIsDirty(true)
 
     validationRules.forEach(rule => {

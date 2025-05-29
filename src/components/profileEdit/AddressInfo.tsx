@@ -171,6 +171,12 @@ export default function AddressInfo() {
                             className="w-full"
                             maxLength={ADDRESS_DETAIL_MAX_LENGTH}
                             minLength={ADDRESS_DETAIL_MIN_LENGTH}
+                            validationRules={[
+                                {
+                                  validate: (e) => newAddress.address.length > 0,
+                                  errorMessage: "먼저 주소를 찾아주세요.",
+                                },
+                            ]}
                         />
                         <div className="mt-4 flex justify-end">
                             <PrimaryButton
