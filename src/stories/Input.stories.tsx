@@ -59,21 +59,21 @@ export const TextInputWithValidation: Story = {
 export const NumberInputWithValidation: Story = {
   args: {
     type: "number",
-    value: "",
+    value: 1,
     onChange: () => {},
     placeholder: "0-1,000,000 사이의 숫자",
-    minNumber: 0,
+    minNumber: 1,
     maxNumber: 1000000,
     designType: "outline",
   },
   render: (args) => {
-    const [value, setValue] = useState("")
+    const [value, setValue] = useState(args.value)
     return (
       <div className="space-y-4">
         <NumberInput
           {...args}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => setValue(Number(e.target.value))}
         />
       </div>
     )

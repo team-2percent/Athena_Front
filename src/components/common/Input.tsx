@@ -6,15 +6,17 @@ interface InputProps {
   className?: string
   type: "text" | "number" | "password" | "email"
   designType?: "outline" | "underline"
+  align?: "left" | "center" | "right"
   value: string | number
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  onEnter?: (e: React.KeyboardEvent<HTMLInputElement>) => void
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
   placeholder?: string
   minLength? : number
   maxLength? : number
   maxNumber? : number
   minNumber? : number
   showCharCount?: boolean
+  onClick?: (e: React.MouseEvent<HTMLInputElement>) => void
 }
 
 export function Input({
@@ -22,22 +24,22 @@ export function Input({
   type,
   designType = "outline",
   value,
+  align = "left",
   onChange,
-  onEnter,
+  onKeyDown,
   placeholder,
   minLength,
   maxLength,
   maxNumber,
-  minNumber,
+  minNumber = 0,
   showCharCount,
+  onClick,
 }: InputProps) {
   const [validationError, setValidationError] = useState<string>("")
   const [isDirty, setIsDirty] = useState(false)
   const hasError = Boolean(isDirty && validationError)
   const design = designType === "outline" ? "rounded border" : "border-b"
   const charCount = typeof value === "string" ? value.length : 0
-
-  console.log(validationError, hasError)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsDirty(true)
@@ -57,11 +59,15 @@ export function Input({
     const newValue = e.target.value
     if (maxLength && newValue.length > maxLength) {
       setValidationError(`${maxLength}자 이내로 입력해주세요`)
+      e.target.value = newValue.slice(0, maxLength)
+      onChange(e)
       return
     }
 
     if (minLength && newValue.length < minLength) {
       setValidationError(`${minLength}자 이상 입력해주세요`)
+    } else {
+      setValidationError("")
     }
 
     onChange(e)
@@ -71,11 +77,12 @@ export function Input({
     const newValue = Number(e.target.value)
     if (maxNumber && newValue > maxNumber) {
       setValidationError(`${maxNumber} 이하로 입력해주세요`)
-      return
+      e.target.value = maxNumber.toString()
     }
 
-    if (minNumber && newValue < minNumber) {
+    if (newValue < minNumber) {
       setValidationError(`${minNumber} 이상으로 입력해주세요`)
+      e.target.value = minNumber.toString()
     }
 
     onChange(e)
@@ -114,23 +121,25 @@ export function Input({
   }
 
   return (
-    <div className="w-full relative">
+    <div className="w-full relative h-fit">
       <input
         type={type}
         value={value}
         onChange={handleChange}
         onKeyDown={(e) => {
-          if (onEnter && e.key === "Enter") onEnter(e)
+          if (onKeyDown && e.key === "Enter") onKeyDown(e)
         }}
         placeholder={placeholder}
-        maxLength={maxLength}
         className={clsx(
           "px-3 py-2 text-sm focus:outline-none transition w-full focus:border-main-color",
           design,
           hasError && "border-red-500",
           showCharCount && "pr-16",
+          align === "center" && "text-center",
+          align === "right" && "text-right",
           className
         )}
+        onClick={onClick}
       />
       {showCharCount && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">
@@ -146,22 +155,25 @@ export function Input({
   )
 }
 
+const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
+  e.currentTarget.select();
+};
+
 export const TextInput = ({
   showCharCount,
   ...props
 }: Omit<InputProps, "type"> & { showCharCount?: boolean }) => (
   <Input {...props} type="text" showCharCount={showCharCount} />
 )
-
 export const NumberInput = (props: Omit<InputProps, "type">) => (
-  <Input {...props} type="number" />
+  <Input {...props} type="number" onClick={handleClick} />
 )
 
 export const PasswordInput = ({
   className,
   value,
   onChange,
-  onEnter,
+  onKeyDown,
   placeholder,
   minLength,
   maxLength,
@@ -176,7 +188,7 @@ export const PasswordInput = ({
         className={clsx("pr-10", className)}
         value={value}
         onChange={onChange}
-        onEnter={onEnter}
+        onKeyDown={onKeyDown}
         placeholder={placeholder}
         designType={designType}
         minLength={minLength}
@@ -197,7 +209,7 @@ export const EmailInput = ({
   className,
   value,
   onChange,
-  onEnter,
+  onKeyDown,
   minLength,
   maxLength,
   placeholder = "이메일을 입력해주세요",
@@ -209,7 +221,7 @@ export const EmailInput = ({
       className={className}
       value={value}
       onChange={onChange}
-      onEnter={onEnter}
+      onKeyDown={onKeyDown}
       placeholder={placeholder}
       designType={designType}
       minLength={minLength}
