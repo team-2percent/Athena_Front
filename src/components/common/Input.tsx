@@ -106,7 +106,7 @@ export const PasswordInput = ({
   const [visible, setVisible] = useState(false)
 
   return (
-    <div className="relative w-full">
+    <div className="relative">
       <Input
         type={visible ? "text" : "password"}
         className={clsx("pr-10", className)}
