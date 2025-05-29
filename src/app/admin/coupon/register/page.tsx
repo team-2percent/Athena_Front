@@ -9,6 +9,9 @@ import { useApi } from "@/hooks/useApi"
 import TimePicker from "@/components/common/TimePicker"
 import OverlaySpinner from "@/components/common/OverlaySpinner"
 import { PrimaryButton } from "@/components/common/Button"
+import { NumberInput, TextInput } from "@/components/common/Input"
+import TextArea from "@/components/common/TextArea"
+import { COUPON_CONTENT_MAX_LENGTH, COUPON_CONTENT_MIN_LENGTH, COUPON_NAME_MAX_LENGTH, COUPON_PRICE_MAX_NUMBER, COUPON_PRICE_MIN_NUMBER, COUPON_STOCK_MAX_NUMBER, COUPON_STOCK_MIN_NUMBER, ESSENTIAL_MIN_LENGTH } from "@/lib/ValidationConstants"
 export default function CouponRegisterPage() {
     const router = useRouter();
     const { apiCall } = useApi();
@@ -129,36 +132,40 @@ export default function CouponRegisterPage() {
                 </button>
                 </div>
                 <h2 className="text-2xl font-medium border-b pb-2">쿠폰 등록</h2>
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-10">
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">쿠폰명</label>
-                        <input 
-                            type="text"
+                        <TextInput
                             placeholder="쿠폰명을 입력하세요"
-                            className="w-full p-3 border rounded-md"
                             value={couponName}
                             onChange={(e) => setCouponName(e.target.value)}
+                            maxLength={COUPON_NAME_MAX_LENGTH}
+                            minLength={ESSENTIAL_MIN_LENGTH}
+                            showCharCount
                         />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">쿠폰 설명</label>
-                        <textarea 
+                        <TextArea
                             placeholder="쿠폰 설명을 입력하세요"
-                            className="w-full p-3 border rounded-md resize-none"
                             value={couponDescription}
                             onChange={(e) => setCouponDescription(e.target.value)}
+                            showCharCount
+                            maxLength={COUPON_CONTENT_MAX_LENGTH}
+                            minLength={COUPON_CONTENT_MIN_LENGTH}
                         />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">가격</label>
                         <div className="flex gap-4 items-center">
-                            <input 
-                                type="text"
+                            <NumberInput
+                                className="w-8"
                                 placeholder="가격을 입력하세요"
-                                className="p-3 border rounded-md"
                                 value={couponPrice}
                                 onClick={handleClick}
                                 onChange={handleCouponPriceChange}
+                                maxNumber={COUPON_PRICE_MAX_NUMBER}
+                                minNumber={COUPON_PRICE_MIN_NUMBER}
                             />
                             {couponPriceError && <p className="text-red-500 text-sm">가격은 최대 100억원까지 설정 가능합니다.</p>}
                         </div>
@@ -183,14 +190,15 @@ export default function CouponRegisterPage() {
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">수량</label>
                         <div className="flex gap-4 items-center">
-                            <input 
-                                type="text"
-                                className="p-3 border rounded-md"
+                            <NumberInput
+                                className="w-8"
+                                placeholder="수량을 입력하세요"
                                 value={couponStock}
                                 onClick={handleClick}
                                 onChange={handleCouponStockChange}
+                                maxNumber={COUPON_STOCK_MAX_NUMBER}
+                                minNumber={COUPON_STOCK_MIN_NUMBER}
                             />
-                            {couponStockError && <p className="text-red-500 text-sm">수량은 최대 100억개까지 설정 가능합니다.</p>}
                         </div>
                     </div>
                     <div className="flex justify-end">
