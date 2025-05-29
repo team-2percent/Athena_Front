@@ -102,8 +102,11 @@ export function Input({
       /[!@#$%^&*(),.?":{}|<>]/.test(newValue))
     ) {
       setValidationError(`비밀번호는 ${minLength}자 이상, 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다`)
+      onChange(e)
+      return;
     }
 
+    setValidationError("")
     onChange(e)
   }
 
@@ -115,8 +118,11 @@ export function Input({
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newValue)) {
       setValidationError("올바른 이메일 형식이 아닙니다")
+      onChange(e)
+      return;
     }
 
+    setValidationError("")
     onChange(e)
   }
 
