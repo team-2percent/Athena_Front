@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite"
+import type { Meta, StoryObj } from "@storybook/nextjs"
 import { Input, TextInput, NumberInput, PasswordInput, EmailInput } from "../components/common/Input"
 import { z } from "zod"
 import { useState } from "react"
