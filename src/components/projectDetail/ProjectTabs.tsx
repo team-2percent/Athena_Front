@@ -4,10 +4,10 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
-import { ThumbsUp, ThumbsDown } from "lucide-react"
 import FollowItem from "../profile/FollowItem"
 import { useApi } from "@/hooks/useApi"
-import MarkdownRenderer from "../projectRegister/MarkdownRenderer"
+import MarkdownRenderer, { extractHeadings } from "../projectRegister/MarkdownRenderer"
+import TableOfContents from "./TableOfContents"
 import useAuthStore from "@/stores/auth"
 
 interface Review {
@@ -172,6 +172,9 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
   작성된 내용이 없습니다.
   `
 
+  // 마크다운에서 헤딩 추출
+  const headings = projectData?.markdown ? extractHeadings(projectData.markdown) : []
+
   return (
     <div className="mt-12">
       {/* 로딩 상태 표시 */}
@@ -212,9 +215,16 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
           {/* 탭 내용 */}
           <div className="mt-8">
             {activeTab === "소개" && (
-              <div className="space-y-8">
-                {/* 마크다운 렌더러를 사용하여 프로젝트 소개 내용 표시 */}
-                <MarkdownRenderer content={projectData?.markdown || defaultMarkdown} />
+              <div className="grid grid-cols-1 lg:grid-cols-6 gap-8">
+                {/* 소개글 영역 (좌측) */}
+                <div className="lg:col-span-4">
+                  <MarkdownRenderer content={projectData?.markdown || defaultMarkdown} />
+                </div>
+
+                {/* 목차 영역 (우측) */}
+                <div className="lg:col-span-2">
+                  <TableOfContents headings={headings} />
+                </div>
               </div>
             )}
 
@@ -227,9 +237,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                 <div className="space-y-6">
                   <div className="flex">
                     <div className="w-1/4 font-medium text-sub-gray">목표금액</div>
-                    <div className="w-3/4 font-medium">
-                      {projectData?.goalAmount?.toLocaleString() || "?"}원
-                    </div>
+                    <div className="w-3/4 font-medium">{projectData?.goalAmount?.toLocaleString() || "?"}원</div>
                   </div>
 
                   <div className="flex">
@@ -315,7 +323,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                               {/* 리뷰 작성자 프로필 사진 */}
                               <div className="h-16 w-16 overflow-hidden rounded-full">
                                 <img
-                                  src={review.imageUrl}
+                                  src={review.imageUrl || "/placeholder.svg"}
                                   alt={`${review.userName} 프로필`}
                                   className="h-full w-full object-cover"
                                 />
