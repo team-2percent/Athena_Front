@@ -78,7 +78,7 @@ export const Button = ({
 
   // 최종 클래스 이름 생성
   const buttonClasses = cn(
-    "font-medium border transition-colors duration-200",
+    "font-medium border transition-colors duration-200 whitespace-nowrap",
     variantClasses[finalVariant as keyof typeof variantClasses],
     sizeClasses[size],
     widthClasses[width],
