@@ -13,6 +13,15 @@ import { useApi } from "@/hooks/useApi"
 import AlertModal from "@/components/common/AlertModal"
 import useAuthStore from "@/stores/auth"
 
+// 마크다운 이미지 정보를 저장하는 인터페이스
+interface MarkdownImageInfo {
+  id: string // 이미지 ID 또는 URL
+  file?: File // 파일 객체 (새 이미지인 경우)
+  url?: string // URL (기존 이미지인 경우)
+  isUrl: boolean // URL 이미지인지 여부
+  index: number // 마크다운에서의 순서
+}
+
 export default function ProductEdit() {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
@@ -243,22 +252,39 @@ export default function ProductEdit() {
     }
   }
 
-  // 마크다운에서 이미지 URL을 추출하는 함수
-  const extractImageUrlsFromMarkdown = (markdown: string): string[] => {
-    const imageRegex = /!\[.*?\]\((https?:\/\/[^\s)]+)\)/g
-    const urls: string[] = []
+  // 마크다운에서 이미지 참조 정보를 추출하는 함수 (로컬 이미지와 URL 이미지 모두 처리)
+  const extractImageReferences = (markdown: string): MarkdownImageInfo[] => {
+    const imageInfos: MarkdownImageInfo[] = []
+    let index = 0
+
+    // 마크다운에서 이미지 참조 추출 (로컬/URL 구분 없이 순서대로)
+    const imageRegex = /!\[.*?\]\(([^)]+)\)/g
     let match
 
     while ((match = imageRegex.exec(markdown)) !== null) {
-      const url = match[1]
-      // 로컬 이미지 참조(/markdown-image/)는 제외
-      if (!url.includes("/markdown-image/") && !urls.includes(url)) {
-        urls.push(url)
+      const src = match[1]
+      if (src.startsWith("/markdown-image/")) {
+      // 로컬 이미지
+      const id = src.replace("/markdown-image/", "")
+      imageInfos.push({
+        id,
+        isUrl: false,
+        index: index++,
+      })
+      } else if (src.startsWith("http://") || src.startsWith("https://")) {
+      // URL 이미지
+      imageInfos.push({
+        id: src,
+        url: src,
+        isUrl: true,
+        index: index++,
+      })
       }
+      // 기타 형식은 무시
     }
 
-    console.log("정규식 매칭 결과:", urls)
-    return urls
+    console.log("마크다운에서 추출한 이미지 참조:", imageInfos)
+    return imageInfos
   }
 
   // 프로젝트 수정 함수
@@ -324,30 +350,55 @@ export default function ProductEdit() {
         }
       }
 
-      // 새로운 마크다운 이미지 파일들 추가
-      state.markdownImages.forEach((markdownImage) => {
-        formData.append("markdownFiles", markdownImage.file)
-      })
+      // 마크다운에서 이미지 참조 정보 추출 (로컬 이미지와 URL 이미지 모두)
+      const imageReferences = extractImageReferences(state.markdown)
 
-      // 마크다운에서 기존 이미지 URL 추출 및 추가
-      const markdownImageUrls = extractImageUrlsFromMarkdown(state.markdown)
-      console.log("마크다운에서 추출한 이미지 URLs:", markdownImageUrls)
-      console.log("마크다운 내용:", state.markdown)
+      // 새로 추가된 마크다운 이미지 정보 로깅
+      console.log("새로 추가된 마크다운 이미지:", state.markdownImages)
 
-      for (let i = 0; i < markdownImageUrls.length; i++) {
-        const imageUrl = markdownImageUrls[i]
-        console.log(`마크다운 이미지 ${i + 1} 처리 중:`, imageUrl)
-        const blob = await urlToBlob(imageUrl)
-        if (blob) {
-          console.log(`마크다운 이미지 ${i + 1} Blob 변환 성공:`, blob.type, blob.size)
-          // URL에서 파일 이름과 확장자 추출
-          const fileName = imageUrl.split("/").pop() || `markdown-image-${i}.jpg`
-          const file = new File([blob], fileName, { type: blob.type || "image/jpeg" })
-          formData.append("markdownFiles", file)
+      // 마크다운 이미지 처리를 위한 배열 준비
+      const markdownImageFiles: File[] = []
+
+      // 마크다운에 참조된 순서대로 이미지 파일 추가
+      for (const reference of imageReferences) {
+        if (!reference.isUrl) {
+          // 로컬 이미지 (새로 추가된 이미지)
+          const matchingImage = state.markdownImages.find((img) => img.id === reference.id)
+          if (matchingImage) {
+            console.log(`마크다운 로컬 이미지 추가 (순서: ${reference.index}):`, reference.id)
+            markdownImageFiles.push(matchingImage.file)
+          }
         } else {
-          console.error(`마크다운 이미지 ${i + 1} Blob 변환 실패:`, imageUrl)
+          // URL 이미지 (기존 이미지)
+          console.log(`마크다운 URL 이미지 처리 (순서: ${reference.index}):`, reference.url)
+          const blob = await urlToBlob(reference.url!)
+          if (blob) {
+            const fileName = reference.url!.split("/").pop() || `markdown-url-image-${reference.index}.jpg`
+            const file = new File([blob], fileName, { type: blob.type || "image/jpeg" })
+            markdownImageFiles.push(file)
+          }
         }
       }
+
+      // 마크다운에 참조되지 않은 나머지 이미지도 추가
+      const referencedLocalIds = new Set(imageReferences.filter((ref) => !ref.isUrl).map((ref) => ref.id))
+      const unreferencedImages = state.markdownImages.filter((img) => !referencedLocalIds.has(img.id))
+
+      if (unreferencedImages.length > 0) {
+        console.log(
+          "마크다운에 참조되지 않은 이미지도 추가:",
+          unreferencedImages.map((img) => img.id),
+        )
+        unreferencedImages.forEach((img) => {
+          markdownImageFiles.push(img.file)
+        })
+      }
+
+      // 정렬된 순서로 마크다운 이미지 파일들 추가
+      markdownImageFiles.forEach((file, index) => {
+        console.log(`최종 마크다운 이미지 파일 ${index + 1} 첨부:`, file.name)
+        formData.append("markdownFiles", file)
+      })
 
       // 프로젝트 수정 API 호출
       const response = await fetch(`https://athena-local.i-am-jay.com/api/project/${state.projectId}`, {

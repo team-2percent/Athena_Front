@@ -398,12 +398,55 @@ export const submitProject = async (
 
     console.log("Submitting project data:", projectData)
 
+    // 마크다운 텍스트에서 이미지 참조 순서를 추출하는 함수
+    const extractImageOrder = (markdown: string): string[] => {
+      // 정규식 패턴 수정 - 마크다운 이미지 문법에 맞게 수정
+      const imageRegex = /!\[.*?\]\(\/markdown-image\/([^)]+)\)/g
+      const imageIds: string[] = []
+      let match
+
+      while ((match = imageRegex.exec(markdown)) !== null) {
+        const imageId = match[1]
+        if (!imageIds.includes(imageId)) {
+          imageIds.push(imageId)
+        }
+      }
+
+      console.log("마크다운 텍스트:", markdown)
+      console.log("추출된 이미지 ID 순서:", imageIds)
+      return imageIds
+    }
+
     // FormData 생성
     const formData = new FormData()
     formData.append("request", new Blob([JSON.stringify(projectData)], { type: "application/json" }))
 
-    // 마크다운 이미지 파일들 추가
-    state.markdownImages.forEach((markdownImage, index) => {
+    // 마크다운에서 이미지가 나타나는 순서대로 정렬
+    const imageOrder = extractImageOrder(state.markdown)
+    console.log("마크다운 이미지 총 개수:", state.markdownImages.length)
+
+    // 마크다운에 참조된 이미지가 있으면 해당 순서대로 정렬, 없으면 원래 순서 유지
+    let sortedMarkdownImages: MarkdownImageFile[] = []
+    if (imageOrder.length > 0) {
+      // 마크다운에 참조된 이미지 먼저 순서대로 추가
+      sortedMarkdownImages = imageOrder
+        .map((imageId) => state.markdownImages.find((img) => img.id === imageId))
+        .filter(Boolean) as MarkdownImageFile[]
+
+      // 마크다운에 참조되지 않은 나머지 이미지도 추가
+      const referencedIds = new Set(imageOrder)
+      const unreferencedImages = state.markdownImages.filter((img) => !referencedIds.has(img.id))
+      sortedMarkdownImages = [...sortedMarkdownImages, ...unreferencedImages]
+    } else {
+      // 마크다운에 이미지 참조가 없으면 원래 순서 유지
+      sortedMarkdownImages = [...state.markdownImages]
+    }
+
+    console.log("정렬된 이미지 개수:", sortedMarkdownImages.length)
+
+    // 정렬된 순서로 마크다운 이미지 파일들 추가
+    sortedMarkdownImages.forEach((markdownImage, index) => {
+      console.log(`이미지 ${index + 1} 첨부:`, markdownImage.id)
       formData.append("markdownFiles", markdownImage.file)
     })
 

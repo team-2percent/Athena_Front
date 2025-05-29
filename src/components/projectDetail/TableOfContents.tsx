@@ -148,7 +148,7 @@ const TableOfContents = ({ headings }: TableOfContentsProps) => {
               onClick={() => scrollToHeading(id)}
               title={text} // 전체 텍스트를 툴팁으로 표시
               className={`
-                block w-full text-left py-2 px-1 text-sm transition-all duration-200 truncate
+                block w-full text-left py-2 px-1 text-sm transition-all duration-75 truncate
                 ${level === 1 ? "font-semibold" : level === 2 ? "font-medium ml-3" : "ml-6"}
                 ${
                   activeId === id
@@ -170,7 +170,7 @@ const TableOfContents = ({ headings }: TableOfContentsProps) => {
           </div>
           <div className="w-full bg-[var(--color-gray-border)] rounded-full h-1.5">
             <div
-              className="bg-[var(--color-main-color)] h-1.5 rounded-full transition-all duration-300"
+              className="bg-[var(--color-main-color)] h-1.5 rounded-full transition-all duration-75"
               style={{
                 width: `${scrollProgress}%`,
               }}
