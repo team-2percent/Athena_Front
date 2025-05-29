@@ -7,6 +7,8 @@ import clsx from "clsx"
 import { useApi } from "@/hooks/useApi"
 import Modal from "@/components/common/Modal"
 import { PrimaryButton } from "../common/Button"
+import { EmailInput, PasswordInput, TextInput } from "../common/Input"
+import { EMAIL_MAX_LENGTH, EMAIL_MIN_LENGTH, NAME_MAX_LENGTH, NAME_MIN_LENGTH, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@/lib/ValidationConstants"
 
 interface SignupModalProps {
   isOpen: boolean
@@ -63,16 +65,13 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             >
               닉네임
             </label>
-            <input
-              id="nickname"
-              type="text"
-              className={`w-full p-2 border-b ${
-                focusedField === "nickname" ? "border-main-color" : "border-gray-300"
-              } focus:outline-none text-lg`}
+            <TextInput
+              designType="underline"
+              placeholder="닉네임"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
-              onFocus={() => setFocusedField("nickname")}
-              onBlur={() => setFocusedField(null)}
+              maxLength={NAME_MAX_LENGTH}
+              minLength={NAME_MIN_LENGTH}
             />
           </div>
 
@@ -84,17 +83,13 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             >
               이메일
             </label>
-            <input
-              id="email"
-              type="email"
-              className={clsx(
-                "w-full p-2 border-b focus:outline-none text-lg",
-                focusedField === "email" ? (isEmailValid ? "border-main-color" : "border-red-500") : "border-gray-300",
-              )}
+            <EmailInput
+              designType="underline"
+              placeholder="이메일"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              onFocus={() => setFocusedField("email")}
-              onBlur={() => setFocusedField(null)}
+              maxLength={EMAIL_MAX_LENGTH}
+              minLength={EMAIL_MIN_LENGTH}
             />
             {/* 이메일 확인 문구 */}
             {email !== "" && !isEmailValid && (
@@ -110,28 +105,14 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             >
               비밀번호
             </label>
-            <input
-              id="password"
-              type="password"
-              className={clsx(
-                "w-full p-2 border-b focus:outline-none text-lg",
-                focusedField === "password"
-                  ? isPasswordValid
-                    ? "border-main-color"
-                    : "border-red-500"
-                  : "border-gray-300",
-              )}
+            <PasswordInput
+              designType="underline"
+              placeholder="비밀번호"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              onFocus={() => setFocusedField("password")}
-              onBlur={() => setFocusedField(null)}
+              maxLength={PASSWORD_MAX_LENGTH}
+              minLength={PASSWORD_MIN_LENGTH}
             />
-            {/* 패스워드 확인 문구 */}
-            {password !== "" && !isPasswordValid && (
-              <p className="absolute bottom-0 translate-y-full text-red-500 text-xs pt-1">
-                최소 8자리 이상, 영문 대소문자, 숫자, 특수문자를 섞어 구성해야 합니다.
-              </p>
-            )}
           </div>
 
           {/* Confirm Password Input */}
@@ -142,21 +123,19 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             >
               비밀번호 확인
             </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              className={clsx(
-                "w-full p-2 border-b focus:outline-none text-lg",
-                focusedField === "confirmPassword"
-                  ? isPasswordMatch
-                    ? "border-main-color"
-                    : "border-red-500"
-                  : "border-gray-300",
-              )}
+            <PasswordInput
+              designType="underline"
+              placeholder="비밀번호"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              onFocus={() => setFocusedField("confirmPassword")}
-              onBlur={() => setFocusedField(null)}
+              maxLength={PASSWORD_MAX_LENGTH}
+              minLength={PASSWORD_MIN_LENGTH}
+              validationRules={[
+                {
+                  validate: () => confirmPassword === password,
+                  errorMessage: "비밀번호가 일치하지 않습니다.",
+                },
+              ]}
             />
             {/* 패스워드 확인 문구 */}
             {!isPasswordMatch && (

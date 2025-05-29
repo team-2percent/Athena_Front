@@ -2,6 +2,11 @@ import clsx from "clsx"
 import { useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 
+interface ValidationRule {
+  validate: (e: React.ChangeEvent<HTMLInputElement>) => boolean
+  errorMessage: string
+}
+
 interface InputProps {
   className?: string
   type: "text" | "number" | "password" | "email"
@@ -17,6 +22,7 @@ interface InputProps {
   minNumber? : number
   showCharCount?: boolean
   onClick?: (e: React.MouseEvent<HTMLInputElement>) => void
+  validationRules?: ValidationRule[]
 }
 
 export function Input({
@@ -34,6 +40,7 @@ export function Input({
   minNumber = 0,
   showCharCount,
   onClick,
+  validationRules = [],
 }: InputProps) {
   const [validationError, setValidationError] = useState<string>("")
   const [isDirty, setIsDirty] = useState(false)
@@ -44,6 +51,14 @@ export function Input({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsDirty(true)
 
+    validationRules.forEach(rule => {
+      if (!rule.validate(e)) {
+        setValidationError(rule.errorMessage)
+        onChange(e);
+        return
+      }
+    })
+
     if (type === "text") {
       handleTextChange(e)
     } else if (type === "number") {
@@ -53,6 +68,15 @@ export function Input({
     } else if (type === "email") {
       handleEmailChange(e)
     }
+
+    // 추가 유효성 검증
+    for (const rule of validationRules) {
+      if (!rule.validate(e)) {
+        setValidationError(rule.errorMessage)
+        return
+      }
+    }
+    setValidationError("")
   }
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
