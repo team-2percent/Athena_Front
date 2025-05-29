@@ -8,6 +8,8 @@ import { useApi } from "@/hooks/useApi"
 import ConfirmModal from "../common/ConfirmModal"
 import AlertModal from "../common/AlertModal"
 import { PrimaryButton } from "../common/Button"
+import { TextInput } from "../common/Input"
+import { ADDRESS_DETAIL_MAX_LENGTH, ADDRESS_DETAIL_MIN_LENGTH } from "@/lib/ValidationConstants"
 
 interface AddressInfo {
     id: number
@@ -160,14 +162,15 @@ export default function AddressInfo() {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             상세주소
                         </label>
-                        <input
-                            type="text"
+                        <TextInput
                             value={newAddress.detailAddress}
                             onChange={(e) => setNewAddress({
                                 ...newAddress,
                                 detailAddress: e.target.value,
                             })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
+                            className="w-full"
+                            maxLength={ADDRESS_DETAIL_MAX_LENGTH}
+                            minLength={ADDRESS_DETAIL_MIN_LENGTH}
                         />
                         <div className="mt-4 flex justify-end">
                             <PrimaryButton

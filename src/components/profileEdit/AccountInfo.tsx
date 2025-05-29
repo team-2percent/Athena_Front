@@ -6,6 +6,8 @@ import { useApi } from "@/hooks/useApi"
 import ConfirmModal from "../common/ConfirmModal"
 import AlertModal from "../common/AlertModal"
 import { PrimaryButton } from "../common/Button"
+import { TextInput } from "../common/Input"
+import { ACCOUNT_HOLDER_MAX_LENGTH, ACCOUNT_HOLDER_MIN_LENGTH, BANK_ACCOUNT_MAX_LENGTH, BANK_ACCOUNT_MIN_LENGTH, BANK_NAME_MAX_LENGTH, BANK_NAME_MIN_LENGTH } from "@/lib/ValidationConstants"
 
 interface AccountInfo {
     id: number
@@ -120,7 +122,7 @@ export default function AccountInfo() {
   }, []);
 
 
-    return <div className="flex gap-4">
+    return <div className="flex gap-4 w-full">
       {/* 5. 컴포넌트 return 문 내부 최상단에 AlertModal 컴포넌트 추가 */}
       <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={() => setIsAlertOpen(false)} />
       <ConfirmModal isOpen={isDefaultModalOpen} message={"기본 계좌로 설정할까요?"} onConfirm={setDefaultAccount} onClose={() => setIsDefaultModalOpen(false)} />
@@ -131,35 +133,38 @@ export default function AccountInfo() {
             <div className="flex gap-4 flex-col">
             <div>
                 <label className="block text-sm font-medium text-sub-gray mb-1">이름</label>
-                <input
-                  type="text"
+                <TextInput
+                  className="w-full"
                   name="accountHolder"
                   value={newAccount.accountHolder}
                   onChange={handleNewAccountChange}
-                  className="w-full px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
                   placeholder="이름"
+                  maxLength={ACCOUNT_HOLDER_MAX_LENGTH}
+                  minLength={ACCOUNT_HOLDER_MIN_LENGTH}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-sub-gray mb-1">은행명</label>
-                <input
-                  type="text"
+                <TextInput
+                className="w-full"
                   name="bankName"
                   value={newAccount.bankName}
                   onChange={handleNewAccountChange}
-                  className="w-full px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
                   placeholder="은행명"
+                  maxLength={BANK_NAME_MAX_LENGTH}
+                  minLength={BANK_NAME_MIN_LENGTH}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-sub-gray mb-1">계좌번호</label>
-                <input
-                  type="number"
+                <TextInput
+                className="w-full"
                   name="bankAccount"
                   value={newAccount.bankAccount}
                   onChange={handleNewAccountChange}
-                  className="w-full px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
                   placeholder="계좌번호"
+                  maxLength={BANK_ACCOUNT_MAX_LENGTH}
+                  minLength={BANK_ACCOUNT_MIN_LENGTH}
                 />
               </div>
             </div>

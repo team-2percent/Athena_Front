@@ -8,6 +8,7 @@ interface ValidationRule {
 }
 
 interface InputProps {
+  name?: string
   className?: string
   type: "text" | "number" | "password" | "email"
   designType?: "outline" | "underline"
@@ -26,6 +27,7 @@ interface InputProps {
 }
 
 export function Input({
+  name,
   className,
   type,
   designType = "outline",
@@ -153,6 +155,7 @@ export function Input({
   return (
     <div className="relative">
       <input
+        name={name}
         type={type}
         value={value}
         onChange={handleChange}

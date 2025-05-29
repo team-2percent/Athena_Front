@@ -12,6 +12,18 @@ export const SELLER_INTRODUCTION_MIN_LENGTH = 0
 export const LINK_URLS_MAX_LENGTH = 200
 export const LINK_URLS_MIN_LENGTH = 0
 
+// 계좌
+export const ACCOUNT_HOLDER_MAX_LENGTH = 50
+export const ACCOUNT_HOLDER_MIN_LENGTH = 1
+export const BANK_NAME_MAX_LENGTH = 50
+export const BANK_NAME_MIN_LENGTH = 1
+export const BANK_ACCOUNT_MAX_LENGTH = 50
+export const BANK_ACCOUNT_MIN_LENGTH = 1
+
+// 배송지
+export const ADDRESS_DETAIL_MAX_LENGTH = 100
+export const ADDRESS_DETAIL_MIN_LENGTH = 1
+
 // 검색
 export const SEARCH_MAX_LENGTH = 20
 
