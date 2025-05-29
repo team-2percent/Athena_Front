@@ -1,203 +1,94 @@
 import clsx from "clsx"
 import { useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
-
-interface ValidationRule {
-  validate: (e: React.ChangeEvent<HTMLInputElement>) => boolean
-  errorMessage: string
-}
+import { z } from "zod"
 
 interface InputProps {
+  id?: string
   name?: string
   className?: string
   type: "text" | "number" | "password" | "email"
-  designType?: "outline" | "underline"
+  designType?: "outline-rect" | "outline-round" | "underline"
   align?: "left" | "center" | "right"
   value: string | number
+  placeholder?: string
+  isError?: boolean
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
-  placeholder?: string
-  minLength? : number
-  maxLength? : number
-  maxNumber? : number
-  minNumber? : number
-  showCharCount?: boolean
   onClick?: (e: React.MouseEvent<HTMLInputElement>) => void
-  validationRules?: ValidationRule[]
+  schema?: z.ZodType<any>
+  onValidationError?: (error: string) => void
 }
 
 export function Input({
+  id,
   name,
   className,
   type,
-  designType = "outline",
+  designType = "outline-rect",
   value,
   align = "left",
+  placeholder,
+  isError = false,
   onChange,
   onKeyDown,
-  placeholder,
-  minLength,
-  maxLength,
-  maxNumber,
-  minNumber = 0,
-  showCharCount,
   onClick,
-  validationRules = [],
+  schema,
+  onValidationError,
 }: InputProps) {
-  const [validationError, setValidationError] = useState<string>("")
-  const [isDirty, setIsDirty] = useState(false)
-  const hasError = Boolean(isDirty && validationError)
-  const design = designType === "outline" ? "rounded border" : "border-b"
-  const charCount = typeof value === "string" ? value.length : 0
+  const design = designType === "outline-rect" ? "rounded border" : designType === "outline-round" ? "rounded-full border" : "border-b"
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>  {
-    setIsDirty(true)
-
-    validationRules.forEach(rule => {
-      if (!rule.validate(e)) {
-        setValidationError(rule.errorMessage)
-        onChange(e);
-        return
-      }
-    })
-
-    if (type === "text") {
-      handleTextChange(e)
-    } else if (type === "number") {
-      handleNumberChange(e)
-    } else if (type === "password") {
-      handlePasswordChange(e)
-    } else if (type === "email") {
-      handleEmailChange(e)
-    }
-
-    // 추가 유효성 검증
-    for (const rule of validationRules) {
-      if (!rule.validate(e)) {
-        setValidationError(rule.errorMessage)
-        return
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (schema) {
+      try {
+        schema.parse(e.target.value)
+        onValidationError?.("")
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          onValidationError?.(error.errors[0].message)
+        }
       }
     }
-    setValidationError("")
-  }
-
-  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value
-    if (maxLength && newValue.length > maxLength) {
-      setValidationError(`${maxLength}자 이내로 입력해주세요`)
-      e.target.value = newValue.slice(0, maxLength)
-      onChange(e)
-      return
-    }
-
-    if (minLength && newValue.length < minLength) {
-      setValidationError(`${minLength}자 이상 입력해주세요`)
-    } else {
-      setValidationError("")
-    }
-
-    onChange(e)
-  }
-
-  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = Number(e.target.value)
-    if (maxNumber && newValue > maxNumber) {
-      setValidationError(`${maxNumber} 이하로 입력해주세요`)
-      e.target.value = maxNumber.toString()
-    }
-
-    else if (newValue < minNumber) {
-      setValidationError(`${minNumber} 이상으로 입력해주세요`)
-    }
-
-    else setValidationError("")
-    onChange(e)
-  }
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value
-    if (maxLength && newValue.length > maxLength) {
-      return
-    }
-
-    if (
-      !((minLength === undefined || minLength && newValue.length >= minLength) &&
-      /[A-Z]/.test(newValue) &&
-      /[a-z]/.test(newValue) &&
-      /\d/.test(newValue) &&
-      /[!@#$%^&*(),.?":{}|<>]/.test(newValue))
-    ) {
-      setValidationError(`비밀번호는 ${minLength}자 이상, 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다`)
-      onChange(e)
-      return;
-    }
-
-    setValidationError("")
-    onChange(e)
-  }
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value
-    if (maxLength && newValue.length > maxLength) {
-      return
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newValue)) {
-      setValidationError("올바른 이메일 형식이 아닙니다")
-      onChange(e)
-      return;
-    }
-
-    setValidationError("")
     onChange(e)
   }
 
   return (
-    <div className="relative">
-      <input
-        name={name}
-        type={type}
-        value={value}
-        onChange={handleChange}
-        onKeyDown={(e) => {
-          if (onKeyDown && e.key === "Enter") onKeyDown(e)
-        }}
-        placeholder={placeholder}
-        className={clsx(
-          "px-3 py-2 text-sm focus:outline-none transition w-full focus:border-main-color",
-          design,
-          hasError && "border-red-500",
-          showCharCount && "pr-16",
-          align === "center" && "text-center",
-          align === "right" && "text-right",
-          className
-        )}
-        onClick={onClick}
-      />
-      {showCharCount && (
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">
-          {charCount}/{maxLength || "-"}
-        </div>
+    <input
+      id={id}
+      name={name}
+      type={type}
+      value={value}
+      onChange={handleChange}
+      onKeyDown={(e) => {
+        if (onKeyDown && e.key === "Enter") onKeyDown(e)
+      }}
+      onClick={onClick}
+      placeholder={placeholder}
+      className={clsx(
+        "px-3 py-2 text-sm border-gray-300 focus:outline-none transition focus:border-main-color",
+        design,
+        isError && "border-red-500",
+        align === "center" && "text-center",
+        align === "right" && "text-right",
+        className
       )}
-      {hasError && (
-        <p className="absolute mt-1 ml-1 text-xs text-red-500">
-          {validationError}
-        </p>
-      )}
-    </div>
+    />
   )
 }
 
+// 클릭 시 모두 선택(주로 NumberInput에서 사용)
 const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
   e.currentTarget.select();
 };
 
+// components
 export const TextInput = ({
   showCharCount,
   ...props
 }: Omit<InputProps, "type"> & { showCharCount?: boolean }) => (
-  <Input {...props} type="text" showCharCount={showCharCount} />
+  <Input {...props} type="text" />
 )
+
 export const NumberInput = (props: Omit<InputProps, "type">) => (
   <Input {...props} type="number" onClick={handleClick} />
 )
@@ -208,9 +99,9 @@ export const PasswordInput = ({
   onChange,
   onKeyDown,
   placeholder,
-  minLength,
-  maxLength,
   designType = "underline",
+  schema,
+  onValidationError,
 }: Omit<InputProps, "type">) => {
   const [visible, setVisible] = useState(false)
 
@@ -224,12 +115,12 @@ export const PasswordInput = ({
         onKeyDown={onKeyDown}
         placeholder={placeholder}
         designType={designType}
-        minLength={minLength}
-        maxLength={maxLength}
+        schema={schema}
+        onValidationError={onValidationError}
       />
       <button
         type="button"
-        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600"
         onClick={() => setVisible((v) => !v)}
       >
         {visible ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -243,10 +134,10 @@ export const EmailInput = ({
   value,
   onChange,
   onKeyDown,
-  minLength,
-  maxLength,
   placeholder = "이메일을 입력해주세요",
   designType = "underline",
+  schema,
+  onValidationError,
 }: Omit<InputProps, "type">) => {
   return (
     <Input
@@ -257,8 +148,8 @@ export const EmailInput = ({
       onKeyDown={onKeyDown}
       placeholder={placeholder}
       designType={designType}
-      minLength={minLength}
-      maxLength={maxLength}
+      schema={schema}
+      onValidationError={onValidationError}
     />
   )
 }
