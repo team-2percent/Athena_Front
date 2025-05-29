@@ -34,10 +34,10 @@ export default function TextArea({ value, onChange, showCharCount, maxLength, cl
     }
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative h-fit">
         <textarea
             className={clsx(
-                "w-full px-3 py-2 text-sm focus:outline-none transition rounded border resize-none w-full focus:border-main-color h-full",
+                "w-full px-3 py-2 text-sm focus:outline-none transition rounded border resize-none focus:border-main-color",
                 hasError && "border-red-500",
                 showCharCount && "pr-16",
                 className
@@ -47,12 +47,12 @@ export default function TextArea({ value, onChange, showCharCount, maxLength, cl
             placeholder={placeholder}
         />
         {showCharCount && (
-            <div className="absolute right-3 bottom-2 text-xs text-gray-500">
+            <div className="absolute right-3 bottom-3 text-xs text-gray-500">
             {charCount}/{maxLength || "-"}
             </div>
         )}
         {hasError && (
-            <p className="absolute ml-1 text-xs text-red-500">
+            <p className="absolute text-xs text-red-500">
             {validationError}
             </p>
         )}

@@ -2,10 +2,12 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Camera, Check, Plus, X } from "lucide-react"
-import PasswordInput from "../common/PasswordInput"
+import { PasswordInput, TextInput } from "../common/Input"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
 import { CancelButton, PrimaryButton } from "../common/Button"
+import { LINK_URLS_MAX_LENGTH, LINK_URLS_MIN_LENGTH, NAME_MAX_LENGTH, NAME_MIN_LENGTH, SELLER_INTRODUCTION_MAX_LENGTH, SELLER_INTRODUCTION_MIN_LENGTH } from "@/lib/ValidationConstants"
+import TextArea from "../common/TextArea"
 
 interface Profile {
     name: string
@@ -281,16 +283,19 @@ export default function ProfileInfo() {
                         <div className="flex-1 flex flex-col justify-start bg-white rounded-lg shadow p-6 gap-8">
                             <h3 className="text-lg font-medium">프로필 정보</h3>
                             <div className="flex justify-start w-full gap-8 items-center">
-                            <div className="flex items-center gap-2">
-                                <input
-                                    className="w-full px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color text-sm"
+                            <div className="flex items-center gap-4">
+                                <span className="text-sm font-medium text-sub-gray w-10">이름</span>
+                                <TextInput
+                                    placeholder="이름"
                                     value={newName}
                                     onChange={(e) => setNewName(e.target.value)}
-                                /> 
+                                    maxLength={NAME_MAX_LENGTH}
+                                    minLength={NAME_MIN_LENGTH}
+                                />
                             </div>
                             </div>
-                            <div className="flex justify-start w-full gap-8 items-center">
-                                <span className="text-sm font-medium text-sub-gray">이메일</span>
+                            <div className="flex justify-start w-full gap-4 items-center">
+                                <span className="text-sm font-medium text-sub-gray w-10">이메일</span>
                                 <span className="text-sm font-medium">{profile.email}</span>
                             </div>
                             <PrimaryButton
@@ -303,14 +308,20 @@ export default function ProfileInfo() {
                     </div>
 
                     {/* 소개, 링크 란 */}
-                    <div className="flex-1 flex flex-col justify-start bg-white rounded-lg shadow p-6 gap-2">
-                        <h3 className="text-lg font-medium">소개</h3>  
-                        {/* 소개란 */}
-                        <textarea
-                            className="w-full h-[150px] px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:border-2 focus:border-main-color text-sm resize-none"
-                            value={newIntroduction ? newIntroduction : ""}
-                            onChange={(e) => setNewIntroduction(e.target.value)}
-                        />
+                    <div className="flex-1 flex flex-col justify-start bg-white rounded-lg shadow p-6 gap-6">
+                        <div>
+                            <h3 className="text-lg font-medium mb-2">소개</h3>  
+                            {/* 소개란 */}
+                            <TextArea
+                                className="h-[150px] w-full"
+                                placeholder="소개를 입력하세요"
+                                value={newIntroduction}
+                                onChange={(e) => setNewIntroduction(e.target.value)}
+                                showCharCount
+                                maxLength={SELLER_INTRODUCTION_MAX_LENGTH}
+                                minLength={SELLER_INTRODUCTION_MIN_LENGTH}
+                            />
+                        </div>
                         {/* 링크란 */}
                         <div className="flex gap-4 items-center flex-wrap">
                             <button onClick={toggleAddingUrl}>
@@ -319,10 +330,13 @@ export default function ProfileInfo() {
                             {
                                 addingUrl &&
                                 <div className="flex gap-2 items-center">
-                                    <input
-                                        type="url"
-                                        className="w-full px-2 py-1 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color text-sm"
-                                        value={newUrl} onChange={(e) => setNewUrl(e.target.value)} />
+                                    <TextInput
+                                        placeholder="링크를 입력하세요"
+                                        value={newUrl}
+                                        onChange={(e) => setNewUrl(e.target.value)}
+                                        maxLength={LINK_URLS_MAX_LENGTH - (newUrls.join(",").length + 1)}
+                                        minLength={LINK_URLS_MIN_LENGTH}
+                                    />
                                     <button onClick={handleUrlAdd}>
                                         <Check className="w-4 h-4" />
                                     </button>

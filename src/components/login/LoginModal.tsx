@@ -8,6 +8,8 @@ import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
 import Modal from "@/components/common/Modal"
 import { Button, PrimaryButton, SecondaryButton } from "../common/Button"
+import { EmailInput, PasswordInput } from "../common/Input"
+import { EMAIL_MAX_LENGTH, EMAIL_MIN_LENGTH, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@/lib/ValidationConstants"
 
 interface LoginModalProps {
   isOpen: boolean
@@ -22,10 +24,6 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
   const [password, setPassword] = useState("")
   const [disabled, setDisabled] = useState(true)
   const [errorMessage, setErrorMessage] = useState("")
-  const [focusedField, setFocusedField] = useState<string | null>(null)
-  const [isEmailValid, setIsEmailValid] = useState(true)
-
-  const checkEmail = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -43,10 +41,6 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
   }
 
   useEffect(() => {
-    setIsEmailValid(checkEmail() || email === "")
-  }, [email])
-
-  useEffect(() => {
     if (email && password) {
       setErrorMessage("")
       setDisabled(false)
@@ -61,37 +55,23 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
         <form className="relative" onSubmit={handleSubmit}>
           {/* Email Input */}
           <div className="relative mb-4">
-            <input
-              type="email"
+            <EmailInput
               placeholder="이메일 입력"
-              className={clsx(
-                "w-full p-3 border-b focus:outline-none text-lg",
-                focusedField === "email" ? (isEmailValid ? "border-main-color" : "border-red-500") : "border-gray-300",
-              )}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              onFocus={() => setFocusedField("email")}
-              onBlur={() => setFocusedField(null)}
+              maxLength={EMAIL_MAX_LENGTH}
+              minLength={EMAIL_MIN_LENGTH}
             />
-            {/* 이메일 확인 문구 */}
-            {!isEmailValid && (
-              <p className="absolute bottom-0 translate-y-full text-red-500 text-xs pt-1">이메일 형식이 아닙니다.</p>
-            )}
           </div>
 
           {/* Password Input */}
           <div className="relative mb-8">
-            <input
-              type="password"
+            <PasswordInput
               placeholder="비밀번호 입력"
-              className={clsx(
-                "w-full p-3 border-b focus:outline-none text-lg",
-                focusedField === "password" ? "border-main-color" : "border-gray-300",
-              )}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              onFocus={() => setFocusedField("password")}
-              onBlur={() => setFocusedField(null)}
+              maxLength={PASSWORD_MAX_LENGTH}
+              minLength={PASSWORD_MIN_LENGTH}
             />
           </div>
 

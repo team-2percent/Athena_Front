@@ -1,5 +1,21 @@
 export const ESSENTIAL_MIN_LENGTH = 1
+
+// 사용자
+export const EMAIL_MAX_LENGTH = 50
+export const EMAIL_MIN_LENGTH = 1
+export const PASSWORD_MIN_LENGTH = 8
+export const PASSWORD_MAX_LENGTH = 100
+export const NAME_MAX_LENGTH = 50
+export const NAME_MIN_LENGTH = 1
+export const SELLER_INTRODUCTION_MAX_LENGTH = 200
+export const SELLER_INTRODUCTION_MIN_LENGTH = 0
+export const LINK_URLS_MAX_LENGTH = 200
+export const LINK_URLS_MIN_LENGTH = 0
+
+// 검색
 export const SEARCH_MAX_LENGTH = 20
+
+// 쿠폰
 export const COUPON_NAME_MAX_LENGTH = 25
 export const COUPON_CONTENT_MIN_LENGTH = 10
 export const COUPON_CONTENT_MAX_LENGTH = 50
@@ -7,3 +23,4 @@ export const COUPON_PRICE_MAX_NUMBER = 50000
 export const COUPON_PRICE_MIN_NUMBER = 1000
 export const COUPON_STOCK_MAX_NUMBER = 1000000
 export const COUPON_STOCK_MIN_NUMBER = 1
+
