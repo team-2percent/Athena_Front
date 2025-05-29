@@ -80,11 +80,11 @@ export function Input({
       e.target.value = maxNumber.toString()
     }
 
-    if (newValue < minNumber) {
+    else if (newValue < minNumber) {
       setValidationError(`${minNumber} 이상으로 입력해주세요`)
-      e.target.value = minNumber.toString()
     }
 
+    else setValidationError("")
     onChange(e)
   }
 
@@ -121,7 +121,7 @@ export function Input({
   }
 
   return (
-    <div className="w-full relative h-fit">
+    <div className="relative">
       <input
         type={type}
         value={value}
