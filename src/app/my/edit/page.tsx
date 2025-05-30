@@ -1,12 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import ProfileInfo from "@/components/profileEdit/ProfileInfo"
 import AccountInfo from "@/components/profileEdit/AccountInfo"
 import AddressInfo from "@/components/profileEdit/AddressInfo"
 import MenuTab from "@/components/common/MenuTab"
 import { ArrowLeftIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
+import UserInfo from "@/components/profileEdit/UserInfo"
 
 export default function EditPage() {
     const [activeTab, setActiveTab] = useState("프로필")
@@ -19,7 +19,7 @@ export default function EditPage() {
     const renderContent = () => {
         switch (activeTab) {
             case "프로필":
-                return <ProfileInfo />
+                return <UserInfo />
             case "계좌":
                 return <AccountInfo />
             case "배송지":

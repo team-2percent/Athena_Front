@@ -4,7 +4,7 @@ import {
   EMAIL_MIN_LENGTH, PASSWORD_MIN_LENGTH,
   NICKNAME_MAX_LENGTH,
   NICKNAME_MIN_LENGTH,
-  SELLER_INTRODUCTION_MAX_LENGTH,
+  SELLER_DESCRIPTION_MAX_LENGTH,
   IMAGE_MAX_MB,
   LINK_URLS_MAX_LENGTH,
 } from "./ValidationConstants"
@@ -235,10 +235,12 @@ export const nicknameSchema = z.string()
   .min(NICKNAME_MIN_LENGTH, "닉네임을 입력해주세요.")
   .max(NICKNAME_MAX_LENGTH, `닉네임은 ${NICKNAME_MAX_LENGTH}자 이내로 입력해주세요.`)
 
-export const sellerIntroductionSchema = z.string()
-  .max(SELLER_INTRODUCTION_MAX_LENGTH, `판매자 소개는 ${SELLER_INTRODUCTION_MAX_LENGTH}자 이내로 입력해주세요.`)
+export const sellerDescriptionSchema = z.string()
+  .max(SELLER_DESCRIPTION_MAX_LENGTH, `판매자 소개는 ${SELLER_DESCRIPTION_MAX_LENGTH}자 이내로 입력해주세요.`)
 
 export const urlSchema = z.string().url();
+
+export const linkUrlsSchema = z.string().max(LINK_URLS_MAX_LENGTH, `링크 전체 ${LINK_URLS_MAX_LENGTH}자 이내로 입력해주세요.`)
 
 // 로그인/회원가입 유효성 검사 스키마
 export const loginSchema = z.object({
@@ -264,9 +266,9 @@ export const signupSchema = z.object({
 // 프로필 수정 스키마
 export const profileEditSchema = z.object({
   nickname: nicknameSchema,
-  sellerIntroduction: sellerIntroductionSchema,
+  sellerDescription: sellerDescriptionSchema,
   profileImage: imageSchema.nullable(),
-  urls: z.string().max(LINK_URLS_MAX_LENGTH, `링크 전체 ${LINK_URLS_MAX_LENGTH}자 이내로 입력해주세요.`)
+  linkUrl: linkUrlsSchema,
 })
 
 // 비밀번호 수정 스키마

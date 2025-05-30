@@ -124,7 +124,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="md" closeOnOutsideClick closeOnEsc title="회원가입">
-      <div className="p-4">
+      <div className="px-4 pt-4">
         <form onSubmit={handleSubmit}>
           {/* Name Input */}
           <div className="mb-6 flex flex-col gap-1 group">
@@ -195,14 +195,14 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
           {/* Signup Button */}
           <PrimaryButton
             type="submit"
-            className="relative w-full py-4 mb-1"
+            className="relative w-full py-4"
             disabled={disabled}
           >
             가입하기
           </PrimaryButton>
-          {signupError && (
-            <p className="absolute bottom-3 left-0 text-red-500 text-sm pt-1 w-full text-center">{errorMessage}</p>
-          )}
+          <div className="h-[1.25rem] text-center">
+            <span className="w-full text-red-500 text-xs">{errorMessage}</span>
+          </div>
         </form>
       </div>
     </Modal>
