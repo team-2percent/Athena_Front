@@ -37,7 +37,7 @@ export default function AccountInfo() {
       accountHolder: "",
   })
 
-  const addable = accountAddSchema.safeParse(newAccount);
+  const addButtonDisabled = accountAddSchema.safeParse(newAccount).error !== undefined;
 
   const [defaultId, setDefaultId] = useState<number | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -207,6 +207,7 @@ export default function AccountInfo() {
                 type="button"
                 onClick={handleAddAccount}
                 className="flex items-center appearance-none"
+                disabled={addButtonDisabled}
               >
                 <Plus className="w-4 h-4 mr-1" /> 계좌 추가
               </PrimaryButton>
@@ -236,13 +237,16 @@ export default function AccountInfo() {
                             >기본 계좌로 설정</button>
                             }
                         </div>
-                        <button
-                            type="button"
-                            onClick={() => handleClickDeleteButton(account.id)}
-                            className="text-sub-gray hover:text-red-500"
-                        >
-                            <Trash2 className="w-4 h-4" />
-                        </button>
+                        {
+                          !account.isDefault &&
+                          <button
+                              type="button"
+                              onClick={() => handleClickDeleteButton(account.id)}
+                              className="text-sub-gray hover:text-red-500"
+                          >
+                              <Trash2 className="w-4 h-4" />
+                          </button>
+                        }
                         </div>
                     ))}  
                     </div>
