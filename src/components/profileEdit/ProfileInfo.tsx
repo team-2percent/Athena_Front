@@ -279,7 +279,7 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
             email: prevProfile.email,
             image: prevProfile.imageUrl,
             sellerDescription: prevProfile.sellerDescription,
-            linkUrls: prevProfile.linkUrl.split(",")
+            linkUrls: prevProfile.linkUrl === "" ? [] : prevProfile.linkUrl.split(",")
         })
     }, [prevProfile])
 
@@ -362,6 +362,8 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                     <InputInfo errorMessage={profileEditError.sellerDescription} showLength length={profile.sellerDescription.length} maxLength={SELLER_DESCRIPTION_MAX_LENGTH} />
                 </div>
                 {/* 링크란 */}
+                <div>
+                <h3 className="text-lg font-medium mb-2">링크</h3>
                 <div className="flex gap-4 items-start flex-wrap">
                     <SecondaryButton className="w-fit rounded-full p-2" onClick={toggleAddingUrl}>
                         <Plus className="w-4 h-4" />
@@ -400,6 +402,7 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                             </div>
                         )
                     })}
+                </div>
                 </div>
             </div> 
             <div className="flex gap-2 justify-end items-end flex-wrap">
