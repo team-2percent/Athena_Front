@@ -8,7 +8,7 @@ import useAuthStore from "@/stores/auth"
 import Modal from "@/components/common/Modal"
 import { PrimaryButton, SecondaryButton } from "../common/Button"
 import { EmailInput, PasswordInput } from "../common/Input"
-import { loginSchema } from "@/lib/validationSchemas"
+import { emailSchema, loginSchema, passwordSchema } from "@/lib/validationSchemas"
 import { EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH } from "@/lib/ValidationConstants"
 import InputInfo from "../common/InputInfo"
 
@@ -29,10 +29,10 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
     password: ""
   })
 
-  const disabled: boolean = loginError.email !== "" || loginError.password !== ""
+  const disabled: boolean = !loginSchema.safeParse({ email, password }).success
 
   const validateEmail = (email: string) => {
-    const result = loginSchema.shape.email.safeParse(email)
+    const result = emailSchema.safeParse(email)
     setLoginError({ 
       ...loginError,
       email: result.success ? "" : result.error.issues[0].message
@@ -40,7 +40,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
   }
 
   const validatePassword = (password: string) => {
-    const result = loginSchema.shape.password.safeParse(password) 
+    const result = passwordSchema.safeParse(password) 
     setLoginError({
       ...loginError,
       password: result.success ? "" : result.error.issues[0].message

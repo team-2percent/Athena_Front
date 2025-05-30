@@ -114,7 +114,7 @@ export const EmailInput = ({
   value,
   onChange,
   onKeyDown,
-  placeholder = "이메일을 입력해주세요",
+  placeholder,
   designType = "underline",
   isError = false,
 }: Omit<InputProps, "type">) => {
