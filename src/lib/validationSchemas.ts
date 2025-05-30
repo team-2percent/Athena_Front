@@ -256,6 +256,7 @@ export const bankNameSchema = z.string()
 export const bankAccountSchema = z.string()
   .min(1, "계좌번호를 입력해주세요.")
   .max(BANK_ACCOUNT_MAX_LENGTH, `계좌번호는 ${BANK_ACCOUNT_MAX_LENGTH}자 이내로 입력해주세요.`)
+  .refine((val) => /^\d+$/.test(val), "숫자만 입력해주세요.")
 
 // 배송지 관련 유효성 검사 스키마
 export const addressDetailSchema = z.string()

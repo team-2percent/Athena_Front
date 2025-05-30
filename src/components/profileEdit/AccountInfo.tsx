@@ -1,4 +1,3 @@
-import clsx from "clsx"
 import { Plus, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useApi } from "@/hooks/useApi"
@@ -8,6 +7,8 @@ import AlertModal from "../common/AlertModal"
 import { PrimaryButton } from "../common/Button"
 import { TextInput } from "../common/Input"
 import { ACCOUNT_HOLDER_MAX_LENGTH, ACCOUNT_HOLDER_MIN_LENGTH, BANK_ACCOUNT_MAX_LENGTH, BANK_ACCOUNT_MIN_LENGTH, BANK_NAME_MAX_LENGTH, BANK_NAME_MIN_LENGTH } from "@/lib/ValidationConstants"
+import InputInfo from "../common/InputInfo"
+import { accountAddSchema, accountHolderSchema, bankAccountSchema, bankNameSchema } from "@/lib/validationSchemas"
 
 interface AccountInfo {
     id: number
@@ -23,13 +24,20 @@ export default function AccountInfo() {
   const [isDefaultModalOpen, setIsDefaultModalOpen] = useState(false); 
   // 계좌 정보 상태
   const [accounts, setAccounts] = useState<AccountInfo[]>([])
-
+  const [accountAddError, setAccountAddError] = useState({
+    accountHolder: "",
+    bankName: "",
+    bankAccount: "",
+  })
+  
   // 새 계좌 정보 폼
   const [newAccount, setNewAccount] = useState<Omit<AccountInfo, "id" | "isDefault">>({
       bankName: "",
       bankAccount: "",
       accountHolder: "",
   })
+
+  const addable = accountAddSchema.safeParse(newAccount);
 
   const [defaultId, setDefaultId] = useState<number | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -77,11 +85,40 @@ export default function AccountInfo() {
   }
 
   // 새 계좌 정보 변경 핸들러
+  const validateAccount = (name: string, value: string) => {
+    let returnValue = ""
+    let error = ""
+
+    if (name === "accountHolder") {
+      const result = accountHolderSchema.safeParse(value)
+      returnValue = result.success ? value : value.slice(0, ACCOUNT_HOLDER_MAX_LENGTH)
+      error = result.error?.issues[0].message || ""
+    } else if (name === "bankName") {
+      const result = bankNameSchema.safeParse(value)
+      returnValue = result.success ? value : value.slice(0, BANK_NAME_MAX_LENGTH)
+      error = result.error?.issues[0].message || ""
+    } else if (name === "bankAccount") {
+      const result = bankAccountSchema.safeParse(value)
+      returnValue = result.success ? value : value.slice(0, BANK_ACCOUNT_MAX_LENGTH).replace(/[^0-9]/g, "")
+      error = result.error?.issues[0].message || ""
+    }
+
+    return {
+      value: returnValue,
+      error: error
+    }
+  }
+
   const handleNewAccountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
+    const { value: returnValue, error } = validateAccount(name, value)
     setNewAccount({
-    ...newAccount,
-    [name]: value,
+      ...newAccount,
+      [name]: returnValue,
+    })
+    setAccountAddError({
+      ...accountAddError,
+      [name]: error
     })
   }
 
@@ -139,9 +176,8 @@ export default function AccountInfo() {
                   value={newAccount.accountHolder}
                   onChange={handleNewAccountChange}
                   placeholder="이름"
-                  maxLength={ACCOUNT_HOLDER_MAX_LENGTH}
-                  minLength={ACCOUNT_HOLDER_MIN_LENGTH}
                 />
+                <InputInfo errorMessage={accountAddError.accountHolder} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-sub-gray mb-1">은행명</label>
@@ -151,9 +187,8 @@ export default function AccountInfo() {
                   value={newAccount.bankName}
                   onChange={handleNewAccountChange}
                   placeholder="은행명"
-                  maxLength={BANK_NAME_MAX_LENGTH}
-                  minLength={BANK_NAME_MIN_LENGTH}
                 />
+                <InputInfo errorMessage={accountAddError.bankName} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-sub-gray mb-1">계좌번호</label>
@@ -163,9 +198,8 @@ export default function AccountInfo() {
                   value={newAccount.bankAccount}
                   onChange={handleNewAccountChange}
                   placeholder="계좌번호"
-                  maxLength={BANK_ACCOUNT_MAX_LENGTH}
-                  minLength={BANK_ACCOUNT_MIN_LENGTH}
                 />
+                <InputInfo errorMessage={accountAddError.bankAccount} />
               </div>
             </div>
             <div className="mt-4 flex justify-end">
