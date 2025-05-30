@@ -16,8 +16,6 @@ interface InputProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
   onClick?: (e: React.MouseEvent<HTMLInputElement>) => void
-  schema?: z.ZodType<any>
-  onValidationError?: (error: string) => void
 }
 
 export function Input({
@@ -33,32 +31,16 @@ export function Input({
   onChange,
   onKeyDown,
   onClick,
-  schema,
-  onValidationError,
 }: InputProps) {
   const design = designType === "outline-rect" ? "rounded border" : designType === "outline-round" ? "rounded-full border" : "border-b"
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (schema) {
-      try {
-        schema.parse(e.target.value)
-        onValidationError?.("")
-      } catch (error) {
-        if (error instanceof z.ZodError) {
-          onValidationError?.(error.errors[0].message)
-        }
-      }
-    }
-    onChange(e)
-  }
-
+  
   return (
     <input
       id={id}
       name={name}
       type={type}
       value={value}
-      onChange={handleChange}
+      onChange={onChange}
       onKeyDown={(e) => {
         if (onKeyDown && e.key === "Enter") onKeyDown(e)
       }}
@@ -67,7 +49,7 @@ export function Input({
       className={clsx(
         "px-3 py-2 text-sm border-gray-300 focus:outline-none transition focus:border-main-color",
         design,
-        isError && "border-red-500",
+        isError && "border-red-500 focus:border-red-500",
         align === "center" && "text-center",
         align === "right" && "text-right",
         className
@@ -100,8 +82,7 @@ export const PasswordInput = ({
   onKeyDown,
   placeholder,
   designType = "underline",
-  schema,
-  onValidationError,
+  isError = false,
 }: Omit<InputProps, "type">) => {
   const [visible, setVisible] = useState(false)
 
@@ -115,8 +96,7 @@ export const PasswordInput = ({
         onKeyDown={onKeyDown}
         placeholder={placeholder}
         designType={designType}
-        schema={schema}
-        onValidationError={onValidationError}
+        isError={isError}
       />
       <button
         type="button"
@@ -136,8 +116,7 @@ export const EmailInput = ({
   onKeyDown,
   placeholder = "이메일을 입력해주세요",
   designType = "underline",
-  schema,
-  onValidationError,
+  isError = false,
 }: Omit<InputProps, "type">) => {
   return (
     <Input
@@ -148,8 +127,7 @@ export const EmailInput = ({
       onKeyDown={onKeyDown}
       placeholder={placeholder}
       designType={designType}
-      schema={schema}
-      onValidationError={onValidationError}
+      isError={isError}
     />
   )
 }

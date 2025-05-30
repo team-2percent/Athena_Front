@@ -1,4 +1,10 @@
 import { z } from "zod"
+import {
+  EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH,
+  EMAIL_MIN_LENGTH, PASSWORD_MIN_LENGTH,
+  NICKNAME_MAX_LENGTH,
+  NICKNAME_MIN_LENGTH,
+} from "./ValidationConstants"
 
 // 1단계 유효성 검사 스키마
 export const stepOneSchema = z
@@ -190,3 +196,45 @@ export const stepThreeSchema = z.object({
 })
 
 export type StepThreeFormData = z.infer<typeof stepThreeSchema>
+
+// 로그인/회원가입 유효성 검사 스키마
+export const loginSchema = z.object({
+  email: z.string()
+          .max(EMAIL_MAX_LENGTH, `${EMAIL_MAX_LENGTH}자 이내로 입력해주세요.`)
+          .refine((val) => val.length >= EMAIL_MIN_LENGTH, `${EMAIL_MIN_LENGTH}자 이상 입력해주세요.`)
+          .refine((val) => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i.test(val), "올바른 이메일 형식이 아닙니다."),
+  password: z.string()
+          .max(PASSWORD_MAX_LENGTH, `${PASSWORD_MAX_LENGTH}자 이내로 입력해주세요.`)
+          .refine((val) => val.length >= PASSWORD_MIN_LENGTH, `${PASSWORD_MIN_LENGTH}자 이상 입력해주세요.`)
+          .refine((val) => /[A-Z]/.test(val), "대문자를 포함해주세요.")
+          .refine((val) => /[a-z]/.test(val), "소문자를 포함해주세요.")
+          .refine((val) => /[0-9]/.test(val), "숫자를 포함해주세요.")
+          .refine((val) => /[!@#$%^&*(),.?":{}|<>]/.test(val), "특수문자를 포함해주세요."),
+})
+
+export type LoginFormData = z.infer<typeof loginSchema>
+
+export const signupSchema = z.object({
+  nickname: z.string()
+          .min(NICKNAME_MIN_LENGTH, "닉네임을 입력해주세요.")
+          .max(NICKNAME_MAX_LENGTH, `닉네임은 ${NICKNAME_MAX_LENGTH}자 이내로 입력해주세요.`),
+  email: z.string()    
+          .max(EMAIL_MAX_LENGTH, `${EMAIL_MAX_LENGTH}자 이내로 입력해주세요.`)
+          .refine((val) => val.length >= EMAIL_MIN_LENGTH, `${EMAIL_MIN_LENGTH}자 이상 입력해주세요.`)
+          .refine((val) => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i.test(val), "올바른 이메일 형식이 아닙니다."),
+  password: z.string()
+          .max(PASSWORD_MAX_LENGTH, `${PASSWORD_MAX_LENGTH}자 이내로 입력해주세요.`)
+          .refine((val) => val.length >= PASSWORD_MIN_LENGTH, `${PASSWORD_MIN_LENGTH}자 이상 입력해주세요.`)
+          .refine((val) => /[A-Z]/.test(val), "대문자를 포함해주세요.")
+          .refine((val) => /[a-z]/.test(val), "소문자를 포함해주세요.")
+          .refine((val) => /[0-9]/.test(val), "숫자를 포함해주세요.")
+          .refine((val) => /[!@#$%^&*(),.?":{}|<>]/.test(val), "특수문자를 포함해주세요."),
+  passwordConfirm: z.string()
+          .max(PASSWORD_MAX_LENGTH, `${PASSWORD_MAX_LENGTH}자 이내로 입력해주세요.`)
+          .refine((val) => val.length >= PASSWORD_MIN_LENGTH, `${PASSWORD_MIN_LENGTH}자 이상 입력해주세요.`)
+}).refine((data) => data.password === data.passwordConfirm, {
+  message: "비밀번호가 일치하지 않습니다.",
+  path: ["passwordConfirm"],
+})
+
+export type SignupFormData = z.infer<typeof signupSchema>

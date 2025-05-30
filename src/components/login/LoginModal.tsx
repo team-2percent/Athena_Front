@@ -3,13 +3,14 @@
 import type React from "react"
 
 import { useEffect, useState } from "react"
-import clsx from "clsx"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
 import Modal from "@/components/common/Modal"
-import { Button, PrimaryButton, SecondaryButton } from "../common/Button"
+import { PrimaryButton, SecondaryButton } from "../common/Button"
 import { EmailInput, PasswordInput } from "../common/Input"
-import { EMAIL_MAX_LENGTH, EMAIL_MIN_LENGTH, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@/lib/ValidationConstants"
+import { loginSchema } from "@/lib/validationSchemas"
+import { EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH } from "@/lib/ValidationConstants"
+import InputInfo from "../common/InputInfo"
 
 interface LoginModalProps {
   isOpen: boolean
@@ -21,9 +22,46 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
   const { apiCall } = useApi()
   const { login } = useAuthStore()
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [disabled, setDisabled] = useState(true)
+  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("")
+  const [loginError, setLoginError] = useState({
+    email: "",
+    password: ""
+  })
+
+  const disabled: boolean = loginError.email !== "" || loginError.password !== ""
+
+  const validateEmail = (email: string) => {
+    const result = loginSchema.shape.email.safeParse(email)
+    setLoginError({ 
+      ...loginError,
+      email: result.success ? "" : result.error.issues[0].message
+    })
+  }
+
+  const validatePassword = (password: string) => {
+    const result = loginSchema.shape.password.safeParse(password) 
+    setLoginError({
+      ...loginError,
+      password: result.success ? "" : result.error.issues[0].message
+    })
+  }
+
+  const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length <= EMAIL_MAX_LENGTH) {
+      setEmail(e.target.value)
+    }
+
+    validateEmail(e.target.value)
+  }
+
+  const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length <= PASSWORD_MAX_LENGTH) {
+      setPassword(e.target.value)
+    }
+
+    validatePassword(e.target.value)
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,15 +78,6 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
     })
   }
 
-  useEffect(() => {
-    if (email && password) {
-      setErrorMessage("")
-      setDisabled(false)
-    } else {
-      setDisabled(true)
-    }
-  }, [email, password])
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="md" closeOnOutsideClick closeOnEsc title="로그인">
       <div className="p-4">
@@ -56,23 +85,25 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
           {/* Email Input */}
           <div className="relative mb-4">
             <EmailInput
+              className="w-full"
               placeholder="이메일 입력"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              maxLength={EMAIL_MAX_LENGTH}
-              minLength={EMAIL_MIN_LENGTH}
+              onChange={handleChangeEmail}
+              isError={loginError.email !== ""}
             />
+            <InputInfo errorMessage={loginError.email} />
           </div>
 
           {/* Password Input */}
           <div className="relative mb-8">
             <PasswordInput
+              className="w-full"
               placeholder="비밀번호 입력"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              maxLength={PASSWORD_MAX_LENGTH}
-              minLength={PASSWORD_MIN_LENGTH}
+              onChange={handleChangePassword}
+              isError={loginError.password !== ""}
             />
+            <InputInfo errorMessage={loginError.password} />
           </div>
 
           {/* Login Button */}
@@ -82,7 +113,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
             className="w-full py-4 mb-8"
             size="lg"
           >로그인</PrimaryButton>
-          <span className="absolute bottom-2 left-0 w-full text-center text-red-500 text-sm">{errorMessage}</span>
+          <span className="absolute -bottom-2 left-0 w-full text-center text-red-500 text-sm">{errorMessage}</span>
         </form>
 
         {/* Divider */}
