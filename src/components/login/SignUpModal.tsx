@@ -8,7 +8,7 @@ import Modal from "@/components/common/Modal"
 import { PrimaryButton } from "../common/Button"
 import { EmailInput, PasswordInput, TextInput } from "../common/Input"
 import { EMAIL_MAX_LENGTH, NICKNAME_MAX_LENGTH, PASSWORD_MAX_LENGTH, } from "@/lib/ValidationConstants"
-import { emailSchema, nicknameSchema, passwordConfirmSchema, passwordMatchSchema, passwordSchema, signupSchema } from "@/lib/validationSchemas"
+import { emailSchema, nicknameSchema, passwordMatchSchema, newPasswordSchema, signupSchema, passwordSchema } from "@/lib/validationSchemas"
 import InputInfo from "../common/InputInfo"
 
 interface SignupModalProps {
@@ -22,7 +22,6 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [focusedField, setFocusedField] = useState<string | null>(null)
 
   const disabled = !signupSchema.safeParse({ nickname, email, password, passwordConfirm: confirmPassword }).success
   
@@ -39,6 +38,9 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
 
   const validateNickname = (nickname: string) => {
     const result = nicknameSchema.safeParse(nickname)
+    if (nickname.length > NICKNAME_MAX_LENGTH) {
+      setNickname(nickname.slice(0, NICKNAME_MAX_LENGTH))
+    }
     setSignupError({
       ...signupError,
       nickname: result.success ? "" : result.error.issues[0].message
@@ -47,6 +49,9 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
 
   const validateEmail = (email: string) => {
     const result = emailSchema.safeParse(email)
+    if (email.length > EMAIL_MAX_LENGTH) {
+      setEmail(email.slice(0, EMAIL_MAX_LENGTH))
+    }
     setSignupError({
       ...signupError,
       email: result.success ? "" : result.error.issues[0].message
@@ -54,7 +59,10 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   }
   
   const validatePassword = (password: string) => {
-    const result = passwordSchema.safeParse(password)
+    const result = newPasswordSchema.safeParse(password)
+    if (password.length > PASSWORD_MAX_LENGTH) {
+      setPassword(password.slice(0, PASSWORD_MAX_LENGTH))
+    }
     setSignupError({
       ...signupError,
       password: result.success ? "" : result.error.issues[0].message
@@ -62,9 +70,11 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   }
   
   const validateConfirmPassword = (confirmPassword: string) => {
-    const result = passwordConfirmSchema.safeParse(confirmPassword)
+    const result = passwordSchema.safeParse(confirmPassword)
     const matchResult = passwordMatchSchema.safeParse({ password, passwordConfirm: confirmPassword })
-    
+    if (confirmPassword.length > PASSWORD_MAX_LENGTH) {
+      setConfirmPassword(confirmPassword.slice(0, PASSWORD_MAX_LENGTH))
+    }
     setSignupError({
       ...signupError,
       confirmPassword: result.success && matchResult.success ? "" : result.error?.issues[0].message || matchResult.error?.issues[0].message || ""

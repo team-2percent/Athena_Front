@@ -4,6 +4,9 @@ import {
   EMAIL_MIN_LENGTH, PASSWORD_MIN_LENGTH,
   NICKNAME_MAX_LENGTH,
   NICKNAME_MIN_LENGTH,
+  SELLER_INTRODUCTION_MAX_LENGTH,
+  IMAGE_MAX_MB,
+  LINK_URLS_MAX_LENGTH,
 } from "./ValidationConstants"
 
 // 1단계 유효성 검사 스키마
@@ -197,6 +200,19 @@ export const stepThreeSchema = z.object({
 
 export type StepThreeFormData = z.infer<typeof stepThreeSchema>
 
+// 이미지 스키마
+export const imageSchema = z.string()
+  .refine((val) => {
+    if (!val) return true // 이미지는 선택사항
+    const validExtensions = ['.jpg', '.jpeg', '.png', '.webp']
+    const extension = val.toLowerCase().substring(val.lastIndexOf('.'))
+    return validExtensions.includes(extension)
+  }, "jpg, jpeg, png, webp 형식의 이미지만 업로드 가능합니다.")
+  .refine((val) => {
+    if (!val) return true
+    return val.length <= IMAGE_MAX_MB * 1024 * 1024 // 10MB
+  }, `이미지 크기는 ${IMAGE_MAX_MB}MB 이하여야 합니다.`)
+
 // 사용자 관련 유효성 검사 스키마
 export const emailSchema = z.string()
   .max(EMAIL_MAX_LENGTH, `${EMAIL_MAX_LENGTH}자 이내로 입력해주세요.`)
@@ -204,6 +220,10 @@ export const emailSchema = z.string()
   .refine((val) => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i.test(val), "올바른 이메일 형식이 아닙니다.")
 
 export const passwordSchema = z.string()
+  .max(PASSWORD_MAX_LENGTH, `${PASSWORD_MAX_LENGTH}자 이내로 입력해주세요.`)
+  .refine((val) => val.length >= PASSWORD_MIN_LENGTH, `${PASSWORD_MIN_LENGTH}자 이상 입력해주세요.`)
+
+export const newPasswordSchema = z.string()
   .max(PASSWORD_MAX_LENGTH, `${PASSWORD_MAX_LENGTH}자 이내로 입력해주세요.`)
   .refine((val) => val.length >= PASSWORD_MIN_LENGTH, `${PASSWORD_MIN_LENGTH}자 이상 입력해주세요.`)
   .refine((val) => /[A-Z]/.test(val), "대문자를 포함해주세요.")
@@ -215,9 +235,10 @@ export const nicknameSchema = z.string()
   .min(NICKNAME_MIN_LENGTH, "닉네임을 입력해주세요.")
   .max(NICKNAME_MAX_LENGTH, `닉네임은 ${NICKNAME_MAX_LENGTH}자 이내로 입력해주세요.`)
 
-export const passwordConfirmSchema = z.string()
-  .max(PASSWORD_MAX_LENGTH, `${PASSWORD_MAX_LENGTH}자 이내로 입력해주세요.`)
-  .refine((val) => val.length >= PASSWORD_MIN_LENGTH, `${PASSWORD_MIN_LENGTH}자 이상 입력해주세요.`)
+export const sellerIntroductionSchema = z.string()
+  .max(SELLER_INTRODUCTION_MAX_LENGTH, `판매자 소개는 ${SELLER_INTRODUCTION_MAX_LENGTH}자 이내로 입력해주세요.`)
+
+export const urlSchema = z.string().url();
 
 // 로그인/회원가입 유효성 검사 스키마
 export const loginSchema = z.object({
@@ -226,8 +247,8 @@ export const loginSchema = z.object({
 })
 
 export const passwordMatchSchema = z.object({
-  password: passwordSchema,
-  passwordConfirm: passwordConfirmSchema,
+  password: newPasswordSchema,
+  passwordConfirm: passwordSchema,
 }).refine((data) => data.password === data.passwordConfirm, {
   message: "비밀번호가 일치하지 않습니다.",
   path: ["passwordConfirm"],
@@ -236,6 +257,21 @@ export const passwordMatchSchema = z.object({
 export const signupSchema = z.object({
   nickname: nicknameSchema,
   email: emailSchema,
-  password: passwordSchema,
-  passwordConfirm: passwordConfirmSchema,
+  password: newPasswordSchema,
+  passwordConfirm: passwordSchema,
+})
+
+// 프로필 수정 스키마
+export const profileEditSchema = z.object({
+  nickname: nicknameSchema,
+  sellerIntroduction: sellerIntroductionSchema,
+  profileImage: imageSchema.nullable(),
+  urls: z.string().max(LINK_URLS_MAX_LENGTH, `링크 전체 ${LINK_URLS_MAX_LENGTH}자 이내로 입력해주세요.`)
+})
+
+// 비밀번호 수정 스키마
+export const passwordEditSchema = z.object({
+  passwordConfirmed: z.boolean().refine((val) => val, "비밀번호 확인이 필요합니다."),
+  newPassword: newPasswordSchema,
+  newPasswordConfirm: passwordSchema,
 })
