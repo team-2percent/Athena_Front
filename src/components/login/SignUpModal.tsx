@@ -127,7 +127,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
       <div className="px-4 pt-4">
         <form onSubmit={handleSubmit}>
           {/* Name Input */}
-          <div className="mb-6 flex flex-col gap-1 group">
+          <div className="mb-2 flex flex-col gap-1 group">
             <label
               htmlFor="nickname"
               className="text-sm text-gray-500 group-focus-within:text-main-color"
@@ -143,7 +143,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
           </div>
 
           {/* Email Input */}
-          <div className="relative mb-6 flex flex-col gap-1 group">
+          <div className="relative mb-2 flex flex-col gap-1 group">
             <label
               htmlFor="email"
               className="text-sm text-gray-500 group-focus-within:text-main-color"
@@ -159,7 +159,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
           </div>
 
           {/* Password Input */}
-          <div className="relative mb-6 flex flex-col gap-1 group">
+          <div className="relative mb-2 flex flex-col gap-1 group">
             <label
               htmlFor="password"
               className="text-sm text-gray-500 group-focus-within:text-main-color"
@@ -176,7 +176,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
           </div>
 
           {/* Confirm Password Input */}
-          <div className="relative mb-10 flex flex-col gap-1 group">
+          <div className="relative mb-6 flex flex-col gap-1 group">
             <label
               htmlFor="confirmPassword"
               className="text-sm text-gray-500 group-focus-within:text-main-color"
