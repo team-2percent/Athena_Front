@@ -27,7 +27,8 @@ export function useImageUpload() {
 
       const accessToken = localStorage.getItem("accessToken")
 
-      const response = await fetch("https://athena-local.i-am-jay.com/api/image", {
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL
+      const response = await fetch(apiBase + "/api/image", {
         method: "POST",
         headers: {
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),

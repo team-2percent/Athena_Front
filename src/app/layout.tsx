@@ -4,6 +4,10 @@ import "./globals.css";
 import HeaderLoader from "@/components/HeaderLoader";
 import RegisterPageButtonLoader from "@/components/RegisterPageButtonLoader";
 import AuthProvider from "@/components/AuthProvider";
+import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
+
+import FCMMessageListener from "@/components/FcmMessageListener";
+
 // Pretendard 폰트를 사용하기 위해 불러옴
 const pretendard = localFont({
   src: "../../public/fonts/PretendardVariable.woff2",
@@ -27,6 +31,7 @@ export default function RootLayout({
       <body
         className={`${pretendard.variable} font-pretendard`} // Pretendard 사용
       >
+        <ServiceWorkerRegistration />
         <AuthProvider>
           <HeaderLoader />
           <main className="flex-1 bg-white m-none w-full">
@@ -34,6 +39,7 @@ export default function RootLayout({
             {children}
             </div>
             <RegisterPageButtonLoader />
+            <FCMMessageListener />
           </main>
         </AuthProvider>
       </body>
