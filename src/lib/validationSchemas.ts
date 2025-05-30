@@ -6,12 +6,13 @@ import {
   NICKNAME_MIN_LENGTH,
   SELLER_DESCRIPTION_MAX_LENGTH,
   IMAGE_MAX_MB,
-  LINK_URLS_MAX_LENGTH,
+  LINK_URLS_MAX_BYTE,
   ACCOUNT_HOLDER_MAX_LENGTH,
   BANK_ACCOUNT_MAX_LENGTH,
   BANK_NAME_MAX_LENGTH,
   ADDRESS_DETAIL_MAX_LENGTH,
 } from "./ValidationConstants"
+import { getByteLength } from "./utils"
 
 // 1단계 유효성 검사 스키마
 export const stepOneSchema = z
@@ -242,7 +243,9 @@ export const nicknameSchema = z.string()
 export const sellerDescriptionSchema = z.string()
   .max(SELLER_DESCRIPTION_MAX_LENGTH, `판매자 소개는 ${SELLER_DESCRIPTION_MAX_LENGTH}자 이내로 입력해주세요.`)
 
-export const linkUrlsSchema = z.string().max(LINK_URLS_MAX_LENGTH, `링크 전체 ${LINK_URLS_MAX_LENGTH}자 이내로 입력해주세요.`)
+export const linkUrlsSchema = z.string().refine((val) => getByteLength(val) <= LINK_URLS_MAX_BYTE, {
+  message: `링크가 너무 깁니다.`,
+})
 
 // 계좌 관련 유효성 검사 스키마
 export const accountHolderSchema = z.string()
@@ -303,8 +306,8 @@ export const passwordEditSchema = z.object({
 export const profileUrlSchema = z.object({
   url: z.string().url("올바른 링크 형식이 아닙니다."),
   linkUrl: z.string().optional(),
-}).refine((data) => data.url.length + (data.linkUrl?.length || 0) < LINK_URLS_MAX_LENGTH, {
-  message: `링크가 너무 많습니다.`,
+}).refine((data) => getByteLength(data.url) + (getByteLength(data.linkUrl ?? '')) < LINK_URLS_MAX_BYTE, {
+  message: `링크가 너무 깁니다.`,
   path: ["url", "linkUrl"],
 })
 

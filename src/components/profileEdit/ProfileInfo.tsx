@@ -6,10 +6,11 @@ import { TextInput } from "../common/Input"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
 import { PrimaryButton, SecondaryButton } from "../common/Button"
-import { LINK_URLS_MAX_LENGTH, NICKNAME_MAX_LENGTH, SELLER_DESCRIPTION_MAX_LENGTH } from "@/lib/ValidationConstants"
+import { LINK_URLS_MAX_BYTE, NICKNAME_MAX_LENGTH, SELLER_DESCRIPTION_MAX_LENGTH } from "@/lib/ValidationConstants"
 import TextArea from "../common/TextArea"
 import InputInfo from "../common/InputInfo"
 import { imageSchema, nicknameSchema, profileEditSchema, profileUrlSchema, sellerDescriptionSchema } from "@/lib/validationSchemas"
+import { getByteLength } from "@/lib/utils"
 
 interface Profile {
     nickname: string
@@ -256,8 +257,16 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
             ...profileEditError,
             urls: message
         })
-        if (e.target.value.length > LINK_URLS_MAX_LENGTH - profile.linkUrls.join(",").length - 1) {
-            setNewUrl(e.target.value.slice(0, LINK_URLS_MAX_LENGTH - profile.linkUrls.join(",").length))
+        const currentUrlsBytes = getByteLength(profile.linkUrls.join(","))
+        const newUrlBytes = getByteLength(e.target.value)
+        
+        if (newUrlBytes + currentUrlsBytes > LINK_URLS_MAX_BYTE - 1) {
+            // 바이트 제한을 초과하지 않는 최대 길이 찾기
+            let slicedUrl = e.target.value
+            while (getByteLength(slicedUrl) + currentUrlsBytes > LINK_URLS_MAX_BYTE - 1) {
+                slicedUrl = slicedUrl.slice(0, -1)
+            }
+            setNewUrl(slicedUrl)
         } else {
             setNewUrl(e.target.value)
         }
@@ -378,7 +387,7 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                                     value={newUrl}
                                     onChange={handleChangeUrl}
                                 />
-                                <InputInfo errorMessage={profileEditError.urls} showLength length={profile.linkUrls.join(",").length + newUrl.length} maxLength={LINK_URLS_MAX_LENGTH} />
+                                <InputInfo errorMessage={profileEditError.urls} />
                             </div>
                             <PrimaryButton
                                 className="w-fit rounded-full p-2"

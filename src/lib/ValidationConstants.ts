@@ -9,8 +9,7 @@ export const NICKNAME_MAX_LENGTH = 50
 export const NICKNAME_MIN_LENGTH = 1
 export const SELLER_DESCRIPTION_MAX_LENGTH = 200
 export const SELLER_DESCRIPTION_MIN_LENGTH = 0
-export const LINK_URLS_MAX_LENGTH = 200
-export const LINK_URLS_MIN_LENGTH = 0
+export const LINK_URLS_MAX_BYTE = 65535
 
 // 계좌
 export const ACCOUNT_HOLDER_MAX_LENGTH = 50
