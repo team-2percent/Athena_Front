@@ -40,9 +40,9 @@ export default function TopToast({ title, body, duration = 5000, onClose }: TopT
   }, [isVisible, isMounted, onClose]);
 
   const toastClasses = `
-    fixed top-4 right-4 z-50 // 우측 상단 고정
-    w-80 // 확장된 너비
-    rounded-lg shadow-lg // 부드러운 그림자
+    fixed top-4 right-4 z-50 // 우측 상단 고정, top/right 여백도 늘림
+    w-88 // 너비 확장 (기존 w-80 → w-96)
+    rounded-xl shadow-2xl // 더 둥글고 그림자 강조
     pointer-events-auto
     overflow-hidden
     bg-main-color // 배경을 main-color로 변경
@@ -50,7 +50,7 @@ export default function TopToast({ title, body, duration = 5000, onClose }: TopT
     transition-all duration-300 ease-out // 트랜지션 설정
     ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'} // 등장/퇴장 애니메이션 (우측에서 슬라이드)
     flex items-start // 세로 정렬
-    p-4 // 패딩
+    p-4 // 패딩 증가 (기존 p-4 → p-6)
   `;
 
   if (!isMounted && !isVisible) {
@@ -59,15 +59,15 @@ export default function TopToast({ title, body, duration = 5000, onClose }: TopT
 
   return (
     <div className={toastClasses}>
-      <div className="flex items-start w-full">
+      <div className="flex items-center w-full">
         {/* 알림 아이콘 */}
-        <div className="flex-shrink-0 mt-1">
-          <Bell className="h-5 w-5 text-white" aria-hidden="true" />
+        <div className="flex-shrink-0 flex items-center h-full">
+          <Bell className="h-8 w-8 text-white" aria-hidden="true" />
         </div>
         {/* 알림 내용 */}
-        <div className="ml-3 flex-1">
-          <p className="text-sm font-semibold text-white">{title}</p>
-          <p className="mt-0.5 text-xs text-white/90">{body}</p>
+        <div className="ml-4 flex-1">
+          <p className="text-base font-bold text-white">{title}</p>
+          <p className="mt-1 text-sm text-white/90">{body}</p>
         </div>
         {/* 닫기 버튼 */}
         <div className="ml-4 flex-shrink-0">
@@ -77,7 +77,7 @@ export default function TopToast({ title, body, duration = 5000, onClose }: TopT
             onClick={() => setIsVisible(false)}
           >
             <span className="sr-only">닫기</span>
-            <X className="h-5 w-5" aria-hidden="true" />
+            <X className="h-6 w-6" aria-hidden="true" />
           </button>
         </div>
       </div>

@@ -2,10 +2,10 @@ import axios from "axios";
 import useAuthStore from "@/stores/auth"
 
 const customAxios = axios.create({
-baseURL: 'https://athena-local.i-am-jay.com',
-headers: {
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  headers: {
     "withCredentials": true,
-},
+  },
 });
 
 // 요청 인터셉터

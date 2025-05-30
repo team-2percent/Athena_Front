@@ -1,23 +1,14 @@
 importScripts('https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.6.10/firebase-messaging-compat.js');
 
-// firebase.initializeApp({
-//   apiKey: self.NEXT_PUBLIC_FIREBASE_API_KEY,
-//   authDomain: self.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-//   projectId: self.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-//   storageBucket: self.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-//   messagingSenderId: self.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-//   appId: self.NEXT_PUBLIC_FIREBASE_APP_ID,
-// });
-
 firebase.initializeApp({
-    apiKey: "AIzaSyAwdB3JVvhAzeGj321_xQonikUiQKCFl8c",
-    authDomain: "athena-3b3a8.firebaseapp.com",
-    projectId: "athena-3b3a8",
-    storageBucket: "athena-3b3a8.firebasestorage.app",
-    messagingSenderId: "185217939036",
-    appId: "1:185217939036:web:66967b45af22cfca58d899",
-    measurementId: "G-0HFP7DDL34",
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 });
 
 const messaging = firebase.messaging();
@@ -30,4 +21,4 @@ messaging.onBackgroundMessage(function(payload) {
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
-}); 
+});

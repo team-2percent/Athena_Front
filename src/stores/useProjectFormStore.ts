@@ -451,7 +451,8 @@ export const submitProject = async (
     })
 
     // (이미지 파일은 별도 업로드를 이미 했으므로, 여기서는 projectData만 전송)
-    const response = await fetch("https://athena-local.i-am-jay.com/api/project", {
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL
+    const response = await fetch(apiBase + "/api/project", {
       method: "POST",
       body: formData,
     }).then(async (res) => ({

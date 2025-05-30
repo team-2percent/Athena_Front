@@ -401,7 +401,8 @@ export default function ProductEdit() {
       })
 
       // 프로젝트 수정 API 호출
-      const response = await fetch(`https://athena-local.i-am-jay.com/api/project/${state.projectId}`, {
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const response = await fetch(`${apiBase}/api/project/${state.projectId}`, {
         method: "PUT",
         body: formData,
       }).then(async (res) => ({
