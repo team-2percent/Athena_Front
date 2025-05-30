@@ -81,7 +81,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="md" closeOnOutsideClick closeOnEsc title="로그인">
       <div className="p-4">
-        <form className="relative" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           {/* Email Input */}
           <div className="relative mb-4">
             <EmailInput
@@ -110,10 +110,12 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
           <PrimaryButton
             type="submit"
             disabled={disabled}
-            className="w-full py-4 mb-8"
+            className="w-full py-4"
             size="lg"
           >로그인</PrimaryButton>
-          <span className="absolute -bottom-2 left-0 w-full text-center text-red-500 text-sm">{errorMessage}</span>
+          <div className="h-[1.25rem] text-center mb-2">
+            <span className="w-full text-red-500 text-xs">{errorMessage}</span>
+          </div>
         </form>
 
         {/* Divider */}
