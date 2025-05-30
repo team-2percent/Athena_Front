@@ -7,6 +7,10 @@ import {
   SELLER_DESCRIPTION_MAX_LENGTH,
   IMAGE_MAX_MB,
   LINK_URLS_MAX_LENGTH,
+  ACCOUNT_HOLDER_MAX_LENGTH,
+  BANK_ACCOUNT_MAX_LENGTH,
+  BANK_NAME_MAX_LENGTH,
+  ADDRESS_DETAIL_MAX_LENGTH,
 } from "./ValidationConstants"
 
 // 1단계 유효성 검사 스키마
@@ -238,9 +242,25 @@ export const nicknameSchema = z.string()
 export const sellerDescriptionSchema = z.string()
   .max(SELLER_DESCRIPTION_MAX_LENGTH, `판매자 소개는 ${SELLER_DESCRIPTION_MAX_LENGTH}자 이내로 입력해주세요.`)
 
-export const urlSchema = z.string().url();
-
 export const linkUrlsSchema = z.string().max(LINK_URLS_MAX_LENGTH, `링크 전체 ${LINK_URLS_MAX_LENGTH}자 이내로 입력해주세요.`)
+
+// 계좌 관련 유효성 검사 스키마
+export const accountHolderSchema = z.string()
+  .min(1, "예금주를 입력해주세요.")
+  .max(ACCOUNT_HOLDER_MAX_LENGTH, `예금주는 ${ACCOUNT_HOLDER_MAX_LENGTH}자 이내로 입력해주세요.`)
+
+export const bankNameSchema = z.string()
+  .min(1, "은행명을 입력해주세요.")
+  .max(BANK_NAME_MAX_LENGTH, `은행명은 ${BANK_NAME_MAX_LENGTH}자 이내로 입력해주세요.`)
+
+export const bankAccountSchema = z.string()
+  .min(1, "계좌번호를 입력해주세요.")
+  .max(BANK_ACCOUNT_MAX_LENGTH, `계좌번호는 ${BANK_ACCOUNT_MAX_LENGTH}자 이내로 입력해주세요.`)
+
+// 배송지 관련 유효성 검사 스키마
+export const addressDetailSchema = z.string()
+  .min(1, "상세 주소를 입력해주세요.")
+  .max(ADDRESS_DETAIL_MAX_LENGTH, `상세 주소는 ${ADDRESS_DETAIL_MAX_LENGTH}자 이내로 입력해주세요.`)
 
 // 로그인/회원가입 유효성 검사 스키마
 export const loginSchema = z.object({
@@ -276,4 +296,20 @@ export const passwordEditSchema = z.object({
   passwordConfirmed: z.boolean().refine((val) => val, "비밀번호 확인이 필요합니다."),
   newPassword: newPasswordSchema,
   newPasswordConfirm: passwordSchema,
+})
+
+// 프로필 url 스키마
+export const profileUrlSchema = z.object({
+  url: z.string().url("올바른 링크 형식이 아닙니다."),
+  linkUrl: z.string().optional(),
+}).refine((data) => data.url.length + (data.linkUrl?.length || 0) < LINK_URLS_MAX_LENGTH, {
+  message: `링크가 너무 많습니다.`,
+  path: ["url", "linkUrl"],
+})
+
+// 계좌 추가 스키마
+export const accountAddSchema = z.object({
+  accountHolder: accountHolderSchema,
+  bankName: bankNameSchema,
+  bankAccount: bankAccountSchema,
 })

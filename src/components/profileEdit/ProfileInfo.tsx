@@ -5,11 +5,11 @@ import { Camera, Check, Plus, X } from "lucide-react"
 import { TextInput } from "../common/Input"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
-import { PrimaryButton } from "../common/Button"
+import { PrimaryButton, SecondaryButton } from "../common/Button"
 import { LINK_URLS_MAX_LENGTH, NICKNAME_MAX_LENGTH, SELLER_DESCRIPTION_MAX_LENGTH } from "@/lib/ValidationConstants"
 import TextArea from "../common/TextArea"
 import InputInfo from "../common/InputInfo"
-import { imageSchema, linkUrlsSchema, nicknameSchema, profileEditSchema, sellerDescriptionSchema, urlSchema } from "@/lib/validationSchemas"
+import { imageSchema, nicknameSchema, profileEditSchema, profileUrlSchema, sellerDescriptionSchema } from "@/lib/validationSchemas"
 
 interface Profile {
     nickname: string
@@ -87,17 +87,18 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
         urls: "",
     })
 
+    const urlAddButtonDisabled = profileEditError.urls !== "" || newUrl.length === 0
+
     // 정보 조회
     const loadData = () => {
         apiCall<LoadResponse>(`/api/user/${userId}`, "GET").then(({ data }) => {
             if (data) {
-                setProfile({
+                setPrevProfile({
                     nickname: data.nickname,
                     email: data.email,
-                    image: data.imageUrl ? data.imageUrl : "",
-                    imageFile: null,
+                    imageUrl: data.imageUrl ? data.imageUrl : "",
                     sellerDescription: data.sellerDescription ? data.sellerDescription : "",
-                    linkUrls: data.linkUrl ? data.linkUrl.split(",") : []
+                    linkUrl: data.linkUrl ? data.linkUrl : ""
                 })
             }
         })
@@ -161,6 +162,7 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
     }
 
     const handleUrlAdd = () => {
+        if (profileEditError.urls) return;
         setProfile({
             ...profile,
             linkUrls: [...profile.linkUrls, newUrl]
@@ -221,23 +223,11 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
     }
 
     const validateUrl = (url: string) => {
-        const result = urlSchema.safeParse(url)
-        if (!result.success) {
-            setProfileEditError({
-                ...profileEditError,
-                urls: result.error.issues[0].message
-            })
-        }
-    }
-
-    const validateLinkUrls = (linkUrls: string[]) => {
-        const result = linkUrlsSchema.safeParse(linkUrls.join(","))
-        if (!result.success) {
-            setProfileEditError({
-                ...profileEditError,
-                urls: result.error.issues[0].message
-            })
-        }
+        const result = profileUrlSchema.safeParse({
+            url: url,
+            linkUrl: profile.linkUrls.join(",")
+        })
+        return result.success ? "" : result.error?.issues[0].message || ""
     }
 
     const handleChangeNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -261,13 +251,15 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
     }
 
     const handleChangeUrl = (e: React.ChangeEvent<HTMLInputElement>) => {
-        validateUrl(e.target.value)
-        validateLinkUrls([...profile.linkUrls, e.target.value])
-        if (e.target.value.length <= LINK_URLS_MAX_LENGTH) {
-            setProfile({
-                ...profile,
-                linkUrls: [...profile.linkUrls, e.target.value]
-            })
+        const message = validateUrl(e.target.value)
+        setProfileEditError({
+            ...profileEditError,
+            urls: message
+        })
+        if (e.target.value.length > LINK_URLS_MAX_LENGTH - profile.linkUrls.join(",").length - 1) {
+            setNewUrl(e.target.value.slice(0, LINK_URLS_MAX_LENGTH - profile.linkUrls.join(",").length))
+        } else {
+            setNewUrl(e.target.value)
         }
     }
     
@@ -289,7 +281,7 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
             sellerDescription: prevProfile.sellerDescription,
             linkUrls: prevProfile.linkUrl.split(",")
         })
-    }, [profile])
+    }, [prevProfile])
 
     return (
         <div className="flex flex-col gap-4">
@@ -333,7 +325,7 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                     <h3 className="text-lg font-medium">프로필 정보</h3>
                     <div className="flex justify-start w-full gap-8 items-center">
                     <div className="flex items-center gap-4">
-                        <span className="text-sm font-medium text-sub-gray w-10">이름</span>
+                        <span className="text-sm font-medium text-sub-gray w-12 whitespace-nowrap">이름</span>
                         <TextInput
                             placeholder="이름"
                             designType="outline-rect"
@@ -344,7 +336,7 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                     </div>
                     </div>
                     <div className="flex justify-start w-full gap-4 items-center">
-                        <span className="text-sm font-medium text-sub-gray w-10">이메일</span>
+                        <span className="text-sm font-medium text-sub-gray w-10 whitespace-nowrap">이메일</span>
                         <span className="text-sm font-medium">{profile.email}</span>
                     </div>
                     <PrimaryButton
@@ -370,13 +362,13 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                     <InputInfo errorMessage={profileEditError.sellerDescription} showLength length={profile.sellerDescription.length} maxLength={SELLER_DESCRIPTION_MAX_LENGTH} />
                 </div>
                 {/* 링크란 */}
-                <div className="flex gap-4 items-center flex-wrap">
-                    <button onClick={toggleAddingUrl}>
+                <div className="flex gap-4 items-start flex-wrap">
+                    <SecondaryButton className="w-fit rounded-full p-2" onClick={toggleAddingUrl}>
                         <Plus className="w-4 h-4" />
-                    </button>
+                    </SecondaryButton>
                     {
                         addingUrl &&
-                        <div className="flex gap-2 items-center">
+                        <div className="flex gap-2 items-start">
                             <div>
                                 <TextInput
                                     designType="outline-rect"
@@ -386,9 +378,13 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                                 />
                                 <InputInfo errorMessage={profileEditError.urls} showLength length={profile.linkUrls.join(",").length + newUrl.length} maxLength={LINK_URLS_MAX_LENGTH} />
                             </div>
-                            <button onClick={handleUrlAdd}>
+                            <PrimaryButton
+                                className="w-fit rounded-full p-2"
+                                onClick={handleUrlAdd}
+                                disabled={urlAddButtonDisabled}
+                            >
                                 <Check className="w-4 h-4" />
-                            </button>
+                            </PrimaryButton>
                         </div>
                     }
                     {profile.linkUrls.map((url, index) => {
