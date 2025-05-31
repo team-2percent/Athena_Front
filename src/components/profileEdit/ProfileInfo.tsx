@@ -5,7 +5,7 @@ import { Camera, Check, Plus, X } from "lucide-react"
 import { TextInput } from "../common/Input"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
-import { PrimaryButton, SecondaryButton } from "../common/Button"
+import { CancelButton, PrimaryButton, SecondaryButton } from "../common/Button"
 import { LINK_URLS_MAX_BYTE, NICKNAME_MAX_LENGTH, SELLER_DESCRIPTION_MAX_LENGTH } from "@/lib/ValidationConstants"
 import TextArea from "../common/TextArea"
 import InputInfo from "../common/InputInfo"
@@ -400,14 +400,14 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                     }
                     {profile.linkUrls.map((url, index) => {
                         return (
-                            <div key={index} className="flex gap-2 items-center rounded-full bg-gray-100 px-4 py-1">
+                            <div key={index} className="flex gap-2 items-center rounded-full bg-gray-100 pl-4 pr-2 py-1">
                                 <span>{url}</span>
-                                <button 
+                                <CancelButton 
                                     onClick={() => handleUrlRemove(index)}
-                                    className="text-sub-gray rounded-md text-sm"
+                                    className="p-0.5 rounded-full"
                                 >
-                                    <X className="w-4 h-4" />
-                                </button>
+                                    <X className="w-3 h-3" />
+                                </CancelButton>
                             </div>
                         )
                     })}

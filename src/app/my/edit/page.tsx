@@ -30,7 +30,7 @@ export default function EditPage() {
     }
     return <div className="h-full mt-8 w-[var(--content-width)] mx-auto">
         <div className="flex w-full mb-5">
-            <button className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.push("/my")}>
+            <button type="button" className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.push("/my")}>
                 <ArrowLeftIcon className="w-4 h-4" />
                 프로필로 돌아가기
             </button>
