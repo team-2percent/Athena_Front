@@ -161,43 +161,39 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
 
     const handleUrlAdd = () => {
         if (profileEditError.urls) return;
-        setProfile({
-            ...profile,
-            linkUrls: [...profile.linkUrls, newUrl]
-        })
+        setProfile(prev => ({
+            ...prev,
+            linkUrls: [...prev.linkUrls, newUrl]
+        }))
         setNewUrl("")
         setAddingUrl(false)
     }
 
     const handleUrlRemove = (index: number) => {
-        if (profile.linkUrls) setProfile({
-            ...profile,
-            linkUrls: profile.linkUrls.filter((_, i) => i !== index)
-        })
+        setProfile(prev => ({
+            ...prev,
+            linkUrls: prev.linkUrls.filter((_, i) => i !== index)
+        }))
     }
 
     // 유효성 검사
     const validateNickname = (nickname: string) => {
         const result = nicknameSchema.safeParse(nickname)
-        if (nickname.length > NICKNAME_MAX_LENGTH) {
-            setProfile({
-                ...profile,
-                nickname: nickname.slice(0, NICKNAME_MAX_LENGTH)
-            })
-        }
-        setProfileEditError({
-            ...profileEditError,
+        setProfileEditError(prev => ({
+            ...prev,
             nickname: result.success ? "" : result.error.issues[0].message
-        })
+        }))
+
+        return nickname.slice(0, NICKNAME_MAX_LENGTH)
     }
 
     const validateImage = (image: File) => {
         const result = imageSchema.safeParse(image)
         if (!result.success) {
-            setProfileEditError({
-                ...profileEditError,
+            setProfileEditError(prev => ({
+                ...prev,
                 profileImage: result.error.issues[0].message
-            })
+            }))
             return false
         } 
         return true
@@ -206,18 +202,12 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
     const validateSellerDescription = (sellerDescription: string) => {
         const result = sellerDescriptionSchema.safeParse(sellerDescription)
 
-        if (!result.success) {
-            if (sellerDescription.length > SELLER_DESCRIPTION_MAX_LENGTH) {
-                setProfile({
-                    ...profile,
-                    sellerDescription: sellerDescription.slice(0, SELLER_DESCRIPTION_MAX_LENGTH)
-                })
-            }
-            setProfileEditError({
-                ...profileEditError,
-                sellerDescription: result.error.issues[0].message
-            })
-        }
+        setProfileEditError(prev => ({
+            ...prev,
+            sellerDescription: result.error?.issues[0].message || ""
+        }))
+
+        return sellerDescription.slice(0, SELLER_DESCRIPTION_MAX_LENGTH)
     }
 
     const validateUrl = (url: string) => {
@@ -229,31 +219,28 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
     }
 
     const handleChangeNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
-        validateNickname(e.target.value)
-        if (e.target.value.length <= NICKNAME_MAX_LENGTH) {
-            setProfile({
-                ...profile,
-                nickname: e.target.value
-            })
-        }
+        const nickname = validateNickname(e.target.value)
+        setProfile(prev => ({
+            ...prev,
+            nickname: nickname
+        }))
     }
 
     const handleChangeSellerDescription = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        validateSellerDescription(e.target.value)
-        if (e.target.value.length <= SELLER_DESCRIPTION_MAX_LENGTH) {
-            setProfile({
-                ...profile,
-                sellerDescription: e.target.value
-            })
-        }
+        const sellerDescription = validateSellerDescription(e.target.value)
+        setProfile(prev => ({
+            ...prev,
+            sellerDescription: sellerDescription
+        }))
     }
 
     const handleChangeUrl = (e: React.ChangeEvent<HTMLInputElement>) => {
         const message = validateUrl(e.target.value)
-        setProfileEditError({
-            ...profileEditError,
+        setProfileEditError(prev => ({
+            ...prev,
             urls: message
-        })
+        }))
+        
         const currentUrlsBytes = getByteLength(profile.linkUrls.join(","))
         const newUrlBytes = getByteLength(e.target.value)
         
