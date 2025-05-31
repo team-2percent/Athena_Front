@@ -262,6 +262,8 @@ export const bankAccountSchema = z.string()
   .refine((val) => /^\d+$/.test(val), "숫자만 입력해주세요.")
 
 // 배송지 관련 유효성 검사 스키마
+export const addressSchema = z.string().min(1, "주소가 필요합니다.")
+
 export const addressDetailSchema = z.string()
   .min(1, "상세 주소를 입력해주세요.")
   .max(ADDRESS_DETAIL_MAX_LENGTH, `상세 주소는 ${ADDRESS_DETAIL_MAX_LENGTH}자 이내로 입력해주세요.`)
@@ -316,4 +318,10 @@ export const accountAddSchema = z.object({
   accountHolder: accountHolderSchema,
   bankName: bankNameSchema,
   bankAccount: bankAccountSchema,
+})
+
+// 배송지 추가 스키마
+export const addressAddSchema = z.object({
+  address: addressSchema,
+  detailAddress: addressDetailSchema,
 })

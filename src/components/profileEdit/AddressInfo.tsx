@@ -10,6 +10,8 @@ import AlertModal from "../common/AlertModal"
 import { PrimaryButton } from "../common/Button"
 import { TextInput } from "../common/Input"
 import { ADDRESS_DETAIL_MAX_LENGTH, ADDRESS_DETAIL_MIN_LENGTH } from "@/lib/ValidationConstants"
+import { addressAddSchema, addressDetailSchema, addressSchema } from "@/lib/validationSchemas"
+import InputInfo from "../common/InputInfo"
 
 interface AddressInfo {
     id: number
@@ -29,26 +31,32 @@ export default function AddressInfo() {
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [defaultId, setDefaultId] = useState<number | null>(null);
 
-    const [alertMessage, setAlertMessage] = useState<string>("")
-    const [isAlertOpen, setIsAlertOpen] = useState(false)
-
     // 배송지 정보 상태
     const [addresses, setAddresses] = useState<AddressInfo[]>([])
 
+    const [addressAddError, setAddressAddError] = useState({
+        address: "",
+        detailAddress: "",
+    })
+
     // 새 배송지
     const [newAddress, setNewAddress] = useState({
-        isDefault: false,
         address: '',
         detailAddress: '',
         zipcode: ''
     })
 
+    const addButtonDisabled = addressAddSchema.safeParse(newAddress).error !== undefined;
+
     const initNewAddress = () => {
         setNewAddress({
-            isDefault: false,
             address: '',
             detailAddress: '',
             zipcode: ''
+        })
+        setAddressAddError({
+            address: "",
+            detailAddress: "",
         })
     }
 
@@ -89,14 +97,46 @@ export default function AddressInfo() {
         setIsAddressModalOpen(true)
     }
 
+    const validateAddress = () => {
+        const result = addressSchema.safeParse(newAddress.address)
+        return result.error ? result.error.issues[0].message : "";
+    }
+
+    const validateDetailAddress = (detailAddress: string) => {
+        const result = addressDetailSchema.safeParse(detailAddress)
+        if (result.success) {
+            return {
+                value: detailAddress,
+                error: ""
+            }
+        } else if (detailAddress.length > ADDRESS_DETAIL_MAX_LENGTH) {
+            return {
+                value: detailAddress.slice(0, ADDRESS_DETAIL_MAX_LENGTH),
+                error: result.error?.issues[0].message
+            }
+        } 
+        return {
+            value: "",
+            error: result.error?.issues[0].message || ""
+        }
+    }
+
+    const handleChangeDetailAddress = (e: React.ChangeEvent<HTMLInputElement>) => { 
+        const addressError = validateAddress();
+        const { value, error } = validateDetailAddress(e.target.value)
+        setNewAddress({
+            ...newAddress,
+            detailAddress: value,
+        })
+        setAddressAddError({
+            ...addressAddError,
+            address: addressError,
+            detailAddress: error
+        })
+    }
+
     // 주소 추가 핸들러
     const handleAddAddress = () => {
-        if (!newAddress.address || !newAddress.detailAddress || !newAddress.zipcode) {
-            setAlertMessage("배송지명, 주소, 상세주소를 모두 입력해주세요.")
-            setIsAlertOpen(true)
-            return
-        }
-
         apiCall("/api/delivery/delivery-info", "POST", {
             zipcode: newAddress.zipcode,
             address: newAddress.address,
@@ -139,16 +179,18 @@ export default function AddressInfo() {
 
     return (
         <div className="flex gap-4">
-            <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={() => setIsAlertOpen(false)} />
             <ConfirmModal isOpen={isDefaultModalOpen} message={"기본 계좌로 설정할까요?"} onConfirm={setDefaultDelivery} onClose={() => setIsDefaultModalOpen(false)} />
             <ConfirmModal isOpen={isDeleteModalOpen} message={"계좌를 삭제할까요?"} onConfirm={deleteDelivery} onClose={() => setIsDeleteModalOpen(false)} />
             <div className="flex-1 bg-white rounded-lg shadow py-6 px-10">
                 <h3 className="text-lg font-medium mb-6">배송지 추가</h3>
                     <div className="flex w-full my-3 gap-2 justify-between items-center my-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            주소
-                        </label>
-                        <p className="block text-sm font-medium text-gray-700">{ newAddress.address.length > 0 && `[${newAddress.zipcode}] ${newAddress.address}`}</p>
+                        <div className="flex gap-2 items-center">
+                            <label className="block text-sm font-medium text-gray-700 mb-1 whitespace-nowrap">
+                                주소
+                            </label>
+                            <p className="block text-sm font-medium text-gray-700">{ newAddress.address.length > 0 && `[${newAddress.zipcode}] ${newAddress.address}`}</p>
+                            <InputInfo errorMessage={addressAddError.address} />
+                        </div>
                         <PrimaryButton
                             type="button"
                             onClick={handleOpenAddressModal}
@@ -156,33 +198,29 @@ export default function AddressInfo() {
                         >
                             <Search className="w-4 h-4" />
                         </PrimaryButton>
+                        
                     </div>
+                    
                     
                     <div className="space-y-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             상세주소
                         </label>
-                        <TextInput
-                            value={newAddress.detailAddress}
-                            onChange={(e) => setNewAddress({
-                                ...newAddress,
-                                detailAddress: e.target.value,
-                            })}
-                            className="w-full"
-                            maxLength={ADDRESS_DETAIL_MAX_LENGTH}
-                            minLength={ADDRESS_DETAIL_MIN_LENGTH}
-                            validationRules={[
-                                {
-                                  validate: (e) => newAddress.address.length > 0,
-                                  errorMessage: "먼저 주소를 찾아주세요.",
-                                },
-                            ]}
-                        />
+                        <div>
+                            <TextInput
+                                value={newAddress.detailAddress}
+                                onChange={handleChangeDetailAddress}
+                                className="w-full"
+                                isError={addressAddError.detailAddress !== ""}
+                            />
+                            <InputInfo errorMessage={addressAddError.detailAddress} />
+                        </div>
                         <div className="mt-4 flex justify-end">
                             <PrimaryButton
                                 type="button"
                                 onClick={handleAddAddress}
                                 className="flex items-center"
+                                disabled={addButtonDisabled}
                             >
                                 <Plus className="w-4 h-4 mr-1" /> 배송지 추가
                             </PrimaryButton>
