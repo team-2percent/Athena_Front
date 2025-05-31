@@ -7,7 +7,7 @@ import { useState } from "react";
 import { PrimaryButton, CancelButton } from "../common/Button";
 import { newPasswordSchema, passwordEditSchema, passwordMatchSchema, passwordSchema } from "@/lib/validationSchemas";
 import InputInfo from "../common/InputInfo";
-import { PASSWORD_MAX_LENGTH } from "@/lib/ValidationConstants";
+import { PASSWORD_MAX_LENGTH } from "@/lib/validationConstant";
 
 interface PasswordInfoProps {
   onBack: () => void;

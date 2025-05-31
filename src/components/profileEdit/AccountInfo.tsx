@@ -6,7 +6,7 @@ import ConfirmModal from "../common/ConfirmModal"
 import AlertModal from "../common/AlertModal"
 import { PrimaryButton } from "../common/Button"
 import { TextInput } from "../common/Input"
-import { ACCOUNT_HOLDER_MAX_LENGTH, ACCOUNT_HOLDER_MIN_LENGTH, BANK_ACCOUNT_MAX_LENGTH, BANK_ACCOUNT_MIN_LENGTH, BANK_NAME_MAX_LENGTH, BANK_NAME_MIN_LENGTH } from "@/lib/ValidationConstants"
+import { ACCOUNT_HOLDER_MAX_LENGTH, BANK_ACCOUNT_MAX_LENGTH, BANK_NAME_MAX_LENGTH } from "@/lib/validationConstant"
 import InputInfo from "../common/InputInfo"
 import { accountAddSchema, accountHolderSchema, bankAccountSchema, bankNameSchema } from "@/lib/validationSchemas"
 

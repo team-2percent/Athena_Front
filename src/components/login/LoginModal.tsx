@@ -9,7 +9,7 @@ import Modal from "@/components/common/Modal"
 import { PrimaryButton, SecondaryButton } from "../common/Button"
 import { EmailInput, PasswordInput } from "../common/Input"
 import { emailSchema, loginSchema, passwordSchema } from "@/lib/validationSchemas"
-import { EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH } from "@/lib/ValidationConstants"
+import { EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH } from "@/lib/validationConstant"
 import InputInfo from "../common/InputInfo"
 
 interface LoginModalProps {

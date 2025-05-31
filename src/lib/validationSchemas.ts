@@ -21,7 +21,7 @@ import {
   COUPON_STOCK_MIN_NUMBER,
   COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR,
   COUPON_EVENT_START_TO_END_MIN_HOUR,
-} from "./ValidationConstants"
+} from "./validationConstant"
 import { getByteLength } from "./utils"
 
 // 1단계 유효성 검사 스키마

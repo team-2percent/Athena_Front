@@ -9,7 +9,7 @@ import ConfirmModal from "../common/ConfirmModal"
 import AlertModal from "../common/AlertModal"
 import { PrimaryButton } from "../common/Button"
 import { TextInput } from "../common/Input"
-import { ADDRESS_DETAIL_MAX_LENGTH, ADDRESS_DETAIL_MIN_LENGTH } from "@/lib/ValidationConstants"
+import { ADDRESS_DETAIL_MAX_LENGTH, ADDRESS_DETAIL_MIN_LENGTH } from "@/lib/validationConstant"
 import { addressAddSchema, addressDetailSchema, addressSchema } from "@/lib/validationSchemas"
 import InputInfo from "../common/InputInfo"
 

@@ -11,7 +11,7 @@ import OverlaySpinner from "@/components/common/OverlaySpinner"
 import { PrimaryButton } from "@/components/common/Button"
 import { NumberInput, TextInput } from "@/components/common/Input"
 import TextArea from "@/components/common/TextArea"
-import { COUPON_CONTENT_MAX_LENGTH, COUPON_CONTENT_MIN_LENGTH, COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR, COUPON_EVENT_START_TO_END_MIN_HOUR, COUPON_NAME_MAX_LENGTH, COUPON_PRICE_MAX_NUMBER, COUPON_PRICE_MIN_NUMBER, COUPON_STOCK_MAX_NUMBER, COUPON_STOCK_MIN_NUMBER, ESSENTIAL_MIN_LENGTH } from "@/lib/ValidationConstants"
+import { COUPON_CONTENT_MAX_LENGTH, COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR, COUPON_EVENT_START_TO_END_MIN_HOUR, COUPON_NAME_MAX_LENGTH, COUPON_PRICE_MAX_NUMBER, COUPON_STOCK_MAX_NUMBER } from "@/lib/validationConstant"
 import { couponAddSchema, couponContentSchema, couponExpireSchema, couponNameSchema, couponPeriodSchema, couponPriceSchema, couponStockSchema } from "@/lib/validationSchemas"
 import InputInfo from "@/components/common/InputInfo"
 export default function CouponRegisterPage() {

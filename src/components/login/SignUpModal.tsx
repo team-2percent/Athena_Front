@@ -7,7 +7,7 @@ import { useApi } from "@/hooks/useApi"
 import Modal from "@/components/common/Modal"
 import { PrimaryButton } from "../common/Button"
 import { EmailInput, PasswordInput, TextInput } from "../common/Input"
-import { EMAIL_MAX_LENGTH, NICKNAME_MAX_LENGTH, PASSWORD_MAX_LENGTH, } from "@/lib/ValidationConstants"
+import { EMAIL_MAX_LENGTH, NICKNAME_MAX_LENGTH, PASSWORD_MAX_LENGTH, } from "@/lib/validationConstant"
 import { emailSchema, nicknameSchema, passwordMatchSchema, newPasswordSchema, signupSchema, passwordSchema } from "@/lib/validationSchemas"
 import InputInfo from "../common/InputInfo"
 

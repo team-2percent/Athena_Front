@@ -12,7 +12,7 @@ import { useApi } from "@/hooks/useApi"
 import AlertModal from "../common/AlertModal"
 import { CancelButton, PrimaryButton, SecondaryButton } from "../common/Button"
 import { TextInput } from "../common/Input"
-import { ADDRESS_DETAIL_MAX_LENGTH, ADDRESS_DETAIL_MIN_LENGTH } from "@/lib/ValidationConstants"
+import { ADDRESS_DETAIL_MAX_LENGTH } from "@/lib/validationConstant"
 import InputInfo from "../common/InputInfo"
 import { addressSchema, addressDetailSchema, addressAddSchema } from "@/lib/validationSchemas"
 
