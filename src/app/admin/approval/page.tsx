@@ -9,6 +9,7 @@ import EmptyMessage from "@/components/common/EmptyMessage";
 import { PrimaryButton } from "@/components/common/Button";
 import { TextInput } from "@/components/common/Input";
 import { SEARCH_MAX_LENGTH } from "@/lib/ValidationConstants";
+import { searchSchema } from "@/lib/validationSchemas";
 
 interface Project {
     projectId: number;
@@ -82,8 +83,17 @@ export default function ApprovalPage() {
         })
     }
 
+    const validateSearch = (value: string) => {
+        const result = searchSchema.safeParse(value);
+        if (result.error && value.length > SEARCH_MAX_LENGTH) {
+            return value.slice(0, SEARCH_MAX_LENGTH)
+        }
+        return value
+    }
+
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.target.value);
+        const value = validateSearch(e.target.value)
+        setSearch(value);
     }
 
     // 엔터키로 검색
@@ -95,11 +105,13 @@ export default function ApprovalPage() {
     }
 
     const handleSearchClick = () => {
-        setQueryParams({
-            page: 0,
-            keyword: search,
-            sort: queryParams.sort
-        });
+        if (search.length > SEARCH_MAX_LENGTH) {
+            setQueryParams({
+                page: 0,
+                keyword: search,
+                sort: queryParams.sort
+            });
+        }
     }
 
     const handleProjectClick = (id: number) => {
@@ -126,7 +138,6 @@ export default function ApprovalPage() {
                         onChange={handleSearchChange}
                         onKeyDown={(e) => activeEnter(e)}
                         value={search}
-                        maxLength={SEARCH_MAX_LENGTH}
                     />
                     <PrimaryButton
                         onClick={handleSearchClick}
