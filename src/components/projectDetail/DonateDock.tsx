@@ -13,6 +13,8 @@ import AlertModal from "../common/AlertModal"
 import { CancelButton, PrimaryButton, SecondaryButton } from "../common/Button"
 import { TextInput } from "../common/Input"
 import { ADDRESS_DETAIL_MAX_LENGTH, ADDRESS_DETAIL_MIN_LENGTH } from "@/lib/ValidationConstants"
+import InputInfo from "../common/InputInfo"
+import { addressSchema, addressDetailSchema, addressAddSchema } from "@/lib/validationSchemas"
 
 interface AddressInfo {
   id: string
@@ -147,6 +149,13 @@ const DonateDock = () => {
     zipcode: "",
   })
 
+  const [addressAddError, setAddressAddError] = useState({
+    address: "",
+    detailAddress: "",
+  })
+
+  const addButtonDisabled = addressAddSchema.safeParse(newAddress).error !== undefined;
+
   // API 관련 상태 추가
   const { apiCall, isLoading: apiLoading } = useApi()
   const [projectData, setProjectData] = useState<ProjectData | null>(null)
@@ -167,6 +176,44 @@ const DonateDock = () => {
     const hasAvailableStock = projectData.productResponses.some((product) => product.stock > 0)
     return hasAvailableStock
   }
+
+  const validateAddress = () => {
+    const result = addressSchema.safeParse(newAddress.address)
+    return result.error ? result.error.issues[0].message : "";
+}
+
+const validateDetailAddress = (detailAddress: string) => {
+    const result = addressDetailSchema.safeParse(detailAddress)
+    if (result.success) {
+        return {
+            value: detailAddress,
+            error: ""
+        }
+    } else if (detailAddress.length > ADDRESS_DETAIL_MAX_LENGTH) {
+        return {
+            value: detailAddress.slice(0, ADDRESS_DETAIL_MAX_LENGTH),
+            error: result.error?.issues[0].message
+        }
+    } 
+    return {
+        value: "",
+        error: result.error?.issues[0].message || ""
+    }
+}
+
+const handleChangeDetailAddress = (e: React.ChangeEvent<HTMLInputElement>) => { 
+    const addressError = validateAddress();
+    const { value, error } = validateDetailAddress(e.target.value)
+    setNewAddress({
+        ...newAddress,
+        detailAddress: value,
+    })
+    setAddressAddError({
+        ...addressAddError,
+        address: addressError,
+        detailAddress: error
+    })
+}
 
   // 프로젝트 데이터 가져오기
   useEffect(() => {
@@ -1165,19 +1212,12 @@ const DonateDock = () => {
               <div>
                 <label className="block text-sm font-medium text-sub-gray mb-2">상세 주소</label>
                 <TextInput
-                  className="w-full"
-                  placeholder="상세 주소 입력"
-                  value={newAddress.detailAddress}
-                  onChange={(e) => handleInputChange(e, "detailAddress")}
-                  maxLength={ADDRESS_DETAIL_MAX_LENGTH}
-                  minLength={ADDRESS_DETAIL_MIN_LENGTH}
-                  validationRules={[
-                    {
-                      validate: (e) => newAddress.address.length > 0,
-                      errorMessage: "먼저 주소를 찾아주세요.",
-                    },
-                  ]}
+                    value={newAddress.detailAddress}
+                    onChange={handleChangeDetailAddress}
+                    className="w-full"
+                    isError={addressAddError.detailAddress !== ""}
                 />
+                <InputInfo errorMessage={addressAddError.detailAddress} />
               </div>
 
               <div className="flex justify-end space-x-3 pt-4">
@@ -1192,6 +1232,7 @@ const DonateDock = () => {
                   type="button"
                   className="px-6 py-3 bg-main-color text-white rounded-lg"
                   onClick={saveNewAddress}
+                  disabled={addButtonDisabled}
                 >
                   저장
                 </PrimaryButton>
