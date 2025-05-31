@@ -84,11 +84,7 @@ export default function ApprovalPage() {
     }
 
     const validateSearch = (value: string) => {
-        const result = searchSchema.safeParse(value);
-        if (result.error && value.length > SEARCH_MAX_LENGTH) {
-            return value.slice(0, SEARCH_MAX_LENGTH)
-        }
-        return value
+        return value.slice(0, SEARCH_MAX_LENGTH)
     }
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,13 +101,11 @@ export default function ApprovalPage() {
     }
 
     const handleSearchClick = () => {
-        if (search.length > SEARCH_MAX_LENGTH) {
-            setQueryParams({
-                page: 0,
-                keyword: search,
-                sort: queryParams.sort
-            });
-        }
+        setQueryParams({
+            page: 0,
+            keyword: search,
+            sort: queryParams.sort
+        });
     }
 
     const handleProjectClick = (id: number) => {
