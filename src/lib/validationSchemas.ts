@@ -12,6 +12,15 @@ import {
   BANK_NAME_MAX_LENGTH,
   ADDRESS_DETAIL_MAX_LENGTH,
   SEARCH_MAX_LENGTH,
+  COUPON_NAME_MAX_LENGTH,
+  COUPON_CONTENT_MIN_LENGTH,
+  COUPON_CONTENT_MAX_LENGTH,
+  COUPON_PRICE_MIN_NUMBER,
+  COUPON_PRICE_MAX_NUMBER,
+  COUPON_STOCK_MAX_NUMBER,
+  COUPON_STOCK_MIN_NUMBER,
+  COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR,
+  COUPON_EVENT_START_TO_END_MIN_HOUR,
 } from "./ValidationConstants"
 import { getByteLength } from "./utils"
 
@@ -272,6 +281,28 @@ export const addressDetailSchema = z.string()
 // 검색 스키마
 export const searchSchema = z.string().min(1, "검색어를 입력해주세요.").max(SEARCH_MAX_LENGTH, `검색어는 ${SEARCH_MAX_LENGTH}자 이내로 입력해주세요.`)
 
+// 쿠폰 스키마
+export const couponNameSchema = z
+  .string()
+  .min(1, "쿠폰 이름을 입력해주세요.")
+  .max(COUPON_NAME_MAX_LENGTH, `쿠폰 이름은 ${COUPON_NAME_MAX_LENGTH}자 이내로 입력해주세요.`)
+
+export const couponContentSchema = z
+  .string()
+  .min(COUPON_CONTENT_MIN_LENGTH, "쿠폰 설명을 입력해주세요.")
+  .max(COUPON_CONTENT_MAX_LENGTH, `쿠폰 설명은 ${COUPON_CONTENT_MAX_LENGTH}자 이내로 입력해주세요.`)
+
+export const couponPriceSchema = z
+  .number()
+  .min(COUPON_PRICE_MIN_NUMBER, `쿠폰 가격은 ${COUPON_PRICE_MIN_NUMBER}원 이상이어야 합니다.`)
+  .max(COUPON_PRICE_MAX_NUMBER, `쿠폰 가격은 ${COUPON_PRICE_MAX_NUMBER}원 이내로 입력해주세요.`)
+
+export const couponStockSchema = z
+  .number()
+  .min(COUPON_STOCK_MIN_NUMBER, `쿠폰 수량은 ${COUPON_STOCK_MIN_NUMBER}개 이상이어야 합니다.`)
+  .max(COUPON_STOCK_MAX_NUMBER, `쿠폰 수량은 ${COUPON_STOCK_MAX_NUMBER}개 이내로 입력해주세요.`)
+
+
 // 로그인/회원가입 유효성 검사 스키마
 export const loginSchema = z.object({
   email: emailSchema,
@@ -328,4 +359,34 @@ export const accountAddSchema = z.object({
 export const addressAddSchema = z.object({
   address: addressSchema,
   detailAddress: addressDetailSchema,
+})
+
+// 쿠폰 추가 스키마
+export const couponPeriodSchema = z.object({
+  startAt: z.date().refine((date) => date >= new Date(), "발급 시작일은 현재 시간 이후여야 합니다."),
+  endAt: z.date(),
+}).refine((data) => {
+    const hourDiff = (data.endAt.getTime() - data.startAt.getTime()) / (1000 * 60 * 60);
+    return hourDiff >= COUPON_EVENT_START_TO_END_MIN_HOUR;
+}, {
+    message: `발급 기간은 최소 ${COUPON_EVENT_START_TO_END_MIN_HOUR}시간 이상이어야 합니다.`
+})
+
+export const couponExpireSchema = z.object({
+  endAt: z.date(),
+  expiresAt: z.date(),
+}).refine((data) => {
+    const hourDiff = (data.expiresAt.getTime() - data.endAt.getTime()) / (1000 * 60 * 60);
+    return hourDiff >= COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR;
+}, {
+    message: `만료 기간은 발급 종료일로부터 최소 ${COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR}시간 이상이어야 합니다.`
+})
+
+export const couponAddSchema = z.object({
+  title: couponNameSchema,
+  content: couponContentSchema,
+  price: couponPriceSchema,
+  period: couponPeriodSchema,
+  expire: couponExpireSchema,
+  stock: couponStockSchema,
 })
