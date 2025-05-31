@@ -8,8 +8,7 @@ import Pagination from "@/components/common/Pagination";
 import EmptyMessage from "@/components/common/EmptyMessage";
 import { PrimaryButton } from "@/components/common/Button";
 import { TextInput } from "@/components/common/Input";
-import { SEARCH_MAX_LENGTH } from "@/lib/ValidationConstants";
-import { searchSchema } from "@/lib/validationSchemas";
+import { SEARCH_MAX_LENGTH } from "@/lib/validationConstant";
 
 interface Project {
     projectId: number;

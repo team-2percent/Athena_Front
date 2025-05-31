@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { Search, X } from "lucide-react"
-import { SEARCH_MAX_LENGTH } from "@/lib/ValidationConstants"
+import { SEARCH_MAX_LENGTH } from "@/lib/validationConstant"
 
 interface SearchBarProps {
   isLogin: boolean
