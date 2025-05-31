@@ -127,16 +127,13 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (file && validateImage(file)) {
-            setProfile({
-                ...profile,
-                imageFile: file
-            })
           const reader = new FileReader()
           reader.onload = (e) => {
             if (e.target?.result) {
               setProfile({
                 ...profile,
-                image: e.target.result as string
+                image: e.target.result as string,
+                imageFile: file
               })
             }
           }
@@ -282,14 +279,14 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
     }, [userId])
 
     useEffect(() => {
-        setProfile({
-            ...profile,
+        setProfile(prev => ({
+            ...prev,
             nickname: prevProfile.nickname,
             email: prevProfile.email,
             image: prevProfile.imageUrl,
             sellerDescription: prevProfile.sellerDescription,
             linkUrls: prevProfile.linkUrl === "" ? [] : prevProfile.linkUrl.split(",")
-        })
+        }))
     }, [prevProfile])
 
     return (
@@ -299,8 +296,12 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                 <div className="flex flex-col items-center bg-white rounded-lg shadow py-6 px-10 space-y-4">
                     <h3 className="text-lg font-medium">프로필 이미지</h3>                            
                     <div className="relative w-fit">
-                        <button className="bg-red-500 p-1 rounded-full absolute top-0 right-0">
-                            <X className="h-3 w-3 text-white" onClick={handleRemoveImage} />
+                        <button
+                            type="button"
+                            className="bg-red-500 p-1 rounded-full absolute top-0 right-0"
+                            onClick={handleRemoveImage}
+                        >
+                            <X className="h-3 w-3 text-white"/>
                         </button>
                         <div className="relative w-32 h-32 overflow-hidden rounded-full mb-4">
                             {profile.image ? (
