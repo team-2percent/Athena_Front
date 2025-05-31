@@ -216,16 +216,13 @@ export const stepThreeSchema = z.object({
 export type StepThreeFormData = z.infer<typeof stepThreeSchema>
 
 // 이미지 스키마
-export const imageSchema = z.string()
+export const imageSchema = z.instanceof(File)
   .refine((val) => {
-    if (!val) return true // 이미지는 선택사항
-    const validExtensions = ['.jpg', '.jpeg', '.png', '.webp']
-    const extension = val.toLowerCase().substring(val.lastIndexOf('.'))
-    return validExtensions.includes(extension)
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    return validTypes.includes(val.type)
   }, "jpg, jpeg, png, webp 형식의 이미지만 업로드 가능합니다.")
   .refine((val) => {
-    if (!val) return true
-    return val.length <= IMAGE_MAX_MB * 1024 * 1024 // 10MB
+    return val.size <= IMAGE_MAX_MB * 1024 * 1024 // 10MB
   }, `이미지 크기는 ${IMAGE_MAX_MB}MB 이하여야 합니다.`)
 
 // 사용자 관련 유효성 검사 스키마
