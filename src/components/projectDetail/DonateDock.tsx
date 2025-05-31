@@ -10,7 +10,7 @@ import { useApi } from "@/hooks/useApi"
 
 // 1. 상단에 AlertModal import 추가
 import AlertModal from "../common/AlertModal"
-import { CancelButton, PrimaryButton, SecondaryButton } from "../common/Button"
+import { CancelButton, PrimaryButton } from "../common/Button"
 import { TextInput } from "../common/Input"
 import { ADDRESS_DETAIL_MAX_LENGTH } from "@/lib/validationConstant"
 import InputInfo from "../common/InputInfo"
@@ -204,15 +204,15 @@ const validateDetailAddress = (detailAddress: string) => {
 const handleChangeDetailAddress = (e: React.ChangeEvent<HTMLInputElement>) => { 
     const addressError = validateAddress();
     const { value, error } = validateDetailAddress(e.target.value)
-    setNewAddress({
-        ...newAddress,
+    setNewAddress(prev => ({
+        ...prev,
         detailAddress: value,
-    })
-    setAddressAddError({
-        ...addressAddError,
+    }))
+    setAddressAddError(prev => ({
+        ...prev,
         address: addressError,
         detailAddress: error
-    })
+    }))
 }
 
   // 프로젝트 데이터 가져오기

@@ -6,10 +6,9 @@ import AddressModal from "./AddressModal"
 import { useApi } from "@/hooks/useApi"
 
 import ConfirmModal from "../common/ConfirmModal"
-import AlertModal from "../common/AlertModal"
 import { PrimaryButton } from "../common/Button"
 import { TextInput } from "../common/Input"
-import { ADDRESS_DETAIL_MAX_LENGTH, ADDRESS_DETAIL_MIN_LENGTH } from "@/lib/validationConstant"
+import { ADDRESS_DETAIL_MAX_LENGTH } from "@/lib/validationConstant"
 import { addressAddSchema, addressDetailSchema, addressSchema } from "@/lib/validationSchemas"
 import InputInfo from "../common/InputInfo"
 
@@ -124,15 +123,15 @@ export default function AddressInfo() {
     const handleChangeDetailAddress = (e: React.ChangeEvent<HTMLInputElement>) => { 
         const addressError = validateAddress();
         const { value, error } = validateDetailAddress(e.target.value)
-        setNewAddress({
-            ...newAddress,
+        setNewAddress(prev => ({
+            ...prev,
             detailAddress: value,
-        })
-        setAddressAddError({
-            ...addressAddError,
+        }))
+        setAddressAddError(prev => ({
+            ...prev,
             address: addressError,
             detailAddress: error
-        })
+        }))
     }
 
     // 주소 추가 핸들러
@@ -152,12 +151,12 @@ export default function AddressInfo() {
     }
 
     const handleComplete = (data: any) => {
-        setNewAddress({
-            ...newAddress,
+        setNewAddress(prev => ({
+            ...prev,
             address: data.address,
             zipcode: data.zonecode,
             detailAddress: "",
-        })
+        }))
         setIsAddressModalOpen(false)
     }
 

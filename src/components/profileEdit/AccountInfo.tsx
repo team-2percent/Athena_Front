@@ -112,14 +112,14 @@ export default function AccountInfo() {
   const handleNewAccountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     const { value: returnValue, error } = validateAccount(name, value)
-    setNewAccount({
-      ...newAccount,
+    setNewAccount(prev => ({
+      ...prev,
       [name]: returnValue,
-    })
-    setAccountAddError({
-      ...accountAddError,
+    }))
+    setAccountAddError(prev => ({
+      ...prev,
       [name]: error
-    })
+    }))
   }
 
   // 계좌 추가 핸들러
