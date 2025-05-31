@@ -3,14 +3,18 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import { ChevronUp, ChevronDown, Plus, Check, ChevronRight, X } from "lucide-react"
+import { ChevronUp, ChevronDown, Plus, Check, ChevronRight, X, Search } from "lucide-react"
 import AddressModal from "../profileEdit/AddressModal"
 import { useParams } from "next/navigation"
 import { useApi } from "@/hooks/useApi"
 
 // 1. 상단에 AlertModal import 추가
 import AlertModal from "../common/AlertModal"
-import { CancelButton, PrimaryButton, SecondaryButton } from "../common/Button"
+import { CancelButton, PrimaryButton } from "../common/Button"
+import { TextInput } from "../common/Input"
+import { ADDRESS_DETAIL_MAX_LENGTH } from "@/lib/validationConstant"
+import InputInfo from "../common/InputInfo"
+import { addressSchema, addressDetailSchema, addressAddSchema } from "@/lib/validationSchemas"
 
 interface AddressInfo {
   id: string
@@ -145,6 +149,13 @@ const DonateDock = () => {
     zipcode: "",
   })
 
+  const [addressAddError, setAddressAddError] = useState({
+    address: "",
+    detailAddress: "",
+  })
+
+  const addButtonDisabled = addressAddSchema.safeParse(newAddress).error !== undefined;
+
   // API 관련 상태 추가
   const { apiCall, isLoading: apiLoading } = useApi()
   const [projectData, setProjectData] = useState<ProjectData | null>(null)
@@ -165,6 +176,44 @@ const DonateDock = () => {
     const hasAvailableStock = projectData.productResponses.some((product) => product.stock > 0)
     return hasAvailableStock
   }
+
+  const validateAddress = () => {
+    const result = addressSchema.safeParse(newAddress.address)
+    return result.error ? result.error.issues[0].message : "";
+}
+
+const validateDetailAddress = (detailAddress: string) => {
+    const result = addressDetailSchema.safeParse(detailAddress)
+    if (result.success) {
+        return {
+            value: detailAddress,
+            error: ""
+        }
+    } else if (detailAddress.length > ADDRESS_DETAIL_MAX_LENGTH) {
+        return {
+            value: detailAddress.slice(0, ADDRESS_DETAIL_MAX_LENGTH),
+            error: result.error?.issues[0].message
+        }
+    } 
+    return {
+        value: "",
+        error: result.error?.issues[0].message || ""
+    }
+}
+
+const handleChangeDetailAddress = (e: React.ChangeEvent<HTMLInputElement>) => { 
+    const addressError = validateAddress();
+    const { value, error } = validateDetailAddress(e.target.value)
+    setNewAddress(prev => ({
+        ...prev,
+        detailAddress: value,
+    }))
+    setAddressAddError(prev => ({
+        ...prev,
+        address: addressError,
+        detailAddress: error
+    }))
+}
 
   // 프로젝트 데이터 가져오기
   useEffect(() => {
@@ -1136,7 +1185,7 @@ const DonateDock = () => {
 
       {/* 배송지 추가 모달 */}
       {showAddressAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
             <div className="mb-6 flex items-center justify-between">
               <h4 className="text-xl font-bold">새 배송지 추가</h4>
@@ -1148,33 +1197,27 @@ const DonateDock = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-sub-gray mb-2">주소</label>
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    className="flex-1 p-3 border border-gray-border rounded-lg"
-                    placeholder="'찾기'를 눌러서 주소 입력"
-                    value={newAddress.address}
-                    readOnly
-                  />
-                  <SecondaryButton
-                    type="button"
-                    className="px-4 py-3 rounded-lg"
-                    onClick={() => setIsAddressModalOpen(true)}
+                <div className="flex space-x-2 justify-between items-center">
+                  <p className="block text-sm font-medium text-gray-700">{ newAddress.address.length > 0 ? `[${newAddress.zipcode}] ${newAddress.address}` : "주소를 입력해주세요"}</p>
+                  <PrimaryButton
+                      type="button"
+                      onClick={handleOpenAddressModal}
+                      className="px-2 py-2"
                   >
-                    찾기
-                  </SecondaryButton>
+                      <Search className="w-4 h-4" />
+                  </PrimaryButton>
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-sub-gray mb-2">상세 주소</label>
-                <input
-                  type="text"
-                  className="w-full p-3 border border-gray-border rounded-lg"
-                  placeholder="상세 주소 입력"
-                  value={newAddress.detailAddress}
-                  onChange={(e) => handleInputChange(e, "detailAddress")}
+                <TextInput
+                    value={newAddress.detailAddress}
+                    onChange={handleChangeDetailAddress}
+                    className="w-full"
+                    isError={addressAddError.detailAddress !== ""}
                 />
+                <InputInfo errorMessage={addressAddError.detailAddress} />
               </div>
 
               <div className="flex justify-end space-x-3 pt-4">
@@ -1189,6 +1232,7 @@ const DonateDock = () => {
                   type="button"
                   className="px-6 py-3 bg-main-color text-white rounded-lg"
                   onClick={saveNewAddress}
+                  disabled={addButtonDisabled}
                 >
                   저장
                 </PrimaryButton>

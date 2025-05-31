@@ -7,6 +7,8 @@ import { formatDateInAdmin } from "@/lib/utils";
 import Pagination from "@/components/common/Pagination";
 import EmptyMessage from "@/components/common/EmptyMessage";
 import { PrimaryButton } from "@/components/common/Button";
+import { TextInput } from "@/components/common/Input";
+import { SEARCH_MAX_LENGTH } from "@/lib/validationConstant";
 
 interface Project {
     projectId: number;
@@ -80,8 +82,13 @@ export default function ApprovalPage() {
         })
     }
 
+    const validateSearch = (value: string) => {
+        return value.slice(0, SEARCH_MAX_LENGTH)
+    }
+
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.target.value);
+        const value = validateSearch(e.target.value)
+        setSearch(value);
     }
 
     // 엔터키로 검색
@@ -117,13 +124,13 @@ export default function ApprovalPage() {
         <div className="flex flex-col mx-auto py-8 w-[var(--content-width)]">
             <h3 className="text-xl font-medium mb-8">확인해야할 상품이 {pendingCount}건 있습니다.</h3>
             <div className="flex items-center mb-8 gap-4">
-                <div className="flex flex-1 gap-2">
-                    <input
-                        type="text"
+                <div className="flex flex-1 gap-2 items-center">
+                    <TextInput
                         placeholder="상품명으로 검색"
-                        className="border flex-1 p-2 border rounded text-left text-sub-gray min-w-[350px] h-10"
+                        className="rounded-md"
                         onChange={handleSearchChange}
                         onKeyDown={(e) => activeEnter(e)}
+                        value={search}
                     />
                     <PrimaryButton
                         onClick={handleSearchClick}

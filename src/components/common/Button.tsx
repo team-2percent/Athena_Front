@@ -78,7 +78,7 @@ export const Button = ({
 
   // 최종 클래스 이름 생성
   const buttonClasses = cn(
-    "font-medium border transition-colors duration-200",
+    "font-medium border transition-colors duration-200 whitespace-nowrap",
     variantClasses[finalVariant as keyof typeof variantClasses],
     sizeClasses[size],
     widthClasses[width],
@@ -90,7 +90,7 @@ export const Button = ({
     <button className={buttonClasses} disabled={disabled || isLoading} {...props}>
       {isLoading && (
         <svg
-          className="animate-spin -ml-1 mr-2 h-4 w-4 text-current"
+          className="animate-spin mx-auto h-4 w-4 text-current"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -104,7 +104,7 @@ export const Button = ({
         </svg>
       )}
       {leftIcon && !isLoading && <span className="mr-2">{leftIcon}</span>}
-      {children}
+      {!isLoading && children}
       {rightIcon && <span className="ml-2">{rightIcon}</span>}
     </button>
   )

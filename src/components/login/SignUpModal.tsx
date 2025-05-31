@@ -2,11 +2,14 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
-import clsx from "clsx"
+import { useState } from "react"
 import { useApi } from "@/hooks/useApi"
 import Modal from "@/components/common/Modal"
 import { PrimaryButton } from "../common/Button"
+import { EmailInput, PasswordInput, TextInput } from "../common/Input"
+import { EMAIL_MAX_LENGTH, NICKNAME_MAX_LENGTH, PASSWORD_MAX_LENGTH, } from "@/lib/validationConstant"
+import { emailSchema, nicknameSchema, passwordMatchSchema, newPasswordSchema, signupSchema, passwordSchema } from "@/lib/validationSchemas"
+import InputInfo from "../common/InputInfo"
 
 interface SignupModalProps {
   isOpen: boolean
@@ -19,164 +22,187 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  // const [agreeToMarketing, setAgreeToMarketing] = useState(false)
-  const [focusedField, setFocusedField] = useState<string | null>(null)
-  const [isPasswordMatch, setIsPasswordMatch] = useState(true)
-  const [isError, setIsError] = useState(false)
-  const [errorMessage, setErrorMessage] = useState("")
-  const [disabled, setDisabled] = useState(true)
 
-  // 이메일, 비밀번호 유효성 검사
-  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  const isPasswordValid = password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password) && /[!@#$%^&*(),.?":{}|<>]/.test(password)
+  const disabled = !signupSchema.safeParse({ nickname, email, password, passwordConfirm: confirmPassword }).success
+  
+  // 유효성 검사
+  const [signupError, setSignupError] = useState({
+    nickname: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  })
+
+  // api 호출 에러
+  const [errorMessage, setErrorMessage] = useState("")
+
+  const validateNickname = (nickname: string) => {
+    const result = nicknameSchema.safeParse(nickname)
+    if (nickname.length > NICKNAME_MAX_LENGTH) {
+      setNickname(nickname.slice(0, NICKNAME_MAX_LENGTH))
+    }
+    setSignupError({
+      ...signupError,
+      nickname: result.success ? "" : result.error.issues[0].message
+    })
+  }
+
+  const validateEmail = (email: string) => {
+    const result = emailSchema.safeParse(email)
+    if (email.length > EMAIL_MAX_LENGTH) {
+      setEmail(email.slice(0, EMAIL_MAX_LENGTH))
+    }
+    setSignupError({
+      ...signupError,
+      email: result.success ? "" : result.error.issues[0].message
+    })
+  }
+  
+  const validatePassword = (password: string) => {
+    const result = newPasswordSchema.safeParse(password)
+    if (password.length > PASSWORD_MAX_LENGTH) {
+      setPassword(password.slice(0, PASSWORD_MAX_LENGTH))
+    }
+    setSignupError({
+      ...signupError,
+      password: result.success ? "" : result.error.issues[0].message
+    })
+  }
+  
+  const validateConfirmPassword = (confirmPassword: string) => {
+    const result = passwordSchema.safeParse(confirmPassword)
+    const matchResult = passwordMatchSchema.safeParse({ password, passwordConfirm: confirmPassword })
+    if (confirmPassword.length > PASSWORD_MAX_LENGTH) {
+      setConfirmPassword(confirmPassword.slice(0, PASSWORD_MAX_LENGTH))
+    }
+    setSignupError({
+      ...signupError,
+      confirmPassword: result.success && matchResult.success ? "" : result.error?.issues[0].message || matchResult.error?.issues[0].message || ""
+    })
+  }
+
+  // 입력 핸들링
+  const handleChangeNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
+    validateNickname(e.target.value)
+    if (e.target.value.length <= NICKNAME_MAX_LENGTH) {
+      setNickname(e.target.value)
+    }
+  }
+
+  const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    validateEmail(e.target.value)
+    if (e.target.value.length <= EMAIL_MAX_LENGTH) {
+      setEmail(e.target.value)
+    }
+  }
+
+  const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    validatePassword(e.target.value)
+    if (e.target.value.length <= PASSWORD_MAX_LENGTH) {
+      setPassword(e.target.value)
+    }
+  }
+
+  const handleChangeConfirmPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    validateConfirmPassword(e.target.value)
+    if (e.target.value.length <= PASSWORD_MAX_LENGTH) {
+      setConfirmPassword(e.target.value)
+    }
+  }
 
   // 회원가입 로직
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    apiCall("/api/user", "POST", { nickname, email, password }).then(({ data }: { data: any }) => {
-      console.log(data)
-      onClose()
+    apiCall("/api/user", "POST", { nickname, email, password }).then(({ error }: { data: any, error: string | null }) => {
+      if (error) {
+        setErrorMessage(error)
+      } else {
+        onClose()
+      }
     })
   }
 
-  // 비밀번호 일치 확인
-  useEffect(() => {
-    setIsPasswordMatch(confirmPassword === password)
-  }, [confirmPassword, password])
-
-  useEffect(() => {
-    setIsError(false)
-    setDisabled(
-      email === "" || password === "" || confirmPassword === "" || nickname === "" || password !== confirmPassword,
-    )
-  }, [nickname, email, confirmPassword, password])
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="md" closeOnOutsideClick closeOnEsc title="회원가입">
-      <div className="p-4">
+      <div className="px-4 pt-4">
         <form onSubmit={handleSubmit}>
           {/* Name Input */}
-          <div className="mb-6">
+          <div className="mb-2 flex flex-col gap-1 group">
             <label
               htmlFor="nickname"
-              className={`text-sm ${focusedField === "nickname" ? "text-main-color" : "text-main-color"}`}
+              className="text-sm text-gray-500 group-focus-within:text-main-color"
             >
               닉네임
             </label>
-            <input
-              id="nickname"
-              type="text"
-              className={`w-full p-2 border-b ${
-                focusedField === "nickname" ? "border-main-color" : "border-gray-300"
-              } focus:outline-none text-lg`}
+            <TextInput
+              designType="underline"
               value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              onFocus={() => setFocusedField("nickname")}
-              onBlur={() => setFocusedField(null)}
+              onChange={handleChangeNickname}
             />
+            <InputInfo errorMessage={signupError.nickname} />
           </div>
 
           {/* Email Input */}
-          <div className="relative mb-6">
+          <div className="relative mb-2 flex flex-col gap-1 group">
             <label
               htmlFor="email"
-              className={`text-sm ${focusedField === "email" ? "text-main-color" : "text-gray-500"}`}
+              className="text-sm text-gray-500 group-focus-within:text-main-color"
             >
               이메일
             </label>
-            <input
-              id="email"
-              type="email"
-              className={clsx(
-                "w-full p-2 border-b focus:outline-none text-lg",
-                focusedField === "email" ? (isEmailValid ? "border-main-color" : "border-red-500") : "border-gray-300",
-              )}
+            <EmailInput
+              designType="underline"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onFocus={() => setFocusedField("email")}
-              onBlur={() => setFocusedField(null)}
+              onChange={handleChangeEmail}
             />
-            {/* 이메일 확인 문구 */}
-            {email !== "" && !isEmailValid && (
-              <p className="absolute bottom-0 translate-y-full text-red-500 text-xs pt-1">이메일 형식이 아닙니다.</p>
-            )}
+            <InputInfo errorMessage={signupError.email} />
           </div>
 
           {/* Password Input */}
-          <div className="relative mb-6">
+          <div className="relative mb-2 flex flex-col gap-1 group">
             <label
               htmlFor="password"
-              className={`text-sm ${focusedField === "password" ? "text-main-color" : "text-gray-500"}`}
+              className="text-sm text-gray-500 group-focus-within:text-main-color"
             >
               비밀번호
             </label>
-            <input
-              id="password"
-              type="password"
-              className={clsx(
-                "w-full p-2 border-b focus:outline-none text-lg",
-                focusedField === "password"
-                  ? isPasswordValid
-                    ? "border-main-color"
-                    : "border-red-500"
-                  : "border-gray-300",
-              )}
+            <PasswordInput
+              className="w-full"
+              designType="underline"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onFocus={() => setFocusedField("password")}
-              onBlur={() => setFocusedField(null)}
+              onChange={handleChangePassword}
             />
-            {/* 패스워드 확인 문구 */}
-            {password !== "" && !isPasswordValid && (
-              <p className="absolute bottom-0 translate-y-full text-red-500 text-xs pt-1">
-                최소 8자리 이상, 영문 대소문자, 숫자, 특수문자를 섞어 구성해야 합니다.
-              </p>
-            )}
+            <InputInfo errorMessage={signupError.password} />
           </div>
 
           {/* Confirm Password Input */}
-          <div className="relative mb-10">
+          <div className="relative mb-6 flex flex-col gap-1 group">
             <label
               htmlFor="confirmPassword"
-              className={`text-sm ${focusedField === "confirmPassword" ? "text-main-color" : "text-gray-500"}`}
+              className="text-sm text-gray-500 group-focus-within:text-main-color"
             >
               비밀번호 확인
             </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              className={clsx(
-                "w-full p-2 border-b focus:outline-none text-lg",
-                focusedField === "confirmPassword"
-                  ? isPasswordMatch
-                    ? "border-main-color"
-                    : "border-red-500"
-                  : "border-gray-300",
-              )}
+            <PasswordInput
+              className="w-full"
+              designType="underline"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              onFocus={() => setFocusedField("confirmPassword")}
-              onBlur={() => setFocusedField(null)}
+              onChange={handleChangeConfirmPassword}
             />
-            {/* 패스워드 확인 문구 */}
-            {!isPasswordMatch && (
-              <p className="absolute bottom-0 translate-y-full text-red-500 text-xs pt-1">
-                비밀번호가 일치하지 않습니다.
-              </p>
-            )}
+            <InputInfo errorMessage={signupError.confirmPassword} />
           </div>
 
           {/* Signup Button */}
           <PrimaryButton
             type="submit"
-            className="relative w-full py-4 mb-1"
+            className="relative w-full py-4"
             disabled={disabled}
           >
             가입하기
           </PrimaryButton>
-          {isError && (
-            <p className="absolute bottom-3 left-0 text-red-500 text-sm pt-1 w-full text-center">{errorMessage}</p>
-          )}
+          <div className="h-[1.25rem] text-center">
+            <span className="w-full text-red-500 text-xs">{errorMessage}</span>
+          </div>
         </form>
       </div>
     </Modal>

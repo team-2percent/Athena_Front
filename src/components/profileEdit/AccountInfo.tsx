@@ -1,4 +1,3 @@
-import clsx from "clsx"
 import { Plus, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useApi } from "@/hooks/useApi"
@@ -6,6 +5,10 @@ import { useApi } from "@/hooks/useApi"
 import ConfirmModal from "../common/ConfirmModal"
 import AlertModal from "../common/AlertModal"
 import { PrimaryButton } from "../common/Button"
+import { TextInput } from "../common/Input"
+import { ACCOUNT_HOLDER_MAX_LENGTH, BANK_ACCOUNT_MAX_LENGTH, BANK_NAME_MAX_LENGTH } from "@/lib/validationConstant"
+import InputInfo from "../common/InputInfo"
+import { accountAddSchema, accountHolderSchema, bankAccountSchema, bankNameSchema } from "@/lib/validationSchemas"
 
 interface AccountInfo {
     id: number
@@ -21,13 +24,20 @@ export default function AccountInfo() {
   const [isDefaultModalOpen, setIsDefaultModalOpen] = useState(false); 
   // 계좌 정보 상태
   const [accounts, setAccounts] = useState<AccountInfo[]>([])
-
+  const [accountAddError, setAccountAddError] = useState({
+    accountHolder: "",
+    bankName: "",
+    bankAccount: "",
+  })
+  
   // 새 계좌 정보 폼
   const [newAccount, setNewAccount] = useState<Omit<AccountInfo, "id" | "isDefault">>({
       bankName: "",
       bankAccount: "",
       accountHolder: "",
   })
+
+  const addButtonDisabled = accountAddSchema.safeParse(newAccount).error !== undefined;
 
   const [defaultId, setDefaultId] = useState<number | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -75,12 +85,41 @@ export default function AccountInfo() {
   }
 
   // 새 계좌 정보 변경 핸들러
+  const validateAccount = (name: string, value: string) => {
+    let returnValue = ""
+    let error = ""
+
+    if (name === "accountHolder") {
+      const result = accountHolderSchema.safeParse(value)
+      returnValue = result.success ? value : value.slice(0, ACCOUNT_HOLDER_MAX_LENGTH)
+      error = result.error?.issues[0].message || ""
+    } else if (name === "bankName") {
+      const result = bankNameSchema.safeParse(value)
+      returnValue = result.success ? value : value.slice(0, BANK_NAME_MAX_LENGTH)
+      error = result.error?.issues[0].message || ""
+    } else if (name === "bankAccount") {
+      const result = bankAccountSchema.safeParse(value)
+      returnValue = result.success ? value : value.slice(0, BANK_ACCOUNT_MAX_LENGTH).replace(/[^0-9]/g, "")
+      error = result.error?.issues[0].message || ""
+    }
+
+    return {
+      value: returnValue,
+      error: error
+    }
+  }
+
   const handleNewAccountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setNewAccount({
-    ...newAccount,
-    [name]: value,
-    })
+    const { value: returnValue, error } = validateAccount(name, value)
+    setNewAccount(prev => ({
+      ...prev,
+      [name]: returnValue,
+    }))
+    setAccountAddError(prev => ({
+      ...prev,
+      [name]: error
+    }))
   }
 
   // 계좌 추가 핸들러
@@ -120,7 +159,7 @@ export default function AccountInfo() {
   }, []);
 
 
-    return <div className="flex gap-4">
+    return <div className="flex gap-4 w-full">
       {/* 5. 컴포넌트 return 문 내부 최상단에 AlertModal 컴포넌트 추가 */}
       <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={() => setIsAlertOpen(false)} />
       <ConfirmModal isOpen={isDefaultModalOpen} message={"기본 계좌로 설정할까요?"} onConfirm={setDefaultAccount} onClose={() => setIsDefaultModalOpen(false)} />
@@ -131,36 +170,36 @@ export default function AccountInfo() {
             <div className="flex gap-4 flex-col">
             <div>
                 <label className="block text-sm font-medium text-sub-gray mb-1">이름</label>
-                <input
-                  type="text"
+                <TextInput
+                  className="w-full"
                   name="accountHolder"
                   value={newAccount.accountHolder}
                   onChange={handleNewAccountChange}
-                  className="w-full px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
                   placeholder="이름"
                 />
+                <InputInfo errorMessage={accountAddError.accountHolder} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-sub-gray mb-1">은행명</label>
-                <input
-                  type="text"
+                <TextInput
+                className="w-full"
                   name="bankName"
                   value={newAccount.bankName}
                   onChange={handleNewAccountChange}
-                  className="w-full px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
                   placeholder="은행명"
                 />
+                <InputInfo errorMessage={accountAddError.bankName} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-sub-gray mb-1">계좌번호</label>
-                <input
-                  type="number"
+                <TextInput
+                className="w-full"
                   name="bankAccount"
                   value={newAccount.bankAccount}
                   onChange={handleNewAccountChange}
-                  className="w-full px-3 py-2 border border-gray-border rounded-md focus:outline-none focus:ring-2 focus:ring-main-color"
                   placeholder="계좌번호"
                 />
+                <InputInfo errorMessage={accountAddError.bankAccount} />
               </div>
             </div>
             <div className="mt-4 flex justify-end">
@@ -168,6 +207,7 @@ export default function AccountInfo() {
                 type="button"
                 onClick={handleAddAccount}
                 className="flex items-center appearance-none"
+                disabled={addButtonDisabled}
               >
                 <Plus className="w-4 h-4 mr-1" /> 계좌 추가
               </PrimaryButton>
@@ -197,13 +237,16 @@ export default function AccountInfo() {
                             >기본 계좌로 설정</button>
                             }
                         </div>
-                        <button
-                            type="button"
-                            onClick={() => handleClickDeleteButton(account.id)}
-                            className="text-sub-gray hover:text-red-500"
-                        >
-                            <Trash2 className="w-4 h-4" />
-                        </button>
+                        {
+                          !account.isDefault &&
+                          <button
+                              type="button"
+                              onClick={() => handleClickDeleteButton(account.id)}
+                              className="text-sub-gray hover:text-red-500"
+                          >
+                              <Trash2 className="w-4 h-4" />
+                          </button>
+                        }
                         </div>
                     ))}  
                     </div>
