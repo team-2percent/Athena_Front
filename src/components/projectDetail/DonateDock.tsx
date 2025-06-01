@@ -189,14 +189,16 @@ const validateDetailAddress = (detailAddress: string) => {
             value: detailAddress,
             error: ""
         }
-    } else if (detailAddress.length > ADDRESS_DETAIL_MAX_LENGTH) {
-        return {
-            value: detailAddress.slice(0, ADDRESS_DETAIL_MAX_LENGTH),
-            error: result.error?.issues[0].message
-        }
+    } 
+  
+    if (detailAddress.length > ADDRESS_DETAIL_MAX_LENGTH) {
+      return {
+          value: detailAddress.slice(0, ADDRESS_DETAIL_MAX_LENGTH),
+          error: result.error?.issues[0].message || ""
+      }
     } 
     return {
-        value: "",
+        value: detailAddress,
         error: result.error?.issues[0].message || ""
     }
 }
