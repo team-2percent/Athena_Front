@@ -756,7 +756,7 @@ const DonateDock = () => {
       <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={() => setIsAlertOpen(false)} />
       {/* 고정된 후원하기 버튼 - 상품이 있고 재고가 있을 때만 표시 */}
       {canDonate(projectData) && (
-        <div className="fixed bottom-0 left-0 z-20 w-full">
+        <div className="fixed bottom-0 left-0 z-4 w-full">
           <div className="mx-auto max-w-6xl px-4">
             <button
               onClick={toggleDock}
@@ -1136,7 +1136,7 @@ const DonateDock = () => {
 
       {/* 배송지 추가 모달 */}
       {showAddressAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
             <div className="mb-6 flex items-center justify-between">
               <h4 className="text-xl font-bold">새 배송지 추가</h4>

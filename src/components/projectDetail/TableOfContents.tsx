@@ -170,7 +170,7 @@ const TableOfContents = ({ headings }: TableOfContentsProps) => {
           </div>
           <div className="w-full bg-[var(--color-gray-border)] rounded-full h-1.5">
             <div
-              className="bg-[var(--color-main-color)] h-1.5 rounded-full transition-all duration-75"
+              className="bg-[var(--color-main-color)] h-1.5 rounded-full transition-none"
               style={{
                 width: `${scrollProgress}%`,
               }}

@@ -9,6 +9,7 @@ import { useApi } from "@/hooks/useApi"
 import { useParams } from "next/navigation"
 
 import { OutlineButton, PrimaryButton } from "../common/Button"
+import gsap from "gsap"
 
 // ProjectData 인터페이스 추가
 interface ProjectData {
@@ -40,7 +41,9 @@ interface ProjectData {
 
 const ProjectDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [visibleImages, setVisibleImages] = useState<number[]>([])
+  const [prevImageIndex, setPrevImageIndex] = useState<number | null>(null)
+  const [isSliding, setIsSliding] = useState(false)
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>("right")
   const imageContainerRef = useRef<HTMLDivElement>(null)
   const metadataContainerRef = useRef<HTMLDivElement>(null)
 
@@ -66,6 +69,9 @@ const ProjectDetail = () => {
 
   const [showSharePopover, setShowSharePopover] = useState(false)
   const [copySuccess, setCopySuccess] = useState(false)
+
+  // 이미지 캐러셀에 사용할 이미지 DOM 배열을 위한 ref
+  const imageRefs = useRef<(HTMLImageElement | null)[]>([])
 
   // 프로젝트 데이터 가져오기
   useEffect(() => {
@@ -100,48 +106,22 @@ const ProjectDetail = () => {
   // 사용할 이미지 배열 결정
   const images = projectData?.imageUrls?.length ? projectData.imageUrls : []
 
-  // 이미지 목록에 표시할 이미지 인덱스 계산
-  useEffect(() => {
-    updateVisibleImages(currentImageIndex)
-  }, [currentImageIndex, images.length])
-
-  // 현재 이미지 인덱스를 기준으로 표시할 이미지 목록 업데이트
-  const updateVisibleImages = (currentIdx: number) => {
-    const totalImages = images.length
-    const visibleCount = Math.min(5, totalImages) // 이미지가 5개 미만이면 실제 이미지 개수만큼만 표시
-
-    if (totalImages <= 5) {
-      // 이미지가 5개 이하면 모든 이미지 표시
-      setVisibleImages(Array.from({ length: totalImages }, (_, i) => i))
-      return
+  const slideTo = (dir: 'left' | 'right') => {
+    if (isSliding || images.length <= 1) return
+    setIsSliding(true)
+    setSlideDirection(dir)
+    setPrevImageIndex(currentImageIndex)
+    let nextIdx
+    if (dir === 'right') {
+      nextIdx = (currentImageIndex + 1) % images.length
+    } else {
+      nextIdx = (currentImageIndex - 1 + images.length) % images.length
     }
-
-    // 이미지가 5개 초과일 때만 슬라이딩 윈도우 적용
-    let startIdx = currentIdx - Math.floor(visibleCount / 2)
-
-    // 경계 조건 처리
-    if (startIdx < 0) {
-      // 시작 인덱스가 0보다 작으면 0부터 시작
-      startIdx = 0
-    } else if (startIdx + visibleCount > totalImages) {
-      // 끝 인덱스가 총 이미지 수를 초과하면 조정
-      startIdx = totalImages - visibleCount
-    }
-
-    // 표시할 이미지 인덱스 배열 생성
-    const newVisibleImages = Array.from({ length: visibleCount }, (_, i) => startIdx + i)
-    setVisibleImages(newVisibleImages)
+    setCurrentImageIndex(nextIdx)
   }
 
-  const nextImage = () => {
-    const newIndex = (currentImageIndex + 1) % images.length
-    setCurrentImageIndex(newIndex)
-  }
-
-  const prevImage = () => {
-    const newIndex = (currentImageIndex - 1 + images.length) % images.length
-    setCurrentImageIndex(newIndex)
-  }
+  const nextImage = () => slideTo('right')
+  const prevImage = () => slideTo('left')
 
   // 날짜 포맷 함수
   const formatDate = (dateString: string) => {
@@ -217,6 +197,36 @@ const ProjectDetail = () => {
     }
   }, [showSharePopover])
 
+  // 슬라이드 애니메이션 useEffect
+  useEffect(() => {
+    if (prevImageIndex === null || prevImageIndex === currentImageIndex) return
+    const prevImg = imageRefs.current[0]
+    const currImg = imageRefs.current[1]
+    if (!prevImg || !currImg) {
+      setIsSliding(false)
+      setPrevImageIndex(null)
+      return
+    }
+    // 초기 위치 세팅
+    gsap.set(prevImg, { xPercent: 0, zIndex: 1 })
+    gsap.set(currImg, { xPercent: slideDirection === 'right' ? 100 : -100, zIndex: 2 })
+    // 애니메이션
+    gsap.to(prevImg, {
+      xPercent: slideDirection === 'right' ? -100 : 100,
+      duration: 0.5,
+      ease: 'power2.inOut',
+      onComplete: () => {
+        setIsSliding(false)
+        setPrevImageIndex(null)
+      }
+    })
+    gsap.to(currImg, {
+      xPercent: 0,
+      duration: 0.5,
+      ease: 'power2.inOut',
+    })
+  }, [currentImageIndex, prevImageIndex, slideDirection])
+
   return (
     <div className="mx-auto max-w-6xl pb-20">
       {/* 로딩 상태 표시 */}
@@ -245,26 +255,41 @@ const ProjectDetail = () => {
             <div ref={imageContainerRef} className="relative aspect-square w-full overflow-hidden rounded-3xl">
               {images.length > 0 ? (
                 <>
+                  {/* 두 장의 이미지만 렌더링: prev, current */}
+                  {prevImageIndex !== null && prevImageIndex !== currentImageIndex && (
+                    <img
+                      key={prevImageIndex}
+                      ref={el => { imageRefs.current[0] = el }}
+                      src={images[prevImageIndex] || "/placeholder.svg"}
+                      alt={projectData?.title || `프로젝트 이미지 ${prevImageIndex + 1}`}
+                      className="absolute top-0 left-0 h-full w-full object-cover"
+                      style={{ zIndex: 1 }}
+                    />
+                  )}
                   <img
+                    key={currentImageIndex}
+                    ref={el => { imageRefs.current[1] = el }}
                     src={images[currentImageIndex] || "/placeholder.svg"}
-                    alt={projectData?.title || "프로젝트 이미지"}
-                    className="h-full w-full object-cover"
+                    alt={projectData?.title || `프로젝트 이미지 ${currentImageIndex + 1}`}
+                    className="absolute top-0 left-0 h-full w-full object-cover"
+                    style={{ zIndex: 2 }}
                   />
-
-                  {/* 이미지가 2개 이상일 때만 캐러셀 좌우 버튼 표시 */}
+                  {/* 좌우 버튼 */}
                   {images.length > 1 && (
                     <>
                       <button
                         onClick={prevImage}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-sub-gray shadow-md hover:bg-white"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-sub-gray shadow-md hover:bg-white z-4"
                         aria-label="이전 이미지"
+                        disabled={isSliding}
                       >
                         <ChevronLeft className="h-6 w-6" />
                       </button>
                       <button
                         onClick={nextImage}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-sub-gray shadow-md hover:bg-white"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/70 p-2 text-sub-gray shadow-md hover:bg-white z-4"
                         aria-label="다음 이미지"
+                        disabled={isSliding}
                       >
                         <ChevronRight className="h-6 w-6" />
                       </button>
@@ -286,17 +311,17 @@ const ProjectDetail = () => {
             {images.length > 0 && (
               <div className="mt-4">
                 <div className="flex justify-center gap-4">
-                  {visibleImages.map((idx) => (
+                  {images.map((img, idx) => (
                     <div
                       key={idx}
                       className={`cursor-pointer overflow-hidden rounded-xl transition-all duration-200 ${
                         currentImageIndex === idx ? "ring-4 ring-main-color" : "hover:ring-2 hover:ring-main-color"
                       }`}
-                      onClick={() => setCurrentImageIndex(idx)}
+                      onClick={() => !isSliding && setCurrentImageIndex(idx)}
                     >
                       <div className="relative h-20 w-20">
                         <img
-                          src={images[idx] || "/placeholder.svg"}
+                          src={img || "/placeholder.svg"}
                           alt={`프로젝트 이미지 ${idx + 1}`}
                           className="w-full h-full object-cover"
                         />
@@ -367,43 +392,47 @@ const ProjectDetail = () => {
                   공유하기
                 </OutlineButton>
 
-                {/* 공유하기 팝오버 - 버튼 바로 아래에 위치 */}
-                {showSharePopover && (
-                  <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-10">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-medium text-gray-900">프로젝트 공유하기</h3>
-                      <button onClick={() => setShowSharePopover(false)} className="text-gray-400 hover:text-gray-600">
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 p-2 bg-gray-50 rounded border text-sm text-gray-600">
-                        <span className="flex-1 truncate">
-                          {typeof window !== "undefined" ? window.location.href : ""}
-                        </span>
-                      </div>
-
-                      <button
-                        onClick={copyToClipboard}
-                        className="w-full flex items-center justify-center gap-2 bg-main-color text-white py-2 px-4 rounded-lg hover:bg-secondary-color-dark transition-colors"
-                        disabled={copySuccess}
-                      >
-                        {copySuccess ? (
-                          <>
-                            <Check className="h-4 w-4" />
-                            복사 완료!
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="h-4 w-4" />
-                            URL 복사하기
-                          </>
-                        )}
-                      </button>
-                    </div>
+                {/* 공유하기 팝오버 - 트랜지션 애니메이션 적용, 항상 렌더링 */}
+                <div
+                  className={`absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-10 transition-all duration-75 ease-out
+                    ${showSharePopover ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'}`}
+                  style={{transformOrigin: 'top left'}}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-medium text-gray-900">프로젝트 공유하기</h3>
+                    <button onClick={() => setShowSharePopover(false)} className="text-gray-400 hover:text-gray-600">
+                      <X className="h-4 w-4" />
+                    </button>
                   </div>
-                )}
+
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 p-2 bg-gray-50 rounded border text-sm text-gray-600">
+                      <span className="flex-1 truncate">
+                        {typeof window !== "undefined" ? window.location.href : ""}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={copyToClipboard}
+                      className={`w-full flex items-center justify-center gap-2 text-white py-2 px-4 rounded-lg transition-colors
+                        ${copySuccess ? 'bg-secondary-color-dark' : 'bg-main-color hover:bg-secondary-color-dark'}
+                      `}
+                      disabled={copySuccess}
+                    >
+                      {copySuccess ? (
+                        <>
+                          <Check className="h-4 w-4" />
+                          복사 완료!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-4 w-4" />
+                          URL 복사하기
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* 후원하기 버튼 - 상품이 없거나 모든 재고가 0이면 비활성화 */}

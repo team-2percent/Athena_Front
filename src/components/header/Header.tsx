@@ -47,8 +47,10 @@ const Header = () => {
   const [showAuthMenu, setShowAuthMenu] = useState(false);
   const authMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const pathname = usePathname().split("/")[1];
-  const activeTab = pathToName[pathname]
+  const pathname = usePathname();
+  const pathFirst = pathname.split("/")[1];
+  const activeTab = pathToName[pathFirst]
+  const isProjectDetail = pathname.startsWith("/project/") && pathname.split("/").length === 3;
   const { showToast } = useToastStore();
 
   useEffect(() => {
@@ -330,6 +332,7 @@ const Header = () => {
             tabs={["전체", "카테고리", "신규", "마감임박"]}
             activeTab={activeTab}
             onClickTab={handleTabClick}
+            hideUnderline={isProjectDetail}
           />
           {/* <PopularSearch onSearchChange={handleSearchChange} onSearch={moveToSearchPage}/> */}
         </div>
