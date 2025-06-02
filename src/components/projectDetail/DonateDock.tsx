@@ -4,13 +4,12 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { ChevronUp, ChevronDown, Plus, Check, ChevronRight, X, Search } from "lucide-react"
-import AddressModal from "../profileEdit/AddressModal"
 import { useParams } from "next/navigation"
 import { useApi } from "@/hooks/useApi"
 
 // 1. 상단에 AlertModal import 추가
 import AlertModal from "../common/AlertModal"
-import { CancelButton, PrimaryButton, SecondaryButton } from "../common/Button"
+import { CancelButton, PrimaryButton } from "../common/Button"
 import AddressAddModal from "./AddressAddModal"
 
 interface AddressInfo {
@@ -135,8 +134,6 @@ const DonateDock = () => {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false)
   // 2. 결제 완료 모달 상태 추가 (isProcessingPayment 상태 아래에 추가)
   const [showPaymentCompleteModal, setShowPaymentCompleteModal] = useState(false)
-  const [paymentResult, setPaymentResult] = useState<null>(null)
-  const [paymentTid, setPaymentTid] = useState<string | null>(null)
   const [paymentError, setPaymentError] = useState<string | null>(null)
 
   // 새 배송지 정보를 객체로 관리
@@ -145,13 +142,6 @@ const DonateDock = () => {
     detailAddress: "",
     zipcode: "",
   })
-
-  const [addressAddError, setAddressAddError] = useState({
-    address: "",
-    detailAddress: "",
-  })
-
-  const addButtonDisabled = addressAddSchema.safeParse(newAddress).error !== undefined;
 
   // API 관련 상태 추가
   const { apiCall, isLoading: apiLoading } = useApi()
@@ -173,46 +163,6 @@ const DonateDock = () => {
     const hasAvailableStock = projectData.productResponses.some((product) => product.stock > 0)
     return hasAvailableStock
   }
-
-  const validateAddress = () => {
-    const result = addressSchema.safeParse(newAddress.address)
-    return result.error ? result.error.issues[0].message : "";
-}
-
-const validateDetailAddress = (detailAddress: string) => {
-    const result = addressDetailSchema.safeParse(detailAddress)
-    if (result.success) {
-        return {
-            value: detailAddress,
-            error: ""
-        }
-    } 
-  
-    if (detailAddress.length > ADDRESS_DETAIL_MAX_LENGTH) {
-      return {
-          value: detailAddress.slice(0, ADDRESS_DETAIL_MAX_LENGTH),
-          error: result.error?.issues[0].message || ""
-      }
-    } 
-    return {
-        value: detailAddress,
-        error: result.error?.issues[0].message || ""
-    }
-}
-
-const handleChangeDetailAddress = (e: React.ChangeEvent<HTMLInputElement>) => { 
-    const addressError = validateAddress();
-    const { value, error } = validateDetailAddress(e.target.value)
-    setNewAddress(prev => ({
-        ...prev,
-        detailAddress: value,
-    }))
-    setAddressAddError(prev => ({
-        ...prev,
-        address: addressError,
-        detailAddress: error
-    }))
-}
 
   // 프로젝트 데이터 가져오기
   useEffect(() => {
