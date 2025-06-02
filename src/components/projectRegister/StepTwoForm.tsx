@@ -1,11 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Plus, Trash2, X, ChevronDown, ChevronUp } from "lucide-react"
 import MarkdownEditor from "./MarkdownEditor"
 import DatePicker from "./DatePicker"
 import { useProjectFormStore } from "@/stores/useProjectFormStore"
 import { PrimaryButton } from "../common/Button"
+import gsap from "gsap"
+import Modal from "../common/Modal"
+import ScheduleDetailsDialog from "./modals/ScheduleDetailsDialog"
 
 // 예산 항목 타입
 interface BudgetItem {
@@ -32,67 +35,6 @@ interface ScheduleDetailsDialogProps {
   details: string
   onSave: (details: string) => void
   scheduleIndex: number
-}
-
-const ScheduleDetailsDialog = ({ isOpen, onClose, details, onSave, scheduleIndex }: ScheduleDetailsDialogProps) => {
-  const [content, setContent] = useState(details || "")
-  const [focusedField, setFocusedField] = useState<boolean>(false)
-
-  if (!isOpen) return null
-
-  const handleSave = () => {
-    onSave(content)
-    onClose()
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* 오버레이 */}
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-
-      {/* 다이얼로그 */}
-      <div className="relative z-10 w-full max-w-2xl rounded-3xl bg-white p-6 shadow-lg">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">일정 {scheduleIndex + 1} 상세 내용</h2>
-          <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <X size={24} />
-          </button>
-        </div>
-
-        <div className="mb-6">
-          <label
-            htmlFor="schedule-details"
-            className={`block text-sm mb-2 ${focusedField ? "text-secondary-color-dark" : "text-main-color"}`}
-          >
-            일정 상세 내용
-          </label>
-          <input
-            id="schedule-details"
-            type="text"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="이 일정에 대한 상세 내용을 입력하세요"
-            className={`w-full p-4 border rounded-xl ${
-              focusedField ? "border-secondary-color-dark" : "border-gray-300"
-            } focus:outline-none`}
-            onFocus={() => setFocusedField(true)}
-            onBlur={() => setFocusedField(false)}
-          />
-          <p className="text-sm text-gray-500 mt-2">* 간단하게 입력해주세요. 줄바꿈은 불가능합니다.</p>
-        </div>
-
-        <div className="flex justify-end">
-          <PrimaryButton
-            type="button"
-            onClick={handleSave}
-            className="bg-main-color text-white font-bold py-2 px-6 rounded-full"
-          >
-            저장
-          </PrimaryButton>
-        </div>
-      </div>
-    </div>
-  )
 }
 
 // 날짜를 YYYY. MM. DD. 형식으로 포맷팅 (한국 시간 기준)
@@ -587,15 +529,13 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown, isEdi
       </div>
 
       {/* 일정 내용 다이얼로그 */}
-      {scheduleDetailsDialogOpen && currentScheduleId !== null && (
-        <ScheduleDetailsDialog
-          isOpen={scheduleDetailsDialogOpen}
-          onClose={() => setScheduleDetailsDialogOpen(false)}
-          details={schedules.find((schedule) => schedule.id === currentScheduleId)?.details || ""}
-          onSave={saveScheduleDetails}
-          scheduleIndex={schedules.findIndex((schedule) => schedule.id === currentScheduleId)}
-        />
-      )}
+      <ScheduleDetailsDialog
+        isOpen={scheduleDetailsDialogOpen && currentScheduleId !== null}
+        onClose={() => setScheduleDetailsDialogOpen(false)}
+        details={currentScheduleId !== null ? (schedules.find((schedule) => schedule.id === currentScheduleId)?.details || "") : ""}
+        onSave={saveScheduleDetails}
+        scheduleIndex={currentScheduleId !== null ? schedules.findIndex((schedule) => schedule.id === currentScheduleId) : 0}
+      />
     </div>
   )
 }

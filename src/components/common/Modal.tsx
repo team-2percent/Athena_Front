@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect, useRef, type ReactNode } from "react"
+import { useEffect, useRef, useState, type ReactNode } from "react"
 import { X } from "lucide-react"
 import clsx from "clsx"
 import gsap from "gsap"
+import ReactDOM from "react-dom"
 
 // 버튼 타입 정의 추가
 type ButtonVariant = "primary" | "secondary" | "danger" | "outline"
@@ -85,6 +86,38 @@ export default function Modal({
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
+  const [visible, setVisible] = useState(isOpen)
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // 모달 mount/unmount 관리
+  useEffect(() => {
+    if (isOpen) {
+      setVisible(true)
+    } else if (visible) {
+      // 퇴장 애니메이션 실행 후 unmount
+      if (modalRef.current && overlayRef.current) {
+        gsap.to(overlayRef.current, {
+          opacity: 0,
+          duration: 0.12,
+          ease: "power2.in",
+        })
+        gsap.to(modalRef.current, {
+          opacity: 0,
+          scale: 0.95,
+          duration: 0.15,
+          ease: "power2.in",
+          onComplete: () => {
+            closeTimeoutRef.current = setTimeout(() => setVisible(false), 0)
+          },
+        })
+      } else {
+        setVisible(false)
+      }
+    }
+    return () => {
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current)
+    }
+  }, [isOpen])
 
   // ESC 키 누르면 모달 닫기
   useEffect(() => {
@@ -104,33 +137,33 @@ export default function Modal({
   // 모달 뒷배경 스크롤 방지
   useEffect(() => {
     if (isOpen) {
-      // 모달이 열릴 때 body 스크롤 방지
       document.body.style.overflow = "hidden"
     }
-
     return () => {
-      // 모달이 닫힐 때 body 스크롤 복원
       document.body.style.overflow = ""
     }
   }, [isOpen])
 
-  // 모달 애니메이션
+  // 모달 등장 애니메이션
   useEffect(() => {
-    if (isOpen && modalRef.current && overlayRef.current) {
+    if (visible && isOpen && modalRef.current && overlayRef.current) {
+      // 초기값 강제 세팅 (깜빡임 방지)
+      gsap.set(overlayRef.current, { opacity: 0 })
+      gsap.set(modalRef.current, { opacity: 0, scale: 0.95 })
       gsap.fromTo(
         overlayRef.current,
         { opacity: 0 },
-        { opacity: 1, duration: 0.25, ease: "power2.out" }
+        { opacity: 1, duration: 0.12, ease: "power2.out" }
       )
       gsap.fromTo(
         modalRef.current,
         { opacity: 0, scale: 0.95 },
-        { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out", delay: 0.05 }
+        { opacity: 1, scale: 1, duration: 0.15, ease: "power2.out", delay: 0.03 }
       )
     }
-  }, [isOpen])
+  }, [visible, isOpen])
 
-  if (!isOpen) return null
+  if (!visible) return null
 
   // 모달 크기에 따른 최대 너비 설정
   const sizeClasses = {
@@ -141,7 +174,7 @@ export default function Modal({
     full: "max-w-full mx-4",
   }
 
-  return (
+  const modalContent = (
     <>
       {/* 배경 오버레이 */}
       <div
@@ -191,6 +224,8 @@ export default function Modal({
       </div>
     </>
   )
+
+  return ReactDOM.createPortal(modalContent, typeof window !== "undefined" ? document.body : ({} as HTMLElement))
 }
 
 // Modal 인터페이스에 static 속성 추가 (export default function Modal 아래에 추가)

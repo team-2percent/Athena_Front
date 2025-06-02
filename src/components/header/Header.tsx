@@ -50,7 +50,12 @@ const Header = () => {
   const pathname = usePathname();
   const pathFirst = pathname.split("/")[1];
   const activeTab = pathToName[pathFirst]
-  const isProjectDetail = pathname.startsWith("/project/") && pathname.split("/").length === 3;
+  const showUnderline = (
+    pathname === "/" ||
+    pathname === "/category" ||
+    pathname === "/new" ||
+    pathname === "/deadline"
+  );
   const { showToast } = useToastStore();
 
   useEffect(() => {
@@ -210,9 +215,9 @@ const Header = () => {
 
   return (
     <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)] z-5">
-      {showCouponModal && <CouponModal isOpen={showCouponModal} onClose={() => setShowCouponModal(false)} />}
-      {showLoginModal && <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} moveToSignupModal={openSignupModalInLoginModal} />}
-      {showSignupModal && <SignupModal isOpen={showSignupModal} onClose={closeSignupModal} />}
+      <CouponModal isOpen={showCouponModal} onClose={() => setShowCouponModal(false)} />
+      <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} moveToSignupModal={openSignupModalInLoginModal} />
+      <SignupModal isOpen={showSignupModal} onClose={closeSignupModal} />
       <div className="container mx-auto px-4 py-4">
         {/* 상단 헤더 영역 */}
         <div className="flex items-center justify-between">
@@ -332,7 +337,7 @@ const Header = () => {
             tabs={["전체", "카테고리", "신규", "마감임박"]}
             activeTab={activeTab}
             onClickTab={handleTabClick}
-            hideUnderline={isProjectDetail}
+            hideUnderline={!showUnderline}
           />
           {/* <PopularSearch onSearchChange={handleSearchChange} onSearch={moveToSearchPage}/> */}
         </div>

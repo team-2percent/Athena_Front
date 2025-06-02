@@ -52,5 +52,5 @@ export default function MenuTab({size="base", tabs, activeTab, onClickTab, class
                 style={{ left: underlineStyle.left, width: underlineStyle.width }}
             />
         )}
-    </nav>
+        </nav>
 }

@@ -95,14 +95,12 @@ const AddressAddModal = ({
         </div>
       </div>
       {/* 배송지 주소 검색 모달 */}
-      {isAddressModalOpen && (
-        <AddressModal
-          isOpen={isAddressModalOpen}
-          onClose={() => setIsAddressModalOpen(false)}
-          onComplete={handleComplete}
-          closeOnOutsideClick={false}
-        />
-      )}
+      <AddressModal
+        isOpen={isAddressModalOpen}
+        onClose={() => setIsAddressModalOpen(false)}
+        onComplete={handleComplete}
+        closeOnOutsideClick={false}
+      />
     </Modal>
   )
 }

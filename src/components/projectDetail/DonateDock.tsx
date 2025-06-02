@@ -1136,19 +1136,17 @@ const DonateDock = () => {
       </div>
 
       {/* 배송지 추가 모달 */}
-      {showAddressAddModal && (
-        <AddressAddModal
-          isOpen={showAddressAddModal}
-          onClose={() => setShowAddressAddModal(false)}
-          newAddress={newAddress}
-          setNewAddress={setNewAddress}
-          isAddressModalOpen={isAddressModalOpen}
-          setIsAddressModalOpen={setIsAddressModalOpen}
-          handleInputChange={handleInputChange}
-          handleComplete={handleComplete}
-          saveNewAddress={saveNewAddress}
-        />
-      )}
+      <AddressAddModal
+        isOpen={showAddressAddModal}
+        onClose={() => setShowAddressAddModal(false)}
+        newAddress={newAddress}
+        setNewAddress={setNewAddress}
+        isAddressModalOpen={isAddressModalOpen}
+        setIsAddressModalOpen={setIsAddressModalOpen}
+        handleInputChange={handleInputChange}
+        handleComplete={handleComplete}
+        saveNewAddress={saveNewAddress}
+      />
 
       {/* 주문 요약 더보기 팝오버 */}
       {showOrderSummaryPopover && (
