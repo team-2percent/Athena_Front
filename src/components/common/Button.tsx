@@ -28,6 +28,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   leftIcon?: ReactNode
   rightIcon?: ReactNode
   className?: string
+  dataCy?: string
 }
 
 // 기본 버튼 컴포넌트
@@ -41,6 +42,7 @@ export const Button = ({
   rightIcon,
   className,
   disabled,
+  dataCy,
   ...props
 }: ButtonProps) => {
   // disabled 상태에 따라 variant 조정
@@ -87,7 +89,7 @@ export const Button = ({
   )
 
   return (
-    <button className={buttonClasses} disabled={disabled || isLoading} {...props}>
+    <button className={buttonClasses} disabled={disabled || isLoading} data-cy={dataCy} {...props}>
       {isLoading && (
         <svg
           className="animate-spin mx-auto h-4 w-4 text-current"

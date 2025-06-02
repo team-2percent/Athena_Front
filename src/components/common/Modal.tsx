@@ -70,6 +70,7 @@ interface ModalProps {
   closeOnEsc?: boolean
   className?: string
   zIndex?: number | string
+  dataCy?: string
 }
 
 export default function Modal({
@@ -82,7 +83,8 @@ export default function Modal({
   closeOnOutsideClick = true,
   closeOnEsc = true,
   className,
-  zIndex = 50,
+  zIndex = 50,  
+  dataCy,
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
@@ -192,6 +194,7 @@ export default function Modal({
         className="fixed inset-0 flex items-center justify-center"
         style={{ zIndex: typeof zIndex === "number" ? zIndex : undefined }}
         onMouseDown={e => e.stopPropagation()}
+        data-cy={dataCy}
       >
         <div
           ref={modalRef}

@@ -17,9 +17,10 @@ interface LoginModalProps {
   isOpen: boolean
   onClose: () => void
   moveToSignupModal: () => void
+  dataCy: string
 }
 
-export default function LoginModal({ isOpen, onClose, moveToSignupModal }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, moveToSignupModal, dataCy }: LoginModalProps) {
   const { apiCall } = useApi()
   const { login, setFcmToken } = useAuthStore()
   const [email, setEmail] = useState("")
@@ -85,7 +86,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md" closeOnOutsideClick closeOnEsc title="로그인">
+    <Modal isOpen={isOpen} onClose={onClose} size="md" closeOnOutsideClick closeOnEsc title="로그인" dataCy={dataCy}>
       <div className="p-4">
         <form onSubmit={handleSubmit}>
           {/* Email Input */}
@@ -96,6 +97,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
               value={email}
               onChange={handleChangeEmail}
               isError={loginError.email !== ""}
+              dataCy="email-input"
             />
             <InputInfo errorMessage={loginError.email} />
           </div>
@@ -108,6 +110,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
               value={password}
               onChange={handleChangePassword}
               isError={loginError.password !== ""}
+              dataCy="password-input"
             />
             <InputInfo errorMessage={loginError.password} />
           </div>
@@ -118,6 +121,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
             disabled={disabled}
             className="w-full py-4"
             size="lg"
+            dataCy="login-button"
           >로그인</PrimaryButton>
           <div className="h-[1.25rem] text-center mb-2">
             <span className="w-full text-red-500 text-xs">{errorMessage}</span>

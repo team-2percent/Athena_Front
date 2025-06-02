@@ -216,7 +216,7 @@ const Header = () => {
   return (
     <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)] z-5">
       <CouponModal isOpen={showCouponModal} onClose={() => setShowCouponModal(false)} />
-      <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} moveToSignupModal={openSignupModalInLoginModal} />
+      <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} moveToSignupModal={openSignupModalInLoginModal} dataCy="login-modal"/>
       <SignupModal isOpen={showSignupModal} onClose={closeSignupModal} />
       <div className="container mx-auto px-4 py-4">
         {/* 상단 헤더 영역 */}
@@ -317,11 +317,11 @@ const Header = () => {
               </>
               :
               <div className="text-main-color font-medium mr-auto flex items-center gap-2">
-                <button type="button" aria-label="로그인" onClick={openLoginModal}>
+                <button type="button" aria-label="로그인" onClick={openLoginModal} data-cy="open-login-modal-button">
                   로그인
                 </button>
                 /
-                <button type="button" aria-label="로그인" onClick={openSignupModal}>
+                <button type="button" aria-label="로그인" onClick={openSignupModal} data-cy="open-signup-modal-button">
                   회원가입
                 </button>
               </div>
