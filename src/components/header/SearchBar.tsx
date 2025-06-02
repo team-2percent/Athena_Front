@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { Search, X } from "lucide-react"
+import { SEARCH_MAX_LENGTH } from "@/lib/validationConstant"
 
 interface SearchBarProps {
   isLogin: boolean
@@ -15,7 +16,6 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
   const [autoCompletes, setAutoCompletes] = useState<string[]>([]) // 자동완성 단어
   const [recentSearches, setRecentSearches] = useState<{ id: number, word: string }[]>([]) // 최근 검색어
   const searchRef = useRef<HTMLDivElement>(null)
-  const maxLength = 30;
 
   // mock data. 로직 구현 후 삭제
   const autoCompleteItems = ["타로 버블티", "타로 버블티 품추가", "타로 버블티 버블 추가"]
@@ -98,7 +98,7 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
           onFocus={() => setIsOpen(true)}
           onKeyDown={(e) => activeEnter(e)}
           className="w-full h-full focus:outline-none text-sm"
-          maxLength={maxLength}
+          maxLength={SEARCH_MAX_LENGTH}
         />
         <button
           type="button"

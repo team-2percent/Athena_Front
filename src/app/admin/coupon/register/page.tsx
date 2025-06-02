@@ -9,6 +9,11 @@ import { useApi } from "@/hooks/useApi"
 import TimePicker from "@/components/common/TimePicker"
 import OverlaySpinner from "@/components/common/OverlaySpinner"
 import { PrimaryButton } from "@/components/common/Button"
+import { NumberInput, TextInput } from "@/components/common/Input"
+import TextArea from "@/components/common/TextArea"
+import { COUPON_CONTENT_MAX_LENGTH, COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR, COUPON_EVENT_START_TO_END_MIN_HOUR, COUPON_NAME_MAX_LENGTH, COUPON_PRICE_MAX_NUMBER, COUPON_STOCK_MAX_NUMBER } from "@/lib/validationConstant"
+import { couponAddSchema, couponContentSchema, couponExpireSchema, couponNameSchema, couponPeriodSchema, couponPriceSchema, couponStockSchema } from "@/lib/validationSchemas"
+import InputInfo from "@/components/common/InputInfo"
 export default function CouponRegisterPage() {
     const router = useRouter();
     const { apiCall } = useApi();
@@ -18,19 +23,179 @@ export default function CouponRegisterPage() {
     const [couponName, setCouponName] = useState<string>("")
     const [couponDescription, setCouponDescription] = useState<string>("")
     const [couponPrice, setCouponPrice] = useState<number>(0)
-    const [couponStartDateTime, setCouponStartDateTime] = useState<Date>(new Date())
-    const [couponEndDateTime, setCouponEndDateTime] = useState<Date>(new Date())
-    const [couponExpireDateTime, setCouponExpireDateTime] = useState<Date>(new Date())
+    
+    // 초기 시간 설정
+    const now = new Date()
+    const nextHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 0)
+    const endHour = new Date(nextHour)
+    endHour.setHours(nextHour.getHours() + COUPON_EVENT_START_TO_END_MIN_HOUR)
+    const expireHour = new Date(endHour)
+    expireHour.setHours(endHour.getHours() + COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR)
+    
+    const [couponStartDateTime, setCouponStartDateTime] = useState<Date>(nextHour)
+    const [couponEndDateTime, setCouponEndDateTime] = useState<Date>(endHour)
+    const [couponExpireDateTime, setCouponExpireDateTime] = useState<Date>(expireHour)
     const [couponStock, setCouponStock] = useState<number>(0)
 
-    const couponPriceLimit = 10000000000
-    const couponStockLimit = 10000000000
-
-    const [couponPriceError, setCouponPriceError] = useState<boolean>(false);
-    const [couponStockError, setCouponStockError] = useState<boolean>(false);
+    const [couponAddError, setCouponAddError] = useState({
+        title: "",
+        content: "",
+        price: "",
+        period: "",
+        expire: "",
+        stock: "",
+    })
     
-    const disabled = couponName === "" || couponDescription === "" || couponPrice === 0 || couponStartDateTime === null || couponEndDateTime === null || couponExpireDateTime === null || couponStock === 0
+    const disabled: boolean = couponAddSchema.safeParse({
+        title: couponName,
+        content: couponDescription,
+        price: couponPrice,
+        period: {
+            startAt: couponStartDateTime,
+            endAt: couponEndDateTime,
+        },
+        expire: {
+            endAt: couponEndDateTime,
+            expiresAt: couponExpireDateTime,
+        },
+        stock: couponStock,
+    }).error !== undefined
 
+    // 유효성 검사 함수
+    const validateTitle = (value: string) => {
+        const result = couponNameSchema.safeParse(value)
+        if (result.success) {
+            setCouponAddError({ ...couponAddError, title: "" })
+            return value
+        }
+
+        if (value.length > COUPON_NAME_MAX_LENGTH) {
+            setCouponAddError({ ...couponAddError, title: result.error.issues[0].message })
+            return value.slice(0, COUPON_NAME_MAX_LENGTH)
+        }
+        setCouponAddError({ ...couponAddError, title: result.error.issues[0].message })
+        return value
+    }
+
+    const validateContent = (value: string) => {
+        const result = couponContentSchema.safeParse(value)
+        if (result.success) {
+            setCouponAddError({ ...couponAddError, content: "" })
+            return value
+        }
+
+        if (value.length > COUPON_CONTENT_MAX_LENGTH) {
+            setCouponAddError({ ...couponAddError, content: result.error.issues[0].message })
+            return value.slice(0, COUPON_CONTENT_MAX_LENGTH)
+        }
+
+        setCouponAddError({ ...couponAddError, content: result.error.issues[0].message })
+        return value
+    }
+
+    const validatePrice = (value: string) => {
+        const newValue = +value.replace(/^0+/, '')
+        const result = couponPriceSchema.safeParse(newValue)
+        if (result.success) {
+            setCouponAddError({ ...couponAddError, price: "" })
+            return newValue
+        }
+
+        if (newValue > COUPON_PRICE_MAX_NUMBER) {
+            setCouponAddError({ ...couponAddError, price: result.error.issues[0].message })
+            return COUPON_PRICE_MAX_NUMBER
+        }
+
+        setCouponAddError({ ...couponAddError, price: result.error.issues[0].message })
+        return newValue
+    }
+
+    const validatePeriod = (startAt: Date, endAt: Date) => {
+        const result = couponPeriodSchema.safeParse({
+            startAt: startAt,
+            endAt: endAt,
+        })
+
+        if (result.success) {
+            setCouponAddError({ ...couponAddError, period: "" })
+            return {
+                startAt: startAt,
+                endAt: endAt
+            }
+        }
+
+        let newStartAt = startAt
+        let newEndAt = endAt
+
+        // 현재 시간과 같거나 이전이면 현재 시간 + 1시간으로 설정 (분은 00분으로)
+        if (startAt <= new Date()) {
+            const now = new Date()
+            const nextHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 0)
+            newStartAt = nextHour
+        }
+
+        // 발급 기간 종료 시간이 발급 기간 시작 시간보다 작으면 발급 기간 시작 시간을 1시간 증가
+        if (newEndAt <= newStartAt) {
+            newEndAt = new Date(newStartAt)
+            newEndAt.setHours(newStartAt.getHours() + COUPON_EVENT_START_TO_END_MIN_HOUR)
+        }
+
+        setCouponAddError({ ...couponAddError, period: result.error.issues[0].message })
+        return {
+            startAt: newStartAt,
+            endAt: newEndAt
+        }
+    }
+
+    const validateExpire = (endAt: Date, expiresAt: Date) => {
+        const result = couponExpireSchema.safeParse({
+            endAt: endAt,
+            expiresAt: expiresAt,
+        })
+
+        if (result.success) {
+            setCouponAddError({ ...couponAddError, expire: "" })
+            return {
+                endAt: endAt,
+                expiresAt: expiresAt
+            }
+        }
+
+        setCouponAddError({ ...couponAddError, expire: result.error.issues[0].message })
+
+        if (expiresAt.getTime() - endAt.getTime() <= 24 * 60 * 60 * 1000) {
+            const newExpireDate = new Date(endAt)
+            newExpireDate.setHours(endAt.getHours() + COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR)
+            return {
+                endAt: endAt,
+                expiresAt: newExpireDate
+            }
+        }
+
+        return {
+            endAt: endAt,
+            expiresAt: expiresAt
+        }
+    }
+
+    const validateStock = (value: string) => {
+        const newValue = +value.replace(/^0+/, '')
+        const result = couponStockSchema.safeParse(newValue)
+        if (result.success) {
+            setCouponAddError({ ...couponAddError, stock: "" })
+            return newValue
+        }
+
+        if (newValue > COUPON_STOCK_MAX_NUMBER) {
+            setCouponAddError({ ...couponAddError, stock: result.error.issues[0].message })
+            return COUPON_STOCK_MAX_NUMBER
+        }
+
+        setCouponAddError({ ...couponAddError, stock: result.error.issues[0].message })
+        return newValue
+    }
+
+    // 핸들링
     const handleAddCoupon = () => {
         // 쿠폰 등록 추가
         setIsModalOpen(false);
@@ -52,35 +217,36 @@ export default function CouponRegisterPage() {
         setIsModalOpen(true)
     }
 
-    const convertInputToNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.value.startsWith("0")) {
-            e.target.value = e.target.value.replace("0", "")
-        }
-        const value = e.target.value.replace(/[^0-9]/g, "")
-        e.target.value = value
-        return Number(e.target.value)
+    const handleCouponNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = validateTitle(e.target.value)
+        setCouponName(value)
+    }
+
+    const handleCouponDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const value = validateContent(e.target.value)
+        setCouponDescription(value)
     }
 
     const handleCouponPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setCouponPriceError(false)
-        const value = convertInputToNumber(e)
-        if (Number(value) > couponPriceLimit) {
-            setCouponPriceError(true)
-            setCouponPrice(couponPriceLimit)
-        } else {
-            setCouponPrice(Number(value))
-        }
+        const value = validatePrice(e.target.value)
+        setCouponPrice(value)
+    }
+
+    const handleCouponPeriodChange = (startAt: Date, endAt: Date) => {
+        const { startAt: newStartAt, endAt: newEndAt } = validatePeriod(startAt, endAt)
+        setCouponStartDateTime(newStartAt)
+        setCouponEndDateTime(newEndAt)
+    }
+
+    const handleCouponExpireChange = (endAt: Date, expiresAt: Date) => {
+        const { endAt: newEndAt, expiresAt: newExpiresAt } = validateExpire(endAt, expiresAt)
+        setCouponEndDateTime(newEndAt)
+        setCouponExpireDateTime(newExpiresAt)
     }
 
     const handleCouponStockChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setCouponStockError(false)
-        const value = convertInputToNumber(e)
-        if (Number(value) > couponStockLimit) {
-            setCouponStock(couponStockLimit)
-            setCouponStockError(true)
-        } else {
-            setCouponStock(Number(value))
-        }
+        const value = validateStock(e.target.value)
+        setCouponStock(value)
     }
 
     const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
@@ -99,23 +265,13 @@ export default function CouponRegisterPage() {
         setCouponExpireDateTime(new Date(couponExpireDateTime.setHours(hour)))
     }
 
-    // 발급 기간 시작 시간이 발급 기간 종료 시간보다 크면 발급 기간 종료 시간을 1시간 증가
     useEffect(() => {
-        if (couponStartDateTime >= couponEndDateTime) {
-            const newEndDate = new Date(couponStartDateTime)
-            newEndDate.setHours(couponStartDateTime.getHours() + 1)
-            setCouponEndDateTime(newEndDate)
-        }
-    }, [couponStartDateTime])
+        handleCouponPeriodChange(couponStartDateTime, couponEndDateTime)
+    }, [couponStartDateTime, couponEndDateTime])
 
-    // 발급 기간 종료 시간이 만료 기간 시작 시간보다 크면 만료 기간 시작 시간을 1시간 증가
     useEffect(() => {
-        if (couponEndDateTime >= couponExpireDateTime) {
-            const newExpireDate = new Date(couponEndDateTime)
-            newExpireDate.setHours(couponEndDateTime.getHours() + 1)
-            setCouponExpireDateTime(newExpireDate)
-        }
-    }, [couponEndDateTime])
+        handleCouponExpireChange(couponEndDateTime, couponExpireDateTime)
+    }, [couponEndDateTime, couponExpireDateTime])
 
     return (
         <div className="flex flex-col mx-auto w-[var(--content-width)] py-8 gap-6">
@@ -129,38 +285,39 @@ export default function CouponRegisterPage() {
                 </button>
                 </div>
                 <h2 className="text-2xl font-medium border-b pb-2">쿠폰 등록</h2>
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">쿠폰명</label>
-                        <input 
-                            type="text"
+                        <TextInput
                             placeholder="쿠폰명을 입력하세요"
-                            className="w-full p-3 border rounded-md"
                             value={couponName}
-                            onChange={(e) => setCouponName(e.target.value)}
+                            onChange={handleCouponNameChange}
+                            isError={couponAddError.title !== ""}
                         />
+                        <InputInfo errorMessage={couponAddError.title} showLength length={couponName.length} maxLength={COUPON_NAME_MAX_LENGTH} />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">쿠폰 설명</label>
-                        <textarea 
+                        <TextArea
                             placeholder="쿠폰 설명을 입력하세요"
-                            className="w-full p-3 border rounded-md resize-none"
                             value={couponDescription}
-                            onChange={(e) => setCouponDescription(e.target.value)}
+                            onChange={handleCouponDescriptionChange}
+                            isError={couponAddError.content !== ""}
                         />
+                        <InputInfo errorMessage={couponAddError.content} showLength length={couponDescription.length} maxLength={COUPON_CONTENT_MAX_LENGTH} />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">가격</label>
                         <div className="flex gap-4 items-center">
-                            <input 
-                                type="text"
+                            <NumberInput
+                                className="w-32"
                                 placeholder="가격을 입력하세요"
-                                className="p-3 border rounded-md"
-                                value={couponPrice}
+                                value={couponPrice.toString()}
                                 onClick={handleClick}
                                 onChange={handleCouponPriceChange}
+                                isError={couponAddError.price !== ""}
                             />
-                            {couponPriceError && <p className="text-red-500 text-sm">가격은 최대 100억원까지 설정 가능합니다.</p>}
+                            <InputInfo errorMessage={couponAddError.price} />
                         </div>
                     </div>
                     <div className="flex flex-col gap-2">
@@ -172,6 +329,7 @@ export default function CouponRegisterPage() {
                             <DatePicker selectedDate={couponEndDateTime} onChange={(date) => setCouponEndDateTime(date)}  minDate={couponStartDateTime}/>
                             <TimePicker selectedDateTime={couponEndDateTime} onChange={handleCouponEndDateTimeChange} minDateTime={couponStartDateTime}/>
                         </div>
+                        <InputInfo errorMessage={couponAddError.period} />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">만료 기간</label>
@@ -179,18 +337,20 @@ export default function CouponRegisterPage() {
                             <DatePicker selectedDate={couponExpireDateTime} onChange={(date) => setCouponExpireDateTime(date)} minDate={couponEndDateTime}/>
                             <TimePicker selectedDateTime={couponExpireDateTime} onChange={handleCouponExpireDateTimeChange} minDateTime={couponEndDateTime}/>
                         </div>
+                        <InputInfo errorMessage={couponAddError.expire} />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">수량</label>
                         <div className="flex gap-4 items-center">
-                            <input 
-                                type="text"
-                                className="p-3 border rounded-md"
+                            <NumberInput
+                                className="w-32"
+                                placeholder="수량을 입력하세요"
                                 value={couponStock}
                                 onClick={handleClick}
                                 onChange={handleCouponStockChange}
+                                isError={couponAddError.stock !== ""}
                             />
-                            {couponStockError && <p className="text-red-500 text-sm">수량은 최대 100억개까지 설정 가능합니다.</p>}
+                            <InputInfo errorMessage={couponAddError.stock} />
                         </div>
                     </div>
                     <div className="flex justify-end">

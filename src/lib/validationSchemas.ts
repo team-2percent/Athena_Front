@@ -1,4 +1,28 @@
 import { z } from "zod"
+import {
+  EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH,
+  EMAIL_MIN_LENGTH, PASSWORD_MIN_LENGTH,
+  NICKNAME_MAX_LENGTH,
+  NICKNAME_MIN_LENGTH,
+  SELLER_DESCRIPTION_MAX_LENGTH,
+  IMAGE_MAX_MB,
+  LINK_URLS_MAX_BYTE,
+  ACCOUNT_HOLDER_MAX_LENGTH,
+  BANK_ACCOUNT_MAX_LENGTH,
+  BANK_NAME_MAX_LENGTH,
+  ADDRESS_DETAIL_MAX_LENGTH,
+  SEARCH_MAX_LENGTH,
+  COUPON_NAME_MAX_LENGTH,
+  COUPON_CONTENT_MIN_LENGTH,
+  COUPON_CONTENT_MAX_LENGTH,
+  COUPON_PRICE_MIN_NUMBER,
+  COUPON_PRICE_MAX_NUMBER,
+  COUPON_STOCK_MAX_NUMBER,
+  COUPON_STOCK_MIN_NUMBER,
+  COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR,
+  COUPON_EVENT_START_TO_END_MIN_HOUR,
+} from "./validationConstant"
+import { getByteLength } from "./utils"
 
 // 1단계 유효성 검사 스키마
 export const stepOneSchema = z
@@ -193,3 +217,176 @@ export const stepThreeSchema = z.object({
 })
 
 export type StepThreeFormData = z.infer<typeof stepThreeSchema>
+
+// 이미지 스키마
+export const imageSchema = z.instanceof(File)
+  .refine((val) => {
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    return validTypes.includes(val.type)
+  }, "jpg, jpeg, png, webp 형식의 이미지만 업로드 가능합니다.")
+  .refine((val) => {
+    return val.size <= IMAGE_MAX_MB * 1024 * 1024 // 10MB
+  }, `이미지 크기는 ${IMAGE_MAX_MB}MB 이하여야 합니다.`)
+
+// 사용자 관련 유효성 검사 스키마
+export const emailSchema = z.string()
+  .max(EMAIL_MAX_LENGTH, `${EMAIL_MAX_LENGTH}자 이내로 입력해주세요.`)
+  .refine(val => val.length >= EMAIL_MIN_LENGTH, `${EMAIL_MIN_LENGTH}자 이상 입력해주세요.`)
+  .refine((val) => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i.test(val), "올바른 이메일 형식이 아닙니다.")
+
+export const passwordSchema = z.string()
+  .max(PASSWORD_MAX_LENGTH, `${PASSWORD_MAX_LENGTH}자 이내로 입력해주세요.`)
+  .refine((val) => val.length >= PASSWORD_MIN_LENGTH, `${PASSWORD_MIN_LENGTH}자 이상 입력해주세요.`)
+
+export const newPasswordSchema = z.string()
+  .max(PASSWORD_MAX_LENGTH, `${PASSWORD_MAX_LENGTH}자 이내로 입력해주세요.`)
+  .refine((val) => val.length >= PASSWORD_MIN_LENGTH, `${PASSWORD_MIN_LENGTH}자 이상 입력해주세요.`)
+  .refine((val) => /[A-Z]/.test(val), "대문자를 포함해주세요.")
+  .refine((val) => /[a-z]/.test(val), "소문자를 포함해주세요.")
+  .refine((val) => /[0-9]/.test(val), "숫자를 포함해주세요.")
+  .refine((val) => /[!@#$%^&*(),.?":{}|<>]/.test(val), "특수문자를 포함해주세요.")
+
+export const nicknameSchema = z.string()
+  .min(NICKNAME_MIN_LENGTH, "닉네임을 입력해주세요.")
+  .max(NICKNAME_MAX_LENGTH, `닉네임은 ${NICKNAME_MAX_LENGTH}자 이내로 입력해주세요.`)
+
+export const sellerDescriptionSchema = z.string()
+  .max(SELLER_DESCRIPTION_MAX_LENGTH, `판매자 소개는 ${SELLER_DESCRIPTION_MAX_LENGTH}자 이내로 입력해주세요.`)
+
+export const linkUrlsSchema = z.string().refine((val) => getByteLength(val) <= LINK_URLS_MAX_BYTE, {
+  message: `링크가 너무 깁니다.`,
+})
+
+// 계좌 관련 유효성 검사 스키마
+export const accountHolderSchema = z.string()
+  .min(1, "예금주를 입력해주세요.")
+  .max(ACCOUNT_HOLDER_MAX_LENGTH, `예금주는 ${ACCOUNT_HOLDER_MAX_LENGTH}자 이내로 입력해주세요.`)
+
+export const bankNameSchema = z.string()
+  .min(1, "은행명을 입력해주세요.")
+  .max(BANK_NAME_MAX_LENGTH, `은행명은 ${BANK_NAME_MAX_LENGTH}자 이내로 입력해주세요.`)
+
+export const bankAccountSchema = z.string()
+  .min(1, "계좌번호를 입력해주세요.")
+  .max(BANK_ACCOUNT_MAX_LENGTH, `계좌번호는 ${BANK_ACCOUNT_MAX_LENGTH}자 이내로 입력해주세요.`)
+  .refine((val) => /^\d+$/.test(val), "숫자만 입력해주세요.")
+
+// 배송지 관련 유효성 검사 스키마
+export const addressSchema = z.string().min(1, "주소가 필요합니다.")
+
+export const addressDetailSchema = z.string()
+  .min(1, "상세 주소를 입력해주세요.")
+  .max(ADDRESS_DETAIL_MAX_LENGTH, `상세 주소는 ${ADDRESS_DETAIL_MAX_LENGTH}자 이내로 입력해주세요.`)
+
+// 검색 스키마
+export const searchSchema = z.string().min(1, "검색어를 입력해주세요.").max(SEARCH_MAX_LENGTH, `검색어는 ${SEARCH_MAX_LENGTH}자 이내로 입력해주세요.`)
+
+// 쿠폰 스키마
+export const couponNameSchema = z
+  .string()
+  .min(1, "쿠폰 이름을 입력해주세요.")
+  .max(COUPON_NAME_MAX_LENGTH, `쿠폰 이름은 ${COUPON_NAME_MAX_LENGTH}자 이내로 입력해주세요.`)
+
+export const couponContentSchema = z
+  .string()
+  .min(COUPON_CONTENT_MIN_LENGTH, "쿠폰 설명을 입력해주세요.")
+  .max(COUPON_CONTENT_MAX_LENGTH, `쿠폰 설명은 ${COUPON_CONTENT_MAX_LENGTH}자 이내로 입력해주세요.`)
+
+export const couponPriceSchema = z
+  .number()
+  .min(COUPON_PRICE_MIN_NUMBER, `쿠폰 가격은 ${COUPON_PRICE_MIN_NUMBER}원 이상이어야 합니다.`)
+  .max(COUPON_PRICE_MAX_NUMBER, `쿠폰 가격은 ${COUPON_PRICE_MAX_NUMBER}원 이내로 입력해주세요.`)
+
+export const couponStockSchema = z
+  .number()
+  .min(COUPON_STOCK_MIN_NUMBER, `쿠폰 수량은 ${COUPON_STOCK_MIN_NUMBER}개 이상이어야 합니다.`)
+  .max(COUPON_STOCK_MAX_NUMBER, `쿠폰 수량은 ${COUPON_STOCK_MAX_NUMBER}개 이내로 입력해주세요.`)
+
+
+// 로그인/회원가입 유효성 검사 스키마
+export const loginSchema = z.object({
+  email: emailSchema,
+  password: passwordSchema,
+})
+
+export const passwordMatchSchema = z.object({
+  password: z.string(),
+  passwordConfirm: z.string(),
+}).refine((data) => data.password === data.passwordConfirm, {
+  message: "비밀번호가 일치하지 않습니다.",
+  path: ["passwordConfirm"],
+})
+
+export const signupSchema = z.object({
+  nickname: nicknameSchema,
+  email: emailSchema,
+  password: newPasswordSchema,
+  passwordConfirm: passwordSchema,
+})
+
+// 프로필 수정 스키마
+export const profileEditSchema = z.object({
+  nickname: nicknameSchema,
+  sellerDescription: sellerDescriptionSchema,
+  profileImage: imageSchema.nullable(),
+  linkUrl: linkUrlsSchema,
+})
+
+// 비밀번호 수정 스키마
+export const passwordEditSchema = z.object({
+  passwordConfirmed: z.boolean().refine((val) => val, "비밀번호 확인이 필요합니다."),
+  newPassword: newPasswordSchema,
+  newPasswordConfirm: passwordSchema,
+})
+
+// 프로필 url 스키마
+export const profileUrlSchema = z.object({
+  url: z.string().url("올바른 링크 형식이 아닙니다."),
+  linkUrl: z.string().optional(),
+}).refine((data) => getByteLength(data.url) + (getByteLength(data.linkUrl ?? '')) < LINK_URLS_MAX_BYTE, {
+  message: `링크가 너무 깁니다.`,
+  path: ["url", "linkUrl"],
+})
+
+// 계좌 추가 스키마
+export const accountAddSchema = z.object({
+  accountHolder: accountHolderSchema,
+  bankName: bankNameSchema,
+  bankAccount: bankAccountSchema,
+})
+
+// 배송지 추가 스키마
+export const addressAddSchema = z.object({
+  address: addressSchema,
+  detailAddress: addressDetailSchema,
+})
+
+// 쿠폰 추가 스키마
+export const couponPeriodSchema = z.object({
+  startAt: z.date().refine((date) => date >= new Date(), "발급 시작일은 현재 시간 이후여야 합니다."),
+  endAt: z.date(),
+}).refine((data) => {
+    const hourDiff = (data.endAt.getTime() - data.startAt.getTime()) / (1000 * 60 * 60);
+    return hourDiff >= COUPON_EVENT_START_TO_END_MIN_HOUR;
+}, {
+    message: `발급 기간은 최소 ${COUPON_EVENT_START_TO_END_MIN_HOUR}시간 이상이어야 합니다.`
+})
+
+export const couponExpireSchema = z.object({
+  endAt: z.date(),
+  expiresAt: z.date(),
+}).refine((data) => {
+    const hourDiff = (data.expiresAt.getTime() - data.endAt.getTime()) / (1000 * 60 * 60);
+    return hourDiff >= COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR;
+}, {
+    message: `만료 기간은 발급 종료일로부터 최소 ${COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR}시간 이상이어야 합니다.`
+})
+
+export const couponAddSchema = z.object({
+  title: couponNameSchema,
+  content: couponContentSchema,
+  price: couponPriceSchema,
+  period: couponPeriodSchema,
+  expire: couponExpireSchema,
+  stock: couponStockSchema,
+})

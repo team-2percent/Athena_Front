@@ -15,3 +15,10 @@ export function formatDateInAdmin(date: string) {
     hour12: false
   }).replace(/\. /g, '.')
 }
+
+export function getByteLength(str: string): number {
+  // TextEncoder를 사용하여 UTF-8 인코딩된 바이트 길이 계산
+  const encoder = new TextEncoder();
+  const encoded = encoder.encode(str);
+  return encoded.length;
+}

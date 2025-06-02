@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import { ChevronUp, ChevronDown, Plus, Check, ChevronRight, X } from "lucide-react"
+import { ChevronUp, ChevronDown, Plus, Check, ChevronRight, X, Search } from "lucide-react"
 import AddressModal from "../profileEdit/AddressModal"
 import { useParams } from "next/navigation"
 import { useApi } from "@/hooks/useApi"
@@ -146,6 +146,13 @@ const DonateDock = () => {
     zipcode: "",
   })
 
+  const [addressAddError, setAddressAddError] = useState({
+    address: "",
+    detailAddress: "",
+  })
+
+  const addButtonDisabled = addressAddSchema.safeParse(newAddress).error !== undefined;
+
   // API 관련 상태 추가
   const { apiCall, isLoading: apiLoading } = useApi()
   const [projectData, setProjectData] = useState<ProjectData | null>(null)
@@ -166,6 +173,46 @@ const DonateDock = () => {
     const hasAvailableStock = projectData.productResponses.some((product) => product.stock > 0)
     return hasAvailableStock
   }
+
+  const validateAddress = () => {
+    const result = addressSchema.safeParse(newAddress.address)
+    return result.error ? result.error.issues[0].message : "";
+}
+
+const validateDetailAddress = (detailAddress: string) => {
+    const result = addressDetailSchema.safeParse(detailAddress)
+    if (result.success) {
+        return {
+            value: detailAddress,
+            error: ""
+        }
+    } 
+  
+    if (detailAddress.length > ADDRESS_DETAIL_MAX_LENGTH) {
+      return {
+          value: detailAddress.slice(0, ADDRESS_DETAIL_MAX_LENGTH),
+          error: result.error?.issues[0].message || ""
+      }
+    } 
+    return {
+        value: detailAddress,
+        error: result.error?.issues[0].message || ""
+    }
+}
+
+const handleChangeDetailAddress = (e: React.ChangeEvent<HTMLInputElement>) => { 
+    const addressError = validateAddress();
+    const { value, error } = validateDetailAddress(e.target.value)
+    setNewAddress(prev => ({
+        ...prev,
+        detailAddress: value,
+    }))
+    setAddressAddError(prev => ({
+        ...prev,
+        address: addressError,
+        detailAddress: error
+    }))
+}
 
   // 프로젝트 데이터 가져오기
   useEffect(() => {

@@ -3,11 +3,14 @@
 import type React from "react"
 
 import { useEffect, useState } from "react"
-import clsx from "clsx"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
 import Modal from "@/components/common/Modal"
-import { Button, PrimaryButton, SecondaryButton } from "../common/Button"
+import { PrimaryButton, SecondaryButton } from "../common/Button"
+import { EmailInput, PasswordInput } from "../common/Input"
+import { emailSchema, loginSchema, passwordSchema } from "@/lib/validationSchemas"
+import { EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH } from "@/lib/validationConstant"
+import InputInfo from "../common/InputInfo"
 import { getFCMToken } from '@/lib/firebase'
 
 interface LoginModalProps {
@@ -20,13 +23,46 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
   const { apiCall } = useApi()
   const { login, setFcmToken } = useAuthStore()
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [disabled, setDisabled] = useState(true)
+  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("")
-  const [focusedField, setFocusedField] = useState<string | null>(null)
-  const [isEmailValid, setIsEmailValid] = useState(true)
+  const [loginError, setLoginError] = useState({
+    email: "",
+    password: ""
+  })
 
-  const checkEmail = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  const disabled: boolean = !loginSchema.safeParse({ email, password }).success
+
+  const validateEmail = (email: string) => {
+    const result = emailSchema.safeParse(email)
+    setLoginError({ 
+      ...loginError,
+      email: result.success ? "" : result.error.issues[0].message
+    })
+  }
+
+  const validatePassword = (password: string) => {
+    const result = passwordSchema.safeParse(password) 
+    setLoginError({
+      ...loginError,
+      password: result.success ? "" : result.error.issues[0].message
+    })
+  }
+
+  const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length <= EMAIL_MAX_LENGTH) {
+      setEmail(e.target.value)
+    }
+
+    validateEmail(e.target.value)
+  }
+
+  const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length <= PASSWORD_MAX_LENGTH) {
+      setPassword(e.target.value)
+    }
+
+    validatePassword(e.target.value)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,67 +84,44 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
     }
   }
 
-  useEffect(() => {
-    setIsEmailValid(checkEmail() || email === "")
-  }, [email])
-
-  useEffect(() => {
-    if (email && password) {
-      setErrorMessage("")
-      setDisabled(false)
-    } else {
-      setDisabled(true)
-    }
-  }, [email, password])
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="md" closeOnOutsideClick closeOnEsc title="로그인">
       <div className="p-4">
-        <form className="relative" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           {/* Email Input */}
           <div className="relative mb-4">
-            <input
-              type="email"
+            <EmailInput
+              className="w-full"
               placeholder="이메일 입력"
-              className={clsx(
-                "w-full p-3 border-b focus:outline-none text-lg",
-                focusedField === "email" ? (isEmailValid ? "border-main-color" : "border-red-500") : "border-gray-300",
-              )}
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onFocus={() => setFocusedField("email")}
-              onBlur={() => setFocusedField(null)}
+              onChange={handleChangeEmail}
+              isError={loginError.email !== ""}
             />
-            {/* 이메일 확인 문구 */}
-            {!isEmailValid && (
-              <p className="absolute bottom-0 translate-y-full text-red-500 text-xs pt-1">이메일 형식이 아닙니다.</p>
-            )}
+            <InputInfo errorMessage={loginError.email} />
           </div>
 
           {/* Password Input */}
           <div className="relative mb-8">
-            <input
-              type="password"
+            <PasswordInput
+              className="w-full"
               placeholder="비밀번호 입력"
-              className={clsx(
-                "w-full p-3 border-b focus:outline-none text-lg",
-                focusedField === "password" ? "border-main-color" : "border-gray-300",
-              )}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onFocus={() => setFocusedField("password")}
-              onBlur={() => setFocusedField(null)}
+              onChange={handleChangePassword}
+              isError={loginError.password !== ""}
             />
+            <InputInfo errorMessage={loginError.password} />
           </div>
 
           {/* Login Button */}
           <PrimaryButton
             type="submit"
             disabled={disabled}
-            className="w-full py-4 mb-8"
+            className="w-full py-4"
             size="lg"
           >로그인</PrimaryButton>
-          <span className="absolute bottom-2 left-0 w-full text-center text-red-500 text-sm">{errorMessage}</span>
+          <div className="h-[1.25rem] text-center mb-2">
+            <span className="w-full text-red-500 text-xs">{errorMessage}</span>
+          </div>
         </form>
 
         {/* Divider */}
