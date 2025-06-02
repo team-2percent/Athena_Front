@@ -240,7 +240,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
             >
               <div className="grid grid-cols-1 lg:grid-cols-6 gap-8">
                 {/* 소개글 영역 (좌측) */}
-                <div className="lg:col-span-4 pb-160">
+                <div className="lg:col-span-4 pb-180">
                   <MarkdownRenderer content={projectData?.markdown || defaultMarkdown} />
                 </div>
                 {/* 목차 영역 (우측) */}

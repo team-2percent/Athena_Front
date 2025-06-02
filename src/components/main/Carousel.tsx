@@ -122,12 +122,12 @@ export default function Carousel({ projects, isLoading }: { projects: MainProjec
         <button
           onClick={() => { slideTo(-1); resetAutoSlide(); }}
           className={cn(
-            "bg-white/90 hover:bg-white text-main-color rounded-full p-3 shadow-lg z-40 transition-colors",
+            "bg-white/90 hover:bg-white text-main-color rounded-full p-3 shadow-lg z-4 transition-colors",
             "absolute left-2 top-1/2 -translate-y-1/2 md:left-4"
           )}
           aria-label="이전"
           disabled={isAnimating}
-          style={{ zIndex: 40 }}
+          style={{ zIndex: 4 }}
         >
           <ChevronLeft className="h-7 w-7" />
         </button>
@@ -182,12 +182,12 @@ export default function Carousel({ projects, isLoading }: { projects: MainProjec
         <button
           onClick={() => { slideTo(1); resetAutoSlide(); }}
           className={cn(
-            "bg-white/90 hover:bg-white text-main-color rounded-full p-3 shadow-lg z-40 transition-colors",
+            "bg-white/90 hover:bg-white text-main-color rounded-full p-3 shadow-lg z-4 transition-colors",
             "absolute right-2 top-1/2 -translate-y-1/2 md:right-4"
           )}
           aria-label="다음"
           disabled={isAnimating}
-          style={{ zIndex: 40 }}
+          style={{ zIndex: 4 }}
         >
           <ChevronRight className="h-7 w-7" />
         </button>

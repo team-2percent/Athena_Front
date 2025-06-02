@@ -119,9 +119,9 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
         {/* Carousel Container */}
         <div className="relative flex-1 w-full min-w-[min(100vw,900px)] overflow-hidden" ref={carouselAreaRef}>
           {/* 왼쪽 그라데이션 오버레이 */}
-          <div className="pointer-events-none absolute left-0 top-0 h-full w-60 bg-gradient-to-r from-white to-transparent z-10" />
+          <div className="pointer-events-none absolute left-0 top-0 h-full w-60 bg-gradient-to-r from-white to-transparent z-4" />
           {/* 오른쪽 그라데이션 오버레이 */}
-          <div className="pointer-events-none absolute right-0 top-0 h-full w-60 bg-gradient-to-l from-white to-transparent z-10" />
+          <div className="pointer-events-none absolute right-0 top-0 h-full w-60 bg-gradient-to-l from-white to-transparent z-4" />
           <div ref={containerRef} className="flex w-fit gap-6">
             {infiniteProjects.map((item: any, index: number) => (
               <div
