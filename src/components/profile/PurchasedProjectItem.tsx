@@ -129,15 +129,13 @@ export default function PurchasedProjectItem({
       </div>
 
       {/* 후기 작성 모달 */}
-      {isReviewFormOpen && (
-        <ReviewForm
-          isOpen={isReviewFormOpen}
-          onClose={() => setIsReviewFormOpen(false)}
-          projectId={projectId}
-          projectName={projectName}
-          sellerName={sellerName}
-        />
-      )}
+      <ReviewForm
+        isOpen={isReviewFormOpen}
+        onClose={() => setIsReviewFormOpen(false)}
+        projectId={projectId}
+        projectName={productName}
+        sellerName={sellerName}
+      />
     </>
   )
 }

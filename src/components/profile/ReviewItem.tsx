@@ -76,14 +76,12 @@ export default function ReviewItem({
       </div>
 
       {/* 댓글 모달 */}
-      {isModalOpen && (
-        <ReviewModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          reviewContent={reviewContent}
-          reviewDate={reviewDate}
-        />
-      )}
+      <ReviewModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        reviewContent={reviewContent}
+        reviewDate={reviewDate}
+      />
     </>
   )
 }

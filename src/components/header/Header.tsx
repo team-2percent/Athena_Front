@@ -266,52 +266,39 @@ const Header = () => {
                 }
                 <div className="relative flex items-center" ref={authMenuRef}>
                 {renderProfile()}
-                  {
-                    showAuthMenu &&
-                    <div className="absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 transition-all duration-200 min-w-[220px] text-left">
-                      <div className="text-xs text-gray-400 font-semibold my-2 pl-1">설정</div>
-                      {isAdmin &&
-                        <button
-                        type="button"
-                        onClick={() => router.push("/admin/approval")}
-                        className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
-                      >
-                        <UserLock className="h-4 w-4" />
-                        관리자페이지
-                      </button>
-                      }
-                      <button
-                        type="button"
-                        onClick={handleClickMyPage}
-                        className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
-                      >
-                        <User className="h-4 w-4" />
-                        마이페이지
-                      </button>
-                      <button
-                          type="button"
-                          onClick={handleLogout}
-                          className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
-                      >
-                          <LogOut className="h-4 w-4" />
-                          로그아웃
-                      </button>
-                      {/* <hr className="my-2 border-gray-200" />
-                      <div className="flex items-center gap-2 px-2 pb-2 justify-between">
-                        <span className="text-sm text-gray-500">알림 받기</span>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            className="sr-only peer"
-                            checked={notificationEnabled}
-                            onChange={handleNotificationToggle}
-                          />
-                          <div className={`w-11 h-6 rounded-full transition peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-main-color ${notificationEnabled ? 'bg-main-color' : 'bg-gray-200'}`}></div>
-                          <span className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${notificationEnabled ? 'translate-x-5' : ''}`}></span>
-                        </label>
-                      </div> */}
-                    </div>
-                  }
+                <div
+                  className={`absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 min-w-[220px] text-left transition-all duration-75 ease-out
+                    ${showAuthMenu ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'}`}
+                  style={{ transformOrigin: 'top right' }}
+                >
+                  <div className="text-xs text-gray-400 font-semibold my-2 pl-1">설정</div>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => router.push("/admin/approval")}
+                      className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
+                    >
+                      <UserLock className="h-4 w-4" />
+                      관리자페이지
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleClickMyPage}
+                    className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
+                  >
+                    <User className="h-4 w-4" />
+                    마이페이지
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    로그아웃
+                  </button>
+                </div>
                 </div>
               </div>
               </>
