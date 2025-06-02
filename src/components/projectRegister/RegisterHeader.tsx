@@ -109,7 +109,7 @@ export default function RegisterHeader({
   const getStepProgress = (step: number) => {
     switch (step) {
       case 1: {
-        // 1단계 필수 항목: 카테고리, 제목, 설명, 목표금액, 시작일, 종료일, 배송일 (7개)
+        // 1단계 필수 항목: 카테고리, 제목, 설명, 목표금액, 시작일, 종료일, 배송일, 대표 이미지 (8개)
         const requiredFields = [
           { key: "categoryId", value: formData.categoryId, schema: z.number().min(1) },
           { key: "title", value: formData.title, schema: z.string().min(1).max(25) },
@@ -175,6 +175,11 @@ export default function RegisterHeader({
                 return deliveryDateOnly >= minDateOnly
               }),
           },
+          {
+            key: "images",
+            value: formData.images,
+            schema: z.array(z.any()).min(1),
+          },
         ]
 
         let requiredCompleted = 0
@@ -187,19 +192,14 @@ export default function RegisterHeader({
           }
         })
 
-        // 전체 완료 항목 (필수 + 선택)
+        // 전체 완료 항목 = 필수 항목 완료 개수
         let totalCompleted = requiredCompleted
-
-        // 이미지는 선택사항이지만 있으면 전체 카운팅에 추가
-        if (formData.images && formData.images.length > 0) {
-          totalCompleted += 1
-        }
 
         return {
           completed: totalCompleted,
-          total: requiredFields.length + 1, // 이미지 포함하여 총 8개
+          total: requiredFields.length, // 8개
           requiredCompleted,
-          requiredTotal: requiredFields.length, // 필수 항목 7개
+          requiredTotal: requiredFields.length, // 8개
         }
       }
 
