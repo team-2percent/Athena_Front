@@ -368,11 +368,13 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
       />
 
       {/* 탭 내용 */}
-      <div className="mx-auto mt-8">
-        {activeTab === "소개" && (
+      <div className="mx-auto mt-8 relative min-h-[300px]">
+        {/* 소개 탭 */}
+        <div
+          className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "소개" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        >
           <div className="mb-8">
             <p className="text-sub-gray mb-8 whitespace-pre-wrap break-words">{sellerDescription || "소개글이 없습니다."}</p>
-
             {/* 링크 목록 */}
             <div className="flex flex-wrap gap-4">
               {linkUrl && linkUrl.split(",").map(url => (
@@ -386,126 +388,122 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
               ))}
             </div>
           </div>
-        )}
-
-        {activeTab === "판매 상품" && (
-          <div>
-            {myProjects.length === 0 && !isLoadingProjects ? (
-              <EmptyMessage message="판매 중인 상품이 없습니다." />
-            ) : (
-              <>
-                {myProjects.map((project) => (
-                  <ProjectListItem
-                    key={project.projectId}
-                    id={project.projectId}
-                    sellerName={project.sellerName || "내 상품"}
-                    projectName={project.title}
-                    description={project.description || "상품 설명이 여기에 표시됩니다."}
-                    createdAt={formatDate(project.createdAt)}
-                    endAt={formatDate(project.endAt)}
-                    imageUrl={project.imageUrl || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"}
-                    achievementRate={project.achievementRate || 0}
-                    daysLeft={project.daysLeft}
-                    isCompleted={project.isCompleted}
-                    projectId={project.projectId}
-                    isMy={isMy}
-                    onClickDelete={(e) => handleDeleteClick(e, project.projectId)}
-                  />
-                ))}
-
-                {/* 무한 스크롤을 위한 로더 */}
-                {sellCursorValue !== null && nextProjectId !== null && (
-                  <div className="w-full py-10 flex justify-center items-center" ref={projectsLoader}>
-                    {isLoadingProjects && <Spinner message="더 불러오는 중입니다..." />}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {activeTab === "구매 상품" && (
-          <div>
-            {myOrders.length === 0 && !isLoadingOrders ? (
-              <EmptyMessage message="구매한 상품이 없습니다." />
-            ) : (
-              <>
-                {myOrders.map((order) => (
-                  <PurchasedProjectItem
-                    key={`${order.orderId}${order.projectId}${order.productId}`}
-                    orderId={order.orderId}
-                    sellerName={order.sellerName}
-                    productName={order.productName}
-                    projectName={order.projectName}
-                    orderedAt={formatDate(order.orderedAt)}
-                    endAt={formatDate(order.endAt)}
-                    imageUrl={
-                      order.thumbnailUrl || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"
-                    }
-                    achievementRate={order.achievementRate}
-                    projectId={order.projectId}
-                    hasCommented={order.hasCommented || false}
-                  />
-                ))}
-
-                {/* 무한 스크롤을 위한 로더 */}
-                {orderCursorValue !== null && lastOrderId !== null && (
-                  <div className="w-full py-10 flex justify-center items-center" ref={ordersLoader}>
-                    {isLoadingOrders && <Spinner message="더 불러오는 중입니다..." />}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {(activeTab === "후기" || activeTab === "내가 쓴 후기") && (
-          <div>
-            {myReviews.length === 0 && !isLoadingReviews ? (
-              <EmptyMessage message="작성한 후기가 없습니다." />
-            ) : (
-              <>
-                {myReviews.map((review) => (
-                  <ReviewItem
-                    key={review.id}
-                    id={review.id}
-                    sellerName={review.userName}
-                    projectName={review.projectName || "상품 이름"}
-                    reviewDate={formatDate(review.createdAt)}
-                    reviewContent={review.content}
-                    imageUrl={review.imageUrl || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"}
-                    projectId={review.projectId || review.id}
-                  />
-                ))}
-
-                {isLoadingReviews && (
-                  <div className="w-full py-10 flex justify-center items-center">
-                    <Spinner message="후기를 불러오는 중입니다..." />
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {activeTab === "쿠폰" && (
-          <div>
-            {userCoupons.length === 0 && !isLoadingCoupons ? (
-              <EmptyMessage message="쿠폰이 없습니다." />
-            ) : (
-              <>
-                <CouponList coupons={userCoupons} />
-
-                {/* 무한 스크롤을 위한 로더 */}
-                {nextCouponId !== null && (
-                  <div className="w-full py-10 flex justify-center items-center" ref={couponsLoader}>
-                    {isLoadingCoupons && <Spinner message="더 불러오는 중입니다..." />}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
+        </div>
+        {/* 판매 상품 탭 */}
+        <div
+          className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "판매 상품" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        >
+          {myProjects.length === 0 && !isLoadingProjects ? (
+            <EmptyMessage message="판매 중인 상품이 없습니다." />
+          ) : (
+            <>
+              {myProjects.map((project) => (
+                <ProjectListItem
+                  key={project.projectId}
+                  id={project.projectId}
+                  sellerName={project.sellerName || "내 상품"}
+                  projectName={project.title}
+                  description={project.description || "상품 설명이 여기에 표시됩니다."}
+                  createdAt={formatDate(project.createdAt)}
+                  endAt={formatDate(project.endAt)}
+                  imageUrl={project.imageUrl || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"}
+                  achievementRate={project.achievementRate || 0}
+                  daysLeft={project.daysLeft}
+                  isCompleted={project.isCompleted}
+                  projectId={project.projectId}
+                  isMy={isMy}
+                  onClickDelete={(e) => handleDeleteClick(e, project.projectId)}
+                />
+              ))}
+              {/* 무한 스크롤을 위한 로더 */}
+              {sellCursorValue !== null && nextProjectId !== null && (
+                <div className="w-full py-10 flex justify-center items-center" ref={projectsLoader}>
+                  {isLoadingProjects && <Spinner message="더 불러오는 중입니다..." />}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+        {/* 구매 상품 탭 */}
+        <div
+          className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "구매 상품" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        >
+          {myOrders.length === 0 && !isLoadingOrders ? (
+            <EmptyMessage message="구매한 상품이 없습니다." />
+          ) : (
+            <>
+              {myOrders.map((order) => (
+                <PurchasedProjectItem
+                  key={`${order.orderId}${order.projectId}${order.productId}`}
+                  orderId={order.orderId}
+                  sellerName={order.sellerName}
+                  productName={order.productName}
+                  projectName={order.projectName}
+                  orderedAt={formatDate(order.orderedAt)}
+                  endAt={formatDate(order.endAt)}
+                  imageUrl={
+                    order.thumbnailUrl || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"
+                  }
+                  achievementRate={order.achievementRate}
+                  projectId={order.projectId}
+                  hasCommented={order.hasCommented || false}
+                />
+              ))}
+              {/* 무한 스크롤을 위한 로더 */}
+              {orderCursorValue !== null && lastOrderId !== null && (
+                <div className="w-full py-10 flex justify-center items-center" ref={ordersLoader}>
+                  {isLoadingOrders && <Spinner message="더 불러오는 중입니다..." />}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+        {/* 후기/내가 쓴 후기 탭 */}
+        <div
+          className={`absolute inset-0 transition-opacity duration-300 ${(activeTab === "후기" || activeTab === "내가 쓴 후기") ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        >
+          {myReviews.length === 0 && !isLoadingReviews ? (
+            <EmptyMessage message="작성한 후기가 없습니다." />
+          ) : (
+            <>
+              {myReviews.map((review) => (
+                <ReviewItem
+                  key={review.id}
+                  id={review.id}
+                  sellerName={review.userName}
+                  projectName={review.projectName || "상품 이름"}
+                  reviewDate={formatDate(review.createdAt)}
+                  reviewContent={review.content}
+                  imageUrl={review.imageUrl || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"}
+                  projectId={review.projectId || review.id}
+                />
+              ))}
+              {isLoadingReviews && (
+                <div className="w-full py-10 flex justify-center items-center">
+                  <Spinner message="후기를 불러오는 중입니다..." />
+                </div>
+              )}
+            </>
+          )}
+        </div>
+        {/* 쿠폰 탭 */}
+        <div
+          className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "쿠폰" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        >
+          {userCoupons.length === 0 && !isLoadingCoupons ? (
+            <EmptyMessage message="쿠폰이 없습니다." />
+          ) : (
+            <>
+              <CouponList coupons={userCoupons} />
+              {/* 무한 스크롤을 위한 로더 */}
+              {nextCouponId !== null && (
+                <div className="w-full py-10 flex justify-center items-center" ref={couponsLoader}>
+                  {isLoadingCoupons && <Spinner message="더 불러오는 중입니다..." />}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   )
