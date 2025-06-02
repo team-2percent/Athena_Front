@@ -23,9 +23,18 @@ export default function CouponRegisterPage() {
     const [couponName, setCouponName] = useState<string>("")
     const [couponDescription, setCouponDescription] = useState<string>("")
     const [couponPrice, setCouponPrice] = useState<number>(0)
-    const [couponStartDateTime, setCouponStartDateTime] = useState<Date>(new Date())
-    const [couponEndDateTime, setCouponEndDateTime] = useState<Date>(new Date())
-    const [couponExpireDateTime, setCouponExpireDateTime] = useState<Date>(new Date())
+    
+    // 초기 시간 설정
+    const now = new Date()
+    const nextHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 0)
+    const endHour = new Date(nextHour)
+    endHour.setHours(nextHour.getHours() + COUPON_EVENT_START_TO_END_MIN_HOUR)
+    const expireHour = new Date(endHour)
+    expireHour.setHours(endHour.getHours() + COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR)
+    
+    const [couponStartDateTime, setCouponStartDateTime] = useState<Date>(nextHour)
+    const [couponEndDateTime, setCouponEndDateTime] = useState<Date>(endHour)
+    const [couponExpireDateTime, setCouponExpireDateTime] = useState<Date>(expireHour)
     const [couponStock, setCouponStock] = useState<number>(0)
 
     const [couponAddError, setCouponAddError] = useState({
@@ -93,6 +102,7 @@ export default function CouponRegisterPage() {
         }
 
         if (newValue > COUPON_PRICE_MAX_NUMBER) {
+            setCouponAddError({ ...couponAddError, price: result.error.issues[0].message })
             return COUPON_PRICE_MAX_NUMBER
         }
 
@@ -114,31 +124,26 @@ export default function CouponRegisterPage() {
             }
         }
 
+        let newStartAt = startAt
+        let newEndAt = endAt
+
         // 현재 시간과 같거나 이전이면 현재 시간 + 1시간으로 설정 (분은 00분으로)
         if (startAt <= new Date()) {
             const now = new Date()
             const nextHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 0)
-            setCouponAddError({ ...couponAddError, period: result.error.issues[0].message })
-            return {
-                startAt: nextHour,
-                endAt: endAt
-            }
+            newStartAt = nextHour
         }
 
-        // 발급 기간 종료 시간이 발급 기간 시작 시간보다 크면 발급 기간 시작 시간을 1시간 증가
-        if (endAt <= startAt) {
-            const newEndAt = new Date(startAt)
-            newEndAt.setHours(startAt.getHours() + COUPON_EVENT_START_TO_END_MIN_HOUR)
-            return {
-                startAt: startAt,
-                endAt: newEndAt
-            }
+        // 발급 기간 종료 시간이 발급 기간 시작 시간보다 작으면 발급 기간 시작 시간을 1시간 증가
+        if (newEndAt <= newStartAt) {
+            newEndAt = new Date(newStartAt)
+            newEndAt.setHours(newStartAt.getHours() + COUPON_EVENT_START_TO_END_MIN_HOUR)
         }
 
         setCouponAddError({ ...couponAddError, period: result.error.issues[0].message })
         return {
-            startAt: startAt,
-            endAt: endAt
+            startAt: newStartAt,
+            endAt: newEndAt
         }
     }
 
@@ -158,8 +163,7 @@ export default function CouponRegisterPage() {
 
         setCouponAddError({ ...couponAddError, expire: result.error.issues[0].message })
 
-        // 발급 기간 종료 시간이 발급 기간 시작 시간보다 크면 발급 기간 시작 시간을 1시간 증가
-        if (expiresAt <= endAt) {
+        if (expiresAt.getTime() - endAt.getTime() <= 24 * 60 * 60 * 1000) {
             const newExpireDate = new Date(endAt)
             newExpireDate.setHours(endAt.getHours() + COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR)
             return {
@@ -183,6 +187,7 @@ export default function CouponRegisterPage() {
         }
 
         if (newValue > COUPON_STOCK_MAX_NUMBER) {
+            setCouponAddError({ ...couponAddError, stock: result.error.issues[0].message })
             return COUPON_STOCK_MAX_NUMBER
         }
 

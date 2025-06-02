@@ -184,11 +184,11 @@ export default function AddressInfo() {
                 <h3 className="text-lg font-medium mb-6">배송지 추가</h3>
                     <div className="flex w-full my-3 gap-2 justify-between items-center my-4">
                         <div className="flex gap-2 items-center">
-                            <label className="block text-sm font-medium text-gray-700 mb-1 whitespace-nowrap">
+                            <label className="block text-sm font-medium text-gray-700 whitespace-nowrap">
                                 주소
                             </label>
                             <p className="block text-sm font-medium text-gray-700">{ newAddress.address.length > 0 && `[${newAddress.zipcode}] ${newAddress.address}`}</p>
-                            <InputInfo errorMessage={addressAddError.address} />
+                            {addressAddError.address && <InputInfo errorMessage={addressAddError.address} />}
                         </div>
                         <PrimaryButton
                             type="button"

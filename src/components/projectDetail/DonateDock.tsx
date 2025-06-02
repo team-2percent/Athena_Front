@@ -1200,7 +1200,11 @@ const handleChangeDetailAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
               <div>
                 <label className="block text-sm font-medium text-sub-gray mb-2">주소</label>
                 <div className="flex space-x-2 justify-between items-center">
-                  <p className="block text-sm font-medium text-gray-700">{ newAddress.address.length > 0 ? `[${newAddress.zipcode}] ${newAddress.address}` : "주소를 입력해주세요"}</p>
+                  { newAddress.address.length > 0 ?
+                    <p className="block text-sm font-medium text-gray-700">{ newAddress.address.length > 0 && `[${newAddress.zipcode}] ${newAddress.address}` }</p>
+                  :
+                    <p className="block text-sm font-medium text-gray-400">주소를 입력해주세요</p>
+                  }
                   <PrimaryButton
                       type="button"
                       onClick={handleOpenAddressModal}

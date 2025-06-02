@@ -307,8 +307,8 @@ export const loginSchema = z.object({
 })
 
 export const passwordMatchSchema = z.object({
-  password: newPasswordSchema,
-  passwordConfirm: passwordSchema,
+  password: z.string(),
+  passwordConfirm: z.string(),
 }).refine((data) => data.password === data.passwordConfirm, {
   message: "비밀번호가 일치하지 않습니다.",
   path: ["passwordConfirm"],
