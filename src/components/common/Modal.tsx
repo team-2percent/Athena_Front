@@ -3,6 +3,7 @@
 import { useEffect, useRef, type ReactNode } from "react"
 import { X } from "lucide-react"
 import clsx from "clsx"
+import gsap from "gsap"
 
 // 버튼 타입 정의 추가
 type ButtonVariant = "primary" | "secondary" | "danger" | "outline"
@@ -67,6 +68,7 @@ interface ModalProps {
   closeOnOutsideClick?: boolean
   closeOnEsc?: boolean
   className?: string
+  zIndex?: number | string
 }
 
 export default function Modal({
@@ -79,25 +81,10 @@ export default function Modal({
   closeOnOutsideClick = true,
   closeOnEsc = true,
   className,
+  zIndex = 50,
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
-
-  // 모달 외부 클릭 시 닫기
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (closeOnOutsideClick && modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        onClose()
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [isOpen, onClose, closeOnOutsideClick])
+  const overlayRef = useRef<HTMLDivElement>(null)
 
   // ESC 키 누르면 모달 닫기
   useEffect(() => {
@@ -106,11 +93,9 @@ export default function Modal({
         onClose()
       }
     }
-
     if (isOpen) {
       document.addEventListener("keydown", handleEscKey)
     }
-
     return () => {
       document.removeEventListener("keydown", handleEscKey)
     }
@@ -129,6 +114,22 @@ export default function Modal({
     }
   }, [isOpen])
 
+  // 모달 애니메이션
+  useEffect(() => {
+    if (isOpen && modalRef.current && overlayRef.current) {
+      gsap.fromTo(
+        overlayRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.25, ease: "power2.out" }
+      )
+      gsap.fromTo(
+        modalRef.current,
+        { opacity: 0, scale: 0.95 },
+        { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out", delay: 0.05 }
+      )
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
 
   // 모달 크기에 따른 최대 너비 설정
@@ -143,10 +144,22 @@ export default function Modal({
   return (
     <>
       {/* 배경 오버레이 */}
-      <div className="fixed inset-0 bg-black/60 z-50" onClick={closeOnOutsideClick ? onClose : undefined} />
+      <div
+        ref={overlayRef}
+        className="fixed inset-0 bg-black/60"
+        style={{ zIndex: typeof zIndex === "number" ? zIndex : undefined }}
+        onClick={e => {
+          e.stopPropagation();
+          if (closeOnOutsideClick) onClose();
+        }}
+      />
 
       {/* 모달 */}
-      <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+      <div
+        className="fixed inset-0 flex items-center justify-center"
+        style={{ zIndex: typeof zIndex === "number" ? zIndex : undefined }}
+        onMouseDown={e => e.stopPropagation()}
+      >
         <div
           ref={modalRef}
           className={clsx(

@@ -3,6 +3,8 @@
 import { Check, X, AlertCircle } from "lucide-react"
 import { useProjectFormStore } from "@/stores/useProjectFormStore"
 import { CancelButton, PrimaryDisabledButton, PrimaryButton } from "../common/Button"
+import gsap from "gsap"
+import { useRef, useEffect } from "react"
 
 interface ValidationModalProps {
   isOpen: boolean
@@ -31,6 +33,24 @@ export default function ValidationModal({ isOpen, onClose, onConfirm }: Validati
     platformPlan,
     bankAccountId,
   } = useProjectFormStore()
+
+  const modalRef = useRef<HTMLDivElement>(null)
+  const overlayRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (isOpen && modalRef.current && overlayRef.current) {
+      gsap.fromTo(
+        overlayRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.25, ease: "power2.out" }
+      )
+      gsap.fromTo(
+        modalRef.current,
+        { opacity: 0, scale: 0.95 },
+        { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out", delay: 0.05 }
+      )
+    }
+  }, [isOpen])
 
   if (!isOpen) return null
 
@@ -131,10 +151,10 @@ export default function ValidationModal({ isOpen, onClose, onConfirm }: Validati
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* 오버레이 */}
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+      <div ref={overlayRef} className="fixed inset-0 bg-black/60" onClick={onClose} />
 
       {/* 모달 */}
-      <div className="relative z-10 w-full max-w-lg rounded-3xl bg-white p-6 shadow-lg max-h-[80vh] overflow-y-auto">
+      <div ref={modalRef} className="relative z-10 w-full max-w-lg rounded-3xl bg-white p-6 shadow-lg max-h-[80vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold">프로젝트 등록 확인</h2>
           <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">
