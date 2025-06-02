@@ -11,6 +11,7 @@ import { EmailInput, PasswordInput } from "../common/Input"
 import { emailSchema, loginSchema, passwordSchema } from "@/lib/validationSchemas"
 import { EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH } from "@/lib/validationConstant"
 import InputInfo from "../common/InputInfo"
+import { getFCMToken } from '@/lib/firebase'
 
 interface LoginModalProps {
   isOpen: boolean
@@ -20,7 +21,7 @@ interface LoginModalProps {
 
 export default function LoginModal({ isOpen, onClose, moveToSignupModal }: LoginModalProps) {
   const { apiCall } = useApi()
-  const { login } = useAuthStore()
+  const { login, setFcmToken } = useAuthStore()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("")
@@ -63,19 +64,24 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
     validatePassword(e.target.value)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    apiCall("/api/user/login", "POST", { email, password }).then(({ data, error }: { data: any, error: string | null }) => {
-      if (error) {
-        setErrorMessage("로그인에 실패했습니다.")
-        return;
+    const { data, error } = await apiCall<any>("/api/user/login", "POST", { email, password })
+    if (error) {
+      setErrorMessage("로그인에 실패했습니다.")
+      return;
+    }
+    if (data.accessToken && data.userId) {
+      login(data.accessToken, data.userId)
+      // FCM 토큰 발급 및 등록
+      const token = await getFCMToken()
+      if (token) {
+        setFcmToken(token);
+        await apiCall('/api/fcm/register', 'POST', { userId: data.userId, token: token })
       }
-      if (data.accessToken && data.userId) {
-        login(data.accessToken, data.userId)
-        window.location.reload()
-      }
-    })
+      window.location.reload()
+    }
   }
 
   return (

@@ -8,9 +8,11 @@ interface AuthStore {
   role: UserRole;
   userId: number | null;
   hydrated: boolean;
+  fcmToken: string | null;
   setLoggedIn: (loggedIn: boolean) => void;
   setRole: (role: UserRole) => void;
   setUserId: (userId: number | null) => void;
+  setFcmToken: (fcmToken: string | null) => void;
   login: (accessToken: string, userId: number) => void;
   logout: () => void;
   setHydrated: (hydrated: boolean) => void;
@@ -21,9 +23,11 @@ const useAuthStore = create<AuthStore>((set) => ({
   role: "",
   userId: null,
   hydrated: false,
+  fcmToken: null,
   setLoggedIn: (loggedIn) => set({ isLoggedIn: loggedIn }),
   setRole: (role) => set({ role }),
   setUserId: (userId) => set({ userId }),
+  setFcmToken: (fcmToken) => set({ fcmToken }),
   login: (accessToken, userId) => {
     if (typeof window !== "undefined") {
       localStorage.setItem("accessToken", accessToken);
@@ -38,7 +42,7 @@ const useAuthStore = create<AuthStore>((set) => ({
       localStorage.removeItem("accessToken")
       localStorage.removeItem("userId")
     }
-    set({ isLoggedIn: false, role: "", userId: null })
+    set({ isLoggedIn: false, role: "", userId: null, fcmToken: null })
   },
   setHydrated: (hydrated) => set({ hydrated }),
 }))

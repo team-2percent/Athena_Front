@@ -380,10 +380,12 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
         </div>
       </div>
 
-      {/* 대표 이미지 - 세로 배치로 변경 (필수 표시 제거) */}
+      {/* 대표 이미지 - 세로 배치로 변경 (필수 표시 추가) */}
       <div className="flex flex-col">
         <div className="flex items-center mb-4">
-          <h3 className="text-xl font-bold">대표 이미지</h3>
+          <h3 className="text-xl font-bold">
+            대표 이미지 <span className="text-red-500">*</span>
+          </h3>
         </div>
         <div className="w-full">
           <div className={`rounded-3xl border p-6 ${getFieldStyle("images")}`}>

@@ -10,11 +10,8 @@ import { useApi } from "@/hooks/useApi"
 
 // 1. 상단에 AlertModal import 추가
 import AlertModal from "../common/AlertModal"
-import { CancelButton, PrimaryButton } from "../common/Button"
-import { TextInput } from "../common/Input"
-import { ADDRESS_DETAIL_MAX_LENGTH } from "@/lib/validationConstant"
-import InputInfo from "../common/InputInfo"
-import { addressSchema, addressDetailSchema, addressAddSchema } from "@/lib/validationSchemas"
+import { CancelButton, PrimaryButton, SecondaryButton } from "../common/Button"
+import AddressAddModal from "./AddressAddModal"
 
 interface AddressInfo {
   id: string
@@ -807,7 +804,7 @@ const handleChangeDetailAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
       <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={() => setIsAlertOpen(false)} />
       {/* 고정된 후원하기 버튼 - 상품이 있고 재고가 있을 때만 표시 */}
       {canDonate(projectData) && (
-        <div className="fixed bottom-0 left-0 z-20 w-full">
+        <div className="fixed bottom-0 left-0 z-4 w-full">
           <div className="mx-auto max-w-6xl px-4">
             <button
               onClick={toggleDock}
@@ -1186,76 +1183,17 @@ const handleChangeDetailAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
       </div>
 
       {/* 배송지 추가 모달 */}
-      {showAddressAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-            <div className="mb-6 flex items-center justify-between">
-              <h4 className="text-xl font-bold">새 배송지 추가</h4>
-              <button onClick={() => setShowAddressAddModal(false)} className="rounded-full p-1 hover:bg-gray-100">
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-sub-gray mb-2">주소</label>
-                <div className="flex space-x-2 justify-between items-center">
-                  { newAddress.address.length > 0 ?
-                    <p className="block text-sm font-medium text-gray-700">{ newAddress.address.length > 0 && `[${newAddress.zipcode}] ${newAddress.address}` }</p>
-                  :
-                    <p className="block text-sm font-medium text-gray-400">주소를 입력해주세요</p>
-                  }
-                  <PrimaryButton
-                      type="button"
-                      onClick={handleOpenAddressModal}
-                      className="px-2 py-2"
-                  >
-                      <Search className="w-4 h-4" />
-                  </PrimaryButton>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-sub-gray mb-2">상세 주소</label>
-                <TextInput
-                    value={newAddress.detailAddress}
-                    onChange={handleChangeDetailAddress}
-                    className="w-full"
-                    isError={addressAddError.detailAddress !== ""}
-                />
-                <InputInfo errorMessage={addressAddError.detailAddress} />
-              </div>
-
-              <div className="flex justify-end space-x-3 pt-4">
-                <CancelButton
-                  type="button"
-                  className="px-6 py-3 rounded-lg"
-                  onClick={() => setShowAddressAddModal(false)}
-                >
-                  취소
-                </CancelButton>
-                <PrimaryButton
-                  type="button"
-                  className="px-6 py-3 bg-main-color text-white rounded-lg"
-                  onClick={saveNewAddress}
-                  disabled={addButtonDisabled}
-                >
-                  저장
-                </PrimaryButton>
-              </div>
-            </div>
-
-            {/* 배송지 주소 검색 모달 */}
-            {isAddressModalOpen && (
-              <AddressModal
-                isOpen={isAddressModalOpen}
-                onClose={() => setIsAddressModalOpen(false)}
-                onComplete={handleComplete}
-              />
-            )}
-          </div>
-        </div>
-      )}
+      <AddressAddModal
+        isOpen={showAddressAddModal}
+        onClose={() => setShowAddressAddModal(false)}
+        newAddress={newAddress}
+        setNewAddress={setNewAddress}
+        isAddressModalOpen={isAddressModalOpen}
+        setIsAddressModalOpen={setIsAddressModalOpen}
+        handleInputChange={handleInputChange}
+        handleComplete={handleComplete}
+        saveNewAddress={saveNewAddress}
+      />
 
       {/* 주문 요약 더보기 팝오버 */}
       {showOrderSummaryPopover && (

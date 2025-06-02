@@ -1,172 +1,148 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { MainProject } from "@/lib/projectInterface"
 import { useRouter } from "next/navigation"
 import ProjectGridItem from "../common/ProjectGridItem"
+import gsap from "gsap"
 
 export default function EditorPicks({ projects, isLoading }: {projects: MainProject[], isLoading: boolean}) {
   const router = useRouter();
-  const [currentPage, setCurrentPage] = useState(0)
-  const [itemsPerPage, setItemsPerPage] = useState(4) // Default to 4 items per page
-  const totalPages = Math.ceil(projects.length / itemsPerPage)
-  const [isTransitioning, setIsTransitioning] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
-  // Calculate total pages based on screen size and items
+  const autoScrollRef = useRef<NodeJS.Timeout | null>(null)
+  const carouselAreaRef = useRef<HTMLDivElement>(null)
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+
+  // 자동 스크롤 관련 useEffect를 이 아래로 이동
   useEffect(() => {
-    const handleResize = () => {
-      let newItemsPerPage = 4 // Default for desktop
-
-      if (window.innerWidth < 768) {
-        newItemsPerPage = 1 // Mobile
-      } else if (window.innerWidth < 1024) {
-        newItemsPerPage = 2 // Tablet
-      }
-
-      setItemsPerPage(newItemsPerPage)
+    // 자동 스크롤 함수
+    const startAutoScroll = () => {
+      if (autoScrollRef.current) clearInterval(autoScrollRef.current)
+      autoScrollRef.current = setInterval(() => {
+        // Implement auto scroll logic here
+      }, 5000)
     }
-
-    // Initial calculation
-    handleResize()
-
-    // Add event listener
-    window.addEventListener("resize", handleResize)
-
-    // Cleanup
-    return () => window.removeEventListener("resize", handleResize)
+    startAutoScroll()
+    const area = carouselAreaRef.current
+    if (area) {
+      area.addEventListener("mouseenter", () => {
+        if (autoScrollRef.current) clearInterval(autoScrollRef.current)
+      })
+      area.addEventListener("mouseleave", startAutoScroll)
+    }
+    return () => {
+      if (autoScrollRef.current) clearInterval(autoScrollRef.current)
+      if (area) {
+        area.removeEventListener("mouseenter", () => {})
+        area.removeEventListener("mouseleave", () => {})
+      }
+    }
   }, [])
 
-  const goToPage = (pageIndex: number) => {
-    if (isTransitioning) return
+  // 프로젝트 호버 애니메이션
+  useEffect(() => {
+    if (!containerRef.current) return
+    const cards = containerRef.current.querySelectorAll('.project-card-anim')
+    cards.forEach((card, idx) => {
+      if (hoveredIndex === null) {
+        gsap.to(card, { scale: 0.92, zIndex: 1, duration: 0.3, ease: 'power2.out' })
+      } else if (idx === hoveredIndex) {
+        gsap.to(card, { scale: 1, zIndex: 2, duration: 0.3, ease: 'power2.out' })
+      } else {
+        gsap.to(card, { scale: 0.84, zIndex: 0, duration: 0.3, ease: 'power2.out' })
+      }
+    })
+  }, [hoveredIndex])
 
-    setIsTransitioning(true)
+  // 무한 슬라이드용: 리스트 2배 복제
+  const infiniteProjects = [...projects, ...projects]
 
-    // Handle wrapping
-    if (pageIndex < 0) {
-      pageIndex = totalPages - 1
-    } else if (pageIndex >= totalPages) {
-      pageIndex = 0
-    }
-
-    setCurrentPage(pageIndex)
-
+  // gsap 무한 슬라이드 애니메이션
+  useEffect(() => {
+    if (!containerRef.current || projects.length === 0) return
+    const container = containerRef.current
+    let anim: gsap.core.Tween | null = null
+    let totalWidth = 0
+    // 렌더 후 실제 width 측정
     setTimeout(() => {
-      setIsTransitioning(false)
-    }, 500)
-  }
-
-  const goToPrevPage = () => {
-    goToPage((currentPage - 1 + totalPages) % totalPages)
-  }
-
-  const goToNextPage = () => {
-    goToPage((currentPage + 1) % totalPages)
-  }
-
-  // Create page data with placeholders for empty slots
-  const getPageData = () => {
-    const pages = []
-
-    for (let i = 0; i < totalPages; i++) {
-      const startIndex = i * itemsPerPage
-      const pageItems = projects.slice(startIndex, startIndex + itemsPerPage)
-
-      // Fill remaining slots with empty placeholders to maintain grid layout
-      const emptySlots = itemsPerPage - pageItems.length
-      const filledPage = [
-        ...pageItems,
-        ...Array(emptySlots)
-          .fill(null)
-          .map((_, index) => ({ id: `empty-${index}`, isEmpty: true })),
-      ]
-
-      pages.push(filledPage)
+      totalWidth = container.scrollWidth / 2
+      gsap.set(container, { x: 0 })
+      anim = gsap.to(container, {
+        x: -totalWidth,
+        duration: 40,
+        ease: 'none',
+        repeat: -1,
+        modifiers: {
+          x: gsap.utils.unitize(x => parseFloat(x) % -totalWidth)
+        }
+      })
+    }, 0)
+    // 마우스 오버 시 일시정지, 아웃 시 재생
+    const area = carouselAreaRef.current
+    const pause = () => anim && anim.pause()
+    const resume = () => anim && anim.resume()
+    if (area) {
+      area.addEventListener('mouseenter', pause)
+      area.addEventListener('mouseleave', resume)
     }
-
-    return pages
-  }
-  
-  const pages = getPageData()
+    return () => {
+      if (anim) anim.kill()
+      if (area) {
+        area.removeEventListener('mouseenter', pause)
+        area.removeEventListener('mouseleave', resume)
+      }
+    }
+  }, [projects])
 
   if (projects === null || projects.length === 0) {
-    return <div>로딩 중입니다.</div> // 로딩 표시 필요
+    return <div>로딩 중입니다.</div>
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-12">
-      {/* Title */}
-      <h2 className="text-center text-3xl font-bold mb-8">
-        에디터 <span className="text-main-color">PICK</span> <span className="text-main-color">💖</span>
-      </h2>
+    <div className="w-full max-w-7xl mx-auto py-12">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center">
+        {/* Title */}
+        <h2 className="text-left font-bold mb-8 lg:mb-0 lg:min-w-[300px] pl-4 text-base sm:text-lg md:text-xl lg:text-3xl">
+          {/* 모바일: 한 줄, 작은 글씨 / 데스크탑: 3줄, 큰 글씨 */}
+          <span className="block lg:hidden">
+            에디터가 <span className="text-main-color">엄선한</span> 프로젝트를 확인해보세요
+          </span>
+          <span className="hidden lg:block">
+            에디터가<br />
+            <span className="text-main-color">엄선한</span> 프로젝트를<br />
+            확인해보세요
+          </span>
+        </h2>
 
-      {/* Carousel Container */}
-      <div className="relative">
-        <div ref={containerRef} className="overflow-hidden">
-          <div
-            className={cn("flex w-fit transition-transform duration-500 ease-out", isTransitioning ? "" : "")}
-            style={{
-              transform: `translateX(-${currentPage * 100}%)`,
-            }}
-          >
-            {pages.map((pageItems, pageIndex) => 
-              <div key={pageIndex} className="w-full flex-shrink-0">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {pageItems.map((item: any, index:number) => {
-                    if (item?.isEmpty) {
-                      return <div key={index + pageItems.length} className="aspect-square invisible" />
-                    }
-
-                    return (
-                      <ProjectGridItem
-                        key={item.projectId}
-                        className="w-full"
-                        id={item.projectId}
-                        imageUrl={item.imageUrl}
-                        sellerName={item.sellerName}
-                        projectName={item.title}
-                        achievementRate={item.achievementRate}
-                        description={item.description}                        
-                      />
-                    )
-                  })}
-                </div>
+        {/* Carousel Container */}
+        <div className="relative flex-1 w-full min-w-[min(100vw,900px)] overflow-hidden" ref={carouselAreaRef}>
+          {/* 왼쪽 그라데이션 오버레이 */}
+          <div className="pointer-events-none absolute left-0 top-0 h-full w-60 bg-gradient-to-r from-white to-transparent z-4" />
+          {/* 오른쪽 그라데이션 오버레이 */}
+          <div className="pointer-events-none absolute right-0 top-0 h-full w-60 bg-gradient-to-l from-white to-transparent z-4" />
+          <div ref={containerRef} className="flex w-fit gap-6">
+            {infiniteProjects.map((item: any, index: number) => (
+              <div
+                key={item.projectId + '-' + index}
+                className="w-full project-card-anim transition-transform"
+                onMouseEnter={() => setHoveredIndex(index % projects.length)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                style={{ willChange: 'transform', minWidth: '220px', maxWidth: '1fr' }}
+              >
+                <ProjectGridItem
+                  className="w-full"
+                  id={item.projectId}
+                  imageUrl={item.imageUrl}
+                  sellerName={item.sellerName}
+                  projectName={item.title}
+                  achievementRate={item.achievementRate}
+                  description={item.description}
+                />
               </div>
-            )}
+            ))}
           </div>
-        </div>
-
-        {/* Navigation Buttons */}
-        <button
-          onClick={goToPrevPage}
-          className="absolute left-0 top-1/3 -translate-y-1/2 -translate-x-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-all duration-300"
-          aria-label="이전 페이지"
-        >
-          <ChevronLeft className="h-6 w-6 text-[#808080]" />
-        </button>
-
-        <button
-          onClick={goToNextPage}
-          className="absolute right-0 top-1/3 -translate-y-1/2 translate-x-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-all duration-300"
-          aria-label="다음 페이지"
-        >
-          <ChevronRight className="h-6 w-6 text-[#808080]" />
-        </button>
-
-        {/* Dots Indicator */}
-        <div className="flex justify-center gap-2">
-          {Array.from({ length: totalPages }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToPage(index)}
-              className={cn(
-                "w-3 h-3 rounded-full transition-all duration-300",
-                currentPage === index ? "bg-[#fb6f92] w-6" : "bg-[#808080]/30 hover:bg-[#808080]/50",
-              )}
-              aria-label={`${index + 1}페이지로 이동`}
-            />
-          ))}
         </div>
       </div>
     </div>
