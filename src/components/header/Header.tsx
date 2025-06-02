@@ -14,6 +14,8 @@ import useAuthStore from "@/stores/auth"
 import { usePathname } from 'next/navigation';
 import { useApi } from "@/hooks/useApi";
 import MenuTab from "../common/MenuTab"
+import { getFCMToken } from '@/lib/firebase';
+import useToastStore from "@/stores/useToastStore";
 
 const nameToPath: Record<string, string> = {
   "전체": "",
@@ -33,21 +35,28 @@ interface HeaderResponse {
 }
 
 const Header = () => {
-  const { isLoggedIn, role, logout } = useAuthStore();
+  const { isLoggedIn, role, logout, userId } = useAuthStore();
   const isAdmin = role === "ROLE_ADMIN";
   const { isLoading, apiCall } = useApi();
   const [user, setUser] = useState<{nickname: string, imageUrl: string} | null>(null);
   const [userLoadError, setUserLoadError] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false)
   const [showCouponModal, setShowCouponModal] = useState(false)
   const [searchWord, setSearchWord] = useState("");
   const [showAuthMenu, setShowAuthMenu] = useState(false);
   const authMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const pathname = usePathname().split("/")[1];
-  const activeTab = pathToName[pathname]
+  const pathname = usePathname();
+  const pathFirst = pathname.split("/")[1];
+  const activeTab = pathToName[pathFirst]
+  const showUnderline = (
+    pathname === "/" ||
+    pathname === "/category" ||
+    pathname === "/new" ||
+    pathname === "/deadline"
+  );
+  const { showToast } = useToastStore();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -104,10 +113,6 @@ const Header = () => {
     setSearchWord("")
   }
 
-  const toggleNotifications = () => {
-    setShowNotifications(!showNotifications)
-  }
-
   const handleCouponClick = () => {
     setShowCouponModal(!showCouponModal)
   }
@@ -140,6 +145,10 @@ const Header = () => {
   const handleClickMyPage = () => {
     router.push("/my")
     setShowAuthMenu(false);
+  }
+
+  const handleTestToast = () => {
+    showToast("테스트 알림", "이것은 토스트 테스트 메시지입니다.")
   }
 
   const notifications = [
@@ -206,9 +215,9 @@ const Header = () => {
 
   return (
     <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)] z-5">
-      {showCouponModal && <CouponModal isOpen={showCouponModal} onClose={() => setShowCouponModal(false)} />}
-      {showLoginModal && <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} moveToSignupModal={openSignupModalInLoginModal} />}
-      {showSignupModal && <SignupModal isOpen={showSignupModal} onClose={closeSignupModal} />}
+      <CouponModal isOpen={showCouponModal} onClose={() => setShowCouponModal(false)} />
+      <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} moveToSignupModal={openSignupModalInLoginModal} />
+      <SignupModal isOpen={showSignupModal} onClose={closeSignupModal} />
       <div className="container mx-auto px-4 py-4">
         {/* 상단 헤더 영역 */}
         <div className="flex items-center justify-between">
@@ -230,6 +239,15 @@ const Header = () => {
               onSearch={moveToSearchPage}
             />
             
+            {/* 테스트 버튼 추가 */}
+            <button
+              type="button"
+              onClick={handleTestToast}
+              className="ml-4 p-2 border rounded" // 간단한 스타일 추가
+            >
+              토스트 테스트
+            </button>
+
             {
               isLoggedIn ? 
               <>
@@ -240,10 +258,6 @@ const Header = () => {
               >
                 <Percent className="h-6 w-6 text-sub-gray" />
               </button>
-              <button type="button" aria-label="알림" onClick={toggleNotifications}>
-                <Bell className="h-6 w-6 text-sub-gray" />
-              </button>
-
               <div className="relative flex items-center space-x-3">
                 {!isLoading ?
                   <span className="text-sm font-medium whitespace-nowrap">{user?.nickname}</span>
@@ -254,12 +268,13 @@ const Header = () => {
                 {renderProfile()}
                   {
                     showAuthMenu &&
-                    <div className="absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 transition-all duration-200">
+                    <div className="absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 transition-all duration-200 min-w-[220px] text-left">
+                      <div className="text-xs text-gray-400 font-semibold my-2 pl-1">설정</div>
                       {isAdmin &&
                         <button
                         type="button"
                         onClick={() => router.push("/admin/approval")}
-                        className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
+                        className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
                       >
                         <UserLock className="h-4 w-4" />
                         관리자페이지
@@ -268,7 +283,7 @@ const Header = () => {
                       <button
                         type="button"
                         onClick={handleClickMyPage}
-                        className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
+                        className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
                       >
                         <User className="h-4 w-4" />
                         마이페이지
@@ -276,11 +291,25 @@ const Header = () => {
                       <button
                           type="button"
                           onClick={handleLogout}
-                          className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
+                          className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
                       >
                           <LogOut className="h-4 w-4" />
                           로그아웃
                       </button>
+                      {/* <hr className="my-2 border-gray-200" />
+                      <div className="flex items-center gap-2 px-2 pb-2 justify-between">
+                        <span className="text-sm text-gray-500">알림 받기</span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={notificationEnabled}
+                            onChange={handleNotificationToggle}
+                          />
+                          <div className={`w-11 h-6 rounded-full transition peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-main-color ${notificationEnabled ? 'bg-main-color' : 'bg-gray-200'}`}></div>
+                          <span className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${notificationEnabled ? 'translate-x-5' : ''}`}></span>
+                        </label>
+                      </div> */}
                     </div>
                   }
                 </div>
@@ -308,49 +337,11 @@ const Header = () => {
             tabs={["전체", "카테고리", "신규", "마감임박"]}
             activeTab={activeTab}
             onClickTab={handleTabClick}
+            hideUnderline={!showUnderline}
           />
           {/* <PopularSearch onSearchChange={handleSearchChange} onSearch={moveToSearchPage}/> */}
         </div>
       </div>
-
-      {/* 알림 패널 */}
-      {showNotifications && (
-        <div className="absolute right-4 top-20 z-50 w-96 rounded-2xl border border-gray-border bg-white p-6 shadow-lg">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">알림</h2>
-            <div className="flex items-center space-x-4">
-              <button type="button" className="text-sm text-sub-gray">모두 지우기</button>
-              <button type="button" onClick={toggleNotifications}>
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-          </div>
-
-          <div>
-            {notifications.map((notification, index) => (
-              <div key={notification.id}>
-                <div className="flex py-4">
-                  <div className="mr-4 h-12 w-12 overflow-hidden rounded-full">
-                    <img
-                      src={notification.profileImage || "/placeholder.svg"}
-                      alt="프로필 이미지"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <p className="mb-1">{notification.message}</p>
-                    <p className="text-sm text-sub-gray">{notification.date}</p>
-                  </div>
-                  <button type="button" className="ml-2 text-sub-gray">
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                </div>
-                {index < notifications.length - 1 && <hr className="border-gray-border" />}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </header>
   )
 }

@@ -8,7 +8,7 @@ interface ApiResponse<T> {
   status: number;
 }
 
-const api_base = "https://athena-local.i-am-jay.com";
+const api_base = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export function useApi() {
   const logout = useAuthStore(s => s.logout);

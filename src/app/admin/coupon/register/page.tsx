@@ -202,15 +202,12 @@ export default function CouponRegisterPage() {
                         </PrimaryButton>
                     </div>
                 </div>
-                {
-                    isModalOpen &&
-                    <ConfirmModal
-                        isOpen={isModalOpen}
-                        message="쿠폰을 등록하시겠습니까?"
-                        onConfirm={handleAddCoupon}
-                        onClose={() => setIsModalOpen(false)}
-                    />
-                }
+                <ConfirmModal
+                    isOpen={isModalOpen}
+                    message="쿠폰을 등록하시겠습니까?"
+                    onConfirm={handleAddCoupon}
+                    onClose={() => setIsModalOpen(false)}
+                />
             </div>
     )
 }

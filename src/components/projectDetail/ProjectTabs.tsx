@@ -2,12 +2,12 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useLayoutEffect } from "react"
 import { useParams } from "next/navigation"
-import { ThumbsUp, ThumbsDown } from "lucide-react"
 import FollowItem from "../profile/FollowItem"
 import { useApi } from "@/hooks/useApi"
-import MarkdownRenderer from "../projectRegister/MarkdownRenderer"
+import MarkdownRenderer, { extractHeadings } from "../projectRegister/MarkdownRenderer"
+import TableOfContents from "./TableOfContents"
 import useAuthStore from "@/stores/auth"
 
 interface Review {
@@ -172,6 +172,24 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
   작성된 내용이 없습니다.
   `
 
+  // 마크다운에서 헤딩 추출
+  const headings = projectData?.markdown ? extractHeadings(projectData.markdown) : []
+
+  const tabList = ["소개", "프로젝트 정보", "후기"]
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0 })
+
+  useLayoutEffect(() => {
+    const idx = tabList.indexOf(activeTab)
+    const node = tabRefs.current[idx]
+    if (node) {
+      setUnderlineStyle({
+        left: node.offsetLeft,
+        width: node.offsetWidth,
+      })
+    }
+  }, [activeTab, tabRefs.current.length])
+
   return (
     <div className="mt-12">
       {/* 로딩 상태 표시 */}
@@ -194,44 +212,55 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
       {!isLoading && !error && (
         <>
           {/* 탭 메뉴 */}
-          <div className="border-b border-gray-border">
-            <div className="flex space-x-8">
-              {["소개", "프로젝트 정보", "후기"].map((tab) => (
+          <div className="border-b border-gray-border relative">
+            <div className="flex space-x-8 relative">
+              {tabList.map((tab, idx) => (
                 <button
                   key={tab}
-                  className={`relative pb-3 text-xl font-medium ${activeTab === tab ? "text-main-color" : "text-sub-gray"}`}
+                  ref={el => { tabRefs.current[idx] = el; }}
+                  className={`relative pb-4 text-xl font-medium ${activeTab === tab ? "text-main-color" : "text-sub-gray"}`}
                   onClick={() => handleTabClick(tab)}
                 >
                   {tab}
-                  {activeTab === tab && <span className="absolute bottom-0 left-0 h-1 w-full bg-main-color"></span>}
                 </button>
               ))}
+              {/* 슬라이드 언더라인 */}
+              <span
+                className="absolute bottom-0 h-1 bg-main-color transition-all duration-300"
+                style={{ left: underlineStyle.left, width: underlineStyle.width }}
+              />
             </div>
           </div>
 
           {/* 탭 내용 */}
-          <div className="mt-8">
-            {activeTab === "소개" && (
-              <div className="space-y-8">
-                {/* 마크다운 렌더러를 사용하여 프로젝트 소개 내용 표시 */}
-                <MarkdownRenderer content={projectData?.markdown || defaultMarkdown} />
+          <div className="mt-8 relative min-h-[300px]">
+            {/* 소개 탭 */}
+            <div
+              className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "소개" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-6 gap-8">
+                {/* 소개글 영역 (좌측) */}
+                <div className="lg:col-span-4 pb-180">
+                  <MarkdownRenderer content={projectData?.markdown || defaultMarkdown} />
+                </div>
+                {/* 목차 영역 (우측) */}
+                <div className="lg:col-span-2">
+                  <TableOfContents headings={headings} />
+                </div>
               </div>
-            )}
-
-            {activeTab === "프로젝트 정보" && (
-              // 프로젝트 기본 정보 영역
+            </div>
+            {/* 프로젝트 정보 탭 */}
+            <div
+              className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "프로젝트 정보" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+            >
               <div>
                 <h2 className="mb-6 text-3xl font-bold">프로젝트 기본 정보</h2>
                 <hr className="border-gray-border mb-8" />
-
                 <div className="space-y-6">
                   <div className="flex">
                     <div className="w-1/4 font-medium text-sub-gray">목표금액</div>
-                    <div className="w-3/4 font-medium">
-                      {projectData?.goalAmount?.toLocaleString() || "?"}원
-                    </div>
+                    <div className="w-3/4 font-medium">{projectData?.goalAmount?.toLocaleString() || "?"}원</div>
                   </div>
-
                   <div className="flex">
                     <div className="w-1/4 font-medium text-sub-gray">펀딩 기간</div>
                     <div className="w-3/4 font-medium">
@@ -252,40 +281,38 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                       )}
                     </div>
                   </div>
-
                   <div className="flex">
                     <div className="w-1/4 font-medium text-sub-gray">결제</div>
                     <div className="w-3/4 font-medium">
                       목표금액 달성 시 {formatDate(projectData?.endAt || "")} 결제 예정
                     </div>
                   </div>
-
                   <div className="flex">
                     <div className="w-1/4 font-medium text-sub-gray">예상 발송 시작일</div>
                     <div className="w-3/4 font-medium">{formatDate(projectData?.shippedAt || "")}</div>
                   </div>
                 </div>
-
                 {/* 판매자 정보 영역 */}
                 <h2 className="mt-12 mb-6 text-3xl font-bold">판매자 정보</h2>
                 <hr className="border-gray-border mb-6" />
-
                 {projectData?.sellerResponse ? (
                   <FollowItem
                     id={projectData.sellerResponse.id}
                     username={projectData.sellerResponse.nickname}
                     oneLinear={projectData.sellerResponse.sellerIntroduction || "판매자 소개가 없습니다."}
-                    profileImage="/abstract-profile.png" // API에서 제공하지 않는 정보는 기본값 사용
+                    profileImage="/abstract-profile.png"
                     onFollow={handleFollow}
-                    isFollowing={false} // 팔로우 상태는 API에서 가져와야 함
+                    isFollowing={false}
                   />
                 ) : (
                   <div className="py-4 text-sub-gray">판매자 정보를 불러올 수 없습니다.</div>
                 )}
               </div>
-            )}
-
-            {activeTab === "후기" && (
+            </div>
+            {/* 후기 탭 */}
+            <div
+              className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "후기" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+            >
               <div className="space-y-6">
                 {/* 로딩 상태 표시 */}
                 {reviewsLoading && (
@@ -293,7 +320,6 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                     <p className="text-sub-gray">리뷰를 불러오는 중...</p>
                   </div>
                 )}
-
                 {/* 에러 메시지 표시 */}
                 {reviewsError && (
                   <div className="rounded-xl bg-red-50 p-4 text-red-500">
@@ -303,7 +329,6 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                     </button>
                   </div>
                 )}
-
                 {/* 리뷰 목록 */}
                 {!reviewsLoading && !reviewsError && (
                   <div className="space-y-4">
@@ -315,12 +340,11 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                               {/* 리뷰 작성자 프로필 사진 */}
                               <div className="h-16 w-16 overflow-hidden rounded-full">
                                 <img
-                                  src={review.imageUrl}
+                                  src={review.imageUrl || "/placeholder.svg"}
                                   alt={`${review.userName} 프로필`}
                                   className="h-full w-full object-cover"
                                 />
                               </div>
-
                               {/* 리뷰 작성자 이름, 게시 날짜, 내용 */}
                               <div>
                                 <h3 className="text-xl font-bold">{review.userName}</h3>
@@ -339,7 +363,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                   </div>
                 )}
               </div>
-            )}
+            </div>
           </div>
         </>
       )}
