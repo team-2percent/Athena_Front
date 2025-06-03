@@ -32,10 +32,10 @@ export default function ReviewItem({
 
   return (
     <>
-      <div className="mb-8">
-        <div className="flex gap-6">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-6">
           {/* 영역 1: 상품 이미지 */}
-          <div className="relative w-60 h-60 flex-shrink-0">
+          <div className="relative w-full h-40 sm:w-60 sm:h-60 flex-shrink-0">
             {/* 상품 이미지 클릭 시 상품 상세 페이지로 이동 */}
             <div className="w-full h-full cursor-pointer" onClick={handleProjectClick}>
               <img
@@ -47,17 +47,17 @@ export default function ReviewItem({
           </div>
 
           {/* 영역 2, 3: 후기 내용 */}
-          <div className="flex-1 flex flex-col w-64">
+          <div className="flex-1 flex flex-col w-full sm:w-64">
             {/* 영역 2: 판매자/상품 정보, 날짜 및 좋아요/싫어요 */}
             <div className="mb-2">
               {/* 판매자 및 상품 정보 */}
-              <div className="mb-1 text-sub-gray">{sellerName} 님의 상품</div>
-              <h3 className="text-xl font-medium mb-1">{projectName}</h3>
+              <div className="mb-1 text-sub-gray text-sm sm:text-base">{sellerName} 님의 상품</div>
+              <h3 className="text-base sm:text-xl font-medium mb-1">{projectName}</h3>
             </div>
 
-            <div className="flex items-center gap-4 mb-2">
-              <div className="text-gray-500">{reviewDate} 에 작성</div>
-              <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 mb-2">
+              <div className="text-gray-500 text-xs sm:text-base">{reviewDate} 에 작성</div>
+              <div className="flex items-center gap-2 sm:gap-4">
               </div>
             </div>
 
@@ -65,10 +65,10 @@ export default function ReviewItem({
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="flex-grow bg-white rounded-2xl border border-gray-200 px-4 py-3 text-left overflow-hidden shadow-sm hover:shadow-md transition-shadow mt-auto"
+              className="flex-grow bg-white rounded-2xl border border-gray-200 px-2 py-2 sm:px-4 sm:py-3 text-left overflow-hidden shadow-sm hover:shadow-md transition-shadow mt-auto"
             >
               <div className="overflow-hidden">
-                <p className="line-clamp-4 text-gray-700 whitespace-pre-wrap break-words">{reviewContent}</p>
+                <p className="line-clamp-4 text-gray-700 whitespace-pre-wrap break-words text-xs sm:text-base">{reviewContent}</p>
               </div>
             </button>
           </div>

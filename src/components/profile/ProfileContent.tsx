@@ -376,12 +376,12 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
           <div className="mb-8">
             <p className="text-sub-gray mb-8 whitespace-pre-wrap break-words">{sellerDescription || "소개글이 없습니다."}</p>
             {/* 링크 목록 */}
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-3 sm:gap-4">
               {linkUrl && linkUrl.split(",").map(url => (
                 <Link
                   href={`${url}`}
                   target="_blank"
-                  className="px-6 py-3 border border-main-color text-main-color rounded-full hover:bg-secondary-color transition-colors"
+                  className="px-3 py-2 sm:px-6 sm:py-3 border border-main-color text-main-color rounded-full hover:bg-secondary-color transition-colors text-sm sm:text-base border-[1px] sm:border-2"
                 >
                   {url}
                 </Link>
