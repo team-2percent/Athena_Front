@@ -81,7 +81,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal, dataCy 
         setFcmToken(token);
         await apiCall('/api/fcm/register', 'POST', { userId: data.userId, token: token })
       }
-      window.location.reload()
+      onClose()
     }
   }
 
@@ -99,7 +99,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal, dataCy 
               isError={loginError.email !== ""}
               dataCy="email-input"
             />
-            <InputInfo errorMessage={loginError.email} />
+            <InputInfo errorMessage={loginError.email} errorMessageDataCy="email-error-message" />
           </div>
 
           {/* Password Input */}
@@ -112,7 +112,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal, dataCy 
               isError={loginError.password !== ""}
               dataCy="password-input"
             />
-            <InputInfo errorMessage={loginError.password} />
+            <InputInfo errorMessage={loginError.password} errorMessageDataCy="password-error-message" />
           </div>
 
           {/* Login Button */}
