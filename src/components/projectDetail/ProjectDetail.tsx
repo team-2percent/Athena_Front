@@ -334,61 +334,70 @@ const ProjectDetail = () => {
           </div>
 
           {/* 오른쪽: 메타데이터 영역 */}
-          <div ref={metadataContainerRef} className="flex flex-col justify-center">
+          <div ref={metadataContainerRef} className="flex flex-col justify-center px-4 md:px-0 text-center md:text-left">
             <div>
-              <h1 className="mb-2 text-3xl font-bold">{projectData?.title || "프로젝트 제목"}</h1>
-              <h2 className="mb-6 text-2xl text-sub-gray">{projectData?.description || "프로젝트 설명"}</h2>
+              <h1 className="text-lg md:text-3xl font-bold mb-2 text-center md:text-left">{projectData?.title || "프로젝트 제목"}</h1>
+              <h2 className="text-sm md:text-2xl text-sub-gray mb-6 break-words leading-tight text-center md:text-left">{projectData?.description || "프로젝트 설명"}</h2>
 
               <div className="mb-4">
-                <p className="mb-3 text-gray-700">달성 금액</p>
-                <div className="flex items-baseline">
-                  <span className="text-5xl font-bold text-main-color">
-                    {projectData?.totalAmount?.toLocaleString() || "0"}
+                <p className="mb-1 text-base md:text-lg text-gray-700 text-center md:text-left">달성 금액</p>
+                <div className="flex items-baseline justify-center md:justify-start">
+                  <span className="text-2xl md:text-5xl font-bold text-main-color">
+                    {projectData?.totalAmount?.toLocaleString() || "0"}원
                   </span>
-                  <span className="ml-2 text-xl text-sub-gray">
-                    / {projectData?.goalAmount?.toLocaleString() || "0"} 원
+                  {/* 데스크톱: 기존처럼 목표금액 옆에 표기 */}
+                  <span className="ml-2 text-base md:text-xl text-sub-gray hidden md:inline">
+                    / {projectData?.goalAmount?.toLocaleString() || "0"}원
                   </span>
                 </div>
               </div>
 
-              <div className="mb-6">
-                <p className="text-lg font-medium text-main-color">
-                  목표 금액의 {calculateAchievementRate(projectData?.goalAmount || 0, projectData?.totalAmount || 0)}%
-                  달성
-                </p>
+              {/* 달성률 표기 */}
+              {/* 데스크톱: 기존 한 줄 표기 */}
+              <p className="text-base md:text-lg font-medium text-main-color hidden md:block mb-4 md:mb-6 text-left">
+                목표 금액의 {calculateAchievementRate(projectData?.goalAmount || 0, projectData?.totalAmount || 0)}% 달성
+              </p>
+              {/* 모바일: 두 줄 표기 */}
+              <div className="block md:hidden text-main-color text-base font-medium mb-4 text-center">
+                <div>
+                  목표금액({projectData?.goalAmount?.toLocaleString() || "0"}원)의
+                </div>
+                <div>
+                  {calculateAchievementRate(projectData?.goalAmount || 0, projectData?.totalAmount || 0)}% 달성
+                </div>
               </div>
 
-              <div className="mb-8">
-                <p className="mb-3 text-gray-700">펀딩 마감까지 남은 시간</p>
-                <div className="flex items-baseline">
+              <div className="mb-6 md:mb-8">
+                <p className="mb-1 md:mb-3 text-base md:text-lg text-gray-700 text-center md:text-left">펀딩 마감까지 남은 시간</p>
+                <div className="flex items-baseline justify-center md:justify-start">
                   {!projectData?.endAt ? (
-                    <span className="text-5xl font-bold text-main-color">알 수 없음</span>
+                    <span className="text-2xl md:text-5xl font-bold text-main-color">알 수 없음</span>
                   ) : (
                     (() => {
                       const daysLeft = calculateDaysLeft(projectData.endAt)
                       if (daysLeft > 0) {
-                        return <span className="text-5xl font-bold text-main-color">{daysLeft}일</span>
+                        return <span className="text-2xl md:text-5xl font-bold text-main-color">{daysLeft}일</span>
                       } else if (daysLeft === 0) {
-                        return <span className="text-5xl font-bold text-main-color">마감임박!</span>
+                        return <span className="text-2xl md:text-5xl font-bold text-main-color">마감임박!</span>
                       } else {
-                        return <span className="text-5xl font-bold text-main-color">펀딩 종료</span>
+                        return <span className="text-2xl md:text-5xl font-bold text-main-color">펀딩 종료</span>
                       }
                     })()
                   )}
-                  <span className="ml-2 text-xl text-sub-gray">/ {formatDate(projectData?.endAt || "")}</span>
+                  <span className="ml-2 text-base md:text-xl text-sub-gray">/ {formatDate(projectData?.endAt || "")}</span>
                 </div>
               </div>
             </div>
 
             {/* 공유하기, 후원하기 버튼 영역 */}
-            <div className="mt-8 flex items-center justify-end space-x-4">
+            <div className="mt-6 md:mt-8 flex flex-col md:flex-row items-stretch md:items-center gap-2 md:justify-end text-center md:text-right">
               {/* 공유하기 버튼을 relative 컨테이너로 감싸기 */}
-              <div className="relative w-1/3">
+              <div className="relative w-full md:w-1/3">
                 <OutlineButton
-                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white py-4 text-xl text-gray-700 hover:bg-gray-50"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white py-3 md:py-4 text-base md:text-xl text-gray-700 hover:bg-gray-50"
                   onClick={() => setShowSharePopover(!showSharePopover)}
                 >
-                  <Share2 className="h-6 w-6" />
+                  <Share2 className="h-5 w-5 md:h-6 md:w-6" />
                   공유하기
                 </OutlineButton>
 
@@ -438,7 +447,7 @@ const ProjectDetail = () => {
               {/* 후원하기 버튼 - 상품이 없거나 모든 재고가 0이면 비활성화 */}
               {canDonate(projectData) ? (
                 <PrimaryButton
-                  className="w-2/3 rounded-xl bg-main-color px-8 py-4 text-center text-xl font-bold text-white hover:bg-secondary-color-dark"
+                  className="w-full md:w-2/3 rounded-xl bg-main-color px-4 md:px-8 py-3 md:py-4 text-base md:text-xl font-bold text-white hover:bg-secondary-color-dark"
                   onClick={() => {
                     const event = new CustomEvent("toggleDonateDock")
                     window.dispatchEvent(event)
@@ -447,7 +456,7 @@ const ProjectDetail = () => {
                   후원하기
                 </PrimaryButton>
               ) : (
-                <div className="w-2/3 rounded-xl bg-gray-300 px-8 py-4 text-center text-xl font-bold text-gray-500 cursor-not-allowed">
+                <div className="w-full md:w-2/3 rounded-xl bg-gray-300 px-4 md:px-8 py-3 md:py-4 text-base md:text-xl font-bold text-gray-500 cursor-not-allowed text-center">
                   후원 불가
                 </div>
               )}

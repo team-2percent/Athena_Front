@@ -240,11 +240,11 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
             >
               <div className="grid grid-cols-1 lg:grid-cols-6 gap-8">
                 {/* 소개글 영역 (좌측) */}
-                <div className="lg:col-span-4 pb-180">
+                <div className="lg:col-span-4 pb-32 md:pb-180">
                   <MarkdownRenderer content={projectData?.markdown || defaultMarkdown} />
                 </div>
                 {/* 목차 영역 (우측) */}
-                <div className="lg:col-span-2">
+                <div className="lg:col-span-2 hidden md:block">
                   <TableOfContents headings={headings} />
                 </div>
               </div>
@@ -313,56 +313,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
             <div
               className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "후기" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
             >
-              <div className="space-y-6">
-                {/* 로딩 상태 표시 */}
-                {reviewsLoading && (
-                  <div className="flex justify-center py-8">
-                    <p className="text-sub-gray">리뷰를 불러오는 중...</p>
-                  </div>
-                )}
-                {/* 에러 메시지 표시 */}
-                {reviewsError && (
-                  <div className="rounded-xl bg-red-50 p-4 text-red-500">
-                    <p>{reviewsError}</p>
-                    <button onClick={fetchReviews} className="mt-2 text-sm underline">
-                      다시 시도
-                    </button>
-                  </div>
-                )}
-                {/* 리뷰 목록 */}
-                {!reviewsLoading && !reviewsError && (
-                  <div className="space-y-4">
-                    {reviews.length > 0 ? (
-                      reviews.map((review) => (
-                        <div key={review.id} className="rounded-3xl border border-gray-border p-6 shadow-sm">
-                          <div className="flex items-start justify-between">
-                            <div className="flex space-x-4">
-                              {/* 리뷰 작성자 프로필 사진 */}
-                              <div className="h-16 w-16 overflow-hidden rounded-full">
-                                <img
-                                  src={review.imageUrl || "/placeholder.svg"}
-                                  alt={`${review.userName} 프로필`}
-                                  className="h-full w-full object-cover"
-                                />
-                              </div>
-                              {/* 리뷰 작성자 이름, 게시 날짜, 내용 */}
-                              <div>
-                                <h3 className="text-xl font-bold">{review.userName}</h3>
-                                <p className="text-sub-gray">{formatDate(review.createdAt)}</p>
-                                <div className="mt-3 whitespace-pre-line">{review.content}</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="flex justify-center py-8">
-                        <p className="text-sub-gray">아직 리뷰가 없습니다. 프로젝트를 후원하고 리뷰를 작성해 보세요!</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+              {/* 후기 탭 내용 */}
             </div>
           </div>
         </>
