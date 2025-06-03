@@ -23,7 +23,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
 
-  const disabled = !signupSchema.safeParse({ nickname, email, password, passwordConfirm: confirmPassword }).success
+  const disabled = !signupSchema.safeParse({ nickname, email, password, passwordConfirm: confirmPassword }).success || !passwordMatchSchema.safeParse({ password, passwordConfirm: confirmPassword }).success
   
   // 유효성 검사
   const [signupError, setSignupError] = useState({
@@ -123,7 +123,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md" closeOnOutsideClick closeOnEsc title="회원가입">
+    <Modal isOpen={isOpen} onClose={onClose} size="md" closeOnOutsideClick closeOnEsc title="회원가입" dataCy="signup-modal">
       <div className="px-4 pt-4">
         <form onSubmit={handleSubmit}>
           {/* Name Input */}
@@ -138,8 +138,10 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
               designType="underline"
               value={nickname}
               onChange={handleChangeNickname}
+              isError={!!signupError.nickname}
+              dataCy="nickname-input"
             />
-            <InputInfo errorMessage={signupError.nickname} />
+            <InputInfo errorMessage={signupError.nickname} errorMessageDataCy="nickname-error-message" />
           </div>
 
           {/* Email Input */}
@@ -154,8 +156,10 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
               designType="underline"
               value={email}
               onChange={handleChangeEmail}
+              isError={!!signupError.email}
+              dataCy="email-input"
             />
-            <InputInfo errorMessage={signupError.email} />
+            <InputInfo errorMessage={signupError.email} errorMessageDataCy="email-error-message" />
           </div>
 
           {/* Password Input */}
@@ -171,8 +175,10 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
               designType="underline"
               value={password}
               onChange={handleChangePassword}
+              isError={!!signupError.password}
+              dataCy="password-input"
             />
-            <InputInfo errorMessage={signupError.password} />
+            <InputInfo errorMessage={signupError.password} errorMessageDataCy="password-error-message" />
           </div>
 
           {/* Confirm Password Input */}
@@ -188,8 +194,10 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
               designType="underline"
               value={confirmPassword}
               onChange={handleChangeConfirmPassword}
+              isError={!!signupError.confirmPassword}
+              dataCy="confirm-password-input"
             />
-            <InputInfo errorMessage={signupError.confirmPassword} />
+            <InputInfo errorMessage={signupError.confirmPassword} errorMessageDataCy="confirm-password-error-message" />
           </div>
 
           {/* Signup Button */}
@@ -197,11 +205,12 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             type="submit"
             className="relative w-full py-4"
             disabled={disabled}
+            dataCy="signup-button"
           >
             가입하기
           </PrimaryButton>
           <div className="h-[1.25rem] text-center">
-            <span className="w-full text-red-500 text-xs">{errorMessage}</span>
+            <span className="w-full text-red-500 text-xs" data-cy="signup-error-message">{errorMessage}</span>
           </div>
         </form>
       </div>
