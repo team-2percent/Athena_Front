@@ -62,7 +62,7 @@ export default function ProjectCard({
     <div className={cn("relative flex", className)}>
       {/* 마감 임박 */}
       {isDeadlineSoon &&
-        <div className="absolute top-2 left-2 z-20 bg-point-color text-white px-3 py-1 rounded-sm text-xs font-bold">
+        <div className="absolute top-2 left-2 z-4 bg-point-color text-white px-3 py-1 rounded-sm text-xs font-bold">
           마감임박
         </div>
       }
