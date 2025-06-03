@@ -3,7 +3,7 @@ import { PASSWORD_MIN_LENGTH } from "../../src/lib/validationConstant"
 describe("회원가입", () => {
     beforeEach(() => {
         // given - 회원가입 모달 오픈, 회원가입 버튼 disabled 확인
-        cy.visit("/")
+        cy.visitMainPage()
         cy.get('header').get('[data-cy="open-signup-modal-button"]').should('be.visible').click()
         cy.get('[data-cy="signup-modal"]').as('signupModal').should('be.visible')
         cy.get('@signupModal').get('[data-cy="signup-button"]').should('be.disabled')

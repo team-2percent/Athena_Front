@@ -1,17 +1,41 @@
 /// <reference types="cypress" />
-// ***********************************************
-// This example commands.ts shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
+
+import { jwtDecode } from "jwt-decode";
+
+Cypress.Commands.add('login', (email: string, password: string) => {
+    cy.request('POST', '/api/user/login', {
+      email,
+      password,
+    }).then((res) => {
+        const { accessToken, userId } = res.body;
+        const { role } = jwtDecode<{ role: string }>(accessToken);
+    
+        cy.window().then((win) => {
+          win.localStorage.setItem('accessToken', accessToken);
+          win.localStorage.setItem('userId', userId.toString());
+        });
+
+        cy.reload(); // zustand에서 인식
+    });
+})
+
+Cypress.Commands.add('visitMainPage', () => {
+    cy.intercept({
+      method: 'GET',
+      url: '/api/project/planRankingView'
+    }, {
+      fixture: 'planRankingView.json'
+    }).as('getPlanRankingView')
+
+    cy.intercept({
+      method: "GET",
+      url: '/api/project/categoryRankingView'
+    }, {
+      fixture: 'categoryRankingView.json'
+    }).as('getCategoryRankingView')
+
+    cy.visit('/')
+})
 //
 //
 // -- This is a child command --
@@ -25,13 +49,14 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      login(email: string, password: string): Chainable<void>
+      visitMainPage(): Chainable<void>
+    //   drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
+    //   dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
+    //   visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
+    }
+  }
+}
