@@ -111,7 +111,7 @@ describe("회원 상호작용", () => {
         cy.visitMainPage()
         cy.login()
         cy.get('header').get('[data-cy="user-nickname"]').should('be.visible')
-        cy.get('header').get('[data-cy="user-profile-image"]').should('be.visible').as('userProfileImage')
+        cy.get('header').get('[data-cy="user-image"]').should('be.visible').as('userProfileImage')
         cy.get('header').get('[data-cy="coupon-event-modal-button"]').should('be.visible').as('couponEventModalButton')
         // cy.get('header').get('[data-cy="notification-button"]').should('be.visible').as('notificationButton')
     })
