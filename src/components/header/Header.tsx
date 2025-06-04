@@ -319,7 +319,7 @@ const Header = () => {
                 </div>
               </>
             ) : (
-              <div className="text-main-color font-medium mr-auto flex items-center gap-2">
+              <div className="text-main-color font-medium mr-auto flex items-center gap-2 whitespace-nowrap">
                 <button type="button" aria-label="로그인" onClick={openLoginModal}>
                   로그인
                 </button>

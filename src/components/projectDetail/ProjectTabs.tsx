@@ -218,7 +218,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                 <button
                   key={tab}
                   ref={el => { tabRefs.current[idx] = el; }}
-                  className={`relative pb-4 text-xl font-medium ${activeTab === tab ? "text-main-color" : "text-sub-gray"}`}
+                  className={`relative pb-4 text-base md:text-xl font-medium ${activeTab === tab ? "text-main-color" : "text-sub-gray"}`}
                   onClick={() => handleTabClick(tab)}
                 >
                   {tab}
@@ -254,47 +254,74 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
               className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "프로젝트 정보" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
             >
               <div>
-                <h2 className="mb-6 text-3xl font-bold">프로젝트 기본 정보</h2>
-                <hr className="border-gray-border mb-8" />
+                <h2 className="mb-4 md:mb-8 text-lg md:text-3xl font-bold">프로젝트 기본 정보</h2>
+                <hr className="border-gray-border mb-4 md:mb-8" />
                 <div className="space-y-6">
-                  <div className="flex">
-                    <div className="w-1/4 font-medium text-sub-gray">목표금액</div>
-                    <div className="w-3/4 font-medium">{projectData?.goalAmount?.toLocaleString() || "?"}원</div>
+                  <div className="flex gap-4 md:gap-0">
+                    <div className="w-1/3 md:w-1/4 text-xs md:text-base font-medium text-sub-gray">목표금액</div>
+                    <div className="w-2/3 md:w-3/4 text-xs md:text-base font-medium">{projectData?.goalAmount?.toLocaleString() || "?"}원</div>
                   </div>
-                  <div className="flex">
-                    <div className="w-1/4 font-medium text-sub-gray">펀딩 기간</div>
-                    <div className="w-3/4 font-medium">
-                      {projectData?.endAt ? (
-                        <>
-                          {formatDate(projectData?.startAt || "")} ~ {formatDate(projectData.endAt)}
-                          {" ("}
-                          {(() => {
-                            const daysLeft = calculateDaysLeft(projectData.endAt)
-                            if (daysLeft < 0) return "종료"
-                            if (daysLeft === 0) return "마감임박"
-                            return `${daysLeft}일 남음`
-                          })()}
-                          {")"}
-                        </>
-                      ) : projectData?.startAt ? null : (
-                        "알 수 없음"
-                      )}
+                  <div className="flex gap-4 md:gap-0">
+                    <div className="w-1/3 md:w-1/4 text-xs md:text-base font-medium text-sub-gray">펀딩 기간</div>
+                    <div className="w-2/3 md:w-3/4 text-xs md:text-base font-medium">
+                      {/* 데스크톱: 기존 한 줄 */}
+                      <span className="hidden md:block">
+                        {projectData?.endAt ? (
+                          <>
+                            {formatDate(projectData?.startAt || "")} ~ {formatDate(projectData.endAt)}
+                            {" ("}
+                            {(() => {
+                              const daysLeft = calculateDaysLeft(projectData.endAt)
+                              if (daysLeft < 0) return "종료"
+                              if (daysLeft === 0) return "마감임박"
+                              return `${daysLeft}일 남음`
+                            })()}
+                            {")"}
+                          </>
+                        ) : projectData?.startAt ? null : (
+                          "알 수 없음"
+                        )}
+                      </span>
+                      {/* 모바일: 두 줄 */}
+                      <span className="block md:hidden">
+                        {projectData?.endAt ? (
+                          <>
+                            {formatDate(projectData?.startAt || "")} ~ {formatDate(projectData.endAt)}<br />
+                            ({(() => {
+                              const daysLeft = calculateDaysLeft(projectData.endAt)
+                              if (daysLeft < 0) return "종료"
+                              if (daysLeft === 0) return "마감임박"
+                              return `${daysLeft}일 남음`
+                            })()})
+                          </>
+                        ) : projectData?.startAt ? null : (
+                          "알 수 없음"
+                        )}
+                      </span>
                     </div>
                   </div>
-                  <div className="flex">
-                    <div className="w-1/4 font-medium text-sub-gray">결제</div>
-                    <div className="w-3/4 font-medium">
-                      목표금액 달성 시 {formatDate(projectData?.endAt || "")} 결제 예정
+                  <div className="flex gap-4 md:gap-0">
+                    <div className="w-1/3 md:w-1/4 text-xs md:text-base font-medium text-sub-gray">결제</div>
+                    <div className="w-2/3 md:w-3/4 text-xs md:text-base font-medium">
+                      {/* 데스크톱: 기존 한 줄 */}
+                      <span className="hidden md:block">
+                        목표금액 달성 시 {formatDate(projectData?.endAt || "")} 결제 예정
+                      </span>
+                      {/* 모바일: 두 줄 */}
+                      <span className="block md:hidden">
+                        목표금액 달성 시<br />
+                        {formatDate(projectData?.endAt || "")} 결제 예정
+                      </span>
                     </div>
                   </div>
-                  <div className="flex">
-                    <div className="w-1/4 font-medium text-sub-gray">예상 발송 시작일</div>
-                    <div className="w-3/4 font-medium">{formatDate(projectData?.shippedAt || "")}</div>
+                  <div className="flex gap-4 md:gap-0">
+                    <div className="w-1/3 md:w-1/4 text-xs md:text-base font-medium text-sub-gray">예상 발송 시작일</div>
+                    <div className="w-2/3 md:w-3/4 text-xs md:text-base font-medium">{formatDate(projectData?.shippedAt || "")}</div>
                   </div>
                 </div>
                 {/* 판매자 정보 영역 */}
-                <h2 className="mt-12 mb-6 text-3xl font-bold">판매자 정보</h2>
-                <hr className="border-gray-border mb-6" />
+                <h2 className="mt-8 md:mt-16 mb-4 md:mb-8 text-lg md:text-3xl font-bold">판매자 정보</h2>
+                <hr className="border-gray-border mb-4 md:mb-8" />
                 {projectData?.sellerResponse ? (
                   <FollowItem
                     id={projectData.sellerResponse.id}
@@ -313,7 +340,55 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
             <div
               className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "후기" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
             >
-              {/* 후기 탭 내용 */}
+              <div className="space-y-6">
+                {/* 로딩 상태 표시 */}
+                {reviewsLoading && (
+                  <div className="flex justify-center py-8">
+                    <p className="text-sub-gray">리뷰를 불러오는 중...</p>
+                  </div>
+                )}
+                {/* 에러 메시지 표시 */}
+                {reviewsError && (
+                  <div className="rounded-xl bg-red-50 p-4 text-red-500">
+                    <p>{reviewsError}</p>
+                    <button onClick={fetchReviews} className="mt-2 text-sm underline">
+                      다시 시도
+                    </button>
+                  </div>
+                )}
+                {/* 리뷰 목록 */}
+                {!reviewsLoading && !reviewsError && (
+                  <div className="space-y-3 md:space-y-4">
+                    {reviews.length > 0 ? (
+                      reviews.map((review) => (
+                        <div key={review.id} className="rounded-3xl border border-gray-border p-4 md:p-6 shadow-sm">
+                          <div className="flex items-center space-x-3 md:space-x-4">
+                            {/* 리뷰 작성자 프로필 사진 */}
+                            <div className="h-10 w-10 md:h-16 md:w-16 overflow-hidden rounded-full">
+                              <img
+                                src={review.imageUrl || "/placeholder.svg"}
+                                alt={`${review.userName} 프로필`}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                            {/* 이름/날짜 */}
+                            <div className="flex flex-col justify-center">
+                              <h3 className="text-base md:text-xl font-bold">{review.userName}</h3>
+                              <p className="text-xs md:text-base text-sub-gray">{formatDate(review.createdAt)}</p>
+                            </div>
+                          </div>
+                          {/* 리뷰 내용 */}
+                          <div className="mt-2 md:mt-3 text-sm md:text-base whitespace-pre-line ml-0 md:ml-20">{review.content}</div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="flex justify-center py-8">
+                        <p className="text-sm md:text-base text-sub-gray">아직 리뷰가 없습니다. 프로젝트를 후원하고 리뷰를 작성해 보세요!</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </>
