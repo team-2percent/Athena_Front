@@ -31,7 +31,7 @@ export default function MenuTab({size="base", tabs, activeTab, onClickTab, class
         }
     }, [activeTab, tabs.length])
 
-    return <nav className={clsx("flex space-x-8 relative", className)}>
+    return <nav className={clsx("flex space-x-8 relative overflow-x-auto whitespace-nowrap scrollbar-hide sm:overflow-visible sm:whitespace-normal", className)}>
         {tabs.map((tab, idx) => (
             <button
                 type="button"

@@ -115,21 +115,21 @@ export default function Carousel({ projects, isLoading }: { projects: MainProjec
   return (
     <div className="w-full bg-secondary-color flex flex-col items-center justify-center py-16 select-none">
       <div
-        className="relative w-full max-w-6xl mx-auto flex items-center justify-center overflow-visible"
+        className="relative w-full max-w-full mx-auto flex items-center justify-center overflow-hidden"
         style={{ height: CARD_HEIGHT }}
       >
         {/* 좌/우 버튼을 absolute로 중앙 세로선 기준 좌/우에 고정 */}
         <button
           onClick={() => { slideTo(-1); resetAutoSlide(); }}
           className={cn(
-            "bg-white/90 hover:bg-white text-main-color rounded-full p-3 shadow-lg z-4 transition-colors",
-            "absolute left-2 top-1/2 -translate-y-1/2 md:left-4"
+            "bg-white/90 hover:bg-white text-main-color rounded-full p-2 md:p-3 shadow-lg z-4 transition-colors",
+            "absolute left-4 top-1/2 -translate-y-1/2 md:left-[12vw]"
           )}
           aria-label="이전"
           disabled={isAnimating}
           style={{ zIndex: 4 }}
         >
-          <ChevronLeft className="h-7 w-7" />
+          <ChevronLeft className="h-5 w-5 md:h-7 md:w-7" />
         </button>
         {/* 5장 flex로 배치, GSAP 애니메이션 적용 */}
         <div
@@ -156,7 +156,7 @@ export default function Carousel({ projects, isLoading }: { projects: MainProjec
                   "shadow-xl"
                 )}
                 style={{
-                  width: '80%',
+                  width: '60%',
                   height: CARD_HEIGHT,
                   transform: `scale(${scale})`,
                   opacity,
@@ -182,14 +182,14 @@ export default function Carousel({ projects, isLoading }: { projects: MainProjec
         <button
           onClick={() => { slideTo(1); resetAutoSlide(); }}
           className={cn(
-            "bg-white/90 hover:bg-white text-main-color rounded-full p-3 shadow-lg z-4 transition-colors",
-            "absolute right-2 top-1/2 -translate-y-1/2 md:right-4"
+            "bg-white/90 hover:bg-white text-main-color rounded-full p-2 md:p-3 shadow-lg z-4 transition-colors",
+            "absolute right-4 top-1/2 -translate-y-1/2 md:right-[12vw]"
           )}
           aria-label="다음"
           disabled={isAnimating}
           style={{ zIndex: 4 }}
         >
-          <ChevronRight className="h-7 w-7" />
+          <ChevronRight className="h-5 w-5 md:h-7 md:w-7" />
         </button>
       </div>
       {/* 인디케이터 */}

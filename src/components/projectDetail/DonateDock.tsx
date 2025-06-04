@@ -11,6 +11,7 @@ import { useApi } from "@/hooks/useApi"
 import AlertModal from "../common/AlertModal"
 import { CancelButton, PrimaryButton } from "../common/Button"
 import AddressAddModal from "./AddressAddModal"
+import Modal from "../common/Modal"
 
 interface AddressInfo {
   id: string
@@ -153,6 +154,15 @@ const DonateDock = () => {
   // URL에서 프로젝트 ID 가져오기
   const { id: projectId } = useParams()
 
+  // 컴포넌트 내부 상단에 추가
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   // 후원 가능 여부 확인 함수
   const canDonate = (projectData: ProjectData | null): boolean => {
     if (!projectData?.productResponses || projectData.productResponses.length === 0) {
@@ -199,7 +209,6 @@ const DonateDock = () => {
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "프로젝트 정보를 불러오는 중 오류가 발생했습니다.")
-        console.error("프로젝트 정보 불러오기 오류:", err)
         // 오류 발생 시 기본 상품 옵션 설정
         setProjectOptions(defaultProjectOptions)
       } finally {
@@ -446,16 +455,20 @@ const DonateDock = () => {
       return
     }
 
+    // 모바일: ref 없이 바로 모달 오픈
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setShowOrderSummaryPopover(true)
+      return
+    }
+
+    // 데스크톱: 기존대로 ref 위치 계산
     if (orderSummaryMoreRef.current) {
       const buttonRect = orderSummaryMoreRef.current.getBoundingClientRect()
       const offset = selectedOptions.length * 44 > 320 ? 320 : selectedOptions.length * 44
-
-      // 팝오버 위치 계산 (버튼 오른쪽 위에 위치하도록 변경)
       setOrderSummaryPopoverPosition({
-        top: buttonRect.top - offset - 80, // 버튼보다 위에 위치
-        left: buttonRect.right + 10, // 버튼 오른쪽에 여백을 두고 위치
+        top: buttonRect.top - offset - 80,
+        left: buttonRect.right + 10,
       })
-
       setShowOrderSummaryPopover(true)
     }
   }
@@ -782,9 +795,9 @@ const DonateDock = () => {
           <div className="rounded-t-3xl border border-gray-border bg-white p-6 pb-0 shadow-lg">
             {/* Dock 헤더 - 항상 동일한 레이아웃 */}
             <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-2xl font-bold">후원하기</h2>
-              <button onClick={toggleDock} className="rounded-full p-1 hover:bg-gray-100" aria-label="닫기">
-                <ChevronDown className="h-6 w-6" />
+              <h2 className="text-lg md:text-2xl font-bold">후원하기</h2>
+              <button onClick={toggleDock} className="rounded-full p-0.5 md:p-1 hover:bg-gray-100" aria-label="닫기">
+                <ChevronDown className="h-5 w-5 md:h-6 md:w-6" />
               </button>
             </div>
 
@@ -810,26 +823,27 @@ const DonateDock = () => {
               <>
                 {step === 1 ? (
                   // 1단계: 상품 선택
-                  <div className="space-y-6">
-                    <h3 className="mb-2 text-lg font-medium">상품 선택 (복수 선택 가능)</h3>
+                  <div className="space-y-4 md:space-y-6">
+                    <h3 className="mb-2 text-base md:text-lg font-medium">상품 선택 (복수 선택 가능)</h3>
 
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                      {/* 왼쪽 영역: 상품 카드 목록 (1/3 너비) - 스크롤 가능하도록 수정 */}
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
+                      {/* 왼쪽 영역: 상품 카드 목록 */}
                       <div className="md:col-span-1">
-                        <div className="h-[500px] overflow-y-auto pr-2 pt-4 space-y-6">
+                        <div className="h-[320px] md:h-[500px] overflow-y-auto pr-1 md:pr-2 pt-2 md:pt-4 space-y-3 md:space-y-6">
                           {projectOptions.map((option) => {
                             const isSelected = selectedOptions.includes(option.id)
                             return (
                               <div
                                 key={option.id}
-                                className={`relative flex cursor-pointer items-center rounded-xl border p-4 transition-all ${
+                                className={`relative flex cursor-pointer items-center rounded-lg md:rounded-xl border p-3 md:p-4 transition-all ${
                                   isSelected
                                     ? "border-2 border-main-color"
                                     : "border-gray-border hover:border-secondary-color-dark"
                                 }`}
                                 onClick={() => handleOptionSelect(option.id)}
                               >
-                                <div className="absolute -right-2 -top-4">
+                                {/* 데스크톱: n개 남음 배지 */}
+                                <div className="hidden md:block absolute -right-2 -top-4">
                                   <div className="rounded-full border-2 border-main-color bg-white px-3 py-1 text-sm text-main-color shadow-sm">
                                     <span>{formatRemaining(option.remaining)}</span>
                                   </div>
@@ -838,15 +852,20 @@ const DonateDock = () => {
                                 <div className="flex-1">
                                   <div className="flex items-center">
                                     <div
-                                      className={`mr-2 h-5 w-5 rounded-md flex items-center justify-center ${
+                                      className={`mr-2 h-4 w-4 md:h-5 md:w-5 rounded-md flex items-center justify-center ${
                                         isSelected ? "bg-main-color" : "border border-gray-border"
                                       }`}
                                     >
-                                      {isSelected && <Check className="h-4 w-4 text-white" />}
+                                      {isSelected && <Check className="h-3 w-3 md:h-4 md:w-4 text-white" />}
                                     </div>
-                                    <h4 className={`text-lg font-bold ${isSelected ? "text-main-color" : ""}`}>
+                                    <h4 className={`text-base md:text-lg font-bold ${isSelected ? "text-main-color" : ""}`}>
                                       {option.title}
                                     </h4>
+                                  </div>
+
+                                  {/* 모바일: 남은 개수 */}
+                                  <div className="block md:hidden mt-1">
+                                    <span className="text-xs text-sub-gray">{formatRemaining(option.remaining)}</span>
                                   </div>
 
                                   {isSelected && (
@@ -856,7 +875,7 @@ const DonateDock = () => {
                                           e.stopPropagation()
                                           decreaseQuantity(option.id)
                                         }}
-                                        className="h-8 w-8 pb-1 rounded-full bg-gray-border flex items-center justify-center text-sub-gray"
+                                        className="h-7 w-7 md:h-8 md:w-8 pb-1 rounded-full bg-gray-border flex items-center justify-center text-sub-gray"
                                       >
                                         -
                                       </button>
@@ -868,14 +887,14 @@ const DonateDock = () => {
                                         onChange={(e) => handleQuantityInputChange(e, option.id)}
                                         onBlur={() => handleQuantityInputBlur(option.id)}
                                         onClick={(e) => e.stopPropagation()}
-                                        className="mx-2 w-12 text-center border border-gray-border rounded-md"
+                                        className="mx-1 md:mx-2 w-8 md:w-12 text-sm md:text-base text-center border border-gray-border rounded-md"
                                       />
                                       <button
                                         onClick={(e) => {
                                           e.stopPropagation()
                                           increaseQuantity(option.id)
                                         }}
-                                        className="h-8 w-8 pb-1 rounded-full bg-gray-border flex items-center justify-center text-sub-gray"
+                                        className="h-7 w-7 md:h-8 md:w-8 pb-1 rounded-full bg-gray-border flex items-center justify-center text-sub-gray"
                                       >
                                         +
                                       </button>
@@ -883,7 +902,7 @@ const DonateDock = () => {
                                   )}
                                 </div>
 
-                                <div className={`text-xl font-medium ${isSelected ? "text-main-color" : ""}`}>
+                                <div className={`text-base md:text-xl font-medium ${isSelected ? "text-main-color" : ""}`}>
                                   {option.price}원
                                 </div>
                               </div>
@@ -892,15 +911,16 @@ const DonateDock = () => {
                         </div>
                       </div>
 
-                      {/* 오른쪽 영역: 선택된 상품 세부 정보 (2/3 너비) */}
-                      <div className="md:col-span-2 rounded-xl border border-gray-border mt-4 flex flex-col h-[484px]">
-                        {/* 스크롤 영역 - 선택된 상품 목록만 포함 */}
-                        <div className="h-[430px] overflow-y-auto p-4 flex-grow">
+                      {/* 오른쪽 영역: 선택된 상품 세부 정보 */}
+                      <div className="md:col-span-2 rounded-lg md:rounded-xl border border-gray-border mt-3 md:mt-4 flex flex-col h-[300px] md:h-[484px] hidden md:flex">
+                        <div className="h-[260px] md:h-[430px] overflow-y-auto p-3 md:p-4 flex-grow">
                           {selectedOptions.length > 0 ? (
                             <>
-                              <h4 className="mb-4 text-lg font-bold">선택된 상품 ({selectedOptions.length}개)</h4>
+                              <h4 className="mb-3 md:mb-4 text-base md:text-lg font-bold">
+                                선택된 상품 ({selectedOptions.length}개)
+                              </h4>
 
-                              <div className="space-y-4">
+                              <div className="space-y-3 md:space-y-4">
                                 {selectedOptions.map((optionId) => {
                                   const option = projectOptions.find((opt) => opt.id === optionId)
                                   if (!option) return null
@@ -911,47 +931,42 @@ const DonateDock = () => {
                                   const isExpanded = expandedProductId === optionId
 
                                   return (
-                                    <div
-                                      key={optionId}
-                                      className="border border-gray-border rounded-lg overflow-hidden"
-                                    >
-                                      {/* 상품 헤더 - 클릭 시 펼침/접힘 */}
+                                    <div key={optionId} className="border border-gray-border rounded-lg overflow-hidden">
                                       <div
-                                        className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50"
+                                        className="flex justify-between items-center p-3 md:p-4 cursor-pointer hover:bg-gray-50"
                                         onClick={(e) => toggleProductExpand(optionId, e)}
                                       >
                                         <div className="flex items-center">
                                           <ChevronRight
-                                            className={`h-5 w-5 mr-2 text-sub-gray transition-transform ${
+                                            className={`h-4 w-4 md:h-5 md:w-5 mr-2 text-sub-gray transition-transform ${
                                               isExpanded ? "rotate-90" : ""
                                             }`}
                                           />
-                                          <h5 className="font-medium">{option.title}</h5>
+                                          <h5 className="text-sm md:text-base font-medium">{option.title}</h5>
                                         </div>
-                                        <span>
+                                        <span className="text-sm md:text-base">
                                           {quantity}개 × {option.price}원 = {itemTotal.toLocaleString()}원
                                         </span>
                                       </div>
 
-                                      {/* 펼쳐진 상태일 때만 구성 정보 표시 */}
                                       {isExpanded && (
-                                        <div className="bg-gray-50 p-4 border-t border-gray-border">
-                                          <div className="mb-4">
-                                            <p className="text-sub-gray">{option.description}</p>
+                                        <div className="bg-gray-50 p-3 md:p-4 border-t border-gray-border">
+                                          <div className="mb-3 md:mb-4">
+                                            <p className="text-sm md:text-base text-sub-gray">{option.description}</p>
                                           </div>
 
-                                          <h6 className="mb-2 font-medium">구성</h6>
+                                          <h6 className="mb-2 text-sm md:text-base font-medium">구성</h6>
                                           {option.details && option.details.length > 0 ? (
-                                            <ul className="space-y-2">
+                                            <ul className="space-y-1 md:space-y-2">
                                               {option.details.map((detail, index) => (
-                                                <li key={index} className="flex items-start">
+                                                <li key={index} className="flex items-start text-sm md:text-base">
                                                   <span className="mr-2 text-main-color">•</span>
                                                   <span>{detail}</span>
                                                 </li>
                                               ))}
                                             </ul>
                                           ) : (
-                                            <p className="text-sub-gray">구성 정보가 없습니다.</p>
+                                            <p className="text-sm md:text-base text-sub-gray">구성 정보가 없습니다.</p>
                                           )}
                                         </div>
                                       )}
@@ -961,27 +976,38 @@ const DonateDock = () => {
                               </div>
                             </>
                           ) : (
-                            <div className="flex flex-col items-center justify-center h-full py-12">
-                              <p className="text-sub-gray text-lg">상품을 선택해주세요</p>
+                            <div className="flex flex-col items-center justify-center h-full py-8 md:py-12">
+                              <p className="text-base md:text-lg text-sub-gray">상품을 선택해주세요</p>
                             </div>
                           )}
                         </div>
 
-                        {/* 총 금액 영역 - 하단에 고정 */}
-                        <div className="border-t border-gray-border p-4">
+                        {/* 총 금액 영역 */}
+                        <div className="border-t border-gray-border p-3 md:p-4">
                           <div className="flex justify-between items-center">
-                            <span className="font-medium">합계</span>
-                            <span className="text-xl font-bold text-main-color">{getTotalPrice()}원</span>
+                            <span className="text-sm md:text-base font-medium">합계</span>
+                            <span className="text-base md:text-xl font-bold text-main-color">{getTotalPrice()}원</span>
                           </div>
                         </div>
                       </div>
                     </div>
 
+                    {/* 모바일: 선택한 상품 보기 버튼 */}
+                    <div className="block md:hidden mt-4">
+                      <button
+                        className="w-full rounded-lg border border-main-color text-main-color py-2 text-sm font-medium"
+                        onClick={toggleOrderSummaryPopover}
+                        type="button"
+                      >
+                        선택한 상품 보기
+                      </button>
+                    </div>
+
                     {/* 다음 단계 버튼 */}
-                    <div className="mt-8 bg-white pb-8">
+                    <div className="mt-6 md:mt-8 bg-white pb-6 md:pb-8">
                       <div className="flex justify-end">
                         <PrimaryButton
-                          className={`rounded-xl px-8 py-3 font-medium ${
+                          className={`w-full md:w-auto rounded-lg md:rounded-xl px-6 md:px-8 py-3 md:py-4 text-sm md:text-base font-medium ${
                             selectedOptions.length > 0
                               ? "bg-main-color text-white hover:bg-secondary-color-dark"
                               : "bg-gray-border text-sub-gray cursor-not-allowed"
@@ -996,32 +1022,31 @@ const DonateDock = () => {
                   </div>
                 ) : (
                   // 2단계: 결제 및 배송지 정보
-                  <div className="space-y-6">
+                  <div className="space-y-4 md:space-y-6">
                     {/* 결제 수단 */}
                     <div>
-                      <h3 className="mb-4 text-lg font-medium">결제 수단</h3>
+                      <h3 className="mb-3 md:mb-4 text-base md:text-lg font-medium">결제 수단</h3>
                       <div
-                        className={`inline-block cursor-pointer rounded-xl border px-16 p-4 transition-all ${
+                        className={`inline-block cursor-pointer rounded-lg md:rounded-xl border px-12 md:px-16 p-3 md:p-4 transition-all ${
                           selectedPay === "kakaopay"
                             ? "border-2 border-main-color"
                             : "border-gray-border hover:border-main-color"
                         }`}
                         onClick={() => handlePaySelect("kakaopay")}
                       >
-                        <span className="font-medium">카카오페이</span>
+                        <span className="text-sm md:text-base font-medium">카카오페이</span>
                       </div>
                     </div>
 
-                    {/* 배송지 선택 - 가로 스크롤로 변경 */}
+                    {/* 배송지 선택 */}
                     <div>
-                      <h3 className="mb-4 text-lg font-medium">배송지 선택</h3>
-
+                      <h3 className="mb-3 md:mb-4 text-base md:text-lg font-medium">배송지 선택</h3>
                       <div className="relative">
-                        <div className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide">
+                        <div className="flex overflow-x-auto pb-3 md:pb-4 space-x-3 md:space-x-4 scrollbar-hide">
                           {addresses.map((address) => (
                             <div
                               key={address.id}
-                              className={`flex-shrink-0 w-60 cursor-pointer rounded-xl border p-4 transition-all ${
+                              className={`flex-shrink-0 w-48 md:w-60 cursor-pointer rounded-lg md:rounded-xl border p-3 md:p-4 transition-all ${
                                 selectedAddress === address.id
                                   ? "border-2 border-main-color"
                                   : "border-gray-border hover:border-main-color"
@@ -1029,17 +1054,17 @@ const DonateDock = () => {
                               onClick={() => handleAddressSelect(address.id)}
                             >
                               <div className="flex items-center justify-between mb-2 overflow-hidden">
-                                <h4 className="font-bold line-clamp-1 whitespace-pre-wrap break-words">
+                                <h4 className="text-sm md:text-base font-bold line-clamp-1 whitespace-pre-wrap break-words">
                                   {address.zipcode}
                                 </h4>
                                 {address.isDefault && (
-                                  <span className="text-xs bg-gray-100 text-sub-gray px-2 py-1 rounded-full">
+                                  <span className="text-xs bg-gray-100 text-sub-gray px-2 py-0.5 md:py-1 rounded-full">
                                     기본 배송지
                                   </span>
                                 )}
                               </div>
                               <div className="overflow-hidden">
-                                <p className="line-clamp-2 text-sub-gray whitespace-pre-wrap break-words">
+                                <p className="text-xs md:text-sm line-clamp-2 text-sub-gray whitespace-pre-wrap break-words">
                                   {address.address} {address.detailAddress}
                                 </p>
                               </div>
@@ -1048,12 +1073,12 @@ const DonateDock = () => {
 
                           {/* 배송지 추가 버튼 */}
                           <div
-                            className="flex-shrink-0 w-60 border border-dashed border-gray-border rounded-xl p-4 flex items-center justify-center cursor-pointer hover:bg-gray-50 relative"
+                            className="flex-shrink-0 w-48 md:w-60 border border-dashed border-gray-border rounded-lg md:rounded-xl p-3 md:p-4 flex items-center justify-center cursor-pointer hover:bg-gray-50 relative"
                             onClick={() => addNewAddress()}
                           >
                             <div className="flex flex-col items-center text-sub-gray">
-                              <Plus className="w-10 h-10 mb-2" />
-                              <span className="text-sm font-medium">배송지 추가</span>
+                              <Plus className="w-8 h-8 md:w-10 md:h-10 mb-1 md:mb-2" />
+                              <span className="text-xs md:text-sm font-medium">배송지 추가</span>
                             </div>
                           </div>
                         </div>
@@ -1061,53 +1086,50 @@ const DonateDock = () => {
                     </div>
 
                     {/* 주문 요약 */}
-                    <div className="rounded-xl border border-gray-border p-4">
-                      <h3 className="mb-4 text-lg font-medium">주문 요약</h3>
-
-                      <div className="space-y-4">
-                        {/* 총 선택 상품 개수만 표시 */}
+                    <div className="rounded-lg md:rounded-xl border border-gray-border p-3 md:p-4">
+                      <h3 className="mb-3 md:mb-4 text-base md:text-lg font-medium">주문 요약</h3>
+                      <div className="space-y-3 md:space-y-4">
                         <div className="flex mb-0 justify-between items-center">
                           <button
                             ref={orderSummaryMoreRef}
                             onClick={toggleOrderSummaryPopover}
-                            className="text-main-color hover:text-main-color font-medium flex items-center"
+                            className="text-sm md:text-base text-main-color hover:text-main-color font-medium flex items-center"
                           >
                             선택한 상품 {selectedOptions.length}개 보기
                             <ChevronRight
-                              className={`ml-1 h-4 w-4 transition-transform ${
+                              className={`ml-1 h-3 w-3 md:h-4 md:w-4 transition-transform ${
                                 showOrderSummaryPopover ? "rotate-180" : ""
                               }`}
                             />
                           </button>
                         </div>
 
-                        <div className="pt-2 flex justify-between text-sub-gray">
+                        <div className="pt-2 flex justify-between text-sm md:text-base text-sub-gray">
                           <span>배송비</span>
                           <span>무료</span>
                         </div>
                       </div>
 
-                      <div className="mt-4 border-t border-gray-border pt-4">
+                      <div className="mt-3 md:mt-4 border-t border-gray-border pt-3 md:pt-4">
                         <div className="flex justify-between">
-                          <span className="font-medium">총 결제 금액</span>
-                          <span className="text-xl font-bold">{getTotalPrice()}원</span>
+                          <span className="text-sm md:text-base font-medium">총 결제 금액</span>
+                          <span className="text-base md:text-xl font-bold">{getTotalPrice()}원</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* 결제 오류 메시지 표시 */}
+                    {/* 결제 오류 메시지 */}
                     {paymentError && (
-                      <div className="rounded-xl bg-red-50 p-4 text-red-500">
+                      <div className="rounded-lg md:rounded-xl bg-red-50 p-3 md:p-4 text-sm md:text-base text-red-500">
                         <p>{paymentError}</p>
                       </div>
                     )}
 
                     {/* 하단 결제 정보 및 버튼 */}
-                    <div className="mt-8 bg-white pb-8">
-                      {/* 버튼 영역 */}
-                      <div className="flex justify-end space-x-4">
+                    <div className="mt-6 md:mt-8 bg-white pb-6 md:pb-8">
+                      <div className="flex flex-col md:flex-row justify-end gap-3 md:gap-4">
                         <PrimaryButton
-                          className={`rounded-xl bg-main-color px-8 py-3 font-medium text-white hover:bg-secondary-color-dark ${
+                          className={`w-full md:w-auto rounded-lg md:rounded-xl bg-main-color px-6 md:px-8 py-3 md:py-4 text-sm md:text-base font-medium text-white hover:bg-secondary-color-dark ${
                             isProcessingPayment ? "opacity-70 cursor-not-allowed" : ""
                           }`}
                           onClick={handlePayment}
@@ -1116,7 +1138,7 @@ const DonateDock = () => {
                           {isProcessingPayment ? "처리 중..." : "후원하기"}
                         </PrimaryButton>
                         <CancelButton
-                          className="rounded-xl bg-cancel-background px-8 py-3 font-medium text-white hover:bg-cancel-background-dark"
+                          className="w-full md:w-auto rounded-lg md:rounded-xl bg-cancel-background px-6 md:px-8 py-3 md:py-4 text-sm md:text-base font-medium text-white hover:bg-cancel-background-dark"
                           onClick={goToPreviousStep}
                           disabled={isProcessingPayment}
                         >
@@ -1145,54 +1167,83 @@ const DonateDock = () => {
         saveNewAddress={saveNewAddress}
       />
 
-      {/* 주문 요약 더보기 팝오버 */}
-      {showOrderSummaryPopover && (
-        <div
-          id="order-summary-popover"
-          className="fixed bg-white rounded-xl border border-gray-border p-4 shadow-lg z-40 w-80"
-          style={{
-            top: `${orderSummaryPopoverPosition.top}px`,
-            left: `${orderSummaryPopoverPosition.left}px`,
-          }}
-        >
-          <div className="flex justify-between items-center mb-3">
-            <h4 className="text-lg font-medium">전체 주문 항목</h4>
-            <button onClick={() => setShowOrderSummaryPopover(false)} className="text-sub-gray hover:text-sub-gray">
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-
-          <div className="max-h-[300px] overflow-y-auto">
-            <div className="space-y-1">
-              {selectedOptions.map((optionId) => {
-                const option = projectOptions.find((opt) => opt.id === optionId)
-                if (!option) return null
-
-                const quantity = quantities[optionId]?.quantity || 0
-                const price = Number.parseInt(option.price.replace(/,/g, ""), 10)
-                const itemTotal = price * quantity
-
-                return (
-                  <div key={optionId} className="flex justify-between items-center py-2">
-                    <div>
-                      <span className="font-medium">{option.title}</span>
-                      <span className="text-sub-gray ml-2">{quantity}개</span>
-                    </div>
-                    <span>{itemTotal.toLocaleString()}원</span>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className="mt-3 pt-3 border-t border-gray-border">
-            <div className="flex justify-between items-center">
-              <span className="font-medium">합계</span>
-              <span className="text-lg font-bold text-main-color">{getTotalPrice()}원</span>
-            </div>
+      {/* 모바일: 주문 요약 모달 */}
+      <Modal
+        isOpen={isMobile && showOrderSummaryPopover}
+        onClose={() => setShowOrderSummaryPopover(false)}
+        title="전체 주문 항목"
+        size="sm"
+        className={isMobile ? 'block' : 'hidden'}
+      >
+        <div className="max-h-72 overflow-y-auto mb-4">
+          <div className="space-y-2">
+            {selectedOptions.map((optionId) => {
+              const option = projectOptions.find((opt) => opt.id === optionId)
+              if (!option) return null
+              const quantity = quantities[optionId]?.quantity || 0
+              const price = Number.parseInt(option.price.replace(/,/g, ''), 10)
+              const itemTotal = price * quantity
+              return (
+                <div key={optionId} className="flex justify-between items-center py-2">
+                  <span className="text-sm font-medium truncate max-w-[60%]" title={option.title}>{option.title}</span>
+                  <span className="flex flex-row items-center flex-shrink-0 min-w-[120px] justify-end text-right">
+                    <span className="text-xs text-sub-gray mr-2">{quantity}개</span>
+                    <span className="text-sm font-bold">{itemTotal.toLocaleString()}원</span>
+                  </span>
+                </div>
+              )
+            })}
           </div>
         </div>
-      )}
+        <div className="border-t border-gray-border pt-2">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium">합계</span>
+            <span className="text-base font-bold text-main-color">{getTotalPrice()}원</span>
+          </div>
+        </div>
+      </Modal>
+      <div
+        id="order-summary-popover"
+        className={isMobile ? 'hidden' : 'md:fixed md:bg-white md:rounded-xl md:border md:border-gray-border md:p-4 md:shadow-lg md:z-40 md:w-80'}
+        style={{
+          top: `${orderSummaryPopoverPosition.top}px`,
+          left: `${orderSummaryPopoverPosition.left}px`,
+          display: !isMobile && showOrderSummaryPopover ? undefined : 'none',
+        }}
+      >
+        <div className="flex justify-between items-center mb-3">
+          <h4 className="text-lg font-medium">전체 주문 항목</h4>
+          <button onClick={() => setShowOrderSummaryPopover(false)} className="text-sub-gray hover:text-sub-gray">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <div className="max-h-[300px] overflow-y-auto">
+          <div className="space-y-1">
+            {selectedOptions.map((optionId) => {
+              const option = projectOptions.find((opt) => opt.id === optionId)
+              if (!option) return null
+              const quantity = quantities[optionId]?.quantity || 0
+              const price = Number.parseInt(option.price.replace(/,/g, ''), 10)
+              const itemTotal = price * quantity
+              return (
+                <div key={optionId} className="flex justify-between items-center py-2">
+                  <span className="text-base font-medium truncate max-w-[75%]" title={option.title}>{option.title}</span>
+                  <span className="flex flex-row items-center flex-shrink-0 min-w-[120px] justify-end text-right">
+                    <span className="text-sm text-sub-gray mr-2">{quantity}개</span>
+                    <span className="text-base font-bold">{itemTotal.toLocaleString()}원</span>
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+        <div className="mt-3 pt-3 border-t border-gray-border">
+          <div className="flex justify-between items-center">
+            <span className="text-base font-medium">합계</span>
+            <span className="text-lg font-bold text-main-color">{getTotalPrice()}원</span>
+          </div>
+        </div>
+      </div>
 
       {/* 결제 완료 모달 */}
       <PaymentCompleteModal />
