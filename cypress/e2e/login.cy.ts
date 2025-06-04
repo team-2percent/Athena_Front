@@ -31,6 +31,11 @@ describe("로그인", () => {
         }
       })
 
+      cy.intercept({
+        method: "POST",
+        url: "/api/fcm/register"
+      })
+
       // when - 로그인 요청
       cy.get('@loginModal').get('[data-cy="email-input"]').type("test@test.com")
       cy.get('@loginModal').get('[data-cy="password-input"]').type("Abc1234%") 

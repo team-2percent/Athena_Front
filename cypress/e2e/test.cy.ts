@@ -22,6 +22,11 @@ describe('Cypress 테스트', () => {
       fixture: 'categoryRankingView.json'
     }).as('getCategoryRankingView')
 
+    cy.intercept({
+      method: "POST",
+      url: "/api/fcm/register"
+    })
+
     // intercept를 사용할 경우 새로고침은 제대로 동작하지 않으므로 사용하지 않음
 
     cy.get('header').get('[data-cy="open-login-modal-button"]').should('be.visible').click()

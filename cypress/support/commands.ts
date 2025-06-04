@@ -3,6 +3,11 @@
 import { jwtDecode } from "jwt-decode";
 
 Cypress.Commands.add('login', () => {
+    cy.intercept({
+      method: "POST",
+      url: "/api/fcm/register"
+    })
+
     cy.window().then((win: Window) => {
         win.localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NyIsInJvbGUiOiJST0xFX1VTRVIiLCJuaWNrbmFtZSI6IuqwgOyehe2FjOyKpO2KuCIsImlhdCI6MTc0ODk2ODQ0MSwiZXhwIjoxNzQ5NTczMjQxfQ.8QkpyGU8Mf9Mh2xSTzlmHCapyxQZONR81ZHcv_GQ2b4");
         win.localStorage.setItem('userId', "57");
@@ -25,7 +30,6 @@ Cypress.Commands.add('visitMainPage', () => {
     }, {
       fixture: 'categoryRankingView.json'
     }).as('getCategoryRankingView')
-
     cy.visit('/')
 })
 //
