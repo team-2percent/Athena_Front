@@ -382,8 +382,15 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                         </div>
                       ))
                     ) : (
-                      <div className="flex justify-center py-8">
-                        <p className="text-sm md:text-base text-sub-gray">아직 리뷰가 없습니다. 프로젝트를 후원하고 리뷰를 작성해 보세요!</p>
+                      <div className="flex justify-center md:py-4">
+                        {/* 데스크톱: 한 줄 */}
+                        <p className="hidden md:block text-sm md:text-base text-sub-gray">
+                          아직 리뷰가 없습니다. 프로젝트를 후원하고 리뷰를 작성해 보세요!
+                        </p>
+                        {/* 모바일: 두 줄 */}
+                        <span className="block md:hidden text-center text-sm text-sub-gray">
+                          아직 리뷰가 없습니다.<br />프로젝트를 후원하고 리뷰를 작성해 보세요!
+                        </span>
                       </div>
                     )}
                   </div>
