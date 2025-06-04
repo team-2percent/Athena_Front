@@ -16,6 +16,7 @@ interface ModalButtonProps {
   children: ReactNode
   className?: string
   disabled?: boolean
+  dataCy?: string
 }
 
 // 텍스트 스타일 컴포넌트 추가
@@ -26,7 +27,7 @@ interface ModalTextProps {
 }
 
 // Modal 컴포넌트 내부에 다음 컴포넌트들을 추가합니다 (export default function Modal 위에 추가)
-function ModalButton({ onClick, variant = "primary", children, className = "", disabled = false }: ModalButtonProps) {
+function ModalButton({ onClick, variant = "primary", children, className = "", disabled = false, dataCy }: ModalButtonProps) {
   const baseStyles = "px-4 py-2 rounded-lg font-medium transition-colors"
 
   const variantStyles = {
@@ -42,6 +43,7 @@ function ModalButton({ onClick, variant = "primary", children, className = "", d
       onClick={onClick}
       disabled={disabled}
       className={clsx(baseStyles, variantStyles[variant], disabled && "opacity-50 cursor-not-allowed", className)}
+      data-cy={dataCy}
     >
       {children}
     </button>
@@ -214,6 +216,7 @@ export default function Modal({
                   onClick={onClose}
                   className="text-gray-500 hover:text-gray-700 transition-colors"
                   aria-label="닫기"
+                  data-cy="modal-close-button"
                 >
                   <X className="h-6 w-6" />
                 </button>

@@ -19,6 +19,7 @@ interface PurchasedProjectItemProps {
   achievementRate: number
   projectId: number
   hasCommented: boolean
+  loadOrders: () => void
 }
 
 export default function PurchasedProjectItem({
@@ -32,6 +33,7 @@ export default function PurchasedProjectItem({
   achievementRate,
   projectId,
   hasCommented,
+  loadOrders
 }: PurchasedProjectItemProps) {
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false)
   const router = useRouter()
@@ -55,7 +57,7 @@ export default function PurchasedProjectItem({
 
   return (
     <>
-      <div className="mb-8">
+      <div className="mb-8" data-cy="order-item">
         <div className="flex gap-6 relative">
           {/* 상품 이미지 */}
           <div className="relative w-60 h-60 flex-shrink-0">
@@ -118,6 +120,7 @@ export default function PurchasedProjectItem({
                   className="flex items-center gap-2 px-4 py-2 transition-colors w-full justify-center"
                   disabled={hasCommented}
                   onClick={handleReviewClick}
+                  dataCy="write-review-button"
                 >
                   <MessageSquare className="h-5 w-5" />
                   <span>{hasCommented ? "후기 작성 완료" : "후기 작성"}</span>
@@ -136,6 +139,7 @@ export default function PurchasedProjectItem({
           projectId={projectId}
           projectName={projectName}
           sellerName={sellerName}
+          load={loadOrders}
         />
       )}
     </>

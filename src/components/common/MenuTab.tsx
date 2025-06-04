@@ -31,7 +31,7 @@ export default function MenuTab({size="base", tabs, activeTab, onClickTab, class
         }
     }, [activeTab, tabs.length])
 
-    return <nav className={clsx("flex space-x-8 relative", className)}>
+    return <nav className={clsx("flex space-x-8 relative", className)} data-cy="menu-tab">
         {tabs.map((tab, idx) => (
             <button
                 type="button"
@@ -42,6 +42,7 @@ export default function MenuTab({size="base", tabs, activeTab, onClickTab, class
                 sizeDesign.button[size]
                 )}
                 onClick={() => onClickTab(tab)}
+                data-cy={`menu-tab-${tab}`}
             >
                 {tab}
             </button>

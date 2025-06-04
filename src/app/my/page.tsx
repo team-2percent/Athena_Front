@@ -13,6 +13,8 @@ export default function ProfilePage() {
   const router = useRouter()
   const { apiCall, isLoading } = useApi()
   const userId = useAuthStore((state) => state.userId)
+  const [isReady, setIsReady] = useState(false)
+
   const [userProfile, setUserProfile] = useState<UserProfile>({
     email: "",
     nickname: "",
@@ -41,8 +43,16 @@ export default function ProfilePage() {
   }
 
   useEffect(() => {
-    loadUserInfo()
-  }, [userId])
+    if (userId !== null) {
+      setIsReady(true);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (isReady) {
+      loadUserInfo()
+    }
+  }, [isReady, userId])
 
   const handleClickEditProfile = () => {
     router.push("/my/edit")
@@ -60,6 +70,7 @@ export default function ProfilePage() {
               <SecondaryButton
                 onClick={handleClickEditProfile}
                 className="px-8 py-3"
+                dataCy="edit-profile-button"
               >
                 프로필 편집
               </SecondaryButton>

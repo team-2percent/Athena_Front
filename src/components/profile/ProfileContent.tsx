@@ -174,6 +174,34 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
     }
   }
 
+  const loadMyOrdersAfterWriteReview = async () => {
+    if (isLoadingOrders) return
+
+    setIsLoadingOrders(true)
+
+    try {
+      const url = `/api/my/order`
+      const response = await apiCall(url, "GET")
+
+      // API 응답 구조에 맞게 데이터 처리
+      const responseData = response.data as MyOrdersResponse
+      console.log("구매 상품 데이터:", responseData)
+
+      if (responseData && responseData.content) {
+        // 완전히 처음부터 불러오기
+        setMyOrders(() => [...responseData.content])
+
+        // 다음 페이지 정보 설정
+        setOrderCursorValue(responseData.nextCursorValue)
+        setLastOrderId(responseData.nextOrderId)
+      }
+    } catch (error) {
+      console.error("구매 상품 조회에 실패했습니다.", error)
+    } finally {
+      setIsLoadingOrders(false)
+    }
+  }
+
   // 쿠폰 불러오기
   const loadUserCoupons = async () => {
     if (isLoadingCoupons) return
@@ -374,14 +402,15 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
           className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "소개" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
         >
           <div className="mb-8">
-            <p className="text-sub-gray mb-8 whitespace-pre-wrap break-words">{sellerDescription || "소개글이 없습니다."}</p>
+            <p className="text-sub-gray mb-8 whitespace-pre-wrap break-words" data-cy="profile-seller-description">{sellerDescription || "소개글이 없습니다."}</p>
             {/* 링크 목록 */}
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4" data-cy="profile-link-list">
               {linkUrl && linkUrl.split(",").map(url => (
                 <Link
                   href={`${url}`}
                   target="_blank"
                   className="px-6 py-3 border border-main-color text-main-color rounded-full hover:bg-secondary-color transition-colors"
+                  data-cy="profile-link"
                 >
                   {url}
                 </Link>
@@ -447,6 +476,7 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
                   achievementRate={order.achievementRate}
                   projectId={order.projectId}
                   hasCommented={order.hasCommented || false}
+                  loadOrders={loadMyOrdersAfterWriteReview}
                 />
               ))}
               {/* 무한 스크롤을 위한 로더 */}

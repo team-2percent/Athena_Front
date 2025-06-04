@@ -55,12 +55,12 @@ export default function ProjectItem({
   }
 
   return (
-    <div className="mb-8">
+    <div className="mb-8" data-cy="project-item">
       <div className="flex gap-6 relative">
         {/* 상품 이미지 */}
         <div className="relative w-60 h-60 flex-shrink-0">
           {/* 상품 이미지 클릭 시 상품 상세 페이지로 이동 */}
-          <div className="w-full h-full cursor-pointer" onClick={handleProjectClick}>
+          <div className="w-full h-full cursor-pointer" onClick={handleProjectClick} data-cy="project-image">
             <img
               src={imageUrl || "/placeholder.svg"}
               alt={projectName}
@@ -84,14 +84,17 @@ export default function ProjectItem({
 
         {/* 상품 정보 */}
         <div className="flex-1 flex flex-col w-64">
-          <div className="mb-1 text-sub-gray">{sellerName}</div>
-          <h3 className="text-xl font-medium mb-1">{projectName}</h3>
-          <p className="text-gray-700 mb-2">{createdAt} 에 생성됨</p>
+          <div className="mb-1 text-sub-gray" data-cy="project-seller-name">{sellerName}</div>
+          <h3 className="text-xl font-medium mb-1" data-cy="project-name">{projectName}</h3>
+          <p className="text-gray-700 mb-2" data-cy="project-created-at">{createdAt} 에 생성됨</p>
 
           {/* 달성률 게이지 */}
           <div className="mt-auto">
             <div className="flex justify-between mb-1">
-              <span className={`font-bold ${isCompleted ? "text-sub-gray" : "text-main-color"}`}>
+              <span
+                className={`font-bold ${isCompleted ? "text-sub-gray" : "text-main-color"}`}
+                data-cy="project-achievement-rate"
+              >
                 {achievementRate}% 달성{isCompleted ? "" : "!"}
               </span>
             </div>
@@ -106,9 +109,9 @@ export default function ProjectItem({
             {/* 남은 일수 또는 종료 메시지 */}
             <div className="text-right mt-1">
               {isCompleted ? (
-                <span className="text-sub-gray">종료되었어요.</span>
+                <span className="text-sub-gray" data-cy="project-end-message">종료되었어요.</span>
               ) : (
-                <span className="text-sub-gray">{daysLeft}일 남았어요.</span>
+                <span className="text-sub-gray" data-cy="project-days-left">{daysLeft}일 남았어요.</span>
               )}
             </div>
 
@@ -118,6 +121,7 @@ export default function ProjectItem({
                 <PrimaryButton
                   className="flex w-full items-center justify-center gap-2 px-4 py-2"
                   onClick={handleEditClick}
+                  dataCy="edit-button"
                 >
                   <Pencil className="h-5 w-5" />
                   <span>수정</span>
@@ -125,6 +129,7 @@ export default function ProjectItem({
                 <SecondaryButton
                   className="flex w-full items-center justify-center gap-2 px-4 py-2"
                   onClick={(e) => onClickDelete?.(e, id)}
+                  dataCy="delete-button"
                 >
                   <Trash className="h-5 w-5" />
                   <span>삭제</span>

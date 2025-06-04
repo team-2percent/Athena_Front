@@ -2,9 +2,14 @@
 
 import type React from "react"
 
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { useApi } from "@/hooks/useApi"
 import Modal from "@/components/common/Modal"
+import TextArea from "../common/TextArea"
+import { reviewContentSchema } from "@/lib/validationSchemas"
+import { REVIEW_CONTENT_MAX_LENGTH } from "@/lib/validationConstant"
+import InputInfo from "../common/InputInfo"
+import { CancelButton, PrimaryButton } from "../common/Button"
 
 interface ReviewFormProps {
   isOpen: boolean
@@ -12,19 +17,27 @@ interface ReviewFormProps {
   projectId: number
   projectName: string
   sellerName: string
+  load: () => void
 }
 
-export default function ReviewForm({ isOpen, onClose, projectId, projectName, sellerName }: ReviewFormProps) {
+export default function ReviewForm({ isOpen, onClose, projectId, projectName, sellerName, load }: ReviewFormProps) {
   const { apiCall, isLoading: apiLoading } = useApi()
   const [reviewContent, setReviewContent] = useState("")
-  const [reviewsError, setReviewsError] = useState<string | null>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [reviewsError, setReviewsError] = useState<string>("")
 
-  // 모달이 열릴 때 텍스트 영역에 포커스
-  const handleAfterOpen = () => {
-    if (textareaRef.current) {
-      textareaRef.current.focus()
+  const validate = (content: string) => {
+    const result = reviewContentSchema.safeParse(content)
+    if (!result.success) {
+      setReviewsError(result.error.message)
+      return content.slice(0, REVIEW_CONTENT_MAX_LENGTH)
     }
+    setReviewsError("")
+    return content
+  }
+
+  const handleChangeReviewContent = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const result = validate(e.target.value)
+    setReviewContent(result)
   }
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
@@ -34,8 +47,11 @@ export default function ReviewForm({ isOpen, onClose, projectId, projectName, se
 
     try {
       const { data, error, status } = await apiCall(
-        `/api/comment/create?projectId=${projectId}&content=${encodeURIComponent(reviewContent)}`,
+        `/api/comment/create?projectId=${projectId}`,
         "POST",
+        {
+          content: reviewContent
+        }
       )
 
       if (error) {
@@ -48,6 +64,7 @@ export default function ReviewForm({ isOpen, onClose, projectId, projectName, se
 
       // 리뷰 제출 후 입력 필드 초기화 및 리뷰 목록 새로고침
       setReviewContent("")
+      load()
     } catch (err) {
       setReviewsError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.")
       console.error("리뷰 제출 오류:", err)
@@ -55,7 +72,7 @@ export default function ReviewForm({ isOpen, onClose, projectId, projectName, se
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="후기 작성" size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title="후기 작성" size="lg" dataCy="review-form">
       <div className="mb-4">
         <p className="font-medium">{projectName}</p>
         <p className="text-sub-gray text-sm">{sellerName}</p>
@@ -63,29 +80,37 @@ export default function ReviewForm({ isOpen, onClose, projectId, projectName, se
 
       <form onSubmit={handleReviewSubmit}>
         <div className="mb-4">
-          <textarea
-            ref={textareaRef}
-            className="w-full h-40 p-3 border border-gray-300 rounded-lg focus:border-none focus:outline-none focus:ring-2 focus:ring-main-color"
-            placeholder="상품에 대한 후기를 작성해주세요."
+          <TextArea
             value={reviewContent}
-            onChange={(e) => setReviewContent(e.target.value)}
+            onChange={handleChangeReviewContent}
+            placeholder="상품에 대한 후기를 작성해주세요."
+            isError={!!reviewsError}
+            dataCy="review-content"
+          />
+          <InputInfo
+            errorMessage={reviewsError}
+            errorMessageDataCy="content-error-message"
+            showLength
+            maxLength={REVIEW_CONTENT_MAX_LENGTH}
+            length={reviewContent.length}
           />
         </div>
 
         <div className="flex justify-end gap-3">
-          <button
+          <CancelButton
             type="button"
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
             onClick={onClose}
+            dataCy="cancel-button"
           >
             취소
-          </button>
-          <button
+          </CancelButton>
+          <PrimaryButton
             type="submit"
-            className="px-4 py-2 bg-main-color text-white rounded-lg hover:bg-secondary-color-dark transition-colors"
+            dataCy="submit-button"
+            disabled={!reviewContent.trim() || !!reviewsError}
           >
             등록하기
-          </button>
+          </PrimaryButton>
         </div>
       </form>
     </Modal>
