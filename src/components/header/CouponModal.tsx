@@ -10,7 +10,7 @@ interface CouponProps {
 
 export default function CouponModal({ isOpen, onClose }: CouponProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="할인 쿠폰" size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title="할인 쿠폰" size="lg" dataCy="coupon-event-modal">
       <div className="space-y-3 max-h-120 overflow-y-auto">
         <CouponList />
       </div>

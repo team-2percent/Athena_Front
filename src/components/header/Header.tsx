@@ -176,7 +176,7 @@ const Header = () => {
     if (isLoading) {
       return <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" onClick={handleProfileClick}/>
     } 
-    return (<button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick}>
+    return (<button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick} data-cy="user-profile-image">
               {
                 user?.imageUrl ?
                 <img
@@ -255,12 +255,13 @@ const Header = () => {
                 type="button" 
                 aria-label="쿠폰"
                 onClick={handleCouponClick}
+                data-cy="coupon-event-modal-button"
               >
                 <Percent className="h-6 w-6 text-sub-gray" />
               </button>
               <div className="relative flex items-center space-x-3">
                 {!isLoading ?
-                  <span className="text-sm font-medium whitespace-nowrap">{user?.nickname}</span>
+                  <span className="text-sm font-medium whitespace-nowrap" data-cy="user-nickname">{user?.nickname}</span>
                   :
                   <div className="h-5 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
                 }
@@ -268,7 +269,10 @@ const Header = () => {
                 {renderProfile()}
                   {
                     showAuthMenu &&
-                    <div className="absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 transition-all duration-200 min-w-[220px] text-left">
+                    <div
+                      className="absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 transition-all duration-200 min-w-[220px] text-left"
+                      data-cy="user-menu"
+                    >
                       <div className="text-xs text-gray-400 font-semibold my-2 pl-1">설정</div>
                       {isAdmin &&
                         <button
@@ -284,6 +288,7 @@ const Header = () => {
                         type="button"
                         onClick={handleClickMyPage}
                         className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
+                        data-cy="mypage-button"
                       >
                         <User className="h-4 w-4" />
                         마이페이지
@@ -292,6 +297,7 @@ const Header = () => {
                           type="button"
                           onClick={handleLogout}
                           className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
+                          data-cy="logout-button"
                       >
                           <LogOut className="h-4 w-4" />
                           로그아웃

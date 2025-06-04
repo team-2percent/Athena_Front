@@ -2,21 +2,13 @@
 
 import { jwtDecode } from "jwt-decode";
 
-Cypress.Commands.add('login', (email: string, password: string) => {
-    cy.request('POST', '/api/user/login', {
-      email,
-      password,
-    }).then((res) => {
-        const { accessToken, userId } = res.body;
-        const { role } = jwtDecode<{ role: string }>(accessToken);
-    
-        cy.window().then((win) => {
-          win.localStorage.setItem('accessToken', accessToken);
-          win.localStorage.setItem('userId', userId.toString());
-        });
+Cypress.Commands.add('login', () => {
+    cy.window().then((win) => {
+        win.localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NyIsInJvbGUiOiJST0xFX1VTRVIiLCJuaWNrbmFtZSI6IuqwgOyehe2FjOyKpO2KuCIsImlhdCI6MTc0ODk2ODQ0MSwiZXhwIjoxNzQ5NTczMjQxfQ.8QkpyGU8Mf9Mh2xSTzlmHCapyxQZONR81ZHcv_GQ2b4");
+        win.localStorage.setItem('userId', "57");
+      });
 
-        cy.reload(); // zustand에서 인식
-    });
+      cy.reload(); // zustand에서 인식
 })
 
 Cypress.Commands.add('visitMainPage', () => {
@@ -52,7 +44,7 @@ Cypress.Commands.add('visitMainPage', () => {
 declare global {
   namespace Cypress {
     interface Chainable {
-      login(email: string, password: string): Chainable<void>
+      login(): Chainable<void>
       visitMainPage(): Chainable<void>
     //   drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
     //   dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
