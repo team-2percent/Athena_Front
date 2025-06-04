@@ -15,9 +15,8 @@ describe("로그인", () => {
       }, {
         statusCode: 200,
         body: {
-          userId: 123,
-          email: "test@test.com",
-          nickname: "테스트유저"
+          accessToken: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NyIsInJvbGUiOiJST0xFX1VTRVIiLCJuaWNrbmFtZSI6IuqwgOyehe2FjOyKpO2KuCIsImlhdCI6MTc0ODk2ODQ0MSwiZXhwIjoxNzQ5NTczMjQxfQ.8QkpyGU8Mf9Mh2xSTzlmHCapyxQZONR81ZHcv_GQ2b4",
+          userId: 57
         }
       }).as('login')
 
@@ -34,8 +33,10 @@ describe("로그인", () => {
 
       // when - 로그인 요청
       cy.get('@loginModal').get('[data-cy="email-input"]').type("test@test.com")
-      cy.get('@loginModal').get('[data-cy="password-input"]').type("Abc1234%")
+      cy.get('@loginModal').get('[data-cy="password-input"]').type("Abc1234%") 
       cy.get('@loginModal').get('[data-cy="login-button"]').should('not.be.disabled').click()
+
+      cy.wait('@login');
 
       // then - 로그인 성공
       cy.get('@loginModal').should('not.exist')
@@ -43,6 +44,7 @@ describe("로그인", () => {
       cy.get('header').get('[data-cy="open-signup-modal-button"]').should('not.exist')
 
       cy.get('header').get('[data-cy="user-nickname"]').should('be.visible').should('have.text', '테스트유저')
+      cy.get('header').get('[data-cy="user-image-button"]').should('be.visible')
       cy.get('header').get('[data-cy="user-image"]').should('be.visible').should('have.attr', 'src').should('include', 'data:image/jpeg;base64')
     })
   })

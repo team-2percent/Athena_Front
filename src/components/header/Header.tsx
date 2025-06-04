@@ -172,30 +172,6 @@ const Header = () => {
     },
   ]
 
-  const renderProfile = () => {
-    if (isLoading) {
-      return <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" onClick={handleProfileClick}/>
-    } 
-    return (<button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick} data-cy="user-profile-image">
-              {
-                user?.imageUrl ?
-                <img
-                  src={user.imageUrl}
-                  alt="프로필 이미지"
-                  className="h-full w-full object-cover"
-                /> :
-                <Image
-                  src={"/placeholder/profile-placeholder.png"}
-                  alt="프로필 플레이스홀더"
-                  width={40}
-                  height={40}
-                  className="h-full w-full object-cover"
-                />
-              }
-            
-          </button>)
-  }
-
   useEffect(() => {
     if (isLoggedIn) loadUserInfo();
   }, [isLoggedIn])
@@ -216,7 +192,7 @@ const Header = () => {
   return (
     <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)] z-5">
       <CouponModal isOpen={showCouponModal} onClose={() => setShowCouponModal(false)} />
-      <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} moveToSignupModal={openSignupModalInLoginModal} dataCy="login-modal"/>
+      <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} moveToSignupModal={openSignupModalInLoginModal} />
       <SignupModal isOpen={showSignupModal} onClose={closeSignupModal} />
       <div className="container mx-auto px-4 py-4">
         {/* 상단 헤더 영역 */}
@@ -266,7 +242,17 @@ const Header = () => {
                   <div className="h-5 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
                 }
                 <div className="relative flex items-center" ref={authMenuRef}>
-                {renderProfile()}
+                {isLoading ?
+                  <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" /> :
+                  <button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick} data-cy="user-image-button">
+                    <img
+                      src={user?.imageUrl || "/placeholder/profile-placeholder.png"}
+                      alt="프로필 이미지"
+                      className="h-full w-full object-cover"
+                      data-cy="user-image"
+                    />
+                  </button>
+                  }
                   {
                     showAuthMenu &&
                     <div

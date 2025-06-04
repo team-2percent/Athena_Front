@@ -17,10 +17,9 @@ interface LoginModalProps {
   isOpen: boolean
   onClose: () => void
   moveToSignupModal: () => void
-  dataCy: string
 }
 
-export default function LoginModal({ isOpen, onClose, moveToSignupModal, dataCy }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, moveToSignupModal }: LoginModalProps) {
   const { apiCall } = useApi()
   const { login, setFcmToken } = useAuthStore()
   const [email, setEmail] = useState("")
@@ -86,7 +85,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal, dataCy 
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md" closeOnOutsideClick closeOnEsc title="로그인" dataCy={dataCy}>
+    <Modal isOpen={isOpen} onClose={onClose} size="md" closeOnOutsideClick closeOnEsc title="로그인" dataCy="login-modal">
       <div className="p-4">
         <form onSubmit={handleSubmit}>
           {/* Email Input */}
