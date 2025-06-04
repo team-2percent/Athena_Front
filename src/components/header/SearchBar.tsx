@@ -88,7 +88,7 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
   }
 
   return (
-    <div ref={searchRef} className="w-80 max-w-xl relative h-10">
+    <div ref={searchRef} className="w-full max-w-xl relative h-10">
       <div className="flex gap-2 rounded-full border border-gray-300 px-4 py-3 h-full">
         <input
           type="text"

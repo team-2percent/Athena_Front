@@ -18,35 +18,33 @@ export default function CouponList({ coupons }: { coupons: UserCoupon[] }) {
     }
 
     return (
-        <div className="flex flex-col gap-4" data-cy="coupon-list">
+        <div className="flex flex-col gap-3 sm:gap-4">
           {coupons.map((coupon) => (
-          <div className="rounded-2xl border border-gray-border flex overflow-hidden" key={coupon.id} data-cy="coupon-item">
+          <div className="rounded-xl sm:rounded-2xl border border-gray-border flex overflow-hidden min-h-[72px] sm:min-h-[100px]" key={coupon.id}  data-cy="coupon-list">
             {/* 왼쪽: 퍼센트 아이콘 */}
-            <div className={clsx("relative min-w-[70px] h-[100px] flex items-center justify-center", coupon.status === "UNUSED" ? "bg-main-color" : "bg-disabled-background")}>
-              <div className="absolute top-0 right-0 w-4 h-4 bg-white rounded-full translate-x-1/2 translate-y-[-50%]"></div>
-              <div className="absolute bottom-0 right-0 w-4 h-4 bg-white rounded-full translate-x-1/2 translate-y-[50%]"></div>
-              <Percent className="h-8 w-8 text-white" />
+            <div className={clsx("relative min-w-[48px] sm:min-w-[70px] flex items-stretch", coupon.status === "UNUSED" ? "bg-main-color" : "bg-disabled-background")}> 
+              <div className="flex flex-col justify-center h-full w-full">
+                <div className="relative flex items-center justify-center h-[72px] sm:h-[100px] w-[48px] sm:w-[70px]">
+                  <div className="absolute top-0 right-0 w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-full translate-x-1/2 translate-y-[-50%]"></div>
+                  <div className="absolute bottom-0 right-0 w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-full translate-x-1/2 translate-y-[50%]"></div>
+                  <Percent className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+                </div>
+              </div>
             </div>
       
             {/* 중앙: 쿠폰 제목 및 설명 */}
-            <div className="flex-1 p-4 flex flex-col justify-center">
-              <h3 className="text-lg font-bold" data-cy="coupon-title">{coupon.title}</h3>
-              <p className="text-sm text-sub-gray mt-1" data-cy="coupon-content">{coupon.content}</p>
+            <div className="flex-1 p-2 sm:p-4 flex flex-col justify-center">
+              <h3 className="text-base sm:text-lg font-bold"  data-cy="coupon-title">{coupon.title}</h3>
+              <p className="text-xs sm:text-sm text-sub-gray mt-1" data-cy="coupon-content">{coupon.content}</p>
             </div>
       
             {/* 구분선 */}
-            <div className="w-0 border-l border-dashed border-gray-border my-4"></div>
+            <div className="w-0 border-l border-dashed border-gray-border my-2 sm:my-4"></div>
       
             {/* 오른쪽: 금액 및 유효기간 */}
-            <div className="p-4 flex flex-col justify-center items-end w-60">
-              <p
-                className={clsx("text-xl font-bold", coupon.status === "UNUSED" ? "text-main-color" : "text-disabled-text")}
-                data-cy="coupon-price"
-              >{coupon.price} 원</p>
-              <p
-                className="text-xs text-sub-gray mt-1"
-                data-cy="coupon-status"
-              >
+            <div className="p-2 sm:p-4 flex flex-col justify-center items-end w-28 sm:w-60">
+              <p className={clsx("text-base sm:text-xl font-bold", coupon.status === "UNUSED" ? "text-main-color" : "text-disabled-text")} data-cy="coupon-price">{coupon.price} 원</p>
+              <p className="text-[10px] sm:text-xs text-sub-gray mt-1 text-right w-full" data-cy="coupon-status">
                 {couponStateMessage(coupon.status, coupon.expires)}
               </p>
             </div>
