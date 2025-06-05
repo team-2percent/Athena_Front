@@ -41,16 +41,16 @@ describe("로그인", () => {
       cy.get('@loginModal').get('[data-cy="password-input"]').type("Abc1234%") 
       cy.get('@loginModal').get('[data-cy="login-button"]').should('not.be.disabled').click()
 
-      cy.wait('@login', { timeout: 5000 })
+      cy.wait('@login').then(() => {
+        // then - 로그인 성공
+        cy.get('@loginModal').should('not.exist')
+        cy.get('header').get('[data-cy="open-login-modal-button"]').should('not.exist')
+        cy.get('header').get('[data-cy="open-signup-modal-button"]').should('not.exist')
 
-      // then - 로그인 성공
-      cy.get('@loginModal').should('not.exist')
-      cy.get('header').get('[data-cy="open-login-modal-button"]').should('not.exist')
-      cy.get('header').get('[data-cy="open-signup-modal-button"]').should('not.exist')
-
-      cy.get('header').get('[data-cy="user-nickname"]').should('be.visible').should('have.text', '테스트유저')
-      cy.get('header').get('[data-cy="user-image-button"]').should('be.visible')
-      cy.get('header').get('[data-cy="user-image"]').should('be.visible').should('have.attr', 'src').should('include', 'data:image/jpeg;base64')
+        cy.get('header').get('[data-cy="user-nickname"]').should('be.visible').should('have.text', '테스트유저')
+        cy.get('header').get('[data-cy="user-image-button"]').should('be.visible')
+        cy.get('header').get('[data-cy="user-image"]').should('be.visible').should('have.attr', 'src').should('include', 'data:image/jpeg;base64')
+      })
     })
   })
 

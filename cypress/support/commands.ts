@@ -31,15 +31,14 @@ Cypress.Commands.add('login', () => {
         cy.get('[data-cy="login-button"]').click()
     })
 
-    // 로그인 API 호출 대기
-    cy.wait('@login')
-
     // 토큰 저장
-    cy.window().then((win: Window) => {
+    cy.wait('@login').then(() => {
+      cy.window().then((win: Window) => {
         win.localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NyIsInJvbGUiOiJST0xFX1VTRVIiLCJuaWNrbmFtZSI6IuqwgOyehe2FjOyKpO2KuCIsImlhdCI6MTc0ODk2ODQ0MSwiZXhwIjoxNzQ5NTczMjQxfQ.8QkpyGU8Mf9Mh2xSTzlmHCapyxQZONR81ZHcv_GQ2b4");
         win.localStorage.setItem('userId', "57");
-    });
-
+      });
+    })
+  
     // 페이지 새로고침
     cy.reload()
 })

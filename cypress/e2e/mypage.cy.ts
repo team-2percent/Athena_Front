@@ -55,12 +55,12 @@ describe("마이페이지", () => {
 
         cy.visit("/my");
 
-        cy.wait(1000)
+        cy.get('[data-cy="profile-header"]', { timeout: 10000 }).should("be.visible").within(() => {
+            cy.get('[data-cy="profile-image"]').should("be.visible");
+            cy.get('[data-cy="profile-nickname"]').should("be.visible");
+        });
 
-        cy.get('[data-cy="profile-header"]').should("be.visible").as("profileHeader");
-        cy.get("@profileHeader").get('[data-cy="profile-image"]').should("be.visible");
-        cy.get("@profileHeader").get('[data-cy="profile-nickname"]').should("be.visible");
-        cy.get('[data-cy="menu-tab"]').should("be.visible").as("menuTab");
+        cy.get('[data-cy="menu-tab"]', { timeout: 10000 }).should("be.visible");
     });
 
     it("마이페이지 소개 확인", () => {
