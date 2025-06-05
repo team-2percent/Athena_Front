@@ -30,13 +30,6 @@ describe("마이페이지", () => {
 
         cy.intercept({
             method: "GET",
-            url: "/api/my/project?nextCursorValue=2024-01-22T12:00:00&nextProjectId=11"
-        }, {
-            fixture: "my/nextProject.json"
-        }).as("getMyNextProjects");
-
-        cy.intercept({
-            method: "GET",
             url: "/api/my/order"
         }, {
             fixture: "my/order.json"
@@ -110,8 +103,15 @@ describe("마이페이지", () => {
             cy.get('[data-cy="project-end-message"]').should('be.visible')
         })
         it("스크롤 추가 조회", () => {
+            cy.intercept({
+                method: "GET",
+                url: "/api/my/project?nextCursorValue=2024-01-22T12:00:00&nextProjectId=11"
+            }, {
+                fixture: "my/nextProject.json"
+            }).as("getMyNextProjects");
             // when - 페이지 맨 아래로 스크롤
             cy.scrollTo('bottom')
+            cy.get('[data-cy="scroll-loader"]').should('be.visible')
 
             cy.wait('@getMyNextProjects').its('response.statusCode').should('eq', 200)
             
