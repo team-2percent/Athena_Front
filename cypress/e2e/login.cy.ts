@@ -2,13 +2,14 @@ describe("로그인", () => {
   beforeEach(() => {
     // given - 로그인 모달 오픈, 로그인 버튼 disabled 확인
     cy.visitMainPage()
-    cy.get('header').get('[data-cy="open-login-modal-button"]').should('be.visible').click()
-    cy.get('[data-cy="login-modal"]').as('loginModal').should('be.visible')
-    cy.get('@loginModal').get('[data-cy="login-button"]').should('be.disabled')
+    cy.get('header').get('[data-cy="open-login-modal-button"]').should('be.visible').click().then(() => {
+      cy.get('[data-cy="login-modal"]').as('loginModal').should('be.visible')
+      cy.get('@loginModal').get('[data-cy="login-button"]').should('be.disabled')
+    })
   })
 
   describe("로그인 성공 케이스", () => {
-    it("유효한 폼 작성 후 로그인 버튼 클릭하면 로그인 성공", () => {
+    it("유효한 폼 작성 후 로그인 버튼 클릭하면 로그인 성공", async () => {
       cy.intercept({
         method: "POST",
         url: "/api/user/login"
@@ -101,47 +102,55 @@ describe("로그인", () => {
   })
 
   describe("로그인 실패 케이스", () => {
-    beforeEach(() => {
-      // given - 로그인 모달 오픈
-      cy.visit('/')
-      cy.get('[data-cy="open-login-modal-button"]').click()
-      cy.get('[data-cy="login-modal"]').as('loginModal')
+    afterEach(() => {
+      // then - 에러메세지 확인
+      cy.contains("로그인에 실패했습니다.").should('be.visible')
     })
 
     it("존재하지 않는 이메일로 로그인 시도 시 실패", () => {
+      cy.intercept(
+        {
+          method: "POST",
+          url: "/api/user/login"
+        },{
+          statusCode: 401
+        }
+      )
       // when - 로그인 요청
       cy.get('@loginModal').get('[data-cy="email-input"]').type("notexist@test.com")
       cy.get('@loginModal').get('[data-cy="password-input"]').type("Abc1234%")
       cy.get('@loginModal').get('[data-cy="login-button"]').click()
-
-      // then - 에러메세지 확인
-      cy.contains("로그인에 실패했습니다.").should('be.visible')
     })
 
     it("잘못된 비밀번호로 로그인 시도 시 실패", () => {
+      cy.intercept(
+        {
+          method: "POST",
+          url: "/api/user/login"
+        },{
+          statusCode: 401
+        }
+      )
       // when - 로그인 요청  
       cy.get('@loginModal').get('[data-cy="email-input"]').type("test@test.com")
       cy.get('@loginModal').get('[data-cy="password-input"]').type("WrongPassword123!")
       cy.get('@loginModal').get('[data-cy="login-button"]').click()
-
-      // then - 에러메세지 확인
-      cy.contains("로그인에 실패했습니다.").should('be.visible')
     })
 
     it("서버 오류 발생 시 로그인 실패", () => {
-      // given - 서버 오류 응답 설정
-      cy.intercept('POST', '/api/user/login', {
-        statusCode: 500,
-        body: { message: "Internal Server Error" }
-      }).as('loginRequest')
+      cy.intercept(
+        {
+          method: "POST",
+          url: "/api/user/login"
+        },{
+          statusCode: 500
+        }
+      )
 
       // when - 로그인 요청
       cy.get('@loginModal').get('[data-cy="email-input"]').type("test@test.com")
       cy.get('@loginModal').get('[data-cy="password-input"]').type("Abc1234%")
-      cy.get('@loginModal').get('[data-cy="login-button"]').click()
-
-      // then - 에러메세지 확인
-      cy.contains("로그인에 실패했습니다.").should('be.visible')
+      cy.get('@loginModal').get('[data-cy="login-button"]').click()      
     })
   })
 })

@@ -28,7 +28,7 @@ export default function ReviewForm({ isOpen, onClose, projectId, projectName, se
   const validate = (content: string) => {
     const result = reviewContentSchema.safeParse(content)
     if (!result.success) {
-      setReviewsError(result.error.message)
+      setReviewsError(result.error.errors[0].message)
       return content.slice(0, REVIEW_CONTENT_MAX_LENGTH)
     }
     setReviewsError("")

@@ -49,24 +49,22 @@ describe("마이페이지", () => {
             fixture: "my/comment.json"
         }).as("getMyComments");
 
-        // when - 로그인 후 마이페이지 접근
+        // given - 로그인, 마이페이지 접근
 
+        cy.visitMainPage();
         cy.login();
-
         cy.visit("/my");
 
         cy.get('[data-cy="profile-header"]').should("be.visible").within(() => {
             cy.get('[data-cy="profile-image"]').should("be.visible");
             cy.get('[data-cy="profile-nickname"]').should("be.visible");
         });
-
-        cy.get('[data-cy="menu-tab"]', { timeout: 10000 }).should("be.visible");
-    });
+    })
 
     it("마이페이지 소개 확인", () => {
         // then
         // 소개 탭이 활성화되어 있는지 확인
-        cy.get("@menuTab").get('[data-cy="menu-tab-소개"]').should('have.class', 'text-main-color')
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-소개"]').should('have.class', 'text-main-color')
 
         // 소개글과 링크 리스트 영역 확인
         cy.get('[data-cy="profile-seller-description"]').should('be.visible')
@@ -84,7 +82,7 @@ describe("마이페이지", () => {
 
     it("마이페이지 보유 쿠폰 확인", () => {
         // when
-        cy.get("@menuTab").get('[data-cy="menu-tab-쿠폰"]').click()
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-쿠폰"]').click()
 
         // then
         cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-쿠폰"]').should('have.class', 'text-main-color')
@@ -99,7 +97,7 @@ describe("마이페이지", () => {
     describe("판매상품 확인", () => {
         beforeEach(() => {
             // when
-            cy.get("@menuTab").get('[data-cy="menu-tab-판매 상품"]').click()
+            cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-판매 상품"]').click()
 
             // then
             cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-판매 상품"]').should('have.class', 'text-main-color')
@@ -170,7 +168,7 @@ describe("마이페이지", () => {
     describe("구매상품 확인", () => {
         beforeEach(() => {
             // when
-            cy.get("@menuTab").get('[data-cy="menu-tab-구매 상품"]').click()
+            cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-구매 상품"]').click()
 
             // then
             cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-구매 상품"]').should('have.class', 'text-main-color')
@@ -254,7 +252,7 @@ describe("마이페이지", () => {
 
     it("후기 확인", () => {
         // when
-        cy.get("@menuTab").get('[data-cy="menu-tab-내가 쓴 후기"]').as("myReviewTab").click()
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-내가 쓴 후기"]').as("myReviewTab").click()
 
         // then
         cy.get("@myReviewTab").get('[data-cy="menu-tab-내가 쓴 후기"]').should('have.class', 'text-main-color')
