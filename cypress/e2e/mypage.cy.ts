@@ -112,6 +112,8 @@ describe("마이페이지", () => {
         it("스크롤 추가 조회", () => {
             // when - 페이지 맨 아래로 스크롤
             cy.scrollTo('bottom')
+
+            cy.wait('@getMyProjects').its('response.statusCode').should('eq', 200)
             
             // 추가 로드된 프로젝트 확인
             cy.get('[data-cy="project-item"]').should('have.length', 12)
@@ -136,10 +138,20 @@ describe("마이페이지", () => {
 
         it("판매상품 삭제", () => {
             cy.intercept({
-                method: "DELETE",
+                method: "GET",
                 url: "/api/my/project"
             }, {
-                fixture: "my/projectAfterDelete.json"
+                fixture: "my/nextProject.json"
+            }).as("getMyProjects")
+
+            cy.intercept({
+                method: "DELETE",
+                url: "/api/project/1"
+            }, {
+                statusCode: 200,
+                body: {
+                    message: "상품이 성공적으로 삭제되었습니다."
+                }
             }).as("deleteProject")
 
             // when - 수정, 삭제 버튼 확인
@@ -158,8 +170,11 @@ describe("마이페이지", () => {
             cy.get('[data-cy="delete-modal"]').contains('상품이 성공적으로 삭제되었습니다.').should('be.visible')
 
             cy.get('[data-cy="delete-modal"]').find('[data-cy="confirm-button"]').click()
-            cy.get('[data-cy="delete-modal"]').should('not.exist')
 
+            cy.wait('@deleteProject').its('response.statusCode').should('eq', 200)
+            cy.wait('@getMyProjects').its('response.statusCode').should('eq', 200)
+
+            cy.get('[data-cy="delete-modal"]').should('not.exist')
             cy.get('[data-cy="project-item"]').should('have.length', 9)
             cy.get('[data-cy="project-item"]').first().should('contain', '캘리그라피 기초 강좌')
         })
