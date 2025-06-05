@@ -212,7 +212,7 @@ const Header = () => {
       <div className="flex items-center justify-between px-4 py-2 md:hidden">
         {/* 로고 */}
         <Link href="/" className="flex items-center">
-          <div className="w-10 h-10 overflow-hidden">
+          <div className="w-10 h-10 overflow-hidden" data-cy="logo-image">
             <img src="/src/athenna_logo.png" alt="Athenna 로고" className="h-10 w-auto object-cover" />
           </div>
         </Link>
