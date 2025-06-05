@@ -3,8 +3,9 @@ describe("로그인", () => {
     // given - 로그인 모달 오픈, 로그인 버튼 disabled 확인
     cy.visitMainPage()
     cy.get('header').get('[data-cy="open-login-modal-button"]').should('be.visible').click().then(() => {
-      cy.get('[data-cy="login-modal"]').as('loginModal').should('be.visible')
-      cy.get('@loginModal').get('[data-cy="login-button"]').should('be.disabled')
+      cy.get('[data-cy="login-modal"]').as('loginModal').should('be.visible').then(() => {
+        cy.get('@loginModal').get('[data-cy="login-button"]').should('be.disabled')
+      })
     })
   })
 
