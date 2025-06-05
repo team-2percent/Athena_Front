@@ -47,7 +47,6 @@ describe("로그인", () => {
       // then - API 응답 대기 및 확인
       cy.wait('@login').its('response.statusCode').should('eq', 200)
       cy.wait('@getHeader').its('response.statusCode').should('eq', 200)
-      // cy.wait('@fcmRegister').its('response.statusCode').should('eq', 200)
 
       // then - UI 상태 확인
       cy.get('@loginModal').should('not.exist')

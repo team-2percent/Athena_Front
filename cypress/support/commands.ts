@@ -33,7 +33,7 @@ Cypress.Commands.add('login', () => {
     })
 
     // 토큰 저장
-    cy.wait('@login').then(() => {
+    cy.wait('@login').its('response.statusCode').should('eq', 200).then(() => {
       cy.window().then((win: Window) => {
         win.localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NyIsInJvbGUiOiJST0xFX1VTRVIiLCJuaWNrbmFtZSI6IuqwgOyehe2FjOyKpO2KuCIsImlhdCI6MTc0ODk2ODQ0MSwiZXhwIjoxNzQ5NTczMjQxfQ.8QkpyGU8Mf9Mh2xSTzlmHCapyxQZONR81ZHcv_GQ2b4");
         win.localStorage.setItem('userId', "57");
