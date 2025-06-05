@@ -85,7 +85,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
             token: token,
           });
         }
-      
+        
         onClose();
       } catch (error) {
         console.error('로그인 후 FCM 등록 중 오류 발생:', error);

@@ -126,7 +126,6 @@ describe("회원 상호작용", () => {
             // given - 회원 메뉴 확인
             cy.get('@userProfileImage').click()
 
-            cy.wait(1000)
             cy.get('header').get('[data-cy="user-menu"]').should('be.visible').as('userMenu')
             cy.get('@userMenu').get('[data-cy="mypage-button"]').should('be.visible').as('mypageButton')
             cy.get('@userMenu').get('[data-cy="logout-button"]').should('be.visible').as('logoutButton')
@@ -168,7 +167,6 @@ describe("회원 상호작용", () => {
             cy.get('@couponEventModalButton').click()
             cy.get('header').get('[data-cy="coupon-event-modal"]').should('be.visible').as('couponEventModal')
             cy.get('@couponEventModal').get('[data-cy="coupon-issue-button"]').should('not.be.disabled').as('couponIssueButton')
-            cy.wait('@getCouponEvent')
         })
 
         it("쿠폰 발급받기 버튼 클릭 시 발급 완료로 전환", () => {
@@ -188,9 +186,6 @@ describe("회원 상호작용", () => {
             }).as("getCouponAfterIssue");
 
             cy.get('[data-cy="coupon-issue-button"]').first().click();
-
-            cy.wait("@issueCoupon");
-            cy.wait("@getCouponAfterIssue");
 
             // 버튼이 비활성화 되었는지 확인
             cy.get('[data-cy="coupon-issue-button"]').first().should("be.disabled");

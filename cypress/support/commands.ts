@@ -19,7 +19,11 @@ Cypress.Commands.add('login', () => {
     cy.intercept({
         method: "POST",
         url: "/api/fcm/register"
+    }, {
+        statusCode: 200,
     })
+
+    cy.visitMainPage()
 
     // 로그인 모달 열기
     cy.get('header').get('[data-cy="open-login-modal-button"]').click()
@@ -28,7 +32,7 @@ Cypress.Commands.add('login', () => {
     cy.get('[data-cy="login-modal"]').within(() => {
         cy.get('[data-cy="email-input"]').type("test@test.com")
         cy.get('[data-cy="password-input"]').type("Abc1234%")
-        cy.get('[data-cy="login-button"]').click()
+        cy.get('[data-cy="login-button"]').should('not.be.disabled').click()
     })
 
     // 토큰 저장

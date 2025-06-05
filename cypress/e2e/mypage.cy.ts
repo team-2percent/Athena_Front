@@ -55,7 +55,7 @@ describe("마이페이지", () => {
 
         cy.visit("/my");
 
-        cy.get('[data-cy="profile-header"]', { timeout: 10000 }).should("be.visible").within(() => {
+        cy.get('[data-cy="profile-header"]').should("be.visible").within(() => {
             cy.get('[data-cy="profile-image"]').should("be.visible");
             cy.get('[data-cy="profile-nickname"]').should("be.visible");
         });
