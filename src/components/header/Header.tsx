@@ -189,30 +189,6 @@ const Header = () => {
     },
   ]
 
-  const renderProfile = () => {
-    if (isLoading) {
-      return <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" onClick={handleProfileClick}/>
-    } 
-    return (<button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick}>
-              {
-                user?.imageUrl ?
-                <img
-                  src={user.imageUrl}
-                  alt="프로필 이미지"
-                  className="h-full w-full object-cover"
-                /> :
-                <Image
-                  src={"/placeholder/profile-placeholder.png"}
-                  alt="프로필 플레이스홀더"
-                  width={40}
-                  height={40}
-                  className="h-full w-full object-cover"
-                />
-              }
-            
-          </button>)
-  }
-
   useEffect(() => {
     if (isLoggedIn) loadUserInfo();
   }, [isLoggedIn])
@@ -271,21 +247,32 @@ const Header = () => {
             />
             {isLoggedIn ? (
               <>
-                <button type="button" aria-label="쿠폰" onClick={handleCouponClick}>
+                <button type="button" aria-label="쿠폰" onClick={handleCouponClick} data-cy="coupon-event-modal-button">
                   <Percent className="h-6 w-6 text-sub-gray" />
                 </button>
                 <div className="relative flex items-center space-x-3">
                   {!isLoading ? (
-                    <span className="text-sm font-medium whitespace-nowrap">{user?.nickname}</span>
+                    <span className="text-sm font-medium whitespace-nowrap" data-cy="user-nickname">{user?.nickname}</span>
                   ) : (
                     <div className="h-5 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
                   )}
                   <div className="relative flex items-center" ref={authMenuRef}>
-                    {renderProfile()}
+                    {isLoading ?
+                    <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" /> :
+                    <button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick} data-cy="user-image-button">
+                      <img
+                        src={user?.imageUrl || "/placeholder/profile-placeholder.png"}
+                        alt="프로필 이미지"
+                        className="h-full w-full object-cover"
+                        data-cy="user-image"
+                      />
+                    </button>
+                    }
                     <div
                       className={`absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 min-w-[220px] text-left transition-all duration-75 ease-out
                         ${showAuthMenu ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'}`}
                       style={{ transformOrigin: 'top right' }}
+                      data-cy="user-menu"
                     >
                       <div className="text-xs text-gray-400 font-semibold my-2 pl-1">설정</div>
                       {isAdmin && (
@@ -302,6 +289,7 @@ const Header = () => {
                         type="button"
                         onClick={handleClickMyPage}
                         className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
+                        data-cy="mypage-button"
                       >
                         <User className="h-4 w-4" />
                         마이페이지
@@ -310,6 +298,7 @@ const Header = () => {
                         type="button"
                         onClick={handleLogout}
                         className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
+                        data-cy="logout-button"
                       >
                         <LogOut className="h-4 w-4" />
                         로그아웃
@@ -320,11 +309,11 @@ const Header = () => {
               </>
             ) : (
               <div className="text-main-color font-medium mr-auto flex items-center gap-2 whitespace-nowrap">
-                <button type="button" aria-label="로그인" onClick={openLoginModal}>
+                <button type="button" aria-label="로그인" onClick={openLoginModal} data-cy="open-login-modal-button">
                   로그인
                 </button>
                 /
-                <button type="button" aria-label="로그인" onClick={openSignupModal}>
+                <button type="button" aria-label="로그인" onClick={openSignupModal} data-cy="open-signup-modal-button">
                   회원가입
                 </button>
               </div>

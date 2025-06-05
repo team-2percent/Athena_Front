@@ -81,6 +81,8 @@ export default function CouponList() {
                 type="button"
                 className={clsx("rounded-full w-fit px-4 py-1.5 text-sm font-medium", coupon.userIssued || coupon.stock === 0? "pointer-events-none bg-disabled-background text-disabled-color" : "bg-main-color text-white")}
                 onClick={() => handleGetCoupon(coupon.couponId)}
+                disabled={coupon.userIssued || coupon.stock === 0}
+                data-cy="coupon-issue-button"
             >
                 {coupon.userIssued ? "발급완료" : coupon.stock === 0 ? "발급종료" : "발급받기"}
             </button>

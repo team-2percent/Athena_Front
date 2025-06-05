@@ -20,7 +20,7 @@ export default function CouponList({ coupons }: { coupons: UserCoupon[] }) {
     return (
         <div className="flex flex-col gap-3 sm:gap-4">
           {coupons.map((coupon) => (
-          <div className="rounded-xl sm:rounded-2xl border border-gray-border flex overflow-hidden min-h-[72px] sm:min-h-[100px]" key={coupon.id}>
+          <div className="rounded-xl sm:rounded-2xl border border-gray-border flex overflow-hidden min-h-[72px] sm:min-h-[100px]" key={coupon.id}  data-cy="coupon-list">
             {/* 왼쪽: 퍼센트 아이콘 */}
             <div className={clsx("relative min-w-[48px] sm:min-w-[70px] flex items-stretch", coupon.status === "UNUSED" ? "bg-main-color" : "bg-disabled-background")}> 
               <div className="flex flex-col justify-center h-full w-full">
@@ -34,8 +34,8 @@ export default function CouponList({ coupons }: { coupons: UserCoupon[] }) {
       
             {/* 중앙: 쿠폰 제목 및 설명 */}
             <div className="flex-1 p-2 sm:p-4 flex flex-col justify-center">
-              <h3 className="text-base sm:text-lg font-bold">{coupon.title}</h3>
-              <p className="text-xs sm:text-sm text-sub-gray mt-1">{coupon.content}</p>
+              <h3 className="text-base sm:text-lg font-bold"  data-cy="coupon-title">{coupon.title}</h3>
+              <p className="text-xs sm:text-sm text-sub-gray mt-1" data-cy="coupon-content">{coupon.content}</p>
             </div>
       
             {/* 구분선 */}
@@ -43,8 +43,8 @@ export default function CouponList({ coupons }: { coupons: UserCoupon[] }) {
       
             {/* 오른쪽: 금액 및 유효기간 */}
             <div className="p-2 sm:p-4 flex flex-col justify-center items-end w-28 sm:w-60">
-              <p className={clsx("text-base sm:text-xl font-bold", coupon.status === "UNUSED" ? "text-main-color" : "text-disabled-text")}>{coupon.price} 원</p>
-              <p className="text-[10px] sm:text-xs text-sub-gray mt-1 text-right w-full">
+              <p className={clsx("text-base sm:text-xl font-bold", coupon.status === "UNUSED" ? "text-main-color" : "text-disabled-text")} data-cy="coupon-price">{coupon.price} 원</p>
+              <p className="text-[10px] sm:text-xs text-sub-gray mt-1 text-right w-full" data-cy="coupon-status">
                 {couponStateMessage(coupon.status, coupon.expires)}
               </p>
             </div>

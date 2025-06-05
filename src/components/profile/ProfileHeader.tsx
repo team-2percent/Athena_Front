@@ -9,10 +9,10 @@ interface ProfileHeaderProps {
 
 export default function ProfileHeader({ nickname, profileImage, buttons }: ProfileHeaderProps) {
   return (
-    <div className="flex flex-col md:flex-row md:justify-between md:items-start items-center mx-auto mb-12 md:h-36 gap-4 md:gap-0">
+    <div className="flex flex-col md:flex-row md:justify-between md:items-start items-center mx-auto mb-12 md:h-36 gap-4 md:gap-0" data-cy="profile-header">
       <div className="flex flex-col md:flex-row items-center md:items-start">
         {/* 프로필 이미지 */}
-        <div className="w-24 h-24 md:w-36 md:h-36 rounded-full bg-gray-200 overflow-hidden md:mr-8 mb-4 md:mb-0 flex-shrink-0">
+        <div className="w-24 h-24 md:w-36 md:h-36 rounded-full bg-gray-200 overflow-hidden md:mr-8 mb-4 md:mb-0 flex-shrink-0" data-cy="profile-image">
           <img
             src={profileImage || "/placeholder/profile-placeholder.png"}
             alt="프로필 이미지"
@@ -22,7 +22,7 @@ export default function ProfileHeader({ nickname, profileImage, buttons }: Profi
 
         {/* 프로필 텍스트 정보 */}
         <div className="flex flex-col justify-center items-center md:items-start h-auto md:h-36">
-          <h1 className="text-xl md:text-3xl font-bold mb-2 md:mb-4">{nickname}</h1>
+          <h1 className="text-xl md:text-3xl font-bold mb-2 md:mb-4" data-cy="profile-nickname">{nickname}</h1>
         </div>
       </div>
 

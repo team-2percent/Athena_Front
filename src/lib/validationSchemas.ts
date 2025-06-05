@@ -21,6 +21,8 @@ import {
   COUPON_STOCK_MIN_NUMBER,
   COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR,
   COUPON_EVENT_START_TO_END_MIN_HOUR,
+  REVIEW_CONTENT_MAX_LENGTH,
+  REVIEW_CONTENT_MIN_LENGTH,
 } from "./validationConstant"
 import { getByteLength } from "./utils"
 
@@ -302,6 +304,9 @@ export const couponStockSchema = z
   .min(COUPON_STOCK_MIN_NUMBER, `쿠폰 수량은 ${COUPON_STOCK_MIN_NUMBER}개 이상이어야 합니다.`)
   .max(COUPON_STOCK_MAX_NUMBER, `쿠폰 수량은 ${COUPON_STOCK_MAX_NUMBER}개 이내로 입력해주세요.`)
 
+export const reviewContentSchema = z.string()
+  .min(REVIEW_CONTENT_MIN_LENGTH, "후기를 입력해주세요.")
+  .max(REVIEW_CONTENT_MAX_LENGTH, "후기는 1000자 이내로 입력해주세요.")
 
 // 로그인/회원가입 유효성 검사 스키마
 export const loginSchema = z.object({

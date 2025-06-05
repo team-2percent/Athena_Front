@@ -80,12 +80,12 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
         setFcmToken(token);
         await apiCall('/api/fcm/register', 'POST', { userId: data.userId, token: token })
       }
-      window.location.reload()
+      onClose()
     }
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md" closeOnOutsideClick closeOnEsc title="로그인">
+    <Modal isOpen={isOpen} onClose={onClose} size="md" closeOnOutsideClick closeOnEsc title="로그인" dataCy="login-modal">
       <div className="p-4">
         <form onSubmit={handleSubmit}>
           {/* Email Input */}
@@ -96,8 +96,9 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
               value={email}
               onChange={handleChangeEmail}
               isError={loginError.email !== ""}
+              dataCy="email-input"
             />
-            <InputInfo errorMessage={loginError.email} />
+            <InputInfo errorMessage={loginError.email} errorMessageDataCy="email-error-message" />
           </div>
 
           {/* Password Input */}
@@ -108,8 +109,9 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
               value={password}
               onChange={handleChangePassword}
               isError={loginError.password !== ""}
+              dataCy="password-input"
             />
-            <InputInfo errorMessage={loginError.password} />
+            <InputInfo errorMessage={loginError.password} errorMessageDataCy="password-error-message" />
           </div>
 
           {/* Login Button */}
@@ -118,6 +120,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
             disabled={disabled}
             className="w-full py-4"
             size="lg"
+            dataCy="login-button"
           >로그인</PrimaryButton>
           <div className="h-[1.25rem] text-center mb-2">
             <span className="w-full text-red-500 text-xs">{errorMessage}</span>

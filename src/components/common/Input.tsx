@@ -16,6 +16,7 @@ interface InputProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
   onClick?: (e: React.MouseEvent<HTMLInputElement>) => void
+  dataCy?: string
 }
 
 export function Input({
@@ -31,6 +32,7 @@ export function Input({
   onChange,
   onKeyDown,
   onClick,
+  dataCy,
 }: InputProps) {
   const design = designType === "outline-rect" ? "rounded border" : designType === "outline-round" ? "rounded-full border" : "border-b"
   
@@ -54,6 +56,7 @@ export function Input({
         align === "right" && "text-right",
         className
       )}
+      data-cy={dataCy}
     />
   )
 }
@@ -83,6 +86,7 @@ export const PasswordInput = ({
   placeholder,
   designType = "underline",
   isError = false,
+  dataCy,
 }: Omit<InputProps, "type">) => {
   const [visible, setVisible] = useState(false)
 
@@ -97,6 +101,7 @@ export const PasswordInput = ({
         placeholder={placeholder}
         designType={designType}
         isError={isError}
+        dataCy={dataCy}
       />
       <button
         type="button"
@@ -117,6 +122,7 @@ export const EmailInput = ({
   placeholder,
   designType = "underline",
   isError = false,
+  dataCy,
 }: Omit<InputProps, "type">) => {
   return (
     <Input
@@ -128,6 +134,7 @@ export const EmailInput = ({
       placeholder={placeholder}
       designType={designType}
       isError={isError}
+      dataCy={dataCy}
     />
   )
 }
