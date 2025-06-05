@@ -33,7 +33,7 @@ describe("마이페이지", () => {
             url: "/api/my/project?nextCursorValue=2024-01-22T12:00:00&nextProjectId=11"
         }, {
             fixture: "my/nextProject.json"
-        }).as("getMyProjects");
+        }).as("getMyNextProjects");
 
         cy.intercept({
             method: "GET",
@@ -113,7 +113,7 @@ describe("마이페이지", () => {
             // when - 페이지 맨 아래로 스크롤
             cy.scrollTo('bottom')
 
-            cy.wait('@getMyProjects').its('response.statusCode').should('eq', 200)
+            cy.wait('@getMyNextProjects').its('response.statusCode').should('eq', 200)
             
             // 추가 로드된 프로젝트 확인
             cy.get('[data-cy="project-item"]').should('have.length', 12)
