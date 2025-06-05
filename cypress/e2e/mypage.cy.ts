@@ -55,6 +55,8 @@ describe("마이페이지", () => {
 
         cy.visit("/my");
 
+        cy.wait(1000)
+
         cy.get('[data-cy="profile-header"]').should("be.visible").as("profileHeader");
         cy.get("@profileHeader").get('[data-cy="profile-image"]').should("be.visible");
         cy.get("@profileHeader").get('[data-cy="profile-nickname"]').should("be.visible");

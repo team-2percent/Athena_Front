@@ -41,6 +41,8 @@ describe("로그인", () => {
       cy.get('@loginModal').get('[data-cy="password-input"]').type("Abc1234%") 
       cy.get('@loginModal').get('[data-cy="login-button"]').should('not.be.disabled').click()
 
+      cy.wait(1000)
+
       // then - 로그인 성공
       cy.get('@loginModal').should('not.exist')
       cy.get('header').get('[data-cy="open-login-modal-button"]').should('not.exist')

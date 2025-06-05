@@ -30,6 +30,8 @@ describe("회원가입", () => {
             cy.get('@signupModal').get('[data-cy="confirm-password-input"]').type("Abc1234%")
             cy.get('@signupModal').get('[data-cy="signup-button"]').should('not.be.disabled').click()
 
+            cy.wait(1000)
+
             // then - 회원가입 성공
             cy.get('@signupModal').should('not.exist')
             cy.get('header').get('[data-cy="open-login-modal-button"]').should('be.visible')

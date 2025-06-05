@@ -3,17 +3,45 @@
 import { jwtDecode } from "jwt-decode";
 
 Cypress.Commands.add('login', () => {
+    // 로그인 API 호출 인터셉트
     cy.intercept({
-      method: "POST",
-      url: "/api/fcm/register"
+        method: "POST",
+        url: "/api/user/login"
+    }, {
+        statusCode: 200,
+        body: {
+            accessToken: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NyIsInJvbGUiOiJST0xFX1VTRVIiLCJuaWNrbmFtZSI6IuqwgOyehe2FjOyKpO2KuCIsImlhdCI6MTc0ODk2ODQ0MSwiZXhwIjoxNzQ5NTczMjQxfQ.8QkpyGU8Mf9Mh2xSTzlmHCapyxQZONR81ZHcv_GQ2b4",
+            userId: "57"
+        }
+    }).as('login')
+
+    // FCM 등록 인터셉트
+    cy.intercept({
+        method: "POST",
+        url: "/api/fcm/register"
     })
 
+    // 로그인 모달 열기
+    cy.get('header').get('[data-cy="open-login-modal-button"]').click()
+    
+    // 로그인 폼 작성
+    cy.get('[data-cy="login-modal"]').within(() => {
+        cy.get('[data-cy="email-input"]').type("test@test.com")
+        cy.get('[data-cy="password-input"]').type("Abc1234%")
+        cy.get('[data-cy="login-button"]').click()
+    })
+
+    // 로그인 API 호출 대기
+    cy.wait('@login')
+
+    // 토큰 저장
     cy.window().then((win: Window) => {
         win.localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NyIsInJvbGUiOiJST0xFX1VTRVIiLCJuaWNrbmFtZSI6IuqwgOyehe2FjOyKpO2KuCIsImlhdCI6MTc0ODk2ODQ0MSwiZXhwIjoxNzQ5NTczMjQxfQ.8QkpyGU8Mf9Mh2xSTzlmHCapyxQZONR81ZHcv_GQ2b4");
         win.localStorage.setItem('userId', "57");
     });
 
-    cy.reload(); // zustand에서 인식
+    // 페이지 새로고침
+    cy.reload()
 })
 
 Cypress.Commands.add('visitMainPage', () => {

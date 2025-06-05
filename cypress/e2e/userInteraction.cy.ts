@@ -110,6 +110,12 @@ describe("회원 상호작용", () => {
         // given - 로그인 후 헤더 확인
         cy.visitMainPage()
         cy.login()
+        
+        // 로그인 모달이 사라질 때까지 대기
+        cy.get('[data-cy="login-modal"]').should('not.exist')
+        
+        // 헤더 요소들이 보이는지 확인
+        cy.get('header').should('be.visible')
         cy.get('header').get('[data-cy="user-nickname"]').should('be.visible')
         cy.get('header').get('[data-cy="user-image"]').should('be.visible').as('userProfileImage')
         cy.get('header').get('[data-cy="coupon-event-modal-button"]').should('be.visible').as('couponEventModalButton')
