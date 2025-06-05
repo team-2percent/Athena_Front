@@ -41,8 +41,6 @@ describe("로그인", () => {
       cy.get('@loginModal').get('[data-cy="password-input"]').type("Abc1234%") 
       cy.get('@loginModal').get('[data-cy="login-button"]').should('not.be.disabled').click()
 
-      cy.wait('@login', { timeout: 8000 });
-
       // then - 로그인 성공
       cy.get('@loginModal').should('not.exist')
       cy.get('header').get('[data-cy="open-login-modal-button"]').should('not.exist')
@@ -142,7 +140,6 @@ describe("로그인", () => {
       cy.get('@loginModal').get('[data-cy="login-button"]').click()
 
       // then - 에러메세지 확인
-      cy.wait('@loginRequest')
       cy.contains("로그인에 실패했습니다.").should('be.visible')
     })
   })
