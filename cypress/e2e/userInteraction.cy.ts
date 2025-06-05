@@ -125,6 +125,8 @@ describe("회원 상호작용", () => {
         beforeEach(() => {
             // given - 회원 메뉴 확인
             cy.get('@userProfileImage').click()
+
+            cy.wait(1000)
             cy.get('header').get('[data-cy="user-menu"]').should('be.visible').as('userMenu')
             cy.get('@userMenu').get('[data-cy="mypage-button"]').should('be.visible').as('mypageButton')
             cy.get('@userMenu').get('[data-cy="logout-button"]').should('be.visible').as('logoutButton')
