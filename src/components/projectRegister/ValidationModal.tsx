@@ -157,6 +157,7 @@ export default function ValidationModal({ isOpen, onClose, onConfirm }: Validati
       showCloseButton={true}
       closeOnOutsideClick={true}
       className="max-w-lg p-6 max-h-[80vh] overflow-y-auto"
+      dataCy="validation-modal"
     >
       {/* 전체 진행률 */}
       <div className="mb-6 p-4 bg-gray-50 rounded-xl">

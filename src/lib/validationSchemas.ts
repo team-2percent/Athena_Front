@@ -25,6 +25,7 @@ import {
   REVIEW_CONTENT_MIN_LENGTH,
 } from "./validationConstant"
 import { getByteLength } from "./utils"
+import { VALIDATION_MESSAGES } from "./validationMessages"
 
 // 1단계 유효성 검사 스키마
 export const stepOneSchema = z
@@ -32,46 +33,46 @@ export const stepOneSchema = z
     // 카테고리: 필수
     categoryId: z
       .number({
-        required_error: "카테고리를 선택해주세요.",
+        required_error: VALIDATION_MESSAGES.REQUIRED_CATEGORY,
       })
-      .min(1, "카테고리를 선택해주세요."),
+      .min(1, VALIDATION_MESSAGES.REQUIRED_CATEGORY),
 
     // 상품 제목: 필수, 25자 이하
     title: z
       .string({
-        required_error: "상품 제목을 입력해주세요.",
+        required_error: VALIDATION_MESSAGES.REQUIRED_TITLE,
       })
-      .min(1, "상품 제목을 입력해주세요.")
-      .max(25, "상품 제목은 25자 이하로 입력해주세요."),
+      .min(1, VALIDATION_MESSAGES.REQUIRED_TITLE)
+      .max(25, VALIDATION_MESSAGES.TITLE_MAX),
 
     // 상품 설명: 필수, 10자 이상 50자 이하
     description: z
       .string({
-        required_error: "상품 설명을 입력해주세요.",
+        required_error: VALIDATION_MESSAGES.REQUIRED_DESCRIPTION,
       })
-      .min(10, "상품 설명은 10자 이상 입력해주세요.")
-      .max(50, "상품 설명은 50자 이하로 입력해주세요."),
+      .min(10, VALIDATION_MESSAGES.DESCRIPTION_MIN)
+      .max(50, VALIDATION_MESSAGES.DESCRIPTION_MAX),
 
     // 대표 이미지: 필수 (최소 1개, 최대 5개)
     images: z
       .array(z.any())
-      .min(1, "대표 이미지를 1개 이상 등록해주세요.")
-      .max(5, "이미지는 최대 5개까지 업로드 가능합니다."),
+      .min(1, VALIDATION_MESSAGES.REQUIRED_IMAGE)
+      .max(5, VALIDATION_MESSAGES.IMAGE_MAX),
 
     // 목표 금액: 필수, 10억원 이하
     targetAmount: z
       .string({
-        required_error: "목표 금액을 입력해주세요.",
+        required_error: VALIDATION_MESSAGES.REQUIRED_TARGET_AMOUNT,
       })
-      .min(1, "목표 금액을 입력해주세요.")
+      .min(1, VALIDATION_MESSAGES.REQUIRED_TARGET_AMOUNT)
       .refine((val) => {
         const numericValue = Number(val.replace(/,/g, ""))
         return !isNaN(numericValue) && numericValue > 0
-      }, "올바른 금액을 입력해주세요.")
+      }, VALIDATION_MESSAGES.TARGET_AMOUNT_INVALID)
       .refine((val) => {
         const numericValue = Number(val.replace(/,/g, ""))
         return numericValue <= 1000000000 // 10억원
-      }, "목표 금액은 10억원 이하로 설정해주세요."),
+      }, VALIDATION_MESSAGES.TARGET_AMOUNT_MAX),
 
     // 펀딩 시작일: 필수, 오늘부터 일주일 뒤
     startDate: z
@@ -154,28 +155,28 @@ export const stepThreeSchema = z.object({
         // 후원 상품 이름: 필수, 25자 이하
         name: z
           .string({
-            required_error: "후원 상품 이름을 입력해주세요.",
+            required_error: VALIDATION_MESSAGES.REQUIRED_SUPPORT_NAME,
           })
-          .min(1, "후원 상품 이름을 입력해주세요.")
-          .max(25, "후원 상품 이름은 25자 이하로 입력해주세요."),
+          .min(1, VALIDATION_MESSAGES.REQUIRED_SUPPORT_NAME)
+          .max(25, VALIDATION_MESSAGES.SUPPORT_NAME_MAX),
 
         // 후원 상품 설명: 선택사항, 50자 이하
-        description: z.string().max(50, "후원 상품 설명은 50자 이하로 입력해주세요.").optional().or(z.literal("")),
+        description: z.string().max(50, VALIDATION_MESSAGES.SUPPORT_DESC_MAX).optional().or(z.literal("")),
 
         // 후원 상품 가격: 필수, 10억 이하
         price: z
           .string({
-            required_error: "후원 상품 가격을 입력해주세요.",
+            required_error: VALIDATION_MESSAGES.REQUIRED_SUPPORT_PRICE,
           })
-          .min(1, "후원 상품 가격을 입력해주세요.")
+          .min(1, VALIDATION_MESSAGES.REQUIRED_SUPPORT_PRICE)
           .refine((val) => {
             const numericValue = Number(val.replace(/,/g, ""))
             return !isNaN(numericValue) && numericValue > 0
-          }, "올바른 가격을 입력해주세요.")
+          }, VALIDATION_MESSAGES.SUPPORT_PRICE_INVALID)
           .refine((val) => {
             const numericValue = Number(val.replace(/,/g, ""))
             return numericValue <= 1000000000 // 10억원
-          }, "후원 상품 가격은 10억원 이하로 설정해주세요."),
+          }, VALIDATION_MESSAGES.SUPPORT_PRICE_MAX),
 
         // 후원 상품 수량: 필수, 1개 이상 1만 개 이하
         stock: z
@@ -261,17 +262,17 @@ export const linkUrlsSchema = z.string().refine((val) => getByteLength(val) <= L
 
 // 계좌 관련 유효성 검사 스키마
 export const accountHolderSchema = z.string()
-  .min(1, "예금주를 입력해주세요.")
+  .min(1, VALIDATION_MESSAGES.REQUIRED_ACCOUNT_HOLDER)
   .max(ACCOUNT_HOLDER_MAX_LENGTH, `예금주는 ${ACCOUNT_HOLDER_MAX_LENGTH}자 이내로 입력해주세요.`)
 
 export const bankNameSchema = z.string()
-  .min(1, "은행명을 입력해주세요.")
+  .min(1, VALIDATION_MESSAGES.REQUIRED_BANK_NAME)
   .max(BANK_NAME_MAX_LENGTH, `은행명은 ${BANK_NAME_MAX_LENGTH}자 이내로 입력해주세요.`)
 
 export const bankAccountSchema = z.string()
-  .min(1, "계좌번호를 입력해주세요.")
+  .min(1, VALIDATION_MESSAGES.REQUIRED_BANK_ACCOUNT)
   .max(BANK_ACCOUNT_MAX_LENGTH, `계좌번호는 ${BANK_ACCOUNT_MAX_LENGTH}자 이내로 입력해주세요.`)
-  .refine((val) => /^\d+$/.test(val), "숫자만 입력해주세요.")
+  .refine((val) => /^\d+$/.test(val), VALIDATION_MESSAGES.BANK_ACCOUNT_NUMBER_ONLY)
 
 // 배송지 관련 유효성 검사 스키마
 export const addressSchema = z.string().min(1, "주소가 필요합니다.")

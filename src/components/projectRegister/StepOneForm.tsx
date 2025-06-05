@@ -8,6 +8,7 @@ import DatePicker from "./DatePicker"
 import { useApi } from "@/hooks/useApi"
 
 import { useProjectFormStore, type ImageFile, type Category } from "@/stores/useProjectFormStore"
+import { VALIDATION_MESSAGES } from "@/lib/validationMessages"
 
 interface StepOneFormProps {
   onUpdateFormData: (data: Partial<any>) => void
@@ -35,7 +36,6 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
   } = useProjectFormStore()
 
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false)
-  const [targetAmountError, setTargetAmountError] = useState("")
   const [isDragging, setIsDragging] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [categoriesLoading, setCategoriesLoading] = useState(false)
@@ -112,14 +112,13 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
 
     handleFieldTouch("targetAmount")
 
-    // 10억 제한 검사 (기존 100억에서 10억으로 변경)
+    // 10억 제한: 10억 초과 입력 시 10억으로 강제 세팅(에러 메시지는 zod가 담당)
     const numericValue = Number(value)
     if (numericValue > 1000000000) {
-      setTargetAmountError("목표 금액은 최대 10억원까지 설정 가능합니다.")
-      // 10억으로 제한
+      setForceTargetAmountMaxError(true)
       onUpdateFormData({ targetAmount: "1000000000" })
     } else {
-      setTargetAmountError("")
+      setForceTargetAmountMaxError(false)
       onUpdateFormData({ targetAmount: value })
     }
   }
@@ -278,6 +277,32 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       : "border-gray-300 focus:border-main-color"
   }
 
+  const [forceTitleMaxError, setForceTitleMaxError] = useState(false)
+  const [forceDescriptionMaxError, setForceDescriptionMaxError] = useState(false)
+  const [forceTargetAmountMaxError, setForceTargetAmountMaxError] = useState(false)
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleFieldTouch("title")
+    if (e.target.value.length > 25) {
+      setForceTitleMaxError(true)
+      onUpdateFormData({ title: e.target.value.slice(0, 25) })
+    } else {
+      setForceTitleMaxError(false)
+      onUpdateFormData({ title: e.target.value })
+    }
+  }
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    handleFieldTouch("description")
+    if (e.target.value.length > 50) {
+      setForceDescriptionMaxError(true)
+      onUpdateFormData({ description: e.target.value.slice(0, 50) })
+    } else {
+      setForceDescriptionMaxError(false)
+      onUpdateFormData({ description: e.target.value })
+    }
+  }
+
   return (
     <div className="space-y-8">
       {/* 카테고리 선택 - 세로 배치로 변경 */}
@@ -336,18 +361,14 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
             id="title"
             type="text"
             value={title}
-            onChange={(e) => {
-              handleFieldTouch("title")
-              // 25자 제한
-              if (e.target.value.length <= 25) {
-                onUpdateFormData({ title: e.target.value })
-              }
-            }}
+            onChange={handleTitleChange}
             placeholder="상품명을 입력해 주세요."
             className={`w-full rounded-full border px-4 py-3 focus:outline-none ${getFieldStyle("title")}`}
           />
           <div className="flex justify-between items-center mt-1">
-            {getErrorMessage("title") && <p className="text-red-500 text-sm">{getErrorMessage("title")}</p>}
+            {(getErrorMessage("title") || forceTitleMaxError) && (
+              <p className="text-red-500 text-sm">{getErrorMessage("title") || VALIDATION_MESSAGES.TITLE_MAX}</p>
+            )}
             <p className="text-gray-400 text-sm ml-auto">{title.length}/25</p>
           </div>
         </div>
@@ -363,18 +384,14 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
           <textarea
             id="description"
             value={description}
-            onChange={(e) => {
-              handleFieldTouch("description")
-              // 50자 제한
-              if (e.target.value.length <= 50) {
-                onUpdateFormData({ description: e.target.value })
-              }
-            }}
+            onChange={handleDescriptionChange}
             placeholder="상품에 대한 간략한 설명을 입력하세요"
             className={`w-full rounded-3xl border px-4 py-3 min-h-[150px] focus:outline-none ${getFieldStyle("description")}`}
           />
           <div className="flex justify-between items-center mt-1">
-            {getErrorMessage("description") && <p className="text-red-500 text-sm">{getErrorMessage("description")}</p>}
+            {(getErrorMessage("description") || forceDescriptionMaxError) && (
+              <p className="text-red-500 text-sm">{getErrorMessage("description") || VALIDATION_MESSAGES.DESCRIPTION_MAX}</p>
+            )}
             <p className="text-gray-400 text-sm ml-auto">{description.length}/50</p>
           </div>
         </div>
@@ -513,8 +530,8 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
           />
           <span className="ml-2 text-lg">원</span>
         </div>
-        {(targetAmountError || getErrorMessage("targetAmount")) && (
-          <p className="text-red-500 text-sm mt-1">{targetAmountError || getErrorMessage("targetAmount")}</p>
+        {(getErrorMessage("targetAmount") || forceTargetAmountMaxError) && (
+          <p className="text-red-500 text-sm">{getErrorMessage("targetAmount") || VALIDATION_MESSAGES.TARGET_AMOUNT_MAX}</p>
         )}
       </div>
 
@@ -532,6 +549,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
             onChange={handleStartDateChange}
             position="top"
             minDate={getMinStartDate()}
+            dataCy="datepicker-start"
           />
           <span>부터</span>
           <DatePicker
@@ -539,6 +557,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
             onChange={handleEndDateChange}
             position="top"
             minDate={startDate || getMinStartDate()}
+            dataCy="datepicker-end"
           />
           <span>까지</span>
         </div>
@@ -561,6 +580,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
             onChange={handleDeliveryDateChange}
             position="top"
             minDate={getMinDeliveryDate()}
+            dataCy="datepicker-delivery"
           />
         </div>
         {getErrorMessage("deliveryDate") && (
