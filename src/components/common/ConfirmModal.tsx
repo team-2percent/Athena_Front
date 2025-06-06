@@ -7,11 +7,12 @@ interface ConfirmModalProps {
   message: string
   onConfirm: () => void
   onClose: () => void
+  dataCy?: string
 }
 
-export default function ConfirmModal({ isOpen, message, onConfirm, onClose }: ConfirmModalProps) {
+export default function ConfirmModal({ isOpen, message, onConfirm, onClose, dataCy }: ConfirmModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="sm" title="확인">
+    <Modal isOpen={isOpen} onClose={onClose} size="sm" title="확인" dataCy={dataCy}>
       <div className="flex flex-col gap-4">
         <Modal.Text variant="body">{message}</Modal.Text>
         <div className="flex gap-4 justify-end">

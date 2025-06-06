@@ -1,15 +1,20 @@
-// src/components/common/TopToast.tsx - 컨셉 1: 우측 상단 슬라이드 탭
+"use client"
+
 import { useEffect, useState } from 'react';
 import { X, Bell } from 'lucide-react';
+import clsx from 'clsx';
 
 interface TopToastProps {
   title: string;
   body: string;
   duration?: number; // milliseconds
   onClose: () => void;
+  className?: string;
+  dataCy?: string;
+  icon?: React.ReactNode;
 }
 
-export default function TopToast({ title, body, duration = 5000, onClose }: TopToastProps) {
+export default function TopToast({ title, body, duration = 5000, onClose, className, dataCy, icon }: TopToastProps) {
   const [isVisible, setIsVisible] = useState(false); // 초기 상태를 false로 변경하여 애니메이션 시작 준비
   const [isMounted, setIsMounted] = useState(false); // 마운트 상태 추적
 
@@ -58,11 +63,11 @@ export default function TopToast({ title, body, duration = 5000, onClose }: TopT
   }
 
   return (
-    <div className={toastClasses}>
+    <div className={clsx(toastClasses, className)} data-cy={dataCy}>
       <div className="flex items-center w-full">
         {/* 알림 아이콘 */}
         <div className="flex-shrink-0 flex items-center h-full">
-          <Bell className="h-8 w-8 text-white" aria-hidden="true" />
+          {icon || <Bell className="h-8 w-8 text-white" aria-hidden="true" />}
         </div>
         {/* 알림 내용 */}
         <div className="ml-4 flex-1">

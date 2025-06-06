@@ -5,8 +5,8 @@ import HeaderLoader from "@/components/HeaderLoader";
 import RegisterPageButtonLoader from "@/components/RegisterPageButtonLoader";
 import AuthProvider from "@/components/AuthProvider";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
-
 import FCMMessageListener from "@/components/FcmMessageListener";
+import AlertLoader from "@/components/AlertLoader";
 
 // Pretendard 폰트를 사용하기 위해 불러옴
 const pretendard = localFont({
@@ -33,6 +33,7 @@ export default function RootLayout({
       >
         <ServiceWorkerRegistration />
         <AuthProvider>
+          <AlertLoader />
           <HeaderLoader />
           <main className="flex-1 bg-white m-none w-full">
             <div className="flex justify-center mx-auto">
