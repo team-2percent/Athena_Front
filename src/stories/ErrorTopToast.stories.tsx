@@ -18,7 +18,6 @@ export const Default: Story = {
         title: '에러 발생',
         body: '작업 중 오류가 발생했습니다.',
         duration: 5000,
-        onClose: () => console.log('Toast closed'),
     },
 }
 
@@ -27,7 +26,6 @@ export const LongMessage: Story = {
         title: '시스템 오류',
         body: '서버와의 통신 중 예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
         duration: 5000,
-        onClose: () => console.log('Toast closed'),
     },
 }
 
@@ -36,6 +34,5 @@ export const ShortDuration: Story = {
         title: '빠른 알림',
         body: '작업이 완료되었습니다.',
         duration: 2000,
-        onClose: () => console.log('Toast closed'),
     },
 }
