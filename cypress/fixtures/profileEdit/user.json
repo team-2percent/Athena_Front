@@ -1,0 +1,8 @@
+{
+  "id": 57,
+  "email": "test@example.com",
+  "nickname": "테스트유저",
+  "imageUrl": null,
+  "sellerDescription": "안녕하세요! 저는 프로젝트를 판매하고 있는 테스트유저입니다.\n열심히 하겠습니다!",
+  "linkUrl": "https://github.com/test,https://blog.test.com"
+} 
