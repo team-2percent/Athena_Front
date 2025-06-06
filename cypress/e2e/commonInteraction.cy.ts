@@ -10,10 +10,24 @@ describe('공통 상호작용', () => {
 
       cy.intercept({
         method: "GET",
-        url: "/api/categoryList"
+        url: "/api/project/categoryList?sortType=LATEST"
       }, {
         fixture: "categoryList.json"
       }).as("getCategoryList");
+
+      cy.intercept({
+        method: 'GET',
+        url: '/api/project/planRankingView'
+      }, {
+        fixture: 'planRankingView.json'
+      }).as('getPlanRankingView')
+    
+      cy.intercept({
+        method: "GET",
+        url: '/api/project/categoryRankingView'
+      }, {
+        fixture: 'categoryRankingView.json'
+      }).as('getCategoryRankingView')
 
       cy.visit('/category')
       cy.get('[data-cy="logo-link"]').filter(':visible').click();
