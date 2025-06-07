@@ -37,6 +37,8 @@ Cypress.Commands.add('login', () => {
     })
     // 로그인 모달 열기
     cy.get('header').get('[data-cy="open-login-modal-button"]').click()
+
+    cy.get('[data-cy="login-modal"]').should('be.visible')
     
     // 로그인 폼 작성
     cy.get('[data-cy="login-modal"]').within(() => {
@@ -98,6 +100,13 @@ Cypress.Commands.add('checkErrorTopToast', (title: string, body: string) => {
 
     cy.get("@errorTopToast").should('not.exist', { timeout: 6000 })
 })
+Cypress.Commands.add('iframeBody', { prevSubject: 'element' }, ($iframe) => {
+  return cy
+    .wrap($iframe)
+    .its('0.contentDocument.body')
+    .should('not.be.empty')
+    .then(cy.wrap);
+});
 //
 //
 // -- This is a child command --
@@ -117,6 +126,7 @@ declare global {
       login(): Chainable<void>
       visitMainPage(): Chainable<void>
       checkErrorTopToast(title: string, body: string): Chainable<void>
+      iframeBody(): Chainable<JQuery<HTMLElement>>
     //   drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
     //   dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
     //   visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>

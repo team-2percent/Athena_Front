@@ -17,6 +17,7 @@ interface InputProps {
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
   onClick?: (e: React.MouseEvent<HTMLInputElement>) => void
   dataCy?: string
+  readOnly?: boolean
 }
 
 export function Input({
@@ -33,6 +34,7 @@ export function Input({
   onKeyDown,
   onClick,
   dataCy,
+  readOnly = false,
 }: InputProps) {
   const design = designType === "outline-rect" ? "rounded border" : designType === "outline-round" ? "rounded-full border" : "border-b"
   
@@ -49,14 +51,16 @@ export function Input({
       onClick={onClick}
       placeholder={placeholder}
       className={clsx(
-        "px-3 py-2 text-sm border-gray-300 focus:outline-none transition focus:border-main-color",
+        "px-3 py-2 text-sm border-gray-300 focus:outline-none transition",
         design,
         isError && "border-red-500 focus:border-red-500",
         align === "center" && "text-center",
         align === "right" && "text-right",
+        !readOnly && "cursor-pointer focus:border-main-color",
         className
       )}
       data-cy={dataCy}
+      readOnly={readOnly}
     />
   )
 }
@@ -87,6 +91,7 @@ export const PasswordInput = ({
   designType = "underline",
   isError = false,
   dataCy,
+  readOnly = false,
 }: Omit<InputProps, "type">) => {
   const [visible, setVisible] = useState(false)
 
@@ -102,6 +107,7 @@ export const PasswordInput = ({
         designType={designType}
         isError={isError}
         dataCy={dataCy}
+        readOnly={readOnly}
       />
       <button
         type="button"
@@ -123,6 +129,7 @@ export const EmailInput = ({
   designType = "underline",
   isError = false,
   dataCy,
+  readOnly = false,
 }: Omit<InputProps, "type">) => {
   return (
     <Input
@@ -135,6 +142,7 @@ export const EmailInput = ({
       designType={designType}
       isError={isError}
       dataCy={dataCy}
+      readOnly={readOnly}
     />
   )
 }

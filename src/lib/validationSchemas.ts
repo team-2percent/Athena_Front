@@ -238,11 +238,11 @@ export const emailSchema = z.string()
 
 export const passwordSchema = z.string()
   .max(PASSWORD_MAX_LENGTH, `${PASSWORD_MAX_LENGTH}자 이내로 입력해주세요.`)
-  .refine((val) => val.length >= PASSWORD_MIN_LENGTH, `${PASSWORD_MIN_LENGTH}자 이상 입력해주세요.`)
+  .min(PASSWORD_MIN_LENGTH, `${PASSWORD_MIN_LENGTH}자 이상 입력해주세요.`)
 
 export const newPasswordSchema = z.string()
   .max(PASSWORD_MAX_LENGTH, `${PASSWORD_MAX_LENGTH}자 이내로 입력해주세요.`)
-  .refine((val) => val.length >= PASSWORD_MIN_LENGTH, `${PASSWORD_MIN_LENGTH}자 이상 입력해주세요.`)
+  .min(PASSWORD_MIN_LENGTH, `${PASSWORD_MIN_LENGTH}자 이상 입력해주세요.`)
   .refine((val) => /[A-Z]/.test(val), "대문자를 포함해주세요.")
   .refine((val) => /[a-z]/.test(val), "소문자를 포함해주세요.")
   .refine((val) => /[0-9]/.test(val), "숫자를 포함해주세요.")
@@ -342,6 +342,7 @@ export const passwordEditSchema = z.object({
   passwordConfirmed: z.boolean().refine((val) => val, "비밀번호 확인이 필요합니다."),
   newPassword: newPasswordSchema,
   newPasswordConfirm: passwordSchema,
+  newPasswordMatch: passwordMatchSchema,
 })
 
 // 프로필 url 스키마

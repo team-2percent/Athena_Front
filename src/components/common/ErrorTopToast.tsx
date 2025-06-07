@@ -17,7 +17,7 @@ export default function ErrorTopToast({ title, body, duration = 5000}: ErrorTopT
             body={body}
             duration={duration}
             onClose={hideErrorToast}
-            className="bg-red-500"
+            className="bg-red-500 z-100"
             dataCy="error-top-toast"
             icon={<CircleAlert className="h-8 w-8 text-white" aria-hidden="true" />}
         />

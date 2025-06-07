@@ -9,6 +9,7 @@ import { TextInput } from "../common/Input"
 import { ACCOUNT_HOLDER_MAX_LENGTH, BANK_ACCOUNT_MAX_LENGTH, BANK_NAME_MAX_LENGTH } from "@/lib/validationConstant"
 import InputInfo from "../common/InputInfo"
 import { accountAddSchema, accountHolderSchema, bankAccountSchema, bankNameSchema } from "@/lib/validationSchemas"
+import useErrorToastStore from "@/stores/useErrorToastStore"
 
 interface AccountInfo {
     id: number
@@ -20,6 +21,7 @@ interface AccountInfo {
 
 export default function AccountInfo() {
   const { isLoading, apiCall } = useApi();
+  const { showErrorToast } = useErrorToastStore();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDefaultModalOpen, setIsDefaultModalOpen] = useState(false); 
   // 계좌 정보 상태
@@ -65,21 +67,21 @@ export default function AccountInfo() {
         // 3. alert 호출 부분 수정 (기본 계좌 삭제 시도 시)
         setAlertMessage("기본 계좌는 삭제할 수 없습니다!")
         setIsAlertOpen(true)
-      } else {
-        console.log("삭제 실패")
+      } else if (status === 500) {
+        showErrorToast("계좌 삭제 실패", "다시 시도해주세요.")
       }
     })
   }
 
   const setDefaultAccount = () => {
     if (defaultId === null) return;
-      apiCall(`/api/bankAccount/state?bankAccountId=${defaultId}`, "PUT").then(({ error }) => {
+      apiCall(`/api/bankAccount/state?bankAccountId=${defaultId}`, "PUT").then(({ error, status }) => {
       if (!error) {
         loadAccounts()
         setDefaultId(null)
         setIsDefaultModalOpen(false)
-      } else {
-        console.log("설정 실패")
+      } else if (status === 500) {
+        showErrorToast("기본 계좌 변경 실패", "다시 시도해주세요.")
       }
     })
   }
@@ -162,10 +164,10 @@ export default function AccountInfo() {
     return <div className="flex gap-4 w-full">
       {/* 5. 컴포넌트 return 문 내부 최상단에 AlertModal 컴포넌트 추가 */}
       <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={() => setIsAlertOpen(false)} />
-      <ConfirmModal isOpen={isDefaultModalOpen} message={"기본 계좌로 설정할까요?"} onConfirm={setDefaultAccount} onClose={() => setIsDefaultModalOpen(false)} />
-      <ConfirmModal isOpen={isDeleteModalOpen} message={"계좌를 삭제할까요?"} onConfirm={deleteAccount} onClose={() => setIsDeleteModalOpen(false)} />
+      <ConfirmModal isOpen={isDefaultModalOpen} message={"기본 계좌로 설정할까요?"} onConfirm={setDefaultAccount} onClose={() => setIsDefaultModalOpen(false)} dataCy="default-account-confirm-modal"/>
+      <ConfirmModal isOpen={isDeleteModalOpen} message={"계좌를 삭제할까요?"} onConfirm={deleteAccount} onClose={() => setIsDeleteModalOpen(false)} dataCy="delete-account-confirm-modal"/>
         {/* 계좌 추가 폼 */}
-        <div className="flex-1 bg-white rounded-lg shadow py-6 px-10">
+        <div className="flex-1 bg-white rounded-lg shadow py-6 px-10" data-cy="account-add-form">
             <h3 className="text-lg font-medium mb-6">새 계좌 추가</h3>
             <div className="flex gap-4 flex-col">
             <div>
@@ -176,8 +178,9 @@ export default function AccountInfo() {
                   value={newAccount.accountHolder}
                   onChange={handleNewAccountChange}
                   placeholder="이름"
+                  dataCy="account-name-input"
                 />
-                <InputInfo errorMessage={accountAddError.accountHolder} />
+                <InputInfo errorMessage={accountAddError.accountHolder} errorMessageDataCy="account-name-error-message"/>
               </div>
               <div>
                 <label className="block text-sm font-medium text-sub-gray mb-1">은행명</label>
@@ -187,8 +190,9 @@ export default function AccountInfo() {
                   value={newAccount.bankName}
                   onChange={handleNewAccountChange}
                   placeholder="은행명"
+                  dataCy="account-bank-input"
                 />
-                <InputInfo errorMessage={accountAddError.bankName} />
+                <InputInfo errorMessage={accountAddError.bankName} errorMessageDataCy="account-bank-error-message"/>
               </div>
               <div>
                 <label className="block text-sm font-medium text-sub-gray mb-1">계좌번호</label>
@@ -198,8 +202,9 @@ export default function AccountInfo() {
                   value={newAccount.bankAccount}
                   onChange={handleNewAccountChange}
                   placeholder="계좌번호"
+                  dataCy="account-number-input"
                 />
-                <InputInfo errorMessage={accountAddError.bankAccount} />
+                <InputInfo errorMessage={accountAddError.bankAccount} errorMessageDataCy="account-number-error-message"/>
               </div>
             </div>
             <div className="mt-4 flex justify-end">
@@ -208,32 +213,37 @@ export default function AccountInfo() {
                 onClick={handleAddAccount}
                 className="flex items-center appearance-none"
                 disabled={addButtonDisabled}
+                dataCy="account-add-button"
               >
                 <Plus className="w-4 h-4 mr-1" /> 계좌 추가
               </PrimaryButton>
             </div>
           </div>
         {/* 계좌 목록 */}
-        <div className="flex-1 flex flex-col bg-white rounded-lg shadow py-6 px-10 justify-between">
+        <div className="flex-1 flex flex-col bg-white rounded-lg shadow py-6 px-10 justify-between" data-cy="account-list">
             <h3 className="text-lg font-medium mb-6">등록된 계좌 목록</h3>
-            <div className="flex-1 flex flex-col gap-4">
+            <div className="flex-1 flex flex-col gap-4" data-cy="account-list">
             {accounts.length === 0 ? (
                     <p className="text-sub-gray text-center py-4">등록된 계좌가 없습니다.</p>
                 ) : (
                     <div className="space-y-3 mt-2">
                     {accounts.map((account) => (
-                        <div key={account.id} className="flex items-center justify-between border-b pb-3">
+                        <div key={account.id} className="flex items-center justify-between border-b pb-3" data-cy="account-list-item">
                         <div className="flex items-center">
                             <div>
                             <p className="font-medium">{account.bankName}</p>
                             <p className="text-sm text-sub-gray">{account.bankAccount}</p>
                             </div>
                             {account.isDefault ? 
-                            <span className="ml-2 px-2 py-0.5 bg-secondary-color text-main-color text-xs rounded-full">기본</span>
+                            <span
+                              className="ml-2 px-2 py-0.5 bg-secondary-color text-main-color text-xs rounded-full"
+                              data-cy="account-default-mark"
+                            >기본</span>
                             :
                             <button
                               className="border-box ml-2 px-2 py-0.5 text-xs text-main-color underline"
                               onClick={() => handleClickSetDefaultButton(account.id)}
+                              data-cy="account-default-change-button"
                             >기본 계좌로 설정</button>
                             }
                         </div>
@@ -243,6 +253,7 @@ export default function AccountInfo() {
                               type="button"
                               onClick={() => handleClickDeleteButton(account.id)}
                               className="text-sub-gray hover:text-red-500"
+                              data-cy="account-delete-button"
                           >
                               <Trash2 className="w-4 h-4" />
                           </button>
