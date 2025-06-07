@@ -255,6 +255,8 @@ describe("카테고리 프로젝트 목록", () => {
             cy.get('[data-cy="category-list-item"]').first().click()
             cy.url().should('include', '/category')
 
+            cy.wait('@getCategoryProjectList').its('response.statusCode').should('eq', 200)
+
             cy.get('[data-cy="list-header-sort-button"]').should('contain', '최신순').click()
 
             cy.get('[data-cy="list-header-sort-dropdown"]').should('be.visible')
@@ -278,11 +280,11 @@ describe("카테고리 프로젝트 목록", () => {
                 url: '/api/project/categoryList?sortType=*'
             }, {
                 statusCode: 500
-            }).as('getCategoryProjectList')
+            }).as('getNextCategoryProjectList')
 
             cy.get('[data-cy="list-header-sort-POPULAR"]').click()
 
-            cy.wait('@getCategoryProjectList').its('response.statusCode').should('eq', 500)
+            cy.wait('@getNextCategoryProjectList').its('response.statusCode').should('eq', 500)
 
             // then - 카테고리 프로젝트 목록 정렬 변경 실패
             cy.get('[data-cy="server-error-card"]').should('be.visible')
