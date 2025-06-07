@@ -59,7 +59,7 @@ export default function ProjectCard({
   }
 
   return (
-    <div className={cn("relative flex", className)}>
+    <div className={cn("relative flex", className)} data-cy="project-list-item">
       {/* 마감 임박 */}
       {isDeadlineSoon &&
         <div className="absolute top-2 left-2 z-4 bg-point-color text-white px-3 py-1 rounded-sm text-xs font-bold">

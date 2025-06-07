@@ -51,12 +51,12 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
   }, [])
 
   return (
-    <div className="flex justify-between items-center w-full py-3 border-b border-gray-100 mb-8">
+    <div className="flex justify-between items-center w-full py-3 border-b border-gray-100 mb-8" data-cy="list-header">
         {/* 상품 개수 표시 */}
-        <div className="flex text-gray-500 font-normal">
-                {type === "search" && searchWord && <p><span className="text-main-color font-normal">{searchWord}</span>와 연관된&nbsp;</p>}
+        <div className="flex text-gray-500 font-normal" data-cy="list-header-info">
+                {type === "search" && searchWord && <p><span className="text-main-color font-normal" data-cy="list-header-search-word">{searchWord}</span>와 연관된&nbsp;</p>}
                 <p>
-                <span className="text-main-color font-normal">{count}</span>개의 상품이 있습니다.
+                <span className="text-main-color font-normal" data-cy="list-header-count">{count}</span>개의 상품이 있습니다.
                 </p>
         </div>
 
@@ -67,6 +67,7 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
                 ref={buttonRef}
                 className="flex items-center text-main-color font-normal"
                 onClick={() => setIsOpen(!isOpen)}
+                data-cy="list-header-sort-button"
             >
                 {sortName[sort as keyof typeof sortName]} {isOpen ? <ChevronUp className="ml-1 h-5 w-5" /> : <ChevronDown className="ml-1 h-5 w-5" />}
             </button>
@@ -86,6 +87,7 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
                     key={option}
                     className={clsx("font-normal", sort === option ? "text-main-color" : "text-gray-500")}
                     onClick={() => handleSortClick(option as "deadline" | "recommend" | "view" | "achievement")}
+                    data-cy={`list-header-sort-${option}`}
                     >
                     {sortName[option as keyof typeof sortName]}
                     </button>
