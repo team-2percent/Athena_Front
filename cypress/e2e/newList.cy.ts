@@ -60,7 +60,10 @@ describe("신규 프로젝트 목록", () => {
         })
 
         it("서버 오류로 인한 프로젝트 목록 조회 실패", () => {
-            cy.intercept('GET', '/api/project/recentList', {
+            cy.intercept({
+                method: 'GET',
+                url: '/api/project/recentList'
+            }, {
                 statusCode: 500
             }).as('getProjectList')
 
@@ -73,7 +76,10 @@ describe("신규 프로젝트 목록", () => {
         })
 
         it("서버 오류로 인한 프로젝트 목록 추가 조회 실패", () => {
-            cy.intercept('GET', '/api/project/recentList?cursorValue=*&lastProjectId=*', {
+            cy.intercept({
+                method: 'GET',
+                url: '/api/project/recentList?cursorValue=*&lastProjectId=*'
+            }, {
                 statusCode: 500
             }).as('getNextProjectList')
 
