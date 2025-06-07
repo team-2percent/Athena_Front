@@ -40,6 +40,8 @@ describe("배송지 편집 페이지", () => {
                 cy.intercept({
                     method: "POST",
                     url: "/api/bankAccount"
+                }, {
+                    statusCode: 200
                 }).as("addAccount")
 
                 cy.fixture('profileEdit/accountList.json').then((accountFixture) => {
