@@ -2,6 +2,8 @@
 
 import { jwtDecode } from "jwt-decode";
 
+let userHeaderFixture: any
+
 Cypress.Commands.add('login', () => {
     // 로그인 API 호출 인터셉트
     cy.intercept({
@@ -51,34 +53,50 @@ Cypress.Commands.add('login', () => {
 })
 
 Cypress.Commands.add('visitMainPage', () => {
-    cy.intercept({
-      method: 'GET',
-      url: '/api/project/planRankingView'
-    }, {
-      fixture: 'planRankingView.json'
-    }).as('getPlanRankingView')
+  cy.intercept({
+    method: 'GET',
+    url: '/api/project/planRankingView'
+  }, {
+    fixture: 'planRankingView.json'
+  }).as('getPlanRankingView')
 
-    cy.intercept({
-      method: "GET",
-      url: '/api/project/categoryRankingView'
-    }, {
-      fixture: 'categoryRankingView.json'
-    }).as('getCategoryRankingView')
-    cy.visit('/', {
-      onBeforeLoad(win: any) {
-        // window 객체에 있는 isSupported를 stub
-        // 보통은 앱 번들 안에서 import 된 모듈이라 직접 접근은 어려움
-        // 그래서 messaging 객체 자체를 shim 처리
-        win.firebase = {
-          messaging: () => ({
-            isSupported: () => Promise.resolve(false), // ✅ 핵심: FCM 전체 비활성화
-          }),
-        };
-  
-        // 또는 메시징 관련 예외가 터지지 않도록 기본 메서드 stub
-        cy.stub(win.Notification, 'requestPermission').resolves('granted');
-      },
-    });
+  cy.intercept({
+    method: "GET",
+    url: '/api/project/categoryRankingView'
+  }, {
+    fixture: 'categoryRankingView.json'
+  }).as('getCategoryRankingView')
+
+  cy.intercept({
+    method: "GET",
+    url: '/api/user/Header'
+  }, {
+    fixture: 'userHeader.json'
+  }).as("getUserHeader")
+
+  cy.visit('/', {
+    onBeforeLoad(win: any) {
+      // window 객체에 있는 isSupported를 stub
+      // 보통은 앱 번들 안에서 import 된 모듈이라 직접 접근은 어려움
+      // 그래서 messaging 객체 자체를 shim 처리
+      win.firebase = {
+        messaging: () => ({
+          isSupported: () => Promise.resolve(false), // ✅ 핵심: FCM 전체 비활성화
+        }),
+      };
+
+      // 또는 메시징 관련 예외가 터지지 않도록 기본 메서드 stub
+      cy.stub(win.Notification, 'requestPermission').resolves('granted');
+    },
+  });
+})
+Cypress.Commands.add('checkErrorTopToast', (title: string, body: string) => {
+    cy.get('[data-cy="error-top-toast"]').should('be.visible').within(() => {
+        cy.get('[data-cy="top-toast-title"]').should('contain', title)
+        cy.get('[data-cy="top-toast-body"]').should('contain', body)
+    }).as("errorTopToast")
+
+    cy.get("@errorTopToast").should('not.exist', { timeout: 6000 })
 })
 //
 //
@@ -98,6 +116,7 @@ declare global {
     interface Chainable {
       login(): Chainable<void>
       visitMainPage(): Chainable<void>
+      checkErrorTopToast(title: string, body: string): Chainable<void>
     //   drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
     //   dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
     //   visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>

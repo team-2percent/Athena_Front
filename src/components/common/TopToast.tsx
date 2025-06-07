@@ -71,8 +71,8 @@ export default function TopToast({ title, body, duration = 5000, onClose, classN
         </div>
         {/* 알림 내용 */}
         <div className="ml-4 flex-1">
-          <p className="text-base font-bold text-white">{title}</p>
-          <p className="mt-1 text-sm text-white/90">{body}</p>
+          <p className="text-base font-bold text-white" data-cy="top-toast-title">{title}</p>
+          <p className="mt-1 text-sm text-white/90" data-cy="top-toast-body">{body}</p>
         </div>
         {/* 닫기 버튼 */}
         <div className="ml-4 flex-shrink-0">
