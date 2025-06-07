@@ -140,6 +140,8 @@ export default function AccountInfo() {
       if (!error) {
         setNewAccount({ bankName: "", bankAccount: "", accountHolder: "" }) // 폼 초기화
         loadAccounts();
+      } else if (status === 500) {
+        showErrorToast("계좌 추가 실패", "다시 시도해주세요.")
       }
     }) 
   }
@@ -230,9 +232,12 @@ export default function AccountInfo() {
                     {accounts.map((account) => (
                         <div key={account.id} className="flex items-center justify-between border-b pb-3" data-cy="account-list-item">
                         <div className="flex items-center">
-                            <div>
-                            <p className="font-medium">{account.bankName}</p>
-                            <p className="text-sm text-sub-gray">{account.bankAccount}</p>
+                            <div className="flex flex-col">
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium">{account.bankName}</p>
+                                <p className="text-sm text-sub-gray">{account.accountHolder}</p>
+                              </div>
+                              <p className="text-sm text-sub-gray">{account.bankAccount}</p>
                             </div>
                             {account.isDefault ? 
                             <span
