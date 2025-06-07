@@ -40,6 +40,8 @@ describe("배송지 편집 페이지", () => {
                 cy.intercept({
                     method: "POST",
                     url: "/api/delivery/delivery-info"
+                }, {
+                    statusCode: 200
                 }).as("addAddress")
 
                 cy.fixture('profileEdit/addressList.json').then((addressFixture) => {
