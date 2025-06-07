@@ -252,6 +252,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
             {/* 프로젝트 정보 탭 */}
             <div
               className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "프로젝트 정보" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+              data-cy="project-info-tab"
             >
               <div>
                 <h2 className="mb-4 md:mb-8 text-lg md:text-3xl font-bold">프로젝트 기본 정보</h2>
@@ -361,7 +362,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                   <div className="space-y-3 md:space-y-4">
                     {reviews.length > 0 ? (
                       reviews.map((review) => (
-                        <div key={review.id} className="rounded-3xl border border-gray-border p-4 md:p-6 shadow-sm">
+                        <div key={review.id} className="rounded-3xl border border-gray-border p-4 md:p-6 shadow-sm" data-cy="review-item">
                           <div className="flex items-center space-x-3 md:space-x-4">
                             {/* 리뷰 작성자 프로필 사진 */}
                             <div className="h-10 w-10 md:h-16 md:w-16 overflow-hidden rounded-full">
@@ -373,12 +374,12 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                             </div>
                             {/* 이름/날짜 */}
                             <div className="flex flex-col justify-center">
-                              <h3 className="text-base md:text-xl font-bold">{review.userName}</h3>
-                              <p className="text-xs md:text-base text-sub-gray">{formatDate(review.createdAt)}</p>
+                              <h3 className="text-base md:text-xl font-bold" data-cy="review-username">{review.userName}</h3>
+                              <p className="text-xs md:text-base text-sub-gray" data-cy="review-date">{formatDate(review.createdAt)}</p>
                             </div>
                           </div>
                           {/* 리뷰 내용 */}
-                          <div className="mt-2 md:mt-3 text-sm md:text-base whitespace-pre-line ml-0 md:ml-20">{review.content}</div>
+                          <div className="mt-2 md:mt-3 text-sm md:text-base whitespace-pre-line ml-0 md:ml-20" data-cy="review-content">{review.content}</div>
                         </div>
                       ))
                     ) : (

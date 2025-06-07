@@ -935,6 +935,7 @@ const DonateDock = () => {
                                       <div
                                         className="flex justify-between items-center p-3 md:p-4 cursor-pointer hover:bg-gray-50"
                                         onClick={(e) => toggleProductExpand(optionId, e)}
+                                        data-cy="expand-selected-product"
                                       >
                                         <div className="flex items-center">
                                           <ChevronRight
