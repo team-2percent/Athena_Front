@@ -81,6 +81,7 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
                     top: buttonRef.current ? buttonRef.current.getBoundingClientRect().bottom + 8 : 0,
                     right: buttonRef.current ? window.innerWidth - buttonRef.current.getBoundingClientRect().right : 0,
                 }}
+                data-cy="list-header-sort-dropdown"
                 >
                 {type !== "new" && listType[type].sort.map((option) => (
                     <button
