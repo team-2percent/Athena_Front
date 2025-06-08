@@ -155,6 +155,11 @@ Cypress.Commands.add('checkServerErrorCard', (message: string) => {
   cy.get('[data-cy="server-error-message"]').should('be.visible').should('contain', message)
   cy.get('[data-cy="retry-button"]').should('be.visible')
 })
+
+Cypress.Commands.add('checkEmptyMessageCard', (message: string) => {
+  cy.get('[data-cy="empty-message-card"]').should('be.visible')
+  cy.get('[data-cy="empty-message"]').should('be.visible').should('contain', message)
+})
 //
 //
 // -- This is a child command --
@@ -176,6 +181,7 @@ declare global {
       visitMainPage(): Chainable<void>
       checkErrorTopToast(title: string, body: string): Chainable<void>
       checkServerErrorCard(message: string): Chainable<void>
+      checkEmptyMessageCard(message: string): Chainable<void>
     //   drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
     //   dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
     //   visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>

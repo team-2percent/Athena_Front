@@ -58,7 +58,7 @@
         "payOutAmount": 479050,
         "sellerName": "user2",
         "requestedAt": "2025-05-21T00:16:48.448337",
-        "status": "PENDING"
+        "status": "COMPLETED"
       },
       {
         "settlementId": 1,
@@ -68,7 +68,7 @@
         "payOutAmount": 479050,
         "sellerName": "User1",
         "requestedAt": "2025-05-21T00:16:48.381529",
-        "status": "PENDING"
+        "status": "COMPLETED"
       }
     ],
     "pageInfo": {

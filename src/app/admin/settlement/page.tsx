@@ -7,6 +7,7 @@ import { useApi } from "@/hooks/useApi";
 import { formatDateInAdmin } from "@/lib/utils";
 import Pagination from "@/components/common/Pagination";
 import EmptyMessage from "@/components/common/EmptyMessage";
+import ServerErrorComponent from "@/components/common/ServerErrorComponent";
 
 interface Settlement {
     settlementId: number,
@@ -48,17 +49,21 @@ export default function SettlementPage() {
     const [settlementList, setSettlementList] = useState<any[]>([])
     const [totalPageCount, setTotalPageCount] = useState<number>(1)
     const [queryParams, setQueryParams] = useState<QueryParamsSettlementList>(queryParamInitial)
-    const [loadError, setLoadError] = useState(false);
-    const isEmpty = totalPageCount === 0 && !isLoading && !loadError;
+    const [serverError, setServerError] = useState(false);
+    const isEmpty = totalPageCount === 0 && !isLoading && !serverError;
     const baseUri = "/api/admin/settlement"
     const queryParamUri = Object.entries(queryParams).filter(([key, value]) => value !== queryParamInitial[key as keyof QueryParamsSettlementList]).map(([key, value]) => `${key}=${value}`).join("&")
     const url = `${baseUri}${queryParamUri ? `?${queryParamUri}` : ""}`
 
     const loadSettlementList = () => {
-        apiCall<Response>(url, "GET").then(({ data }) => {
-            if (!data) return
-            setSettlementList(data.content)
-            setTotalPageCount(data.pageInfo.totalPages)
+        apiCall<Response>(url, "GET").then(({ data, error, status }) => {
+            if (!error && data) {
+                setSettlementList(data.content)
+                setTotalPageCount(data.pageInfo.totalPages)
+            }
+            if (error && status === 500) {
+                setServerError(true)
+            }
         })
     }
 
@@ -103,7 +108,6 @@ export default function SettlementPage() {
             page: page
         })
     }
-    
 
     useEffect(() => {
         loadSettlementList()
@@ -118,7 +122,7 @@ export default function SettlementPage() {
             <h3 className="text-xl font-medium mb-8">정산 내역</h3>
             <div className="flex gap-4">
                 <div className="relative">
-                    <select className="border rounded px-4 py-2" onChange={handleStatusChange}>
+                    <select className="border rounded px-4 py-2" onChange={handleStatusChange} data-cy="status-filter">
                         <option value="ALL">상태 전체</option>
                         <option value="PENDING">미정산</option>
                         <option value="COMPLETED">정산 완료</option>
@@ -126,7 +130,7 @@ export default function SettlementPage() {
                     </select>
                 </div>
                 <div className="relative">
-                    <select className="border rounded px-4 py-2" onChange={handleYearChange}>
+                    <select className="border rounded px-4 py-2" onChange={handleYearChange} data-cy="year-filter">
                         <option value={0}>년도 전체</option>
                         {Array.from({ length: new Date().getFullYear() - 2024 }, (_, i) => (
                             <option key={2025 + i} value={2025 + i}>{2025 + i}년</option>
@@ -136,7 +140,7 @@ export default function SettlementPage() {
                 {
                     queryParams.year !== 0 &&
                     <div className="relative">
-                        <select className="border rounded px-4 py-2" onChange={handleMonthChange}>
+                        <select className="border rounded px-4 py-2" onChange={handleMonthChange} data-cy="month-filter">
                             <option value={0}>월 전체</option>
                             {Array.from({ length: 12 }, (_, i) => (
                                 <option key={i + 1} value={i + 1}>{i + 1}월</option>
@@ -159,9 +163,14 @@ export default function SettlementPage() {
                             <th className="border-b p-4 w-[5%]">정산 상태</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody data-cy="settlement-list">
                         {settlementList.map((settlement) => (
-                            <tr key={settlement.settlementId} className="text-sm" onClick={() => router.push(`/admin/settlement/${settlement.settlementId}`)}>
+                            <tr
+                                key={settlement.settlementId}
+                                className="text-sm"
+                                onClick={() => router.push(`/admin/settlement/${settlement.settlementId}`)}
+                                data-cy="settlement-list-item"
+                            >
                                 <td className="border-b p-4 text-left">{settlement.projectTitle}</td>
                                 <td className="border-b p-4">{settlement.totalSales}</td>
                                 <td className="border-b p-4">{settlement.platformFee}</td>
@@ -175,6 +184,7 @@ export default function SettlementPage() {
                 </table>
             </div>
             {isEmpty && <EmptyMessage message="정산 내역이 없습니다." />}
+            {serverError && <ServerErrorComponent message="정산 내역 조회에 실패했습니다." onRetry={loadSettlementList}/>}
             <Pagination totalPages={totalPageCount} currentPage={queryParams.page} onPageChange={handlePageChange}/>
         </div>
     )

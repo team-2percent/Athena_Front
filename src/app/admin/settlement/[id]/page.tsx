@@ -10,6 +10,7 @@ import OverlaySpinner from "@/components/common/OverlaySpinner"
 import { formatDateInAdmin } from "@/lib/utils"
 import { SecondaryButton } from "@/components/common/Button"
 import Pagination from "@/components/common/Pagination"
+import ServerErrorComponent from "@/components/common/ServerErrorComponent"
 
 interface SettlementInfo {
     "projectTitle": string,
@@ -87,6 +88,7 @@ export default function SettlementDetailPage() {
     const [productSummary, setProductSummary] = useState<SettlementProductSummaryItem[] | null>(null)
     const [productSummaryTotal, setProductSummaryTotal] = useState<SettlementProductTotalSummary | null>(null)
     const [history, setHistory] = useState<SettlementHistoryItem[] | null>(null)
+    const [serverError, setServerError] = useState(false);
 
     const leftPageDisabled = currentPage === 0
     const rightPageDisabled = currentPage === totalPageCount - 1
@@ -102,19 +104,33 @@ export default function SettlementDetailPage() {
     }
 
     const loadSettlement = () => {
-        apiCall<SettlementInfo>(`/api/admin/settlement/${id}/info`, "GET").then(({ data }) => {
-            setInfo(data)
+        apiCall<SettlementInfo>(`/api/admin/settlement/${id}/info`, "GET").then(({ data, error, status }) => {
+            if (!error && data) {
+                setInfo(data)
+            }
+            if (error && status === 500) {
+                setServerError(true)
+                return
+            }
         })
-        apiCall<SettlementProductSummary>(`/api/admin/settlement/${id}/product-summary`, "GET").then(({ data }) => {
-            if (data) {
+        apiCall<SettlementProductSummary>(`/api/admin/settlement/${id}/product-summary`, "GET").then(({ data, error, status }) => {
+            if (!error && data) {
                 setProductSummary(data.items)
                 setProductSummaryTotal(data.total)
             }
+            if (error && status === 500) {
+                setServerError(true)
+                return
+            }
         })
-        apiCall<SettlementHistory>(`/api/admin/settlement/${id}/history`, "GET").then(({ data }) => {
-            if (data) {
+        apiCall<SettlementHistory>(`/api/admin/settlement/${id}/history`, "GET").then(({ data, error, status }) => {
+            if (!error && data) {
                 setHistory(data.content)
                 setTotalPageCount(data.pageInfo.totalPages)
+            }
+            if (error && status === 500) {
+                setServerError(true)
+                return
             }
         })
     }
@@ -125,12 +141,13 @@ export default function SettlementDetailPage() {
 
     const render = () => {
         if (isLoading) return <OverlaySpinner message="정산 정보를 불러오고 있습니다." />
+        if (serverError) return <ServerErrorComponent message="정산 정보 조회에 실패했습니다." onRetry={loadSettlement}/>
         if (!info || !productSummary || !productSummaryTotal || !history) return null
 
         return (
             <div>
                 {/* 프로젝트 기본 정보 */}
-            <div className="flex flex-col gap-6 py-6">
+            <div className="flex flex-col gap-6 py-6" data-cy="settlement-detail-info">
                 <h2 className="text-2xl font-medium border-b pb-2">프로젝트 기본 정보</h2>
                 <table className="w-full border-collapse text-left">
                     <tbody>
@@ -198,7 +215,7 @@ export default function SettlementDetailPage() {
                 </table>
             </div>
             {/* 판매자 정보 */}
-            <div className="flex flex-col gap-6 py-6">
+            <div className="flex flex-col gap-6 py-6" data-cy="settlement-detail-seller-info">
                 <h2 className="text-2xl font-medium border-b pb-2">판매자 정보</h2>
                 <div className="flex items-center mt-4 justify-between">
                     <div className="flex items-center gap-4">
@@ -227,7 +244,7 @@ export default function SettlementDetailPage() {
                 </div>
             </div>
             {/* 프로젝트 상품 별 정보 */}
-            <div className="flex flex-col gap-6 py-6">
+            <div className="flex flex-col gap-6 py-6" data-cy="settlement-detail-product-list">
                 <h2 className="text-2xl font-medium border-b pb-2">프로젝트 상품 별 정보</h2>
                 <table className="w-full border-collapse text-center">
                     <tbody>
@@ -264,7 +281,7 @@ export default function SettlementDetailPage() {
                 </table>
             </div>
             {/* 정산 기록 */}
-            <div className="flex flex-col gap-6 py-6">
+            <div className="flex flex-col gap-6 py-6" data-cy="settlement-history-list">
                 <h2 className="text-2xl font-medium border-b pb-2">정산 기록</h2>
                 <table className="w-full border-collapse text-center">
                     <tbody>
