@@ -11,6 +11,8 @@ import OverlaySpinner from "@/components/common/OverlaySpinner"
 import { useEffect } from "react";
 import { formatDateInAdmin } from "@/lib/utils"
 import { PrimaryButton, SecondaryButton } from "@/components/common/Button";
+import useErrorToastStore from "@/stores/useErrorToastStore";
+import ServerErrorComponent from "@/components/common/ServerErrorComponent";
 
 interface ApprovalProject {
     id: number,
@@ -46,30 +48,36 @@ export default function ProjectApprovalDetailPage() {
     const { id } = useParams();
     const router = useRouter();
     const { isLoading, apiCall } = useApi();
+    const { showErrorToast } = useErrorToastStore();
     // const [comment, setComment] = useState("")
     const [isApproved, setIsApproved] = useState<"approve" | "reject" | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [project, setProject] = useState<ApprovalProject | null>(null);
     const approve = isApproved === "approve" ? true : isApproved === "reject" ? false : null;
     const disabled = isApproved === null;
+    const [serverError, setServerError] = useState(false);
 
     const handleConfirm = () => {
         apiCall(`/api/admin/project/${id}/approval`, "PATCH", {
             approve: approve,
             // comment: comment
-        }).then(({ error }) => {
-            console.log(error);
-            if (error) {
+        }).then(({ error, status }) => {
+            if (!error) {
+                loadProject();
                 setIsModalOpen(false);
-            } else {
-                window.location.reload();
+            } else if (status === 500) {
+                if (approve) showErrorToast("프로젝트 승인 처리 실패", "다시 시도해주세요.")
+                else showErrorToast("프로젝트 반려 처리 실패", "다시 시도해주세요.")
             }
         })
     }
 
     const loadProject = () => {
-        apiCall<ApprovalProject>(`/api/admin/project/${id}`, "GET").then(({ data }) => {
-            setProject(data);
+        apiCall<ApprovalProject>(`/api/admin/project/${id}`, "GET").then(({ data, error, status }) => {
+            if (!error && data) setProject(data);
+            else if (error && status === 500) {
+                setServerError(true);
+            }
         })
     }
 
@@ -86,11 +94,12 @@ export default function ProjectApprovalDetailPage() {
 
     const renderProject = () => {
         if (isLoading) return <OverlaySpinner message="처리 중입니다."/>
+        if (serverError) return <ServerErrorComponent message="프로젝트 상세 조회에 실패했습니다." onRetry={loadProject}/>
         if (project === null) return <></>
         return (
             <div>
                 {/* 프로젝트 기본 정보 */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4" data-cy="project-detail-info">
                 <h2 className="text-2xl font-medium border-b pb-2">프로젝트 기본 정보</h2>
                 <div className="grid grid-cols-5 gap-4">
                     {project.imageUrls.map((imageUrl) => (
@@ -147,13 +156,13 @@ export default function ProjectApprovalDetailPage() {
                 
                 
             </div>
-            <div className="flex flex-col gap-4 mt-6">
+            <div className="flex flex-col gap-4 mt-6" data-cy="project-detail-markdown">
                 <h2 className="text-2xl font-medium border-b pb-2">상세 소개</h2>
                 <MarkdownRenderer content={project.markdown} />
             </div>
 
             {/* 상품 정보 */}
-            <div className="flex flex-col gap-4 mb-6">
+            <div className="flex flex-col gap-4 mb-6" data-cy="project-detail-product">
                 <h2 className="text-2xl font-medium border-b pb-2">상품 정보</h2>
                 <div className="flex flex-col">
                     {project.productResponses.map((product, idx) => 
@@ -248,7 +257,7 @@ export default function ProjectApprovalDetailPage() {
 
             {/* 승인 반려 란 */}
             {project?.isApproved === "PENDING" && (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4" data-cy="project-approve-form">
                 <h2 className="text-2xl font-medium border-b pb-2">프로젝트 승인 여부</h2>
                 <div className="flex justify-between">
                 <div className="flex items-center space-x-4 mt-4">
@@ -260,6 +269,7 @@ export default function ProjectApprovalDetailPage() {
                             checked={isApproved === "approve"}
                             onChange={(e) => setIsApproved(e.target.value as "approve")}
                             className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
+                            data-cy="project-approve-radio"
                         />
                         <span>승인</span>
                     </label>
@@ -271,6 +281,7 @@ export default function ProjectApprovalDetailPage() {
                             checked={isApproved === "reject"}
                             onChange={(e) => setIsApproved(e.target.value as "reject")}
                             className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
+                            data-cy="project-reject-radio"
                         />
                         <span>반려</span>
                     </label>
@@ -288,6 +299,7 @@ export default function ProjectApprovalDetailPage() {
                     <PrimaryButton
                         disabled={disabled}
                         onClick={() => setIsModalOpen(true)}
+                        data-cy="project-save-button"
                     >저장</PrimaryButton>
                 </div>
                 </div>
@@ -300,6 +312,7 @@ export default function ProjectApprovalDetailPage() {
                     message={`${isApproved === "approve" ? "승인" : "반려"} 하시겠습니까?`}
                     onConfirm={handleConfirm}
                     onClose={() => setIsModalOpen(false)}
+                    dataCy="project-approve-modal"
                 />
             }
         </div>

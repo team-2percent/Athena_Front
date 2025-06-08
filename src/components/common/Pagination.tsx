@@ -1,7 +1,6 @@
 "use client"
 
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
-import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 
 interface PaginationProps {
@@ -56,7 +55,7 @@ export default function Pagination({ totalPages, currentPage, onPageChange }: Pa
   }
 
   return (
-    <div className="flex justify-center items-center space-x-2 my-8">
+    <div className="flex justify-center items-center space-x-2 my-8" data-cy="pagination">
       {/* 첫 페이지로 이동 버튼 */}
       <button
         onClick={() => onPageChange(0)}
@@ -66,6 +65,7 @@ export default function Pagination({ totalPages, currentPage, onPageChange }: Pa
           currentPage === 0 ? "text-disabled-text cursor-not-allowed" : "text-main-color hover:bg-secondary-color",
         )}
         aria-label="첫 페이지로 이동"
+        data-cy="first-page-button"
       >
         <ChevronsLeft className="h-5 w-5" />
       </button>
@@ -79,6 +79,7 @@ export default function Pagination({ totalPages, currentPage, onPageChange }: Pa
           currentPage === 0 ? "text-disabled-text cursor-not-allowed" : "text-main-color hover:bg-secondary-color",
         )}
         aria-label="이전 페이지"
+        data-cy="prev-page-button"
       >
         <ChevronLeft className="h-5 w-5" />
       </button>
@@ -87,7 +88,7 @@ export default function Pagination({ totalPages, currentPage, onPageChange }: Pa
       {getPageNumbers().map((item, index) => {
         if (item.type === "ellipsis" || item.value === undefined) {
           return (
-            <span key={`ellipsis-${index}`} className="w-8 h-8 flex items-center justify-center text-black">
+            <span key={`ellipsis-${index}`} className="w-8 h-8 flex items-center justify-center text-black" data-cy="page-button">
               ...
             </span>
           )
@@ -101,6 +102,7 @@ export default function Pagination({ totalPages, currentPage, onPageChange }: Pa
               "w-8 h-8 flex items-center justify-center rounded-full",
               currentPage + 1 === item.value ? "bg-main-color text-white font-medium" : "text-black hover:bg-gray-100",
             )}
+            data-cy="page-button"
           >
             {item.value}
           </button>
@@ -116,6 +118,7 @@ export default function Pagination({ totalPages, currentPage, onPageChange }: Pa
           currentPage + 1 === totalPages ? "text-disabled-text cursor-not-allowed" : "text-main-color hover:bg-secondary-color",
         )}
         aria-label="다음 페이지"
+        data-cy="next-page-button"
       >
         <ChevronRight className="h-5 w-5" />
       </button>
@@ -129,6 +132,7 @@ export default function Pagination({ totalPages, currentPage, onPageChange }: Pa
           currentPage + 1 === totalPages ? "text-disabled-text cursor-not-allowed" : "text-main-color hover:bg-secondary-color",
         )}
         aria-label="마지막 페이지로 이동"
+        data-cy="last-page-button"
       >
         <ChevronsRight className="h-5 w-5" />
       </button>

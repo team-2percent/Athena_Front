@@ -149,13 +149,12 @@ Cypress.Commands.add('checkErrorTopToast', (title: string, body: string) => {
 
     cy.get("@errorTopToast").should('not.exist', { timeout: 6000 })
 })
-Cypress.Commands.add('iframeBody', { prevSubject: 'element' }, ($iframe) => {
-  return cy
-    .wrap($iframe)
-    .its('0.contentDocument.body')
-    .should('not.be.empty')
-    .then(cy.wrap);
-});
+
+Cypress.Commands.add('checkServerErrorCard', (message: string) => {
+  cy.get('[data-cy="server-error-card"]').should('be.visible')
+  cy.get('[data-cy="server-error-message"]').should('be.visible').should('contain', message)
+  cy.get('[data-cy="retry-button"]').should('be.visible')
+})
 //
 //
 // -- This is a child command --
@@ -176,7 +175,7 @@ declare global {
       adminLogin(): Chainable<void>
       visitMainPage(): Chainable<void>
       checkErrorTopToast(title: string, body: string): Chainable<void>
-      iframeBody(): Chainable<JQuery<HTMLElement>>
+      checkServerErrorCard(message: string): Chainable<void>
     //   drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
     //   dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
     //   visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>

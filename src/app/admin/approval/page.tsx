@@ -9,6 +9,7 @@ import EmptyMessage from "@/components/common/EmptyMessage";
 import { PrimaryButton } from "@/components/common/Button";
 import { TextInput } from "@/components/common/Input";
 import { SEARCH_MAX_LENGTH } from "@/lib/validationConstant";
+import ServerErrorComponent from "@/components/common/ServerErrorComponent";
 
 interface Project {
     projectId: number;
@@ -44,8 +45,8 @@ export default function ApprovalPage() {
     });
     const [totalPageCount, setTotalPageCount] = useState(1);
     const [pendingCount, setPendingCount] = useState(0);
-    const [loadError, setLoadError] = useState(false);
-    const isEmpty = totalPageCount === 0 && !isLoading && !loadError;
+    const [serverError, setServerError] = useState(false);
+    const isEmpty = totalPageCount === 0 && !isLoading && !serverError;
 
     const [search, setSearch] = useState("");
 
@@ -53,16 +54,21 @@ export default function ApprovalPage() {
     const queryParamUri = `?page=${queryParams.page}&direction=${queryParams.sort}${queryParams.keyword.length ? `&keyword=${queryParams.keyword}` : ""}`
     const url = `${baseUri}${queryParamUri ? `${queryParamUri}` : ""}`
     const loadProjects = () => {
-        apiCall<Response>(url, "GET").then(({ data }) => {
-            if (data === null) return
-            setProjects(data.content);
-            setQueryParams({
-                page: data.pageInfo.currentPage,
-                keyword: queryParams.keyword,
-                sort: queryParams.sort
-            });
-            setTotalPageCount(data.pageInfo.totalPages);
-            setPendingCount(data.pendingCount);
+        apiCall<Response>(url, "GET").then(({ data, error, status }) => {
+            if (!error && data !== null) {
+                setProjects(data.content);
+                setQueryParams({
+                    page: data.pageInfo.currentPage,
+                    keyword: queryParams.keyword,
+                    sort: queryParams.sort
+                });
+                setTotalPageCount(data.pageInfo.totalPages);
+                setPendingCount(data.pendingCount);
+            } else if (error && status === 500) {
+                setProjects(() => []);
+                setServerError(true);
+            }
+            
         })
     }
 
@@ -122,7 +128,7 @@ export default function ApprovalPage() {
 
     return (
         <div className="flex flex-col mx-auto py-8 w-[var(--content-width)]">
-            <h3 className="text-xl font-medium mb-8">확인해야할 상품이 {pendingCount}건 있습니다.</h3>
+            <h3 className="text-xl font-medium mb-8">확인해야할 상품이 <span data-cy="project-pending-count">{pendingCount}</span>건 있습니다.</h3>
             <div className="flex items-center mb-8 gap-4">
                 <div className="flex flex-1 gap-2 items-center">
                     <TextInput
@@ -131,15 +137,17 @@ export default function ApprovalPage() {
                         onChange={handleSearchChange}
                         onKeyDown={(e) => activeEnter(e)}
                         value={search}
+                        dataCy="search-input"
                     />
                     <PrimaryButton
                         onClick={handleSearchClick}
+                        dataCy="search-button"
                     >검색</PrimaryButton>
                 </div>
                 <div className="flex gap-4">
-                    <select className="border rounded px-4 py-2 h-10" onChange={handleSortChange}>
-                        <option value="asc">오래된순</option>
-                        <option value="desc">최신순</option>
+                    <select className="border rounded px-4 py-2 h-10" onChange={handleSortChange} data-cy="sort-select">
+                        <option value="asc" data-cy="sort-option">오래된순</option>
+                        <option value="desc" data-cy="sort-option">최신순</option>
                     </select>
                 </div>
             </div>
@@ -153,9 +161,14 @@ export default function ApprovalPage() {
                         <th className="text-center p-4 w-[10%]">승인 상태</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody data-cy="project-approval-list">
                     {projects.map((project, index) => (
-                        <tr key={project.projectId} className="border-b hover:bg-gray-50" onClick={() => handleProjectClick(project.projectId)}>
+                        <tr
+                            key={project.projectId}
+                            className="border-b hover:bg-gray-50"
+                            onClick={() => handleProjectClick(project.projectId)}
+                            data-cy="project-approval-list-item"
+                        >
                             <td className="text-center p-4 whitespace-nowrap">{index + 1}</td>
                             <td className="text-center p-4 truncate max-w-0">{project.title}</td>
                             <td className="text-center p-4 whitespace-nowrap">{formatDateInAdmin(project.createdAt)}</td>
@@ -165,7 +178,8 @@ export default function ApprovalPage() {
                     ))}
                 </tbody>
             </table>
-            {isEmpty && <EmptyMessage message="프로젝트가 없습니다." />}
+            {isEmpty && <EmptyMessage message="승인 대기 중인 프로젝트가 없습니다." />}
+            {serverError && <ServerErrorComponent message="프로젝트 승인 목록 조회에 실패했습니다." onRetry={loadProjects}/>}
             <Pagination totalPages={totalPageCount} currentPage={queryParams.page} onPageChange={handlePageChange} />
         </div>
     )
