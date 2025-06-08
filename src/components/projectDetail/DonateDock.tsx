@@ -314,9 +314,9 @@ const DonateDock = () => {
       if (event.data && typeof event.data === "object" && event.data.type === "KAKAO_PAYMENT_SUCCESS") {
         // 결제가 성공적으로 완료됨
         setIsOpen(false)
-        // 선택된 상품 초기화
         setSelectedOptions([])
         setQuantities({})
+        setShowPaymentCompleteModal(true) // 결제 완료 모달 띄우기
       }
     }
 
@@ -729,36 +729,28 @@ const DonateDock = () => {
   }
 
   // 7. 결제 완료 모달 컴포넌트
-  const PaymentCompleteModal = () => {
-    if (!showPaymentCompleteModal) return null
-
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-          <div className="mb-4 flex items-center justify-center">
-            <div className="rounded-full bg-green-100 p-3">
-              <Check className="h-8 w-8 text-green-500" />
-            </div>
-          </div>
-
-          <h3 className="mb-2 text-center text-2xl font-bold">결제 완료</h3>
-          <p className="mb-6 text-center text-sub-gray">결제가 성공적으로 완료되었습니다.</p>
-
-          <div className="flex justify-center">
-            <button
-              onClick={() => {
-                setShowPaymentCompleteModal(false)
-                setIsOpen(false)
-              }}
-              className="rounded-xl bg-main-color px-8 py-3 font-medium text-white hover:bg-secondary-color-dark"
-            >
-              확인
-            </button>
-          </div>
+  const PaymentCompleteModal = () => (
+    <Modal
+      isOpen={showPaymentCompleteModal}
+      onClose={() => setShowPaymentCompleteModal(false)}
+      size="sm"
+      title="결제 완료"
+      showCloseButton={false}
+    >
+      <div className="flex flex-col items-center">
+        <div className="rounded-full bg-green-100 p-3 mb-4">
+          <Check className="h-8 w-8 text-green-500" />
         </div>
+        <p className="mb-6 text-center text-sub-gray">결제가 성공적으로 완료되었습니다.</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="rounded-xl bg-main-color px-8 py-3 font-medium text-white hover:bg-secondary-color-dark"
+        >
+          확인
+        </button>
       </div>
-    )
-  }
+    </Modal>
+  )
 
   // 8. 결제 완료 모달 렌더링 추가 (return 문 내부 마지막에 추가)
   // 결제 완료 모달 렌더링 부분을 return 문 내부 마지막에 추가
