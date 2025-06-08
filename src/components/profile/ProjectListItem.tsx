@@ -55,8 +55,8 @@ export default function ProjectItem({
   }
 
   return (
-    <div className="mb-8">
-      <div className="flex gap-6 relative">
+    <div className="mb-6 sm:mb-8">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 relative">
         {/* 상품 이미지 */}
         <div className="relative w-full h-40 sm:w-60 sm:h-60 flex-shrink-0">
           {/* 상품 이미지 클릭 시 상품 상세 페이지로 이동 */}
@@ -83,20 +83,20 @@ export default function ProjectItem({
         </div>
 
         {/* 상품 정보 */}
-        <div className="flex-1 flex flex-col w-64">
-          <div className="mb-1 text-sub-gray">{sellerName}</div>
-          <h3 className="text-xl font-medium mb-1">{projectName}</h3>
-          <p className="text-gray-700 mb-2">{createdAt} 에 생성됨</p>
+        <div className="flex-1 flex flex-col w-full sm:w-64">
+          <div className="mb-1 text-sub-gray text-sm sm:text-base">{sellerName}</div>
+          <h3 className="text-base sm:text-xl font-medium mb-1">{projectName}</h3>
+          <p className="text-gray-700 mb-2 text-xs sm:text-base">{createdAt} 에 생성됨</p>
 
           {/* 달성률 게이지 */}
           <div className="mt-auto">
             <div className="flex justify-between mb-1">
-              <span className={`font-bold ${isCompleted ? "text-sub-gray" : "text-main-color"}`}>
+              <span className={`font-bold ${isCompleted ? "text-sub-gray" : "text-main-color"} text-sm sm:text-base`}>
                 {achievementRate}% 달성{isCompleted ? "" : "!"}
               </span>
             </div>
 
-            <div className={`w-full h-1.5 sm:h-2 rounded-full ${isCompleted ? "bg-sub-gray" : "bg-secondary-color"}`}>
+            <div className={`w-full h-1.5 sm:h-2 rounded-full ${isCompleted ? "bg-sub-gray" : "bg-secondary-color"}`}> 
               <div
                 className={`h-full rounded-full bg-main-color ${isCompleted ? "bg-sub-gray" : "bg-main-color"}`}
                 style={{ width: `${progressWidth}%` }}

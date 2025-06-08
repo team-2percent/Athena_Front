@@ -18,6 +18,17 @@ export default function ProjectRegister() {
   const { apiCall } = useApi()
   const { uploadImages } = useImageUpload()
 
+  // 모바일 환경 감지
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
+
   // AlertModal 상태 추가
   const [alertMessage, setAlertMessage] = useState("")
   const [isAlertOpen, setIsAlertOpen] = useState(false)
@@ -92,6 +103,15 @@ export default function ProjectRegister() {
       setShouldRedirect(false)
       router.push("/my")
     }
+  }
+
+  if (isMobile) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+        <h2 className="text-2xl font-bold text-main-color mb-4">모바일에서는 프로젝트 등록이 불가능합니다.</h2>
+        <p className="text-gray-500 text-center">PC 환경에서 접속해 주세요.</p>
+      </div>
+    )
   }
 
   return (
