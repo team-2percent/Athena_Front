@@ -14,9 +14,11 @@ import TextArea from "@/components/common/TextArea"
 import { COUPON_CONTENT_MAX_LENGTH, COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR, COUPON_EVENT_START_TO_END_MIN_HOUR, COUPON_NAME_MAX_LENGTH, COUPON_PRICE_MAX_NUMBER, COUPON_STOCK_MAX_NUMBER } from "@/lib/validationConstant"
 import { couponAddSchema, couponContentSchema, couponExpireSchema, couponNameSchema, couponPeriodSchema, couponPriceSchema, couponStockSchema } from "@/lib/validationSchemas"
 import InputInfo from "@/components/common/InputInfo"
+import useErrorToastStore from "@/stores/useErrorToastStore"
 export default function CouponRegisterPage() {
     const router = useRouter();
     const { apiCall } = useApi();
+    const { showErrorToast } = useErrorToastStore()
     const [isLoading, setIsLoading] = useState<boolean>(false) // 쿠폰 등록 중 로딩 상태
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     // 쿠폰 추가
@@ -208,8 +210,12 @@ export default function CouponRegisterPage() {
             endAt: couponEndDateTime.toISOString(),
             expiresAt: couponExpireDateTime.toISOString(),
             stock: couponStock,
-        }).then(() => {
-            router.push('/admin/coupon')
+        }).then(({ error, status }) => {
+            if (error && status === 500) {
+                showErrorToast("쿠폰 등록 실패", "다시 시도해 주세요.")
+            } else if (!error) {
+                router.push('/admin/coupon')
+            }
         })
     }
 
@@ -293,6 +299,7 @@ export default function CouponRegisterPage() {
                             value={couponName}
                             onChange={handleCouponNameChange}
                             isError={couponAddError.title !== ""}
+                            dataCy="coupon-name-input"
                         />
                         <InputInfo errorMessage={couponAddError.title} showLength length={couponName.length} maxLength={COUPON_NAME_MAX_LENGTH} />
                     </div>
@@ -303,6 +310,7 @@ export default function CouponRegisterPage() {
                             value={couponDescription}
                             onChange={handleCouponDescriptionChange}
                             isError={couponAddError.content !== ""}
+                            dataCy="coupon-description-input"
                         />
                         <InputInfo errorMessage={couponAddError.content} showLength length={couponDescription.length} maxLength={COUPON_CONTENT_MAX_LENGTH} />
                     </div>
@@ -316,6 +324,7 @@ export default function CouponRegisterPage() {
                                 onClick={handleClick}
                                 onChange={handleCouponPriceChange}
                                 isError={couponAddError.price !== ""}
+                                dataCy="coupon-price-input"
                             />
                             <InputInfo errorMessage={couponAddError.price} />
                         </div>
@@ -349,6 +358,7 @@ export default function CouponRegisterPage() {
                                 onClick={handleClick}
                                 onChange={handleCouponStockChange}
                                 isError={couponAddError.stock !== ""}
+                                dataCy="coupon-stock-input"
                             />
                             <InputInfo errorMessage={couponAddError.stock} />
                         </div>
@@ -357,6 +367,7 @@ export default function CouponRegisterPage() {
                         <PrimaryButton
                             disabled={disabled}
                             onClick={handleModalOpen}
+                            dataCy="coupon-submit-button"
                         >
                             등록
                         </PrimaryButton>
@@ -367,6 +378,7 @@ export default function CouponRegisterPage() {
                     message="쿠폰을 등록하시겠습니까?"
                     onConfirm={handleAddCoupon}
                     onClose={() => setIsModalOpen(false)}
+                    dataCy="coupon-confirm-modal"
                 />
             </div>
     )
