@@ -1,0 +1,108 @@
+{
+    "content": [
+      {
+        "productName": "상품31",
+        "quantity": 1,
+        "totalPrice": 100000,
+        "platformFee": 9000,
+        "pgFee": 3000,
+        "vat": 900,
+        "amount": 87100,
+        "orderedAt": "2025-03-11T00:00:00"
+      },
+      {
+        "productName": "상품31",
+        "quantity": 1,
+        "totalPrice": 90000,
+        "platformFee": 8100,
+        "pgFee": 2700,
+        "vat": 810,
+        "amount": 78390,
+        "orderedAt": "2025-03-10T00:00:00"
+      },
+      {
+        "productName": "상품31",
+        "quantity": 1,
+        "totalPrice": 80000,
+        "platformFee": 7200,
+        "pgFee": 2400,
+        "vat": 720,
+        "amount": 69680,
+        "orderedAt": "2025-03-09T00:00:00"
+      },
+      {
+        "productName": "상품31",
+        "quantity": 1,
+        "totalPrice": 70000,
+        "platformFee": 6300,
+        "pgFee": 2100,
+        "vat": 630,
+        "amount": 60970,
+        "orderedAt": "2025-03-08T00:00:00"
+      },
+      {
+        "productName": "상품31",
+        "quantity": 1,
+        "totalPrice": 60000,
+        "platformFee": 5400,
+        "pgFee": 1800,
+        "vat": 540,
+        "amount": 52260,
+        "orderedAt": "2025-03-07T00:00:00"
+      },
+      {
+        "productName": "상품31",
+        "quantity": 1,
+        "totalPrice": 50000,
+        "platformFee": 4500,
+        "pgFee": 1500,
+        "vat": 450,
+        "amount": 43550,
+        "orderedAt": "2025-03-06T00:00:00"
+      },
+      {
+        "productName": "상품31",
+        "quantity": 1,
+        "totalPrice": 40000,
+        "platformFee": 3600,
+        "pgFee": 1200,
+        "vat": 360,
+        "amount": 34840,
+        "orderedAt": "2025-03-05T00:00:00"
+      },
+      {
+        "productName": "상품31",
+        "quantity": 1,
+        "totalPrice": 30000,
+        "platformFee": 2700,
+        "pgFee": 900,
+        "vat": 270,
+        "amount": 26130,
+        "orderedAt": "2025-03-04T00:00:00"
+      },
+      {
+        "productName": "상품31",
+        "quantity": 1,
+        "totalPrice": 20000,
+        "platformFee": 1800,
+        "pgFee": 600,
+        "vat": 180,
+        "amount": 17420,
+        "orderedAt": "2025-03-03T00:00:00"
+      },
+      {
+        "productName": "상품31",
+        "quantity": 1,
+        "totalPrice": 10000,
+        "platformFee": 900,
+        "pgFee": 300,
+        "vat": 90,
+        "amount": 8710,
+        "orderedAt": "2025-03-02T00:00:00"
+      }
+    ],
+    "pageInfo": {
+      "currentPage": 0,
+      "totalPages": 1
+    }
+}

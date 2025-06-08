@@ -1,0 +1,210 @@
+{
+    "content": [
+      {
+        "id": 35,
+        "title": "Completed Coupon 10",
+        "stock": 0,
+        "price": 1900,
+        "status": "ENDED",
+        "startAt": "2025-05-10T00:00:00",
+        "endAt": "2025-05-28T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 34,
+        "title": "Completed Coupon 09",
+        "stock": 0,
+        "price": 1800,
+        "status": "ENDED",
+        "startAt": "2025-05-09T00:00:00",
+        "endAt": "2025-05-23T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 33,
+        "title": "Completed Coupon 08",
+        "stock": 0,
+        "price": 1700,
+        "status": "ENDED",
+        "startAt": "2025-05-08T00:00:00",
+        "endAt": "2025-05-25T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 32,
+        "title": "Completed Coupon 07",
+        "stock": 0,
+        "price": 1600,
+        "status": "ENDED",
+        "startAt": "2025-05-07T00:00:00",
+        "endAt": "2025-05-30T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 31,
+        "title": "Completed Coupon 06",
+        "stock": 0,
+        "price": 1400,
+        "status": "ENDED",
+        "startAt": "2025-05-06T00:00:00",
+        "endAt": "2025-05-26T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 30,
+        "title": "Completed Coupon 05",
+        "stock": 0,
+        "price": 1300,
+        "status": "ENDED",
+        "startAt": "2025-05-05T00:00:00",
+        "endAt": "2025-05-27T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 29,
+        "title": "Completed Coupon 04",
+        "stock": 0,
+        "price": 1100,
+        "status": "ENDED",
+        "startAt": "2025-05-04T00:00:00",
+        "endAt": "2025-05-29T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 28,
+        "title": "Completed Coupon 03",
+        "stock": 0,
+        "price": 1500,
+        "status": "ENDED",
+        "startAt": "2025-05-03T00:00:00",
+        "endAt": "2025-05-28T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 27,
+        "title": "Completed Coupon 02",
+        "stock": 0,
+        "price": 1200,
+        "status": "ENDED",
+        "startAt": "2025-05-02T00:00:00",
+        "endAt": "2025-05-25T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 26,
+        "title": "Completed Coupon 01",
+        "stock": 0,
+        "price": 1000,
+        "status": "ENDED",
+        "startAt": "2025-05-01T00:00:00",
+        "endAt": "2025-05-30T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 25,
+        "title": "InProgress Coupon 12",
+        "stock": 22,
+        "price": 2100,
+        "status": "ENDED",
+        "startAt": "2025-05-08T00:00:00",
+        "endAt": "2025-05-28T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 24,
+        "title": "InProgress Coupon 11",
+        "stock": 8,
+        "price": 2000,
+        "status": "ENDED",
+        "startAt": "2025-05-07T00:00:00",
+        "endAt": "2025-05-27T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 23,
+        "title": "InProgress Coupon 10",
+        "stock": 11,
+        "price": 1900,
+        "status": "ENDED",
+        "startAt": "2025-05-04T00:00:00",
+        "endAt": "2025-05-26T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 22,
+        "title": "InProgress Coupon 09",
+        "stock": 13,
+        "price": 1800,
+        "status": "ENDED",
+        "startAt": "2025-05-02T00:00:00",
+        "endAt": "2025-05-25T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 21,
+        "title": "InProgress Coupon 08",
+        "stock": 14,
+        "price": 1700,
+        "status": "ENDED",
+        "startAt": "2025-05-06T00:00:00",
+        "endAt": "2025-05-23T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 20,
+        "title": "InProgress Coupon 07",
+        "stock": 17,
+        "price": 1600,
+        "status": "ENDED",
+        "startAt": "2025-05-03T00:00:00",
+        "endAt": "2025-05-30T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 19,
+        "title": "InProgress Coupon 06",
+        "stock": 25,
+        "price": 1400,
+        "status": "ENDED",
+        "startAt": "2025-05-09T00:00:00",
+        "endAt": "2025-05-27T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 18,
+        "title": "InProgress Coupon 05",
+        "stock": 20,
+        "price": 1300,
+        "status": "ENDED",
+        "startAt": "2025-05-11T00:00:00",
+        "endAt": "2025-05-29T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 17,
+        "title": "InProgress Coupon 04",
+        "stock": 9,
+        "price": 1100,
+        "status": "ENDED",
+        "startAt": "2025-05-12T00:00:00",
+        "endAt": "2025-05-26T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 16,
+        "title": "InProgress Coupon 03",
+        "stock": 6,
+        "price": 1500,
+        "status": "ENDED",
+        "startAt": "2025-05-01T00:00:00",
+        "endAt": "2025-05-24T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      }
+    ],
+    "page": {
+      "size": 20,
+      "number": 1,
+      "totalElements": 55,
+      "totalPages": 3
+    }
+  }

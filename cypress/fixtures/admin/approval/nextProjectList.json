@@ -1,0 +1,89 @@
+{
+    "content": [
+      {
+        "projectId": 82,
+        "title": "다식",
+        "createdAt": "2025-05-28 07:05:47.446440",
+        "sellerName": "user2",
+        "isApproved": "PENDING",
+        "platformPlan": "PRO"
+      },
+      {
+        "projectId": 71,
+        "title": "asdfasdfas",
+        "createdAt": "2025-05-26 06:16:09.225632",
+        "sellerName": "user2",
+        "isApproved": "PENDING",
+        "platformPlan": "PRO"
+      },
+      {
+        "projectId": 70,
+        "title": "b,jhvjv,jv,jgv,gjvmghcmgh",
+        "createdAt": "2025-05-26 06:08:57.066945",
+        "sellerName": "user2",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      },
+      {
+        "projectId": 69,
+        "title": "dfsdfsdfasfdsafsdfas",
+        "createdAt": "2025-05-26 05:07:07.476141",
+        "sellerName": "user2",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      },
+      {
+        "projectId": 67,
+        "title": "안녕? 난 빵구쟁이야",
+        "createdAt": "2025-05-26 04:24:58.783336",
+        "sellerName": "user2",
+        "isApproved": "PENDING",
+        "platformPlan": "PRO"
+      },
+      {
+        "projectId": 66,
+        "title": "이게뭐죠이게뭐죠이게뭐죠이게뭐죠이게뭐죠이게뭐죠ㅏ",
+        "createdAt": "2025-05-26 02:24:15.307156",
+        "sellerName": "user2",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      },
+      {
+        "projectId": 65,
+        "title": "ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ",
+        "createdAt": "2025-05-26 02:09:02.542961",
+        "sellerName": "user2",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      },
+      {
+        "projectId": 64,
+        "title": "녀ㅗㄹ햐ㅕㄴ오려ㅑ히ㅗㄴ여ㅑㅣ로혀ㅣㅑㄴ오리ㅕㅑ호",
+        "createdAt": "2025-05-26 02:02:52.470752",
+        "sellerName": "user2",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      },
+      {
+        "projectId": 63,
+        "title": "ㅁ냐ㅐㅕㅇ롬냐ㅕㅇ로ㅑㅕㅁㄴ오리ㅑㅕㅁ뇌여ㅑ뢰ㅕㅑ",
+        "createdAt": "2025-05-26 01:44:15.156067",
+        "sellerName": "user2",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      },
+      {
+        "projectId": 62,
+        "title": "ㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴ",
+        "createdAt": "2025-05-26 01:42:31.164838",
+        "sellerName": "user2",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      }
+    ],
+    "pageInfo": {
+      "currentPage": 1,
+      "totalPages": 9
+    },
+    "pendingCount": 25
+  }

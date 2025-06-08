@@ -1,0 +1,78 @@
+{
+    "content": [
+      {
+        "settlementId": 7,
+        "projectTitle": "켄싱턴 트랙볼",
+        "totalSales": 550000,
+        "platformFee": 49500,
+        "payOutAmount": 479050,
+        "sellerName": "User7",
+        "requestedAt": "2025-05-21T00:17:18.304621",
+        "status": "PENDING"
+      },
+      {
+        "settlementId": 6,
+        "projectTitle": "손목이 아프다면? 스플릿 키보드!",
+        "totalSales": 550000,
+        "platformFee": 49500,
+        "payOutAmount": 479050,
+        "sellerName": "User6",
+        "requestedAt": "2025-05-21T00:17:18.272329",
+        "status": "PENDING"
+      },
+      {
+        "settlementId": 5,
+        "projectTitle": "드론 컨트롤&재머 풀세트",
+        "totalSales": 550000,
+        "platformFee": 27500,
+        "payOutAmount": 503250,
+        "sellerName": "User5",
+        "requestedAt": "2025-05-21T00:17:18.247094",
+        "status": "PENDING"
+      },
+      {
+        "settlementId": 4,
+        "projectTitle": "Clockwork’s uConsole",
+        "totalSales": 550000,
+        "platformFee": 49500,
+        "payOutAmount": 479050,
+        "sellerName": "User4",
+        "requestedAt": "2025-05-21T00:16:48.529808",
+        "status": "PENDING"
+      },
+      {
+        "settlementId": 3,
+        "projectTitle": "Flipper Zero: 내 귀여운 돌고래가 엄청난 해커였던 건",
+        "totalSales": 550000,
+        "platformFee": 49500,
+        "payOutAmount": 479050,
+        "sellerName": "User3",
+        "requestedAt": "2025-05-21T00:16:48.486093",
+        "status": "PENDING"
+      },
+      {
+        "settlementId": 2,
+        "projectTitle": "앗! 해골 너무 무섭다 무서운 성능의 Intel NUC",
+        "totalSales": 550000,
+        "platformFee": 49500,
+        "payOutAmount": 479050,
+        "sellerName": "user2",
+        "requestedAt": "2025-05-21T00:16:48.448337",
+        "status": "PENDING"
+      },
+      {
+        "settlementId": 1,
+        "projectTitle": "Nvidia Jetson origin",
+        "totalSales": 550000,
+        "platformFee": 49500,
+        "payOutAmount": 479050,
+        "sellerName": "User1",
+        "requestedAt": "2025-05-21T00:16:48.381529",
+        "status": "PENDING"
+      }
+    ],
+    "pageInfo": {
+      "currentPage": 0,
+      "totalPages": 1
+    }
+  }

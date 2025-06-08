@@ -1,0 +1,110 @@
+{
+    "content": [
+      {
+        "id": 45,
+        "title": "Ended Coupon 07",
+        "stock": 0,
+        "price": 1600,
+        "status": "ENDED",
+        "startAt": "2025-01-15T00:00:00",
+        "endAt": "2025-02-15T23:59:59",
+        "expiresAt": "2025-03-15T23:59:59"
+      },
+      {
+        "id": 44,
+        "title": "Ended Coupon 06",
+        "stock": 0,
+        "price": 1400,
+        "status": "ENDED",
+        "startAt": "2025-03-10T00:00:00",
+        "endAt": "2025-03-28T23:59:59",
+        "expiresAt": "2025-04-12T23:59:59"
+      },
+      {
+        "id": 43,
+        "title": "Ended Coupon 05",
+        "stock": 0,
+        "price": 1300,
+        "status": "ENDED",
+        "startAt": "2025-04-05T00:00:00",
+        "endAt": "2025-04-25T23:59:59",
+        "expiresAt": "2025-05-10T23:59:59"
+      },
+      {
+        "id": 42,
+        "title": "Ended Coupon 04",
+        "stock": 0,
+        "price": 1100,
+        "status": "ENDED",
+        "startAt": "2025-01-01T00:00:00",
+        "endAt": "2025-01-31T23:59:59",
+        "expiresAt": "2025-02-15T23:59:59"
+      },
+      {
+        "id": 41,
+        "title": "Ended Coupon 03",
+        "stock": 0,
+        "price": 1500,
+        "status": "ENDED",
+        "startAt": "2025-02-01T00:00:00",
+        "endAt": "2025-02-28T23:59:59",
+        "expiresAt": "2025-03-15T23:59:59"
+      },
+      {
+        "id": 40,
+        "title": "Ended Coupon 02",
+        "stock": 0,
+        "price": 1200,
+        "status": "ENDED",
+        "startAt": "2025-03-01T00:00:00",
+        "endAt": "2025-03-30T23:59:59",
+        "expiresAt": "2025-04-15T23:59:59"
+      },
+      {
+        "id": 39,
+        "title": "Ended Coupon 01",
+        "stock": 0,
+        "price": 1000,
+        "status": "ENDED",
+        "startAt": "2025-04-01T00:00:00",
+        "endAt": "2025-04-30T23:59:59",
+        "expiresAt": "2025-05-15T23:59:59"
+      },
+      {
+        "id": 38,
+        "title": "Completed Coupon 13",
+        "stock": 0,
+        "price": 2200,
+        "status": "ENDED",
+        "startAt": "2025-05-13T00:00:00",
+        "endAt": "2025-05-30T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 37,
+        "title": "Completed Coupon 12",
+        "stock": 0,
+        "price": 2100,
+        "status": "ENDED",
+        "startAt": "2025-05-12T00:00:00",
+        "endAt": "2025-05-29T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      },
+      {
+        "id": 36,
+        "title": "Completed Coupon 11",
+        "stock": 0,
+        "price": 2000,
+        "status": "ENDED",
+        "startAt": "2025-05-11T00:00:00",
+        "endAt": "2025-05-27T23:59:59",
+        "expiresAt": "2025-06-01T23:59:59"
+      }
+    ],
+    "page": {
+      "size": 10,
+      "number": 1,
+      "totalElements": 55,
+      "totalPages": 6
+    }
+  }
