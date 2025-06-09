@@ -11,31 +11,76 @@ function selectDynamicDates(startOffset = 7, endOffset = 14, deliveryOffset = 21
   const deliveryDate = new Date(today); deliveryDate.setDate(today.getDate() + deliveryOffset);
 
   cy.get('[data-cy="datepicker-start"]').click();
-  cy.contains(startDate.getDate().toString()).click();
+  cy.get('button')
+  .filter(`:contains(${startDate.getDate().toString()})`)     
+  .not(':disabled')                    
+  .first()                              
+  .click();
   cy.get('[data-cy="datepicker-end"]').click();
-  cy.contains(endDate.getDate().toString()).click();
+  cy.get('button')
+  .filter(`:contains(${endDate.getDate().toString()})`)     
+  .not(':disabled')                    
+  .first()                              
+  .click();
   cy.get('[data-cy="datepicker-delivery"]').click();
-  cy.contains(deliveryDate.getDate().toString()).click();
+  cy.get('button')
+  .filter(`:contains(${deliveryDate.getDate().toString()})`)     
+  .not(':disabled')                    
+  .first()                              
+  .click();
 }
 
 describe('프로젝트 등록 플로우', () => {
   beforeEach(() => {
-    // 로그인 모킹: accessToken, userId 세팅 및 fcm/register intercept
     cy.intercept({
-      method: "POST",
-      url: "/api/fcm/register"
-    });
-    // 계좌 정보가 없는 상태를 보장
-    cy.intercept('GET', '/api/bankAccount', {
+      method: "GET",
+      url: '/api/project'
+    }, {
       statusCode: 200,
-      body: [],
-    }).as('getBankAccount');
-    cy.window().then((win) => {
-      win.localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NyIsInJvbGUiOiJST0xFX1VTRVIiLCJuaWNrbmFtZSI6IuqwgOyehe2FjOyKpO2KuCIsImlhdCI6MTc0ODk2ODQ0MSwiZXhwIjoxNzQ5NTczMjQxfQ.8QkpyGU8Mf9Mh2xSTzlmHCapyxQZONR81ZHcv_GQ2b4");
-      win.localStorage.setItem('userId', "57");
-    });
+      body: 100
+    }).as('getProject');
+
+    cy.fixture('category.json').then((category) => {
+      cy.intercept({
+        method: "GET",
+        url: '/api/category'
+      }, {
+        statusCode: 200,
+        body: category
+      }).as('getCategory');
+    })
+
+    cy.fixture('bankAccount.json').then((bankAccount) => {
+      cy.intercept({
+        method: "GET",
+        url: '/api/bankAccount'
+      }, {
+        statusCode: 200,
+        body: bankAccount
+      }).as('getBankAccount');
+    })
+
+    // 로그인 모킹: accessToken, userId 세팅 및 fcm/register intercept
+    // cy.intercept({
+    //   method: "POST",
+    //   url: "/api/fcm/register"
+    // });
+    // // 계좌 정보가 없는 상태를 보장
+    // cy.intercept('GET', '/api/bankAccount', {
+    //   statusCode: 200,
+    //   body: [],
+    // }).as('getBankAccount');
+    
+    // cy.window().then((win) => {
+    //   win.localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NyIsInJvbGUiOiJST0xFX1VTRVIiLCJuaWNrbmFtZSI6IuqwgOyehe2FjOyKpO2KuCIsImlhdCI6MTc0ODk2ODQ0MSwiZXhwIjoxNzQ5NTczMjQxfQ.8QkpyGU8Mf9Mh2xSTzlmHCapyxQZONR81ZHcv_GQ2b4");
+    //   win.localStorage.setItem('userId', "57");
+    // });
+    cy.visitMainPage();
+    cy.login();
+
     cy.visit('/project/register');
-    cy.wait(2000)
+    cy.wait('@getCategory').its('response.statusCode').should('eq', 200);
+    cy.wait('@getProject').its('response.statusCode').should('eq', 200);
   });
 
   it('프로젝트 등록 성공 케이스', () => {
@@ -382,6 +427,14 @@ describe('프로젝트 등록 플로우', () => {
   });
 
   it('계좌 정보 누락 시 붉은색 X 아이콘 표시', () => {
+    cy.intercept({
+      method: "GET",
+      url: '/api/bankAccount'
+    }, {
+      statusCode: 200,
+      body: []
+    }).as('getBankAccount');
+
     cy.contains('카테고리를 선택해주세요').click();
     cy.contains('디지털').click();
     cy.get('input#title').type('E2E 테스트 프로젝트');
@@ -393,6 +446,7 @@ describe('프로젝트 등록 플로우', () => {
     cy.get('textarea').type('상세 설명 마크다운 입력 E2E 테스트');
     cy.get('textarea').type('{selectall}{backspace}');
     cy.contains('다음 단계로').click();
+    cy.wait('@getBankAccount').its('response.statusCode').should('eq', 200);
     cy.contains('상품 추가').click();
     cy.get('input[placeholder="상품 이름을 지어주세요."]').type('테스트 리워드');
     cy.get('input[placeholder="해당 옵션을 자세히 설명해 주세요."]').type('테스트 리워드 설명');
@@ -440,21 +494,44 @@ describe('프로젝트 등록 플로우', () => {
 
 describe('프로젝트 입력란 유효성 검사', () => {
   beforeEach(() => {
-    // 로그인 모킹 및 프로젝트 등록 페이지 진입
     cy.intercept({
-      method: "POST",
-      url: "/api/fcm/register"
-    });
-    cy.intercept('GET', '/api/bankAccount', {
+      method: "GET",
+      url: '/api/project'
+    }, {
       statusCode: 200,
-      body: [],
-    }).as('getBankAccount');
-    cy.window().then((win) => {
-      win.localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NyIsInJvbGUiOiJST0xFX1VTRVIiLCJuaWNrbmFtZSI6IuqwgOyehe2FjOyKpO2KuCIsImlhdCI6MTc0ODk2ODQ0MSwiZXhwIjoxNzQ5NTczMjQxfQ.8QkpyGU8Mf9Mh2xSTzlmHCapyxQZONR81ZHcv_GQ2b4");
-      win.localStorage.setItem('userId', "57");
-    });
+      body: 100
+    }).as('getProject');
+
+    cy.fixture('category.json').then((category) => {
+      cy.intercept({
+        method: "GET",
+        url: '/api/category'
+      }, {
+        statusCode: 200,
+        body: category
+      }).as('getCategory');
+    })
+    // 로그인 모킹: accessToken, userId 세팅 및 fcm/register intercept
+    // cy.intercept({
+    //   method: "POST",
+    //   url: "/api/fcm/register"
+    // });
+    // // 계좌 정보가 없는 상태를 보장
+    // cy.intercept('GET', '/api/bankAccount', {
+    //   statusCode: 200,
+    //   body: [],
+    // }).as('getBankAccount');
+    
+    // cy.window().then((win) => {
+    //   win.localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NyIsInJvbGUiOiJST0xFX1VTRVIiLCJuaWNrbmFtZSI6IuqwgOyehe2FjOyKpO2KuCIsImlhdCI6MTc0ODk2ODQ0MSwiZXhwIjoxNzQ5NTczMjQxfQ.8QkpyGU8Mf9Mh2xSTzlmHCapyxQZONR81ZHcv_GQ2b4");
+    //   win.localStorage.setItem('userId', "57");
+    // });
+    cy.visitMainPage();
+    cy.login();
+
     cy.visit('/project/register');
-    cy.wait(1000);
+    cy.wait('@getCategory').its('response.statusCode').should('eq', 200);
+    cy.wait('@getProject').its('response.statusCode').should('eq', 200);
   });
 
   describe('상품 제목', () => {

@@ -21,7 +21,7 @@ export default function OverlaySpinner({ message }: Props) {
     }, [])
 
     return (
-        <div className="fixed inset-0 bg-white/20 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-white/20 flex items-center justify-center z-50" data-cy="spinner">
             <Spinner message={message} />
         </div>
     )
