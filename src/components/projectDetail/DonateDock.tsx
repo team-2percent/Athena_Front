@@ -116,7 +116,7 @@ const DonateDock = () => {
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null)
 
   const [selectedPay, setSelectedPay] = useState<string | null>(null)
-  const [selectedAddress, setSelectedAddress] = useState<string | null>("1")
+  const [selectedAddress, setSelectedAddress] = useState<string | null>(null)
 
   // 배송지 검색 모달 상태
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
@@ -314,9 +314,9 @@ const DonateDock = () => {
       if (event.data && typeof event.data === "object" && event.data.type === "KAKAO_PAYMENT_SUCCESS") {
         // 결제가 성공적으로 완료됨
         setIsOpen(false)
-        // 선택된 상품 초기화
         setSelectedOptions([])
         setQuantities({})
+        setShowPaymentCompleteModal(true) // 결제 완료 모달 띄우기
       }
     }
 
@@ -598,14 +598,14 @@ const DonateDock = () => {
   // 결제 처리 함수
   const handlePayment = async () => {
     // 필수 입력값 검증
-    if (!selectedAddress) {
-      setAlertMessage("배송지를 선택해주세요.")
+    if (!selectedPay) {
+      setAlertMessage("결제 수단을 선택해주세요.")
       setIsAlertOpen(true)
       return
     }
 
-    if (!selectedPay) {
-      setAlertMessage("결제 수단을 선택해주세요.")
+    if (!selectedAddress) {
+      setAlertMessage("배송지를 선택해주세요.")
       setIsAlertOpen(true)
       return
     }
@@ -729,36 +729,28 @@ const DonateDock = () => {
   }
 
   // 7. 결제 완료 모달 컴포넌트
-  const PaymentCompleteModal = () => {
-    if (!showPaymentCompleteModal) return null
-
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-          <div className="mb-4 flex items-center justify-center">
-            <div className="rounded-full bg-green-100 p-3">
-              <Check className="h-8 w-8 text-green-500" />
-            </div>
-          </div>
-
-          <h3 className="mb-2 text-center text-2xl font-bold">결제 완료</h3>
-          <p className="mb-6 text-center text-sub-gray">결제가 성공적으로 완료되었습니다.</p>
-
-          <div className="flex justify-center">
-            <button
-              onClick={() => {
-                setShowPaymentCompleteModal(false)
-                setIsOpen(false)
-              }}
-              className="rounded-xl bg-main-color px-8 py-3 font-medium text-white hover:bg-secondary-color-dark"
-            >
-              확인
-            </button>
-          </div>
+  const PaymentCompleteModal = () => (
+    <Modal
+      isOpen={showPaymentCompleteModal}
+      onClose={() => setShowPaymentCompleteModal(false)}
+      size="sm"
+      title="결제 완료"
+      showCloseButton={false}
+    >
+      <div className="flex flex-col items-center">
+        <div className="rounded-full bg-green-100 p-3 mb-4">
+          <Check className="h-8 w-8 text-green-500" />
         </div>
+        <p className="mb-6 text-center text-sub-gray">결제가 성공적으로 완료되었습니다.</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="rounded-xl bg-main-color px-8 py-3 font-medium text-white hover:bg-secondary-color-dark"
+        >
+          확인
+        </button>
       </div>
-    )
-  }
+    </Modal>
+  )
 
   // 8. 결제 완료 모달 렌더링 추가 (return 문 내부 마지막에 추가)
   // 결제 완료 모달 렌더링 부분을 return 문 내부 마지막에 추가
@@ -935,6 +927,7 @@ const DonateDock = () => {
                                       <div
                                         className="flex justify-between items-center p-3 md:p-4 cursor-pointer hover:bg-gray-50"
                                         onClick={(e) => toggleProductExpand(optionId, e)}
+                                        data-cy="expand-selected-product"
                                       >
                                         <div className="flex items-center">
                                           <ChevronRight
@@ -1007,6 +1000,7 @@ const DonateDock = () => {
                     <div className="mt-6 md:mt-8 bg-white pb-6 md:pb-8">
                       <div className="flex justify-end">
                         <PrimaryButton
+                          data-cy="donate-next-step"
                           className={`w-full md:w-auto rounded-lg md:rounded-xl px-6 md:px-8 py-3 md:py-4 text-sm md:text-base font-medium ${
                             selectedOptions.length > 0
                               ? "bg-main-color text-white hover:bg-secondary-color-dark"
@@ -1033,6 +1027,7 @@ const DonateDock = () => {
                             : "border-gray-border hover:border-main-color"
                         }`}
                         onClick={() => handlePaySelect("kakaopay")}
+                        data-cy="pay-kakaopay"
                       >
                         <span className="text-sm md:text-base font-medium">카카오페이</span>
                       </div>
@@ -1052,6 +1047,7 @@ const DonateDock = () => {
                                   : "border-gray-border hover:border-main-color"
                               }`}
                               onClick={() => handleAddressSelect(address.id)}
+                              data-cy={`address-card-${address.id}`}
                             >
                               <div className="flex items-center justify-between mb-2 overflow-hidden">
                                 <h4 className="text-sm md:text-base font-bold line-clamp-1 whitespace-pre-wrap break-words">
@@ -1129,6 +1125,7 @@ const DonateDock = () => {
                     <div className="mt-6 md:mt-8 bg-white pb-6 md:pb-8">
                       <div className="flex flex-col md:flex-row justify-end gap-3 md:gap-4">
                         <PrimaryButton
+                          data-cy="donate-submit"
                           className={`w-full md:w-auto rounded-lg md:rounded-xl bg-main-color px-6 md:px-8 py-3 md:py-4 text-sm md:text-base font-medium text-white hover:bg-secondary-color-dark ${
                             isProcessingPayment ? "opacity-70 cursor-not-allowed" : ""
                           }`}

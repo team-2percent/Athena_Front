@@ -258,6 +258,7 @@ const ProjectDetail = () => {
                   {/* 두 장의 이미지만 렌더링: prev, current */}
                   {prevImageIndex !== null && prevImageIndex !== currentImageIndex && (
                     <img
+                      data-cy="project-image"
                       key={prevImageIndex}
                       ref={el => { imageRefs.current[0] = el }}
                       src={images[prevImageIndex] || "/placeholder.svg"}
@@ -267,6 +268,7 @@ const ProjectDetail = () => {
                     />
                   )}
                   <img
+                    data-cy="project-image"
                     key={currentImageIndex}
                     ref={el => { imageRefs.current[1] = el }}
                     src={images[currentImageIndex] || "/placeholder.svg"}

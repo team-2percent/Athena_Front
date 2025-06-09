@@ -8,9 +8,10 @@ interface DatePickerProps {
   onChange: (date: Date) => void
   position?: "top" | "bottom"
   minDate?: Date // 최소 선택 가능 날짜 추가
+  dataCy?: string // Cypress 테스트용 data-cy 속성
 }
 
-export default function DatePicker({ selectedDate, onChange, position = "top", minDate }: DatePickerProps) {
+export default function DatePicker({ selectedDate, onChange, position = "top", minDate, dataCy }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const datePickerRef = useRef<HTMLDivElement>(null)
@@ -161,6 +162,7 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
             !selectedDate ? "text-gray-400" : ""
           }`}
           onClick={() => setIsOpen(!isOpen)}
+          data-cy={dataCy}
         />
         <Calendar className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500 pointer-events-none" />
       </div>

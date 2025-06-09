@@ -48,6 +48,7 @@ export default function AddAccountModal({ isOpen, onClose, onSave }: AddAccountM
       size="md"
       className="max-w-md"
       zIndex={100}
+      dataCy="add-account-modal"
     >
       <div className="space-y-4">
         {/* 예금주 */}
