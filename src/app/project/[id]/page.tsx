@@ -3,8 +3,8 @@ import DonateDock from "@/components/projectDetail/DonateDock"
 
 export default function ProjectDetailPage() {
   return (
-    <main className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8">
+    <main className="min-h-screen bg-white w-[var(--content-width)]">
+      <div className="container mx-auto py-8">
         {/* 상품 상세 페이지 영역 */}
         <ProjectDetail />
       </div>

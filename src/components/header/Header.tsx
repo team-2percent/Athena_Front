@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Percent, Heart, Bell, X, Trash2, LogOut, User, UserLock } from "lucide-react"
+import { Percent, Heart, Bell, X, Trash2, LogOut, User, UserLock, Menu } from "lucide-react"
 import CouponModal from "./CouponModal"
 import PopularSearch from "./PopularSearch"
 import SearchBar from "./SearchBar"
@@ -13,27 +13,53 @@ import SignupModal from "../login/SignUpModal"
 import useAuthStore from "@/stores/auth"
 import { usePathname } from 'next/navigation';
 import { useApi } from "@/hooks/useApi";
+import MenuTab from "../common/MenuTab"
+import { getFCMToken } from '@/lib/firebase';
+import useToastStore from "@/stores/useToastStore";
 
-const uris: Record<string, string> = {
+const nameToPath: Record<string, string> = {
   "전체": "",
   "카테고리": "category",
   "신규": "new",
   "마감임박": "deadline",
 }
+
+const pathToName = Object.fromEntries(
+  Object.entries(nameToPath).map(([k, v]) => [v, k])
+) as Record<string, keyof typeof nameToPath>;
+
+interface HeaderResponse {
+  id: number
+  nickname: string
+  imageUrl: string
+}
+
 const Header = () => {
-  const { isLoggedIn, role, logout } = useAuthStore();
+  const { isLoggedIn, role, logout, userId } = useAuthStore();
   const isAdmin = role === "ROLE_ADMIN";
-  const { apiCall } = useApi();
+  const { isLoading, apiCall } = useApi();
   const [user, setUser] = useState<{nickname: string, imageUrl: string} | null>(null);
+  const [userLoadError, setUserLoadError] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false)
   const [showCouponModal, setShowCouponModal] = useState(false)
   const [searchWord, setSearchWord] = useState("");
   const [showAuthMenu, setShowAuthMenu] = useState(false);
   const authMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const pathname = usePathname().split("/")[1];
+  const pathname = usePathname();
+  const pathFirst = pathname.split("/")[1];
+  const activeTab = pathToName[pathFirst]
+  const showUnderline = (
+    pathname === "/" ||
+    pathname === "/category" ||
+    pathname === "/new" ||
+    pathname === "/deadline"
+  );
+  const { showToast } = useToastStore();
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+  const [sidebarAnim, setSidebarAnim] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -47,6 +73,20 @@ const Header = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (showMobileMenu) {
+      setIsSidebarVisible(true);
+      setTimeout(() => setSidebarAnim(true), 10);
+    } else {
+      setSidebarAnim(false);
+    }
+  }, [showMobileMenu]);
+
+  const handleSidebarClose = () => setShowMobileMenu(false);
+  const handleSidebarTransitionEnd = () => {
+    if (!sidebarAnim) setIsSidebarVisible(false);
+  };
 
   // 로그인 모달 열기 / 닫기
   const openLoginModal = () => {
@@ -90,10 +130,6 @@ const Header = () => {
     setSearchWord("")
   }
 
-  const toggleNotifications = () => {
-    setShowNotifications(!showNotifications)
-  }
-
   const handleCouponClick = () => {
     setShowCouponModal(!showCouponModal)
   }
@@ -104,12 +140,32 @@ const Header = () => {
 
   // 유저 정보 조회
   const loadUserInfo = () => {
-    apiCall<{id: number, nickname: string, imageUrl: string}>("/api/user/Header", "GET").then(({ data }) => {
-      if (data !== null) setUser({
+    setUserLoadError(false);
+    apiCall<HeaderResponse>("/api/user/Header", "GET").then(({ data, error }) => {
+      if (error) {
+        setUserLoadError(true)
+      } else if (data !== null) setUser({
         nickname: data.nickname,
         imageUrl: data.imageUrl,
       })
     })
+  }
+
+  // 로그아웃
+  const handleLogout = () => {
+    apiCall("/api/user/logout", "POST").then(() => {
+      logout();
+      router.push("/")
+    })
+  }
+
+  const handleClickMyPage = () => {
+    router.push("/my")
+    setShowAuthMenu(false);
+  }
+
+  const handleTestToast = () => {
+    showToast("테스트 알림", "이것은 토스트 테스트 메시지입니다.")
   }
 
   const notifications = [
@@ -134,8 +190,8 @@ const Header = () => {
   ]
 
   useEffect(() => {
-    loadUserInfo();
-  }, [])
+    if (isLoggedIn) loadUserInfo();
+  }, [isLoggedIn])
 
   // 모달 뒷배경 스크롤 방지
   useEffect(() => {
@@ -151,176 +207,211 @@ const Header = () => {
   }, [showLoginModal, showSignupModal, showCouponModal])
 
   return (
-    <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)]">
-      {showCouponModal && <CouponModal isOpen={showCouponModal} onClose={() => setShowCouponModal(false)} />}
-      {showLoginModal && <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} moveToSignupModal={openSignupModalInLoginModal} />}
-      {showSignupModal && <SignupModal isOpen={showSignupModal} onClose={closeSignupModal} />}
-      <div className="container mx-auto px-4 py-4">
+    <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)] z-5">
+      {/* 모바일 헤더 (md 미만) */}
+      <div className="flex items-center justify-between px-4 py-2 md:hidden">
+        {/* 로고 */}
+        <Link href="/" className="flex items-center" data-cy="logo-link">
+            <div className="w-10 h-10 overflow-hidden">
+              <img src="/src/athenna_logo.png" alt="Athenna 로고" className="h-10 w-auto object-cover" />
+            </div>
+        </Link>
+        {/* 햄버거 메뉴 */}
+        <button onClick={() => setShowMobileMenu(true)} aria-label="메뉴 열기">
+          <Menu className="w-8 h-8 text-gray-700" />
+        </button>
+      </div>
+
+      {/* 데스크톱 헤더 (md 이상) */}
+      <div className="container mx-auto px-4 py-4 hidden md:block">
         {/* 상단 헤더 영역 */}
         <div className="flex items-center justify-between">
           {/* 로고와 검색창 */}
           <div className="flex items-center space-x-4">
             <Link href="/" className="flex items-center">
-              <Image src="/src/athenna_logo.png" alt="Athenna 로고" width={40} height={40} className="h-10 w-auto" />
+              <div className="w-10 h-10 overflow-hidden" data-cy="logo-link">
+                <img src="/src/athenna_logo.png" alt="Athenna 로고" className="h-10 w-auto object-cover" />
+              </div>
             </Link>
           </div>
-
           {/* 검색창 및 우측 아이콘 및 프로필 */}
           <div className="flex items-center space-x-6">
             <SearchBar
               isLogin={isLoggedIn}
               searchWord={searchWord}
               onSearchChange={handleSearchChange}
-              onSearch={moveToSearchPage}
+              onSearch={(word) => {
+                setShowMobileMenu(false);
+                moveToSearchPage(word);
+              }}
             />
-            
-            {
-              isLoggedIn ? 
+            {isLoggedIn ? (
               <>
-                <button
-                type="button" 
-                aria-label="쿠폰"
-                onClick={handleCouponClick}
-              >
-                <Percent className="h-6 w-6 text-sub-gray" />
-              </button>
-                <button type="button" aria-label="찜 목록">
-                <Heart className="h-6 w-6 text-sub-gray" />
-              </button>
-              <button type="button" aria-label="알림" onClick={toggleNotifications}>
-                <Bell className="h-6 w-6 text-sub-gray" />
-              </button>
-              <div className="relative flex items-center space-x-3">
-                {user ?
-                  <span className="text-sm font-medium whitespace-nowrap">{user?.nickname}</span>
-                  :
-                  <div className="h-5 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-                }
-                <div className="relative flex items-center" ref={authMenuRef}>
-                  {user ?
-                  <button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick}>
-                    <Image
-                      src={user?.imageUrl || "/abstract-profile.png"}
-                      alt="프로필 이미지"
-                      width={40}
-                      height={40}
-                      className="h-full w-full object-cover"
-                    />
-                  </button>
-                  :
-                  <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
-                  }
-                  {
-                    showAuthMenu &&
-                    <div className="absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 transition-all duration-200">
-                      {isAdmin &&
+                <button type="button" aria-label="쿠폰" onClick={handleCouponClick} data-cy="coupon-event-modal-button">
+                  <Percent className="h-6 w-6 text-sub-gray" />
+                </button>
+                <div className="relative flex items-center space-x-3">
+                  {!isLoading ? (
+                    <span className="text-sm font-medium whitespace-nowrap" data-cy="user-nickname">{user?.nickname}</span>
+                  ) : (
+                    <div className="h-5 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+                  )}
+                  <div className="relative flex items-center" ref={authMenuRef}>
+                    {isLoading ?
+                    <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" /> :
+                    <button className="h-10 w-10 overflow-hidden rounded-full" onClick={handleProfileClick} data-cy="user-image-button">
+                      <img
+                        src={user?.imageUrl || "/placeholder/profile-placeholder.png"}
+                        alt="프로필 이미지"
+                        className="h-full w-full object-cover"
+                        data-cy="user-image"
+                      />
+                    </button>
+                    }
+                    <div
+                      className={`absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 min-w-[220px] text-left transition-all duration-75 ease-out
+                        ${showAuthMenu ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'}`}
+                      style={{ transformOrigin: 'top right' }}
+                      data-cy="user-menu"
+                    >
+                      <div className="text-xs text-gray-400 font-semibold my-2 pl-1">설정</div>
+                      {isAdmin && (
                         <button
-                        type="button"
-                        onClick={() => router.push("/admin/approval")}
-                        className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
-                      >
-                        <UserLock className="h-4 w-4" />
-                        관리자페이지
-                      </button>
-                      }
+                          type="button"
+                          onClick={() => router.push("/admin/approval")}
+                          className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
+                          data-cy="adminpage-button"
+                        >
+                          <UserLock className="h-4 w-4" />
+                          관리자페이지
+                        </button>
+                      )}
                       <button
                         type="button"
-                        onClick={() => router.push("/my")}
-                        className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
+                        onClick={handleClickMyPage}
+                        className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
+                        data-cy="mypage-button"
                       >
                         <User className="h-4 w-4" />
                         마이페이지
                       </button>
                       <button
-                          type="button"
-                          onClick={logout}
-                          className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
+                        type="button"
+                        onClick={handleLogout}
+                        className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
+                        data-cy="logout-button"
                       >
-                          <LogOut className="h-4 w-4" />
-                          로그아웃
+                        <LogOut className="h-4 w-4" />
+                        로그아웃
                       </button>
                     </div>
-                  }
+                  </div>
                 </div>
-              </div>
               </>
-              :
-              <div className="text-main-color font-medium mr-auto flex items-center gap-2">
-                <button type="button" aria-label="로그인" onClick={openLoginModal}>
+            ) : (
+              <div className="text-main-color font-medium mr-auto flex items-center gap-2 whitespace-nowrap">
+                <button type="button" aria-label="로그인" onClick={openLoginModal} data-cy="open-login-modal-button">
                   로그인
                 </button>
                 /
-                <button type="button" aria-label="로그인" onClick={openSignupModal}>
+                <button type="button" aria-label="로그인" onClick={openSignupModal} data-cy="open-signup-modal-button">
                   회원가입
                 </button>
               </div>
-            }
-
-            
+            )}
           </div>
         </div>
-
         {/* 하단 네비게이션 탭 */}
         <div className="mt-4 flex justify-between items-center">
-          <nav className="flex space-x-8">
-            {["전체", "카테고리", "신규", "마감임박"].map((tab) => (
-              <button
-                type="button"
-                key={tab}
-                className={`relative pb-1 text-base font-medium ${
-                  pathname === uris[tab] ? "text-main-color" : "text-sub-gray"
-                }`}
-                onClick={() => handleTabClick(tab)}
-              >
-                {tab}
-                {pathname === uris[tab] && <span className="absolute bottom-0 left-0 h-0.5 w-full bg-main-color" />}
-              </button>
-            ))}
-          </nav>
-          <PopularSearch onSearchChange={handleSearchChange} onSearch={moveToSearchPage}/>
+          <MenuTab
+            tabs={["전체", "카테고리", "신규", "마감임박"]}
+            activeTab={activeTab}
+            onClickTab={handleTabClick}
+            hideUnderline={!showUnderline}
+          />
         </div>
       </div>
 
-      {/* 알림 패널 */}
-      {showNotifications && (
-        <div className="absolute right-4 top-20 z-50 w-96 rounded-2xl border border-gray-border bg-white p-6 shadow-lg">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">알림</h2>
-            <div className="flex items-center space-x-4">
-              <button type="button" className="text-sm text-sub-gray">모두 지우기</button>
-              <button type="button" onClick={toggleNotifications}>
-                <X className="h-6 w-6" />
-              </button>
+      {/* 모바일 메뉴 오버레이 */}
+      {isSidebarVisible && (
+        <div className="fixed inset-0 z-50 flex">
+          {/* 오버레이 배경 */}
+          <div className="absolute inset-0 bg-black/60" onClick={handleSidebarClose} />
+          {/* 사이드 메뉴 (슬라이드 인/아웃 애니메이션 적용) */}
+          <div
+            className={`fixed left-0 top-0 h-full bg-white w-4/5 max-w-xs z-10 flex flex-col p-6 transition-transform duration-300 ${sidebarAnim ? 'translate-x-0' : '-translate-x-full'}`}
+            onTransitionEnd={handleSidebarTransitionEnd}
+          >
+            {/* 닫기 버튼 */}
+            <button className="mb-6 self-end" onClick={handleSidebarClose} aria-label="메뉴 닫기">
+              <X className="w-8 h-8" />
+            </button>
+            {/* 검색창 */}
+            <div className="mb-4 w-full">
+              <SearchBar
+                isLogin={isLoggedIn}
+                searchWord={searchWord}
+                onSearchChange={handleSearchChange}
+                onSearch={(word) => {
+                  setShowMobileMenu(false);
+                  moveToSearchPage(word);
+                }}
+              />
             </div>
-          </div>
-
-          <div>
-            {notifications.map((notification, index) => (
-              <div key={notification.id}>
-                <div className="flex py-4">
-                  <div className="mr-4 h-12 w-12 overflow-hidden rounded-full">
-                    <Image
-                      src={notification.profileImage || "/placeholder.svg"}
-                      alt="프로필 이미지"
-                      width={48}
-                      height={48}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <p className="mb-1">{notification.message}</p>
-                    <p className="text-sm text-sub-gray">{notification.date}</p>
-                  </div>
-                  <button type="button" className="ml-2 text-sub-gray">
-                    <Trash2 className="h-5 w-5" />
+            {/* 네비게이션 탭 (가로 스크롤, 줄바꿈 방지) */}
+            <div className="mb-6 overflow-x-auto whitespace-nowrap">
+              <MenuTab
+                tabs={["전체", "카테고리", "신규", "마감임박"]}
+                activeTab={activeTab}
+                onClickTab={(tab) => {
+                  setShowMobileMenu(false);
+                  handleTabClick(tab);
+                }}
+                hideUnderline={!showUnderline}
+              />
+            </div>
+            {/* 메뉴 항목 */}
+            <div className="flex flex-col gap-4 mt-4">
+              {isLoggedIn ? (
+                <>
+                  {/* 프로젝트 등록 버튼 - 메뉴 항목 스타일로 추가 */}
+                  {/*
+                  <button type="button" className="flex items-center gap-2 text-gray-700" onClick={() => { setShowMobileMenu(false); router.push('/project/register'); }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    프로젝트 등록
                   </button>
-                </div>
-                {index < notifications.length - 1 && <hr className="border-gray-border" />}
-              </div>
-            ))}
+                  */}
+                  <button type="button" className="flex items-center gap-2 text-gray-700" onClick={() => { setShowMobileMenu(false); handleCouponClick(); }}>
+                    <Percent className="h-5 w-5" /> 쿠폰
+                  </button>
+                  <button type="button" className="flex items-center gap-2 text-gray-700" onClick={() => { setShowMobileMenu(false); handleClickMyPage(); }}>
+                    <User className="h-5 w-5" /> 마이페이지
+                  </button>
+                  {isAdmin && (
+                    <button type="button" className="flex items-center gap-2 text-gray-700" onClick={() => { setShowMobileMenu(false); router.push("/admin/approval"); }}>
+                      <UserLock className="h-5 w-5" /> 관리자페이지
+                    </button>
+                  )}
+                  <button type="button" className="flex items-center gap-2 text-gray-700" onClick={() => { setShowMobileMenu(false); handleLogout(); }}>
+                    <LogOut className="h-5 w-5" /> 로그아웃
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button type="button" className="text-main-color font-medium" onClick={openLoginModal}>로그인</button>
+                  <button type="button" className="text-main-color font-medium" onClick={openSignupModal}>회원가입</button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
+      {/* 모달들 */}
+      <CouponModal isOpen={showCouponModal} onClose={() => setShowCouponModal(false)} />
+      <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} moveToSignupModal={openSignupModalInLoginModal} />
+      <SignupModal isOpen={showSignupModal} onClose={closeSignupModal} />
     </header>
   )
 }

@@ -1,10 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Plus, Trash2, X } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { Plus, Trash2, X, ChevronDown, ChevronUp } from "lucide-react"
 import MarkdownEditor from "./MarkdownEditor"
 import DatePicker from "./DatePicker"
 import { useProjectFormStore } from "@/stores/useProjectFormStore"
+import { PrimaryButton } from "../common/Button"
+import gsap from "gsap"
+import Modal from "../common/Modal"
+import ScheduleDetailsDialog from "./modals/ScheduleDetailsDialog"
 
 // 예산 항목 타입
 interface BudgetItem {
@@ -33,68 +37,7 @@ interface ScheduleDetailsDialogProps {
   scheduleIndex: number
 }
 
-const ScheduleDetailsDialog = ({ isOpen, onClose, details, onSave, scheduleIndex }: ScheduleDetailsDialogProps) => {
-  const [content, setContent] = useState(details || "")
-  const [focusedField, setFocusedField] = useState<boolean>(false)
-
-  if (!isOpen) return null
-
-  const handleSave = () => {
-    onSave(content)
-    onClose()
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* 오버레이 */}
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-
-      {/* 다이얼로그 */}
-      <div className="relative z-10 w-full max-w-2xl rounded-3xl bg-white p-6 shadow-lg">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">일정 {scheduleIndex + 1} 상세 내용</h2>
-          <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <X size={24} />
-          </button>
-        </div>
-
-        <div className="mb-6">
-          <label
-            htmlFor="schedule-details"
-            className={`block text-sm mb-2 ${focusedField ? "text-secondary-color-dark" : "text-main-color"}`}
-          >
-            일정 상세 내용
-          </label>
-          <input
-            id="schedule-details"
-            type="text"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="이 일정에 대한 상세 내용을 입력하세요"
-            className={`w-full p-4 border rounded-xl ${
-              focusedField ? "border-secondary-color-dark" : "border-gray-300"
-            } focus:outline-none`}
-            onFocus={() => setFocusedField(true)}
-            onBlur={() => setFocusedField(false)}
-          />
-          <p className="text-sm text-gray-500 mt-2">* 간단하게 입력해주세요. 줄바꿈은 불가능합니다.</p>
-        </div>
-
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={handleSave}
-            className="bg-main-color text-white font-bold py-2 px-6 rounded-full"
-          >
-            저장
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// 날짜를 YYYY. MM. DD. 형식으로 포맷팅
+// 날짜를 YYYY. MM. DD. 형식으로 포맷팅 (한국 시간 기준)
 const formatDate = (date: Date): string => {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, "0")
@@ -107,15 +50,18 @@ const formatNumber = (value: string) => {
   return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
+// 인터페이스에 isEditMode 속성 추가
 interface StepTwoFormProps {
   targetAmount?: string
   initialData?: {
     markdown?: string
   }
   onUpdateMarkdown?: (markdown: string) => void
+  isEditMode?: boolean
 }
 
-export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown }: StepTwoFormProps) {
+// 함수 매개변수에 isEditMode 추가
+export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown, isEditMode = false }: StepTwoFormProps) {
   // Zustand 스토어에서 상태 가져오기
   const { markdown, updateFormData } = useProjectFormStore()
 
@@ -123,10 +69,11 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown }: Ste
   const [totalBudget, setTotalBudget] = useState(targetAmount || "0")
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([])
   const [schedules, setSchedules] = useState<ProjectSchedule[]>([])
-  const [budgetInputMethod, setBudgetInputMethod] = useState<"form" | "direct">("form")
-  const [scheduleInputMethod, setScheduleInputMethod] = useState<"form" | "direct">("form")
+  const [budgetInputMethod, setBudgetInputMethod] = useState<"form" | "direct">("direct")
+  const [scheduleInputMethod, setScheduleInputMethod] = useState<"form" | "direct">("direct")
   const [scheduleDetailsDialogOpen, setScheduleDetailsDialogOpen] = useState(false)
   const [currentScheduleId, setCurrentScheduleId] = useState<number | null>(null)
+  const [isAutofillExpanded, setIsAutofillExpanded] = useState(false)
 
   // Add useEffect to update totalBudget when targetAmount changes
   useEffect(() => {
@@ -156,6 +103,7 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown }: Ste
   // 일정 추가
   const addSchedule = () => {
     const newId = schedules.length > 0 ? Math.max(...schedules.map((schedule) => schedule.id)) + 1 : 1
+    // 오늘 날짜 설정
     const today = new Date()
     const threeWeeksLater = new Date(today)
     threeWeeksLater.setDate(today.getDate() + 21)
@@ -278,289 +226,316 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown }: Ste
     handleMarkdownChange(generateMarkdown())
   }
 
+  // 자동 채우기 패널 토글
+  const toggleAutofillPanel = () => {
+    setIsAutofillExpanded(!isAutofillExpanded)
+  }
+
   return (
     <div className="space-y-8">
-      {/* 예산 계획 섹션 */}
-      <div className="flex flex-col">
-        <div className="flex items-center mb-4">
-          <h2 className="text-xl font-bold mr-8">예산 계획</h2>
-          <div className="flex items-center space-x-4">
-            <label className="inline-flex items-center cursor-pointer">
-              <input
-                type="radio"
-                checked={budgetInputMethod === "form"}
-                onChange={() => setBudgetInputMethod("form")}
-                className="sr-only"
-              />
-              <span
-                className={`w-5 h-5 rounded-full flex items-center justify-center ${budgetInputMethod === "form" ? "bg-main-color text-white" : "border border-gray-300"}`}
-              >
-                {budgetInputMethod === "form" && <span className="w-2 h-2 bg-white rounded-full"></span>}
-              </span>
-              <span className="ml-2">자동 채우기 사용</span>
-            </label>
-
-            <label className="inline-flex items-center cursor-pointer">
-              <input
-                type="radio"
-                checked={budgetInputMethod === "direct"}
-                onChange={() => setBudgetInputMethod("direct")}
-                className="sr-only"
-              />
-              <span
-                className={`w-5 h-5 rounded-full flex items-center justify-center ${budgetInputMethod === "direct" ? "bg-main-color text-white" : "border border-gray-300"}`}
-              >
-                {budgetInputMethod === "direct" && <span className="w-2 h-2 bg-white rounded-full"></span>}
-              </span>
-              <span className="ml-2">직접 상세 설명에 입력</span>
-            </label>
+      {/* 자동 채우기 패널 */}
+      {!isEditMode && (
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center">
+              <h2 className="text-xl font-bold">자동 채우기</h2>
+              <span className="ml-3 text-gray-500 text-sm">* 상품 상세 설명에 내용을 자동으로 채웁니다.</span>
+            </div>
+            <PrimaryButton
+              type="button"
+              onClick={toggleAutofillPanel}
+              className="bg-main-color hover:bg-secondary-color-dark text-white font-medium py-2 px-4 rounded-full text-sm flex items-center"
+            >
+              사용해 보기{" "}
+              {isAutofillExpanded ? <ChevronUp className="ml-1 w-4 h-4" /> : <ChevronDown className="ml-1 w-4 h-4" />}
+            </PrimaryButton>
           </div>
-        </div>
 
-        {/* 설정한 목표 금액 - 가로 배치로 변경 */}
-        <div className="mb-6 flex items-center">
-          <span className="text-lg font-medium mr-4">설정한 목표 금액</span>
-          <div className="flex items-center">
-            <span className="font-bold text-xl">{formatNumber(totalBudget)}원</span>
-            <span className="ml-4 text-gray-500">* 기본 정보의 목표 금액과 동일합니다.</span>
-          </div>
-        </div>
+          {isAutofillExpanded && (
+            <div className="mt-4 space-y-8 border-t pt-4">
+              {/* 예산 계획 섹션 */}
+              <div className="flex flex-col">
+                <div className="flex items-center mb-4">
+                  <h3 className="text-lg font-bold mr-8">예산 계획</h3>
+                  <div className="flex items-center space-x-4">
+                    <label className="inline-flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={budgetInputMethod === "form"}
+                        onChange={() => setBudgetInputMethod("form")}
+                        className="sr-only"
+                      />
+                      <span
+                        className={`w-5 h-5 rounded-full flex items-center justify-center ${budgetInputMethod === "form" ? "bg-main-color text-white" : "border border-gray-300"}`}
+                      >
+                        {budgetInputMethod === "form" && <span className="w-2 h-2 bg-white rounded-full"></span>}
+                      </span>
+                      <span className="ml-2">자동 채우기 사용</span>
+                    </label>
 
-        {budgetInputMethod === "form" && (
-          <>
-            {/* 예산 항목 목록 */}
-            <div className="space-y-4">
-              {budgetItems.map((item, index) => (
-                <div key={item.id} className="flex flex-col">
-                  <div className="flex items-center mb-2">
-                    <span className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full mr-2">
-                      {index + 1}
-                    </span>
-                    <input
-                      type="text"
-                      value={item.name}
-                      onChange={(e) => handleBudgetNameChange(item.id, e.target.value)}
-                      placeholder="항목명"
-                      className="w-64 rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none"
-                    />
-
-                    <div className="mx-4 h-6 w-px bg-gray-300"></div>
-
-                    <div className="flex items-center">
-                      <label className="inline-flex items-center cursor-pointer mr-4">
-                        <input
-                          type="radio"
-                          checked={!item.isPercentage}
-                          onChange={() => handleBudgetTypeChange(item.id, false)}
-                          className="sr-only"
-                        />
-                        <span
-                          className={`w-5 h-5 rounded-full flex items-center justify-center ${!item.isPercentage ? "bg-main-color text-white" : "border border-gray-300"}`}
-                        >
-                          {!item.isPercentage && <span className="w-2 h-2 bg-white rounded-full"></span>}
-                        </span>
-                        <span className="ml-2">금액입력</span>
-                      </label>
-
-                      <label className="inline-flex items-center cursor-pointer">
-                        <input
-                          type="radio"
-                          checked={item.isPercentage}
-                          onChange={() => handleBudgetTypeChange(item.id, true)}
-                          className="sr-only"
-                        />
-                        <span
-                          className={`w-5 h-5 rounded-full flex items-center justify-center ${item.isPercentage ? "bg-main-color text-white" : "border border-gray-300"}`}
-                        >
-                          {item.isPercentage && <span className="w-2 h-2 bg-white rounded-full"></span>}
-                        </span>
-                        <span className="ml-2">비율입력</span>
-                      </label>
-                    </div>
-
-                    <div className="ml-4 flex items-center">
-                      {item.isPercentage ? (
-                        <div className="flex items-center">
-                          <input
-                            type="text"
-                            value={item.percentage?.replace("%", "") || ""}
-                            onChange={(e) => handleBudgetPercentageChange(item.id, e.target.value)}
-                            placeholder="0"
-                            className="w-24 rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none text-right"
-                          />
-                          <span className="ml-2">%</span>
-                          <span className="ml-4 text-gray-500">({item.amount}원)</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center">
-                          <input
-                            type="text"
-                            value={item.amount}
-                            onChange={(e) => handleBudgetAmountChange(item.id, e.target.value)}
-                            placeholder="0"
-                            className="w-40 rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none text-right"
-                          />
-                          <span className="ml-2">원</span>
-                          <span className="ml-4 text-gray-500">(전체의 {item.percentage})</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => removeBudgetItem(item.id)}
-                      className="ml-auto p-2 text-gray-400 hover:text-red-500 transition-colors"
-                      aria-label="항목 삭제"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </button>
+                    <label className="inline-flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={budgetInputMethod === "direct"}
+                        onChange={() => setBudgetInputMethod("direct")}
+                        className="sr-only"
+                      />
+                      <span
+                        className={`w-5 h-5 rounded-full flex items-center justify-center ${budgetInputMethod === "direct" ? "bg-main-color text-white" : "border border-gray-300"}`}
+                      >
+                        {budgetInputMethod === "direct" && <span className="w-2 h-2 bg-white rounded-full"></span>}
+                      </span>
+                      <span className="ml-2">직접 상세 설명에 입력</span>
+                    </label>
                   </div>
                 </div>
-              ))}
-            </div>
 
-            {/* 예산 항목 추가 버튼 */}
-            <div className="mt-4">
-              <div
-                className="border border-dashed border-gray-300 rounded-xl p-3 flex items-center justify-center cursor-pointer hover:bg-gray-50 h-14"
-                onClick={addBudgetItem}
-              >
-                <div className="flex items-center text-gray-500">
-                  <Plus className="w-5 h-5 mr-2" />
-                  <span className="text-sm font-medium">예산 계획 추가</span>
+                {budgetInputMethod === "form" && (
+                  <>
+                    {/* 설정한 목표 금액 - 가로 배치로 변경 */}
+                    <div className="mb-6 flex items-center">
+                      <span className="text-lg font-medium mr-4">설정한 목표 금액</span>
+                      <div className="flex items-center">
+                        <span className="font-bold text-xl">{formatNumber(totalBudget)}원</span>
+                        <span className="ml-4 text-gray-500">* 기본 정보의 목표 금액과 동일합니다.</span>
+                      </div>
+                    </div>
+
+                    {/* 예산 항목 목록 */}
+                    <div className="space-y-4">
+                      {budgetItems.map((item, index) => (
+                        <div key={item.id} className="flex flex-col">
+                          <div className="flex items-center mb-2">
+                            <span className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full mr-2">
+                              {index + 1}
+                            </span>
+                            <input
+                              type="text"
+                              value={item.name}
+                              onChange={(e) => handleBudgetNameChange(item.id, e.target.value)}
+                              placeholder="항목명"
+                              className="w-64 rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none"
+                            />
+
+                            <div className="mx-4 h-6 w-px bg-gray-300"></div>
+
+                            <div className="flex items-center">
+                              <label className="inline-flex items-center cursor-pointer mr-4">
+                                <input
+                                  type="radio"
+                                  checked={!item.isPercentage}
+                                  onChange={() => handleBudgetTypeChange(item.id, false)}
+                                  className="sr-only"
+                                />
+                                <span
+                                  className={`w-5 h-5 rounded-full flex items-center justify-center ${!item.isPercentage ? "bg-main-color text-white" : "border border-gray-300"}`}
+                                >
+                                  {!item.isPercentage && <span className="w-2 h-2 bg-white rounded-full"></span>}
+                                </span>
+                                <span className="ml-2">금액입력</span>
+                              </label>
+
+                              <label className="inline-flex items-center cursor-pointer">
+                                <input
+                                  type="radio"
+                                  checked={item.isPercentage}
+                                  onChange={() => handleBudgetTypeChange(item.id, true)}
+                                  className="sr-only"
+                                />
+                                <span
+                                  className={`w-5 h-5 rounded-full flex items-center justify-center ${item.isPercentage ? "bg-main-color text-white" : "border border-gray-300"}`}
+                                >
+                                  {item.isPercentage && <span className="w-2 h-2 bg-white rounded-full"></span>}
+                                </span>
+                                <span className="ml-2">비율입력</span>
+                              </label>
+                            </div>
+
+                            <div className="ml-4 flex items-center">
+                              {item.isPercentage ? (
+                                <div className="flex items-center">
+                                  <input
+                                    type="text"
+                                    value={item.percentage?.replace("%", "") || ""}
+                                    onChange={(e) => handleBudgetPercentageChange(item.id, e.target.value)}
+                                    placeholder="0"
+                                    className="w-24 rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none text-right"
+                                  />
+                                  <span className="ml-2">%</span>
+                                  <span className="ml-4 text-gray-500">({item.amount}원)</span>
+                                </div>
+                              ) : (
+                                <div className="flex items-center">
+                                  <input
+                                    type="text"
+                                    value={item.amount}
+                                    onChange={(e) => handleBudgetAmountChange(item.id, e.target.value)}
+                                    placeholder="0"
+                                    className="w-40 rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none text-right"
+                                  />
+                                  <span className="ml-2">원</span>
+                                  <span className="ml-4 text-gray-500">(전체의 {item.percentage})</span>
+                                </div>
+                              )}
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => removeBudgetItem(item.id)}
+                              className="ml-auto p-2 text-gray-400 hover:text-red-500 transition-colors"
+                              aria-label="항목 삭제"
+                            >
+                              <Trash2 className="h-5 w-5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* 예산 항목 추가 버튼 */}
+                    <div className="mt-4">
+                      <div
+                        className="border border-dashed border-gray-300 rounded-xl p-3 flex items-center justify-center cursor-pointer hover:bg-gray-50 h-14"
+                        onClick={addBudgetItem}
+                      >
+                        <div className="flex items-center text-gray-500">
+                          <Plus className="w-5 h-5 mr-2" />
+                          <span className="text-sm font-medium">예산 계획 추가</span>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* 프로젝트 일정 섹션 */}
+              <div className="flex flex-col">
+                <div className="flex items-center mb-4">
+                  <h3 className="text-lg font-bold mr-8">프로젝트 일정</h3>
+                  <div className="flex items-center space-x-4">
+                    <label className="inline-flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={scheduleInputMethod === "form"}
+                        onChange={() => setScheduleInputMethod("form")}
+                        className="sr-only"
+                      />
+                      <span
+                        className={`w-5 h-5 rounded-full flex items-center justify-center ${scheduleInputMethod === "form" ? "bg-main-color text-white" : "border border-gray-300"}`}
+                      >
+                        {scheduleInputMethod === "form" && <span className="w-2 h-2 bg-white rounded-full"></span>}
+                      </span>
+                      <span className="ml-2">자동 채우기 사용</span>
+                    </label>
+
+                    <label className="inline-flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={scheduleInputMethod === "direct"}
+                        onChange={() => setScheduleInputMethod("direct")}
+                        className="sr-only"
+                      />
+                      <span
+                        className={`w-5 h-5 rounded-full flex items-center justify-center ${scheduleInputMethod === "direct" ? "bg-main-color text-white" : "border border-gray-300"}`}
+                      >
+                        {scheduleInputMethod === "direct" && <span className="w-2 h-2 bg-white rounded-full"></span>}
+                      </span>
+                      <span className="ml-2">직접 상세 설명에 입력</span>
+                    </label>
+                  </div>
                 </div>
+
+                {scheduleInputMethod === "form" && (
+                  <>
+                    {/* 일정 목록 */}
+                    <div className="space-y-4">
+                      {schedules.map((schedule, index) => (
+                        <div key={schedule.id} className="flex items-center">
+                          <span className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full mr-2">
+                            {index + 1}
+                          </span>
+
+                          <DatePicker
+                            selectedDate={schedule.startDate}
+                            onChange={(date) => handleStartDateChange(schedule.id, date)}
+                            position="top"
+                          />
+
+                          <span className="mx-2">부터</span>
+
+                          <DatePicker
+                            selectedDate={schedule.endDate}
+                            onChange={(date) => handleEndDateChange(schedule.id, date)}
+                            position="top"
+                          />
+
+                          <span className="mx-2">까지</span>
+
+                          <button
+                            type="button"
+                            className="ml-4 text-main-color hover:text-secondary-color-dark"
+                            onClick={() => openScheduleDetailsDialog(schedule.id)}
+                          >
+                            내용 작성(편집) &gt;
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => removeSchedule(schedule.id)}
+                            className="ml-auto p-2 text-gray-400 hover:text-red-500 transition-colors"
+                            aria-label="일정 삭제"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* 일정 추가 버튼 */}
+                    <div className="mt-4">
+                      <div
+                        className="border border-dashed border-gray-300 rounded-xl p-3 flex items-center justify-center cursor-pointer hover:bg-gray-50 h-14"
+                        onClick={addSchedule}
+                      >
+                        <div className="flex items-center text-gray-500">
+                          <Plus className="w-5 h-5 mr-2" />
+                          <span className="text-sm font-medium">일정 추가</span>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* 마크다운에 적용 버튼 */}
+              <div className="flex justify-center mt-8">
+                <PrimaryButton
+                  type="button"
+                  onClick={updateMarkdown}
+                  className="bg-main-color hover:bg-secondary-color-dark text-white font-bold py-3 px-8 rounded-full"
+                >
+                  선택 내용 자동 채우기
+                </PrimaryButton>
               </div>
             </div>
-          </>
-        )}
-      </div>
-
-      {/* 프로젝트 일정 섹션 */}
-      <div className="flex flex-col mt-8">
-        <div className="flex items-center mb-4">
-          <h2 className="text-xl font-bold mr-8">프로젝트 일정</h2>
-          <div className="flex items-center space-x-4">
-            <label className="inline-flex items-center cursor-pointer">
-              <input
-                type="radio"
-                checked={scheduleInputMethod === "form"}
-                onChange={() => setScheduleInputMethod("form")}
-                className="sr-only"
-              />
-              <span
-                className={`w-5 h-5 rounded-full flex items-center justify-center ${scheduleInputMethod === "form" ? "bg-main-color text-white" : "border border-gray-300"}`}
-              >
-                {scheduleInputMethod === "form" && <span className="w-2 h-2 bg-white rounded-full"></span>}
-              </span>
-              <span className="ml-2">자동 채우기 사용</span>
-            </label>
-
-            <label className="inline-flex items-center cursor-pointer">
-              <input
-                type="radio"
-                checked={scheduleInputMethod === "direct"}
-                onChange={() => setScheduleInputMethod("direct")}
-                className="sr-only"
-              />
-              <span
-                className={`w-5 h-5 rounded-full flex items-center justify-center ${scheduleInputMethod === "direct" ? "bg-main-color text-white" : "border border-gray-300"}`}
-              >
-                {scheduleInputMethod === "direct" && <span className="w-2 h-2 bg-white rounded-full"></span>}
-              </span>
-              <span className="ml-2">직접 상세 설명에 입력</span>
-            </label>
-          </div>
+          )}
         </div>
-
-        {scheduleInputMethod === "form" && (
-          <>
-            {/* 일정 목록 */}
-            <div className="space-y-4">
-              {schedules.map((schedule, index) => (
-                <div key={schedule.id} className="flex items-center">
-                  <span className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full mr-2">
-                    {index + 1}
-                  </span>
-
-                  <DatePicker
-                    selectedDate={schedule.startDate}
-                    onChange={(date) => handleStartDateChange(schedule.id, date)}
-                    position="top"
-                  />
-
-                  <span className="mx-2">부터</span>
-
-                  <DatePicker
-                    selectedDate={schedule.endDate}
-                    onChange={(date) => handleEndDateChange(schedule.id, date)}
-                    position="top"
-                  />
-
-                  <span className="mx-2">까지</span>
-
-                  <button
-                    type="button"
-                    className="ml-4 text-main-color hover:text-secondary-color-dark"
-                    onClick={() => openScheduleDetailsDialog(schedule.id)}
-                  >
-                    내용 작성(편집) &gt;
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => removeSchedule(schedule.id)}
-                    className="ml-auto p-2 text-gray-400 hover:text-red-500 transition-colors"
-                    aria-label="일정 삭제"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            {/* 일정 추가 버튼 */}
-            <div className="mt-4">
-              <div
-                className="border border-dashed border-gray-300 rounded-xl p-3 flex items-center justify-center cursor-pointer hover:bg-gray-50 h-14"
-                onClick={addSchedule}
-              >
-                <div className="flex items-center text-gray-500">
-                  <Plus className="w-5 h-5 mr-2" />
-                  <span className="text-sm font-medium">일정 추가</span>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* 마크다운에 적용 버튼 */}
-      <div className="flex justify-center mt-8">
-        <button
-          type="button"
-          onClick={updateMarkdown}
-          className="bg-main-color hover:bg-secondary-color-dark text-white font-bold py-3 px-8 rounded-full"
-        >
-          선택 내용 자동 채우기
-        </button>
-      </div>
+      )}
 
       {/* 마크다운 에디터 */}
       <div className="flex flex-col mt-8">
         <h2 className="text-xl font-bold mb-4">상품 상세 설명</h2>
-        <MarkdownEditor value={markdown} onChange={handleMarkdownChange} />
+          <MarkdownEditor value={markdown} onChange={handleMarkdownChange} />
       </div>
 
       {/* 일정 내용 다이얼로그 */}
-      {scheduleDetailsDialogOpen && currentScheduleId !== null && (
-        <ScheduleDetailsDialog
-          isOpen={scheduleDetailsDialogOpen}
-          onClose={() => setScheduleDetailsDialogOpen(false)}
-          details={schedules.find((schedule) => schedule.id === currentScheduleId)?.details || ""}
-          onSave={saveScheduleDetails}
-          scheduleIndex={schedules.findIndex((schedule) => schedule.id === currentScheduleId)}
-        />
-      )}
+      <ScheduleDetailsDialog
+        isOpen={scheduleDetailsDialogOpen && currentScheduleId !== null}
+        onClose={() => setScheduleDetailsDialogOpen(false)}
+        details={currentScheduleId !== null ? (schedules.find((schedule) => schedule.id === currentScheduleId)?.details || "") : ""}
+        onSave={saveScheduleDetails}
+        scheduleIndex={currentScheduleId !== null ? schedules.findIndex((schedule) => schedule.id === currentScheduleId) : 0}
+      />
     </div>
   )
 }

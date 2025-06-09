@@ -1,0 +1,36 @@
+{
+  "content": [
+    {
+      "id": 1,
+      "couponId": 100,
+      "title": "신규 가입 할인 쿠폰",
+      "content": "신규 가입 회원을 위한 특별 할인 쿠폰입니다",
+      "price": 5000,
+      "stock": 100,
+      "expires": "2025-12-31",
+      "status": "UNUSED"
+    },
+    {
+      "id": 2, 
+      "couponId": 101,
+      "title": "첫 구매 할인 쿠폰",
+      "content": "첫 구매 고객을 위한 할인 쿠폰입니다",
+      "price": 10000,
+      "stock": 50,
+      "expires": "2025-06-30",
+      "status": "USED"
+    },
+    {
+        "id": 3, 
+        "couponId": 102,
+        "title": "첫 구매 할인 쿠폰",
+        "content": "첫 구매 고객을 위한 할인 쿠폰입니다",
+        "price": 10000,
+        "stock": 50,
+        "expires": "2025-06-01",
+        "status": "EXPIRED"
+      }
+  ],
+  "nextCouponId": null,
+  "total": 2
+}

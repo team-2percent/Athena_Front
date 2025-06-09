@@ -2,94 +2,88 @@
 
 import ProfileHeader from "@/components/profile/ProfileHeader"
 import ProfileContent from "@/components/profile/ProfileContent"
-import useAuthStore from "@/stores/auth"
-import { redirect } from "next/navigation"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
-import { cn } from "@/lib/utils"
 import { useApi } from "@/hooks/useApi"
-
-interface UserProfile {
-  id: number
-  email: string
-  nickname: string
-}
+import useAuthStore from "@/stores/auth"
+import { SecondaryButton } from "@/components/common/Button"
+import { UserInfo, UserProfile, UserResponse } from "@/lib/userInterface"
 
 export default function ProfilePage() {
-  const isLoggedIn = useAuthStore((state: { isLoggedIn: boolean }) => state.isLoggedIn)
-  if (!isLoggedIn) {
-    redirect("/")
-  }
-
   const router = useRouter()
   const { apiCall, isLoading } = useApi()
-  const [isOpenViewTransaction, setIsOpenViewTransaction] = useState(false)
+  const userId = useAuthStore((state) => state.userId)
+  const [isReady, setIsReady] = useState(false)
+
   const [userProfile, setUserProfile] = useState<UserProfile>({
-    id: 9,
     email: "",
-    nickname: "사용자 닉네임", // 기본값
+    nickname: "",
+    imageUrl: ""
+  })
+  const [userInfo, setUserInfo] = useState<UserInfo>({
+    sellerDescription: "",
+    linkUrl: "",
   })
 
-  // 프로필 데이터 (실제로는 API에서 가져올 데이터)
-  const profileData = {
-    following: "-",
-    purchases: "-",
-    profileImage: "/abstract-profile.png",
+  // 유저 정보 가져오기
+  const loadUserInfo = () => {
+    apiCall<UserResponse>(`/api/user/${userId}`, "GET").then(({ data }) => {
+      if (data) {
+        setUserProfile({
+          email: data.email,
+          nickname: data.nickname,
+          imageUrl: data.imageUrl
+        })
+        setUserInfo({
+          sellerDescription: data.sellerDescription,
+          linkUrl: data.linkUrl
+        })
+      }
+    })
   }
 
   useEffect(() => {
-    // 유저 프로필 정보 가져오기
-    const fetchUserProfile = async () => {
-      try {
-        const response = await apiCall("/api/user/9", "GET")
-        if (response && response.data) {
-          setUserProfile(response.data as UserProfile)
-        }
-      } catch (error) {
-        console.error("프로필 정보를 가져오는데 실패했습니다.", error)
-      }
+    if (userId !== null) {
+      setIsReady(true);
     }
+  }, [userId]);
 
-    fetchUserProfile()
-  }, [])
+  useEffect(() => {
+    if (isReady) {
+      loadUserInfo()
+    }
+  }, [isReady, userId])
 
   const handleClickEditProfile = () => {
     router.push("/my/edit")
   }
 
-  const handleClickViewTransaction = () => {
-    setIsOpenViewTransaction(true)
-  }
-
   return (
-    <main className="min-h-screen bg-white">
-      {/* 거래내역 모달 추가 필요*/}
-
-      <div className="container mx-auto px-4">
+    <main className="min-h-screen bg-white w-[var(--content-width)]">
+      <div className="container my-8">
         {/* 프로필 상단 영역 */}
         <ProfileHeader
           nickname={userProfile.nickname}
-          following={profileData.following}
-          purchases={profileData.purchases}
-          profileImage={profileData.profileImage}
+          profileImage={userProfile.imageUrl}
           buttons={
             <div className="flex flex-col gap-2">
-              <button
-                className={cn(
-                  "px-8 py-3 rounded-lg border-2 border-main-color text-main-color font-medium text-center transition-colors",
-                  "hover:bg-secondary-color active:bg-secondary-color",
-                  "focus:outline-none focus:ring-2 focus:ring-main-color focus:ring-offset-2",
-                )}
+              <SecondaryButton
                 onClick={handleClickEditProfile}
+                className="px-8 py-3"
+                dataCy="edit-profile-button"
               >
                 프로필 편집
-              </button>
+              </SecondaryButton>
             </div>
           }
         />
 
         {/* 프로필 콘텐츠 영역 */}
-        <ProfileContent isMy={true} />
+        <ProfileContent
+          isMy={true}
+          sellerDescription={userInfo.sellerDescription}
+          linkUrl={userInfo.linkUrl}
+        />
       </div>
     </main>
   )

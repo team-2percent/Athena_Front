@@ -1,25 +1,31 @@
-import { useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
-import useAuthStore from "@/stores/auth";
+import { useEffect } from "react"
+import { jwtDecode } from "jwt-decode"
+import useAuthStore from "@/stores/auth"
 
 export function useHydrateAuth() {
-  const setLoggedIn = useAuthStore((s) => s.setLoggedIn);
-  const setRole = useAuthStore((s) => s.setRole);
+  const {setLoggedIn, setRole, setUserId} = useAuthStore();
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
+    const userId = localStorage.getItem("userId");
 
-    if (accessToken && refreshToken) {
+    if (accessToken && userId) {
+      setLoggedIn(true);
       try {
-        const { role } = jwtDecode<{ role: "ADMIN" | "USER" }>(accessToken);
-        setLoggedIn(true);
+        const { role } = jwtDecode<{ role: "ROLE_ADMIN" | "ROLE_USER" }>(accessToken);
         setRole(role);
+        setUserId(+userId);
       } catch {
-        setLoggedIn(false);
         setRole("");
+        setUserId(null);
       }
+    } else {
+      setLoggedIn(false)
     }
-  }, [setLoggedIn, setRole]);
+
+    if (userId) {
+      setUserId(Number(userId))
+    }
+  }, [setLoggedIn, setRole, setUserId])
 }
 
-export default useHydrateAuth;
+export default useHydrateAuth

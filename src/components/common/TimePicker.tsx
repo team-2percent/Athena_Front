@@ -16,10 +16,19 @@ export default function TimePicker({ selectedDateTime, onChange, minDateTime }: 
   const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"))
 
   const handleTimeSelect = (hour: string) => {
-    onChange(+hour)
+    const koreaHour = Number.parseInt(hour)
+    onChange(koreaHour)
   }
 
-  const isBeforeMinTime = (hour: string) => selectedDateTime.getDate() === minDateTime?.getDate() && +hour <= minDateTime?.getHours()
+  const isBeforeMinTime = (hour: string) => {
+    if (!minDateTime) return false
+
+    // 한국 시간 기준으로 비교
+    const koreaSelectedDate = new Date(selectedDateTime.getTime() + 9 * 60 * 60 * 1000)
+    const koreaMinDate = new Date(minDateTime.getTime() + 9 * 60 * 60 * 1000)
+
+    return koreaSelectedDate.getUTCDate() === koreaMinDate.getUTCDate() && +hour <= koreaMinDate.getUTCHours()
+  }
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -41,13 +50,13 @@ export default function TimePicker({ selectedDateTime, onChange, minDateTime }: 
         onClick={() => setIsOpen(!isOpen)}
       >
         <Clock className="w-5 h-5 text-gray-500 absolute left-4 top-1/2 -translate-y-1/2" />
-        <span>{selectedDateTime.getHours().toString().padStart(2, "0")}:00</span>
+        <span>
+          {new Date(selectedDateTime.getTime() + 9 * 60 * 60 * 1000).getUTCHours().toString().padStart(2, "0")}:00
+        </span>
       </div>
 
       {isOpen && (
-        <div 
-          className="absolute z-50 mt-1 bg-white border rounded-lg shadow-lg w-32 p-4"
-        >
+        <div className="absolute z-50 mt-1 bg-white border rounded-lg shadow-lg w-32 p-4">
           <div className="flex flex-col items-center max-h-[200px] overflow-y-auto overflow-x-hidden scrollbar-hide">
             {hours.map((hour) => (
               <button
@@ -56,8 +65,10 @@ export default function TimePicker({ selectedDateTime, onChange, minDateTime }: 
                 className={clsx(
                   "w-fit p-2 text-sm rounded-md transition-all duration-200",
                   "hover:bg-gray-100 focus:outline-none",
-                  selectedDateTime.getHours() === +hour ? "bg-main-color text-white scale-110" : "",
-                  isBeforeMinTime(hour) ? "text-gray-300" : ""
+                  new Date(selectedDateTime.getTime() + 9 * 60 * 60 * 1000).getUTCHours() === +hour
+                    ? "bg-main-color text-white scale-110"
+                    : "",
+                  isBeforeMinTime(hour) ? "text-gray-300" : "",
                 )}
                 onClick={() => handleTimeSelect(hour)}
               >

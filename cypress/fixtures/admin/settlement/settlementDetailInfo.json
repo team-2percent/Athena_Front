@@ -1,0 +1,21 @@
+{
+  "projectTitle": "켄싱턴 트랙볼",
+  "sellerNickname": "User7",
+  "userId": 7,
+  "targetAmount": 700000,
+  "totalSales": 550000,
+  "payOutAmount": 479050,
+  "platformFeeTotal": 49500,
+  "pgFeeTotal": 16500,
+  "vatTotal": 4950,
+  "totalCount": 10,
+  "settledAt": null,
+  "status": "PENDING",
+  "bankAccount": {
+    "bankName": "은행7",
+    "accountNumber": "0000000007"
+  },
+  "fundingStartDate": "2025-03-02T00:00:00",
+  "fundingEndDate": "2025-03-22T00:00:00",
+  "planName": "PRO"
+}

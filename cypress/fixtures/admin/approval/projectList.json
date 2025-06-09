@@ -1,0 +1,89 @@
+{
+    "content": [
+      {
+        "projectId": 101,
+        "title": "이건 상품 개수 많을 때 테스트에요",
+        "createdAt": "2025-06-04 06:00:23.754862",
+        "sellerName": "minseok",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      },
+      {
+        "projectId": 100,
+        "title": "마크다운 테스트를 합니다 (2)",
+        "createdAt": "2025-06-04 01:23:44.898084",
+        "sellerName": "minseok",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      },
+      {
+        "projectId": 98,
+        "title": "대충 이것도 마크다운 테스트입니다",
+        "createdAt": "2025-06-04 00:48:45.855984",
+        "sellerName": "minseok",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      },
+      {
+        "projectId": 97,
+        "title": "오버워치 3",
+        "createdAt": "2025-06-03 13:04:56.589169",
+        "sellerName": "테스트유저2",
+        "isApproved": "PENDING",
+        "platformPlan": "PREMIUM"
+      },
+      {
+        "projectId": 96,
+        "title": "대충 곰",
+        "createdAt": "2025-06-02 03:40:09.162293",
+        "sellerName": "user2",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      },
+      {
+        "projectId": 95,
+        "title": "좋은 디지털 기기",
+        "createdAt": "2025-05-30 06:43:31.411302",
+        "sellerName": "imuser1",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      },
+      {
+        "projectId": 94,
+        "title": "이미지 순서 테스트",
+        "createdAt": "2025-05-29 07:10:00.643761",
+        "sellerName": "user2",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      },
+      {
+        "projectId": 87,
+        "title": "asdfasdf",
+        "createdAt": "2025-05-29 05:45:01.041505",
+        "sellerName": "user2",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      },
+      {
+        "projectId": 84,
+        "title": "대충 먹을 것이다.",
+        "createdAt": "2025-05-29 05:01:49.788202",
+        "sellerName": "user2",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      },
+      {
+        "projectId": 83,
+        "title": "마크다운 테스트를 합니다",
+        "createdAt": "2025-05-28 07:56:34.869119",
+        "sellerName": "user2",
+        "isApproved": "PENDING",
+        "platformPlan": "BASIC"
+      }
+    ],
+    "pageInfo": {
+      "currentPage": 0,
+      "totalPages": 9
+    },
+    "pendingCount": 25
+  }

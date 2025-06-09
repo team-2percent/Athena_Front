@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { Search, X } from "lucide-react"
+import { SEARCH_MAX_LENGTH } from "@/lib/validationConstant"
 
 interface SearchBarProps {
   isLogin: boolean
@@ -15,7 +16,6 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
   const [autoCompletes, setAutoCompletes] = useState<string[]>([]) // 자동완성 단어
   const [recentSearches, setRecentSearches] = useState<{ id: number, word: string }[]>([]) // 최근 검색어
   const searchRef = useRef<HTMLDivElement>(null)
-  const maxLength = 30;
 
   // mock data. 로직 구현 후 삭제
   const autoCompleteItems = ["타로 버블티", "타로 버블티 품추가", "타로 버블티 버블 추가"]
@@ -88,7 +88,7 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
   }
 
   return (
-    <div ref={searchRef} className="w-80 max-w-xl relative h-10">
+    <div ref={searchRef} className="w-full max-w-xl relative h-10">
       <div className="flex gap-2 rounded-full border border-gray-300 px-4 py-3 h-full">
         <input
           type="text"
@@ -98,22 +98,23 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
           onFocus={() => setIsOpen(true)}
           onKeyDown={(e) => activeEnter(e)}
           className="w-full h-full focus:outline-none text-sm"
-          maxLength={maxLength}
+          maxLength={SEARCH_MAX_LENGTH}
+          data-cy="search-input"
         />
         <button
           type="button"
           className=""
           onClick={search}
+          data-cy="search-button"
         >
           <Search className="h-4 w-4 text-gray-500" />
         </button>
       </div>
 
-      {/* Dropdown */}
-      {isOpen && (
+      {/* {isOpen && (
         <div className="absolute w-full mt-2 bg-white rounded-3xl border border-gray-300 shadow-lg z-30">
           <div className="p-4">
-            {/* Auto-complete section */}
+            
             <div className="mb-4">
               <h3 className="text-lg font-bold mb-2">자동 완성</h3>
               <div className="flex flex-col">
@@ -130,7 +131,7 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
               </div>
             </div>
 
-            {/* Recent searches section */}
+            
             {isLogin &&
               <div>
               <h3 className="text-lg font-bold mb-2">최근 검색어</h3>
@@ -163,7 +164,7 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
             
           </div>
         </div>
-      )}
+      )} */}
     </div>
   )
 }

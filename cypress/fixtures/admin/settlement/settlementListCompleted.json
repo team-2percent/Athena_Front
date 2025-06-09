@@ -1,0 +1,28 @@
+{
+    "content": [
+      {
+        "settlementId": 2,
+        "projectTitle": "앗! 해골 너무 무섭다 무서운 성능의 Intel NUC",
+        "totalSales": 550000,
+        "platformFee": 49500,
+        "payOutAmount": 479050,
+        "sellerName": "user2",
+        "requestedAt": "2025-05-21T00:16:48.448337",
+        "status": "COMPLETED"
+      },
+      {
+        "settlementId": 1,
+        "projectTitle": "Nvidia Jetson origin",
+        "totalSales": 550000,
+        "platformFee": 49500,
+        "payOutAmount": 479050,
+        "sellerName": "User1",
+        "requestedAt": "2025-05-21T00:16:48.381529",
+        "status": "COMPLETED"
+      }
+    ],
+    "pageInfo": {
+      "currentPage": 0,
+      "totalPages": 1
+    }
+  }

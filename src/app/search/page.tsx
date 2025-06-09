@@ -8,7 +8,9 @@ const Search = () => {
     const searchParams = useSearchParams()
     const searchWord = searchParams.get('query') ?? undefined
     return (
-        <ListPage type="search" searchWord={searchWord} />
+        <div className="flex flex-col items-center w-[var(--content-width)]">
+         <ListPage type="search" searchWord={searchWord} />
+        </div>
     )
 }
 

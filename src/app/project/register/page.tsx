@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import RegisterHeader from "@/components/projectRegister/RegisterHeader"
 import StepButtons from "@/components/projectRegister/StepButtons"
 import StepOneForm from "@/components/projectRegister/StepOneForm"
@@ -11,11 +11,28 @@ import { useProjectFormStore, fetchProjectId, submitProject } from "@/stores/use
 import { useApi } from "@/hooks/useApi"
 import { useImageUpload } from "@/hooks/useImageUpload"
 import Spinner from "@/components/common/Spinner"
+import AlertModal from "@/components/common/AlertModal"
 
 export default function ProjectRegister() {
   const router = useRouter()
   const { apiCall } = useApi()
   const { uploadImages } = useImageUpload()
+
+  // 모바일 환경 감지
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
+
+  // AlertModal 상태 추가
+  const [alertMessage, setAlertMessage] = useState("")
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
+  const [shouldRedirect, setShouldRedirect] = useState(false) // 리디렉션 여부 상태 추가
 
   // Zustand 스토어에서 상태와 액션 가져오기
   const {
@@ -29,7 +46,6 @@ export default function ProjectRegister() {
     updateFormData,
     resetForm,
   } = useProjectFormStore()
-  
 
   // 페이지 로드 시 프로젝트 ID 가져오기
   useEffect(() => {
@@ -61,11 +77,8 @@ export default function ProjectRegister() {
 
   // 취소 처리
   const handleCancel = () => {
-    // 취소 시 홈으로 이동하거나 다른 처리
-    if (confirm("상품 등록을 취소하시겠습니까?")) {
-      resetForm()
-      router.push("/")
-    }
+    resetForm()
+    router.push("/my")
   }
 
   // 등록 처리
@@ -73,15 +86,37 @@ export default function ProjectRegister() {
     const success = await submitProject(apiCall, uploadImages)
 
     if (success) {
-      // 성공 시 홈으로 이동
-      alert("상품이 성공적으로 등록되었습니다.")
+      // 성공 시 모달만 표시하고 리디렉션은 하지 않음
+      setAlertMessage("상품이 성공적으로 등록되었습니다.")
+      setIsAlertOpen(true)
+      setShouldRedirect(true) // 리디렉션 플래그 설정
       resetForm()
+    }
+  }
+
+  // AlertModal 닫기 핸들러 - 확인 버튼을 눌렀을 때 리디렉션
+  const handleAlertClose = () => {
+    setIsAlertOpen(false)
+
+    // 성공 모달이었다면 마이페이지로 리디렉션
+    if (shouldRedirect) {
+      setShouldRedirect(false)
       router.push("/my")
     }
   }
 
+  if (isMobile) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+        <h2 className="text-2xl font-bold text-main-color mb-4">모바일에서는 프로젝트 등록이 불가능합니다.</h2>
+        <p className="text-gray-500 text-center">PC 환경에서 접속해 주세요.</p>
+      </div>
+    )
+  }
+
   return (
-    <div className="container mx-auto px-4">
+    <div className="container mx-auto my-8 px-4">
+      <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={handleAlertClose} />
       <RegisterHeader currentStep={currentStep} onStepChange={setCurrentStep} />
 
       {error && (
@@ -117,7 +152,6 @@ export default function ProjectRegister() {
           </div>
         </div>
       )}
-
     </div>
   )
 }

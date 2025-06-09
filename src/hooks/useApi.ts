@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-// import { useAuth } from "../contexts/AuthContext";
 import useAuthStore from "@/stores/auth";
 
 interface ApiResponse<T> {
@@ -9,34 +8,11 @@ interface ApiResponse<T> {
   status: number;
 }
 
-const api_base = "http://localhost:3000";
+const api_base = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export function useApi() {
-  const { logout } = useAuthStore();
+  const logout = useAuthStore(s => s.logout);
   const [isLoading, setIsLoading] = useState(false);
-
-  const refreshAccessToken = async () => {
-    const refreshToken = localStorage.getItem("refreshToken");
-    if (!refreshToken) {
-      throw new Error("No refresh token available");
-    }
-
-    const response = await fetch(api_base + "/api/accounts/token/refresh/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ refresh: refreshToken }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to refresh token");
-    }
-
-    const data = await response.json();
-    localStorage.setItem("accessToken", data.access);
-    return data.access;
-  };
 
   const apiCall = useCallback(
     async <T>(
@@ -50,35 +26,36 @@ export function useApi() {
         const makeRequest = async (
           token: string | null
         ): Promise<ApiResponse<T>> => {
+          const isFormData = body instanceof FormData;
           const response = await fetch(api_base + url, {
             method, // 여기서 전달받은 method를 사용합니다.
             headers: {
-              "Content-Type": "application/json",
+              ...(isFormData ? {} : {"Content-Type": "application/json"}),
               ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
-            ...(body ? { body: JSON.stringify(body) } : {}),
+            ...(body ? (isFormData ? { body: body } : { body: JSON.stringify(body) }) : {}),
           });
 
           if (response.status === 204) {
             return { data: null, error: null, isLoading: false, status: 204 };
-          }
-
-          const responseData = await response.json();
+          }          
 
           if (!response.ok) {
             if (response.status === 401) {
               throw new Error("Unauthorized");
             }
             return {
-              data: responseData,
-              error: responseData.message || "API request failed",
+              data: null,
+              error: await response.text() || "API request failed",
               isLoading: false,
               status: response.status,
             };
           }
 
+          const responseText = await response.text();
+
           return {
-            data: responseData,
+            data: IsJsonString(responseText) ? JSON.parse(responseText) : responseText,
             error: null,
             isLoading: false,
             status: response.status,
@@ -91,28 +68,15 @@ export function useApi() {
           return result;
         } catch (error) {
           if (error instanceof Error && error.message === "Unauthorized") {
-            // Token might be expired, try to refresh
-            try {
-              accessToken = await refreshAccessToken();
-              const result = await makeRequest(accessToken);
-              setIsLoading(false);
-              return result;
-            } catch (refreshError) {
-              if (
-                refreshError instanceof Error &&
-                refreshError.message === "Failed to refresh token"
-              ) {
-                logout();
-                setIsLoading(false);
-                return {
-                  data: null,
-                  error: "Authentication failed. Please log in again.",
-                  isLoading: false,
-                  status: 401,
-                };
-              }
-              throw refreshError;
-            }
+            // 바로 logout 실행
+            logout();
+            setIsLoading(false);
+            return {
+              data: null,
+              error: "Authentication failed. Please log in again.",
+              isLoading: false,
+              status: 401,
+            };
           }
           throw error;
         }
@@ -138,4 +102,13 @@ export function useApi() {
   );
 
   return { apiCall, isLoading };
+}
+
+function IsJsonString(str: string) {
+  try {
+    var json = JSON.parse(str);
+    return (typeof json === 'object');
+  } catch (e) {
+    return false;
+  }
 }

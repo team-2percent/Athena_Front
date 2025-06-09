@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "userName": "김예술",
+    "projectName": "도자기 만들기 클래스",
+    "createdAt": "2024-01-20T10:00:00",
+    "content": "정말 좋은 수업이었습니다. 도자기 만드는 과정이 재미있었고 강사님의 설명도 이해하기 쉬웠어요.",
+    "imageUrl": "https://example.com/pottery.jpg",
+    "projectId": 21
+  },
+  {
+    "id": 2,
+    "userName": "이공예",
+    "projectName": "마크라메 월행잉 만들기",
+    "createdAt": "2024-01-22T14:30:00", 
+    "content": "처음 해보는 마크라메였는데 너무 재미있었어요! 완성품도 예쁘고 집에 걸어두니 인테리어 효과도 좋네요.",
+    "imageUrl": "https://example.com/macrame.jpg",
+    "projectId": 22
+  },
+  {
+    "id": 3,
+    "userName": "박수공",
+    "projectName": "가죽 카드지갑 만들기",
+    "createdAt": "2024-01-23T16:00:00",
+    "content": "가죽공예는 처음이라 걱정했는데, 친절하게 알려주셔서 잘 만들 수 있었습니다. 실용적이고 퀄리티도 좋아요!",
+    "imageUrl": "https://example.com/leather-wallet.jpg", 
+    "projectId": 23
+  }
+]

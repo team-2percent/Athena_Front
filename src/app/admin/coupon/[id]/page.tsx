@@ -8,15 +8,20 @@ import { useEffect, useState } from "react";
 import { CouponDetail } from "@/lib/CouponConstant";
 import Spinner from "@/components/common/Spinner";
 import { formatDateInAdmin } from "@/lib/utils";
+import ServerErrorComponent from "@/components/common/ServerErrorComponent";
 
 export default function ProjectApprovalDetailPage() {
     const { id } = useParams();
     const router = useRouter();
     const { isLoading, apiCall } = useApi();
-    const [coupon, setcoupon] = useState<CouponDetail | null>(null);
+    const [coupon, setCoupon] = useState<CouponDetail | null>(null);
+    const [serverError, setServerError] = useState(false);
     const loadData = () => {
-        apiCall<{ data: CouponDetail }>(`/api/coupon/${id}`, "GET").then(({ data }) => {
-            if (data !== null) setcoupon(data.data);
+        apiCall<CouponDetail>(`/api/admin/${id}`, "GET").then(({ data, error, status }) => {
+            setCoupon(data);
+            if (error && status === 500) {
+                setServerError(true);
+            }
         })
     }
 
@@ -25,7 +30,7 @@ export default function ProjectApprovalDetailPage() {
     }, []);
 
     return (
-        <div className="flex flex-col mx-auto w-full p-8 gap-6">
+        <div className="flex flex-col mx-auto w-[var(--content-width)] py-8 gap-6">
             <div className="flex w-full">
             <button className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.push("/admin/coupon")}>
                 <ArrowLeftIcon className="w-4 h-4" />
@@ -34,8 +39,9 @@ export default function ProjectApprovalDetailPage() {
             </div>
             <div className="flex flex-col gap-6 mb-8">
             <h2 className="text-2xl font-medium border-b pb-2">쿠폰 정보</h2>
+                {serverError && <ServerErrorComponent message="쿠폰 정보 조회에 실패했습니다." onRetry={loadData}/>}
                 {isLoading ? <Spinner message="쿠폰 정보를 불러오고 있습니다."/> : coupon && <table>
-                    <tbody>
+                    <tbody data-cy="coupon-detail">
                         <tr className="border-b">
                             <td className="p-4 font-semibold w-[10%]">쿠폰명</td>
                             <td className="p-4">{coupon.title}</td>

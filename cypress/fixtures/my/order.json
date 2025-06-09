@@ -1,0 +1,30 @@
+{
+  "content": [
+    {
+      "orderId": 1,
+      "sellerName": "가죽공방",
+      "productName": "가죽 지갑 만들기 키트",
+      "projectName": "가죽 공예 클래스",
+      "orderedAt": "2024-01-25T14:00:00",
+      "endAt": "2024-02-25T23:00:00",
+      "thumbnailUrl": "https://example.com/leather.jpg",
+      "achievementRate": 35,
+      "projectId": 11,
+      "hasCommented": false
+    },
+    {
+      "orderId": 2, 
+      "sellerName": "향기공방",
+      "productName": "소이 캔들 제작 키트",
+      "projectName": "캔들 만들기 원데이 클래스",
+      "orderedAt": "2024-01-26T15:00:00",
+      "endAt": "2024-02-26T22:00:00",
+      "thumbnailUrl": "https://example.com/candle.jpg",
+      "achievementRate": 45,
+      "projectId": 12,
+      "hasCommented": true
+    }
+  ],
+  "nextCursorValue": null,
+  "lastOrderId": null
+}

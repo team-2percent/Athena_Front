@@ -5,8 +5,10 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { Upload, ChevronDown, Check, Trash2 } from "lucide-react"
 import DatePicker from "./DatePicker"
+import { useApi } from "@/hooks/useApi"
 
-import { useProjectFormStore, type ImageFile } from "@/stores/useProjectFormStore"
+import { useProjectFormStore, type ImageFile, type Category } from "@/stores/useProjectFormStore"
+import { VALIDATION_MESSAGES } from "@/lib/validationMessages"
 
 interface StepOneFormProps {
   onUpdateFormData: (data: Partial<any>) => void
@@ -15,39 +17,108 @@ interface StepOneFormProps {
 }
 
 export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
+  // API 호출 훅 사용
+  const { apiCall, isLoading: apiLoading } = useApi()
+
   // Zustand 스토어에서 상태 가져오기
-  const { targetAmount, category, title, description, startDate, endDate, deliveryDate, images } = useProjectFormStore()
+  const {
+    targetAmount,
+    category,
+    categoryId,
+    title,
+    description,
+    startDate,
+    endDate,
+    deliveryDate,
+    images,
+    validationErrors,
+    validateStepOne,
+  } = useProjectFormStore()
+
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false)
-  const [targetAmountError, setTargetAmountError] = useState("")
-  const [minDeliveryDate, setMinDeliveryDate] = useState(() => {
-    // 최소 배송일: 펀딩 종료일 + 7일
-    const date = new Date(endDate)
-    date.setDate(date.getDate() + 7)
-    return date
-  })
   const [isDragging, setIsDragging] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [categoriesLoading, setCategoriesLoading] = useState(false)
   const dragCounter = useRef(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const categoryOptions = ["책", "예술", "음악", "공예", "디자인"]
+  // 각 필드의 터치 상태 관리 (최초 입력 전까지는 에러 표시하지 않음)
+  const [touchedFields, setTouchedFields] = useState<{ [key: string]: boolean }>({})
 
-  const handleCategorySelect = (selectedCategory: string) => {
+  // 최소 펀딩 시작일: 오늘로부터 8일째 되는 날 (한국 시간 기준)
+  const getMinStartDate = () => {
+    const today = new Date()
+    const minStartDate = new Date(today)
+    minStartDate.setDate(today.getDate() + 7) // 오늘 + 7일
+    return minStartDate
+  }
+
+  // 최소 배송일 계산 (종료일 + 7일)
+  const getMinDeliveryDate = () => {
+    if (!endDate) return getMinStartDate() // 종료일이 없으면 시작일 기준
+    const minDeliveryDate = new Date(endDate)
+    minDeliveryDate.setDate(endDate.getDate() + 7)
+    return minDeliveryDate
+  }
+
+  // 카테고리 목록 가져오기
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setCategoriesLoading(true)
+      try {
+        const response = await apiCall<Category[]>("/api/category", "GET")
+        if (response.data) {
+          setCategories(response.data)
+        } else {
+          console.error("카테고리 목록을 가져오는데 실패했습니다:", response.error)
+        }
+      } catch (error) {
+        console.error("카테고리 API 호출 중 오류 발생:", error)
+      } finally {
+        setCategoriesLoading(false)
+      }
+    }
+
+    fetchCategories()
+  }, [apiCall])
+
+  // 폼 데이터 변경 시 유효성 검사 실행
+  useEffect(() => {
+    validateStepOne()
+  }, [targetAmount, categoryId, title, description, startDate, endDate, deliveryDate, images, validateStepOne])
+
+  // 필드 터치 처리
+  const handleFieldTouch = (fieldName: string) => {
+    setTouchedFields((prev) => ({ ...prev, [fieldName]: true }))
+  }
+
+  const handleCategorySelect = (selectedCategory: Category) => {
     setIsCategoryDropdownOpen(false)
-    onUpdateFormData({ category: selectedCategory })
+    handleFieldTouch("categoryId")
+    onUpdateFormData({
+      category: selectedCategory.categoryName,
+      categoryId: selectedCategory.id,
+    })
   }
 
   // 숫자만 입력 가능하도록 처리
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^0-9]/g, "")
+    let value = e.target.value.replace(/[^0-9]/g, "")
 
-    // 100억 제한 검사
+    // 앞자리 0 제거 (단, "0" 하나만 있는 경우는 유지)
+    if (value.length > 1 && value.startsWith("0")) {
+      value = value.replace(/^0+/, "")
+    }
+
+    handleFieldTouch("targetAmount")
+
+    // 10억 제한: 10억 초과 입력 시 10억으로 강제 세팅(에러 메시지는 zod가 담당)
     const numericValue = Number(value)
-    if (numericValue > 10000000000) {
-      setTargetAmountError("목표 금액은 최대 100억원까지 설정 가능합니다.")
-      // 100억으로 제한
-      onUpdateFormData({ targetAmount: "10000000000" })
+    if (numericValue > 1000000000) {
+      setForceTargetAmountMaxError(true)
+      onUpdateFormData({ targetAmount: "1000000000" })
     } else {
-      setTargetAmountError("")
+      setForceTargetAmountMaxError(false)
       onUpdateFormData({ targetAmount: value })
     }
   }
@@ -58,17 +129,38 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
     return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
   }
 
-  // 펀딩 종료일이 변경될 때 최소 배송일 업데이트
-  useEffect(() => {
-    const newMinDeliveryDate = new Date(endDate)
-    newMinDeliveryDate.setDate(newMinDeliveryDate.getDate() + 7)
-    setMinDeliveryDate(newMinDeliveryDate)
+  // 시작일 변경 핸들러
+  const handleStartDateChange = (date: Date) => {
+    handleFieldTouch("startDate")
+    onUpdateFormData({ startDate: date })
 
-    // 현재 배송일이 새로운 최소 배송일보다 이전이면 최소 배송일로 설정
-    if (deliveryDate < newMinDeliveryDate) {
-      onUpdateFormData({ deliveryDate: newMinDeliveryDate })
+    // 종료일이 시작일보다 이전이면 시작일 + 30일로 설정
+    if (!endDate || endDate <= date) {
+      const newEndDate = new Date(date)
+      newEndDate.setDate(newEndDate.getDate() + 30)
+      onUpdateFormData({ endDate: newEndDate })
     }
-  }, [endDate, deliveryDate, onUpdateFormData])
+  }
+
+  // 종료일 변경 핸들러
+  const handleEndDateChange = (date: Date) => {
+    handleFieldTouch("endDate")
+    onUpdateFormData({ endDate: date })
+
+    // 배송일이 종료일 + 7일보다 이전이면 종료일 + 7일로 설정
+    const minDeliveryDate = new Date(date)
+    minDeliveryDate.setDate(date.getDate() + 7)
+
+    if (!deliveryDate || deliveryDate < minDeliveryDate) {
+      onUpdateFormData({ deliveryDate: minDeliveryDate })
+    }
+  }
+
+  // 배송일 변경 핸들러
+  const handleDeliveryDateChange = (date: Date) => {
+    handleFieldTouch("deliveryDate")
+    onUpdateFormData({ deliveryDate: date })
+  }
 
   // 파일 처리 함수
   const handleFiles = (files: FileList | null) => {
@@ -98,6 +190,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
     }
 
     const updatedImages = [...images, ...newImages]
+    handleFieldTouch("images")
     onUpdateFormData({ images: updatedImages })
   }
 
@@ -170,81 +263,149 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
     return "이미지"
   }
 
+  // 에러 메시지 가져오기 함수 (터치된 필드만 에러 표시)
+  const getErrorMessage = (fieldName: string) => {
+    if (!touchedFields[fieldName]) return ""
+    return validationErrors[fieldName]?.[0] || ""
+  }
+
+  // 필드 스타일 결정 함수 (터치된 필드만 에러 스타일 적용)
+  const getFieldStyle = (fieldName: string) => {
+    if (!touchedFields[fieldName]) return "border-gray-300 focus:border-main-color"
+    return getErrorMessage(fieldName)
+      ? "border-red-500 focus:border-red-500"
+      : "border-gray-300 focus:border-main-color"
+  }
+
+  const [forceTitleMaxError, setForceTitleMaxError] = useState(false)
+  const [forceDescriptionMaxError, setForceDescriptionMaxError] = useState(false)
+  const [forceTargetAmountMaxError, setForceTargetAmountMaxError] = useState(false)
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleFieldTouch("title")
+    if (e.target.value.length > 25) {
+      setForceTitleMaxError(true)
+      onUpdateFormData({ title: e.target.value.slice(0, 25) })
+    } else {
+      setForceTitleMaxError(false)
+      onUpdateFormData({ title: e.target.value })
+    }
+  }
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    handleFieldTouch("description")
+    if (e.target.value.length > 50) {
+      setForceDescriptionMaxError(true)
+      onUpdateFormData({ description: e.target.value.slice(0, 50) })
+    } else {
+      setForceDescriptionMaxError(false)
+      onUpdateFormData({ description: e.target.value })
+    }
+  }
+
   return (
     <div className="space-y-8">
       {/* 카테고리 선택 - 세로 배치로 변경 */}
       <div className="flex flex-col">
         <label htmlFor="category" className="text-xl font-bold mb-4">
-          카테고리 선택
+          카테고리 선택 <span className="text-red-500">*</span>
         </label>
         <div className="w-full max-w-md">
           <div className="relative">
             <button
               type="button"
-              className="flex w-full items-center justify-between rounded-full border border-gray-300 px-4 py-3 text-left text-gray-700 focus:outline-none"
+              className={`flex w-full items-center justify-between rounded-full border px-4 py-3 text-left focus:outline-none ${getFieldStyle(
+                "categoryId",
+              )} ${getErrorMessage("categoryId") ? "text-red-700" : "text-gray-700"}`}
               onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+              disabled={categoriesLoading}
             >
-              <span>{category}</span>
+              {categoriesLoading ? (
+                <span className="text-gray-400">카테고리 로딩 중...</span>
+              ) : category ? (
+                <span>{category}</span>
+              ) : (
+                <span className="text-gray-400">카테고리를 선택해주세요</span>
+              )}
               <ChevronDown className="h-5 w-5" />
             </button>
-            {isCategoryDropdownOpen && (
+            {isCategoryDropdownOpen && categories.length > 0 && (
               <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
-                {categoryOptions.map((option) => (
+                {categories.map((cat) => (
                   <div
-                    key={option}
+                    key={cat.id}
                     className="flex cursor-pointer items-center justify-between px-4 py-3 hover:bg-gray-100"
-                    onClick={() => handleCategorySelect(option)}
+                    onClick={() => handleCategorySelect(cat)}
                   >
-                    <span>{option}</span>
-                    {category === option && <Check className="h-5 w-5 text-main-color" />}
+                    <span>{cat.categoryName}</span>
+                    {category === cat.categoryName && <Check className="h-5 w-5 text-main-color" />}
                   </div>
                 ))}
               </div>
             )}
           </div>
+          {getErrorMessage("categoryId") && (
+            <p className="text-red-500 text-sm mt-1">{getErrorMessage("categoryId")}</p>
+          )}
         </div>
       </div>
 
       {/* 상품 제목 - 세로 배치로 변경 */}
       <div className="flex flex-col">
         <label htmlFor="title" className="text-xl font-bold mb-4">
-          상품 제목
+          상품 제목 <span className="text-red-500">*</span>
+          <span className="text-sm text-gray-500 ml-2">(25자 이하)</span>
         </label>
         <div className="w-full">
           <input
             id="title"
             type="text"
             value={title}
-            onChange={(e) => onUpdateFormData({ title: e.target.value })}
+            onChange={handleTitleChange}
             placeholder="상품명을 입력해 주세요."
-            className="w-full rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none"
+            className={`w-full rounded-full border px-4 py-3 focus:outline-none ${getFieldStyle("title")}`}
           />
+          <div className="flex justify-between items-center mt-1">
+            {(getErrorMessage("title") || forceTitleMaxError) && (
+              <p className="text-red-500 text-sm">{getErrorMessage("title") || VALIDATION_MESSAGES.TITLE_MAX}</p>
+            )}
+            <p className="text-gray-400 text-sm ml-auto">{title.length}/25</p>
+          </div>
         </div>
       </div>
 
       {/* 상품 요약 - 세로 배치로 변경 */}
       <div className="flex flex-col">
         <label htmlFor="description" className="text-xl font-bold mb-4">
-          상품 요약
+          상품 요약 <span className="text-red-500">*</span>
+          <span className="text-sm text-gray-500 ml-2">(10자 이상 50자 이하)</span>
         </label>
         <div className="w-full">
           <textarea
             id="description"
             value={description}
-            onChange={(e) => onUpdateFormData({ description: e.target.value })}
+            onChange={handleDescriptionChange}
             placeholder="상품에 대한 간략한 설명을 입력하세요"
-            className="w-full rounded-3xl border border-gray-300 px-4 py-3 min-h-[150px] focus:border-main-color focus:outline-none"
+            className={`w-full rounded-3xl border px-4 py-3 min-h-[150px] focus:outline-none ${getFieldStyle("description")}`}
           />
+          <div className="flex justify-between items-center mt-1">
+            {(getErrorMessage("description") || forceDescriptionMaxError) && (
+              <p className="text-red-500 text-sm">{getErrorMessage("description") || VALIDATION_MESSAGES.DESCRIPTION_MAX}</p>
+            )}
+            <p className="text-gray-400 text-sm ml-auto">{description.length}/50</p>
+          </div>
         </div>
       </div>
 
-      {/* 대표 이미지 - 세로 배치로 변경 */}
+      {/* 대표 이미지 - 세로 배치로 변경 (필수 표시 추가) */}
       <div className="flex flex-col">
-        <label htmlFor="image" className="text-xl font-bold mb-4">
-          대표 이미지 <span className="text-sm text-gray-500 font-normal">(최대 5개까지 업로드 가능)</span>
-        </label>
+        <div className="flex items-center mb-4">
+          <h3 className="text-xl font-bold">
+            대표 이미지 <span className="text-red-500">*</span>
+          </h3>
+        </div>
         <div className="w-full">
-          <div className="rounded-3xl border border-gray-300 p-6">
+          <div className={`rounded-3xl border p-6 ${getFieldStyle("images")}`}>
             {/* 드래그 앤 드롭 영역 */}
             <div
               className={`border-2 border-dashed rounded-lg p-4 transition-colors relative ${
@@ -339,19 +500,23 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
               <ul className="list-disc pl-5 space-y-2 text-gray-700">
                 <li>첫 번째에 있는 이미지가 대표 썸네일이 됩니다.</li>
                 <li>최대 5개까지 업로드 가능합니다.</li>
+                <li>JPEG 파일만 업로드 가능합니다.</li>
                 <li>초상권, 저작권, 명예훼손 등의 우려가 있는 이미지는 사용을 삼가 주시기 바랍니다.</li>
-                <li>이미지 사용에 따른 법적 책임은 이용약관에 따라 작품 게시자 본인에게 있습니다.</li>
+                <li>이미지 사용에 따른 법적 책임은 게시자 본인에게 있습니다.</li>
               </ul>
             </div>
           </div>
+          {getErrorMessage("images") && <p className="text-red-500 text-sm mt-1">{getErrorMessage("images")}</p>}
         </div>
       </div>
 
       {/* 목표 금액 - 세로 배치로 변경 */}
       <div className="flex flex-col">
         <div className="flex items-center mb-4">
-          <h3 className="text-xl font-bold mr-8">목표 금액</h3>
-          <span className="text-sm text-gray-500 ml-4">* 최대 100억원까지 입력 가능합니다.</span>
+          <h3 className="text-xl font-bold">
+            목표 금액 <span className="text-red-500">*</span>
+          </h3>
+          <span className="text-sm text-gray-500 ml-4">* 최대 10억 원까지 입력 가능합니다.</span>
         </div>
 
         <div className="w-full max-w-md flex items-center">
@@ -361,49 +526,66 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
             value={formatAmount(targetAmount)}
             onChange={handleAmountChange}
             placeholder="0"
-            className="w-full rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none text-right"
+            className={`w-full rounded-full border px-4 py-3 focus:outline-none text-right ${getFieldStyle("targetAmount")}`}
           />
           <span className="ml-2 text-lg">원</span>
         </div>
-        {targetAmountError && <p className="text-red-500 text-sm mt-1">{targetAmountError}</p>}
+        {(getErrorMessage("targetAmount") || forceTargetAmountMaxError) && (
+          <p className="text-red-500 text-sm">{getErrorMessage("targetAmount") || VALIDATION_MESSAGES.TARGET_AMOUNT_MAX}</p>
+        )}
       </div>
 
       {/* 펀딩 일정 - 세로 배치로 변경 */}
       <div className="flex flex-col">
-        <label htmlFor="fundingPeriod" className="text-xl font-bold mb-4">
-          펀딩 일정
-        </label>
+        <div className="flex items-center mb-4">
+          <h3 className="text-xl font-bold">
+            펀딩 일정 <span className="text-red-500">*</span>
+          </h3>
+          <span className="text-sm text-gray-500 ml-4">* 펀딩 시작일은 오늘의 일주일 뒤부터 선택 가능합니다.</span>
+        </div>
         <div className="flex items-center gap-4">
           <DatePicker
             selectedDate={startDate}
-            onChange={(date) => onUpdateFormData({ startDate: date })}
+            onChange={handleStartDateChange}
             position="top"
+            minDate={getMinStartDate()}
+            dataCy="datepicker-start"
           />
           <span>부터</span>
           <DatePicker
             selectedDate={endDate}
-            onChange={(date) => onUpdateFormData({ endDate: date })}
+            onChange={handleEndDateChange}
             position="top"
-            minDate={startDate}
+            minDate={startDate || getMinStartDate()}
+            dataCy="datepicker-end"
           />
           <span>까지</span>
         </div>
+        {(getErrorMessage("startDate") || getErrorMessage("endDate")) && (
+          <p className="text-red-500 text-sm mt-1">{getErrorMessage("startDate") || getErrorMessage("endDate")}</p>
+        )}
       </div>
 
       {/* 배송 예정일 - 새로 추가 */}
       <div className="flex flex-col">
         <div className="flex items-center mb-4">
-          <h3 className="text-xl font-bold">배송 예정일</h3>
-          <span className="text-sm text-gray-500 ml-4">* 펀딩 종료일의 7일째 되는 날부터 선택 가능합니다.</span>
+          <h3 className="text-xl font-bold">
+            배송 예정일 <span className="text-red-500">*</span>
+          </h3>
+          <span className="text-sm text-gray-500 ml-4">* 펀딩 종료일의 일주일 뒤부터 선택 가능합니다.</span>
         </div>
         <div className="flex items-center gap-4">
           <DatePicker
             selectedDate={deliveryDate}
-            onChange={(date) => onUpdateFormData({ deliveryDate: date })}
+            onChange={handleDeliveryDateChange}
             position="top"
-            minDate={minDeliveryDate}
+            minDate={getMinDeliveryDate()}
+            dataCy="datepicker-delivery"
           />
         </div>
+        {getErrorMessage("deliveryDate") && (
+          <p className="text-red-500 text-sm mt-1">{getErrorMessage("deliveryDate")}</p>
+        )}
       </div>
     </div>
   )

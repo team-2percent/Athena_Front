@@ -4,14 +4,19 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { formatDateInAdmin } from "@/lib/utils";
-import clsx from "clsx";
+import Pagination from "@/components/common/Pagination";
+import EmptyMessage from "@/components/common/EmptyMessage";
+import { PrimaryButton } from "@/components/common/Button";
+import { TextInput } from "@/components/common/Input";
+import { SEARCH_MAX_LENGTH } from "@/lib/validationConstant";
+import ServerErrorComponent from "@/components/common/ServerErrorComponent";
 
 interface Project {
     projectId: number;
     title: string;
     createdAt: string;
     sellerName: string;
-    approvalStatus: "PENDING" | "APPROVED" | "REJECTED";
+    isApproved: "PENDING" | "APPROVED" | "REJECTED";
 }
 
 interface Response {
@@ -38,44 +43,32 @@ export default function ApprovalPage() {
         keyword: "",
         sort: "asc"
     });
-    const [totalPageCount, setTotalPageCount] = useState(0);
+    const [totalPageCount, setTotalPageCount] = useState(1);
     const [pendingCount, setPendingCount] = useState(0);
+    const [serverError, setServerError] = useState(false);
+    const isEmpty = totalPageCount === 0 && !isLoading && !serverError;
 
     const [search, setSearch] = useState("");
 
-    const baseUri = "/api/admin/projects"
-    const queryParamUri = `?page=${queryParams.page}&sort=${queryParams.sort}${queryParams.keyword.length ? `&keyword=${queryParams.keyword}` : ""}`
+    const baseUri = "/api/admin/project"
+    const queryParamUri = `?page=${queryParams.page}&direction=${queryParams.sort}${queryParams.keyword.length ? `&keyword=${queryParams.keyword}` : ""}`
     const url = `${baseUri}${queryParamUri ? `${queryParamUri}` : ""}`
     const loadProjects = () => {
-        apiCall<Response>(url, "GET").then(({ data }) => {
-            if (data === null) return
-            setProjects(data.content);
-            setQueryParams({
-                page: data.pageInfo.currentPage,
-                keyword: queryParams.keyword,
-                sort: queryParams.sort
-            });
-            setTotalPageCount(data.pageInfo.totalPages);
-            setPendingCount(data.pendingCount);
-        })
-    }
-
-    const leftPageDisabled = queryParams.page === 0
-    const rightPageDisabled = queryParams.page === totalPageCount - 1
-
-    const handlePrevPage = () => {
-        if (leftPageDisabled) return
-        setQueryParams({
-            ...queryParams,
-            page: queryParams.page - 1
-        })
-    }
-    
-    const handleNextPage = () => {
-        if (rightPageDisabled) return
-        setQueryParams({
-            ...queryParams,
-            page: queryParams.page + 1
+        apiCall<Response>(url, "GET").then(({ data, error, status }) => {
+            if (!error && data !== null) {
+                setProjects(data.content);
+                setQueryParams({
+                    page: data.pageInfo.currentPage,
+                    keyword: queryParams.keyword,
+                    sort: queryParams.sort
+                });
+                setTotalPageCount(data.pageInfo.totalPages);
+                setPendingCount(data.pendingCount);
+            } else if (error && status === 500) {
+                setProjects(() => []);
+                setServerError(true);
+            }
+            
         })
     }
 
@@ -83,7 +76,7 @@ export default function ApprovalPage() {
         setQueryParams({
             page: 0,
             keyword: queryParams.keyword,
-            sort: e.target.value as "old" | "new"
+            sort: e.target.value as "asc" | "desc"
         });
     }
 
@@ -95,8 +88,21 @@ export default function ApprovalPage() {
         })
     }
 
+    const validateSearch = (value: string) => {
+        return value.slice(0, SEARCH_MAX_LENGTH)
+    }
+
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.target.value);
+        const value = validateSearch(e.target.value)
+        setSearch(value);
+    }
+
+    // 엔터키로 검색
+    const activeEnter = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            handleSearchClick();
+        }
     }
 
     const handleSearchClick = () => {
@@ -121,25 +127,27 @@ export default function ApprovalPage() {
 
 
     return (
-        <div className="flex flex-col mx-auto max-w-6xl w-full p-8">
-            <h3 className="text-xl font-medium mb-8">확인해야할 상품이 {pendingCount}건 있습니다.</h3>
+        <div className="flex flex-col mx-auto py-8 w-[var(--content-width)]">
+            <h3 className="text-xl font-medium mb-8">확인해야할 상품이 <span data-cy="project-pending-count">{pendingCount}</span>건 있습니다.</h3>
             <div className="flex items-center mb-8 gap-4">
-                <div className="flex flex-1 gap-2">
-                    <input
-                        type="text"
+                <div className="flex flex-1 gap-2 items-center">
+                    <TextInput
                         placeholder="상품명으로 검색"
-                        className="border flex-1 p-2 border rounded text-left text-sub-gray min-w-[350px] h-10"
+                        className="rounded-md"
                         onChange={handleSearchChange}
+                        onKeyDown={(e) => activeEnter(e)}
+                        value={search}
+                        dataCy="search-input"
                     />
-                    <button
+                    <PrimaryButton
                         onClick={handleSearchClick}
-                        className="border bg-main-color text-white px-4 py-2 rounded h-10 hover:bg-secondary-color-dark"
-                    >검색</button>
+                        dataCy="search-button"
+                    >검색</PrimaryButton>
                 </div>
                 <div className="flex gap-4">
-                    <select className="border rounded px-4 py-2 h-10" onChange={handleSortChange}>
-                        <option value="asc">오래된순</option>
-                        <option value="desc">최신순</option>
+                    <select className="border rounded px-4 py-2 h-10" onChange={handleSortChange} data-cy="sort-select">
+                        <option value="asc" data-cy="sort-option">오래된순</option>
+                        <option value="desc" data-cy="sort-option">최신순</option>
                     </select>
                 </div>
             </div>
@@ -153,23 +161,26 @@ export default function ApprovalPage() {
                         <th className="text-center p-4 w-[10%]">승인 상태</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody data-cy="project-approval-list">
                     {projects.map((project, index) => (
-                        <tr key={project.projectId} className="border-b hover:bg-gray-50" onClick={() => handleProjectClick(project.projectId)}>
+                        <tr
+                            key={project.projectId}
+                            className="border-b hover:bg-gray-50"
+                            onClick={() => handleProjectClick(project.projectId)}
+                            data-cy="project-approval-list-item"
+                        >
                             <td className="text-center p-4 whitespace-nowrap">{index + 1}</td>
                             <td className="text-center p-4 truncate max-w-0">{project.title}</td>
                             <td className="text-center p-4 whitespace-nowrap">{formatDateInAdmin(project.createdAt)}</td>
                             <td className="text-center p-4 truncate max-w-0">{project.sellerName}</td>
-                            <td className="text-center p-4 whitespace-nowrap">{approvalStatus[project.approvalStatus]}</td>
+                            <td className="text-center p-4 whitespace-nowrap">{approvalStatus[project.isApproved]}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
-            <div className="flex justify-center gap-2">
-                <button className={clsx("px-3 py-2", leftPageDisabled ? "text-gray-300" : "text-main-color")} disabled={leftPageDisabled} onClick={handlePrevPage}>◀</button>
-                <button className="px-3 py-2 text-main-color">{queryParams.page + 1}</button>
-                <button className={clsx("px-3 py-2", rightPageDisabled ? "text-gray-300" : "text-main-color")} disabled={rightPageDisabled} onClick={handleNextPage}>▶</button>
-            </div>
+            {isEmpty && <EmptyMessage message="승인 대기 중인 프로젝트가 없습니다." />}
+            {serverError && <ServerErrorComponent message="프로젝트 승인 목록 조회에 실패했습니다." onRetry={loadProjects}/>}
+            <Pagination totalPages={totalPageCount} currentPage={queryParams.page} onPageChange={handlePageChange} />
         </div>
     )
 }

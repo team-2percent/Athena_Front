@@ -1,0 +1,73 @@
+{
+    "id": 101,
+    "category": "푸드",
+    "title": "이건 상품 개수 많을 때 테스트에요",
+    "description": "ㅁㄴ야ㅐㅕ롬냐ㅕㅇ로먀녀ㅣ오랴ㅕㅣㅁㄴ오려ㅑㅣㅁㄴㄹㅇ",
+    "goalAmount": 234234,
+    "totalAmount": 0,
+    "markdown": "이건 따로 뭐라고 채우진 않을게요",
+    "startAt": "2025-06-11T00:00:00",
+    "endAt": "2025-07-11T00:00:00",
+    "shippedAt": "2025-07-18T00:00:00",
+    "createdAt": "2025-06-04T06:00:23.754862",
+    "imageUrls": [
+      "https://athena-local.i-am-jay.com/images/406d9b91-9e6d-4dd3-9237-b0ea0ba8879f.webp"
+    ],
+    "sellerResponse": {
+      "id": 59,
+      "nickname": "minseok",
+      "sellerIntroduction": null,
+      "linkUrl": null
+    },
+    "productResponses": [
+      {
+        "id": 124,
+        "name": "상품 1",
+        "description": "뭐가 많을 거예요",
+        "price": 5000000,
+        "stock": 10000,
+        "options": [
+          "이런 것도 있고",
+          "저런 것도 있고"
+        ]
+      },
+      {
+        "id": 125,
+        "name": "상품 2",
+        "description": "이것도 뭐가 있다",
+        "price": 1000000,
+        "stock": 5000,
+        "options": [
+          "이런 것도 있고",
+          "저런 것도 있고"
+        ]
+      },
+      {
+        "id": 126,
+        "name": "상품 3",
+        "description": "그럴지도 모른다",
+        "price": 1234234,
+        "stock": 10000,
+        "options": []
+      },
+      {
+        "id": 127,
+        "name": "상품 4",
+        "description": "이건 뭔가 다를까?",
+        "price": 234234,
+        "stock": 233,
+        "options": []
+      },
+      {
+        "id": 128,
+        "name": "상품 5",
+        "description": "그건 아닐지도",
+        "price": 134134,
+        "stock": 13,
+        "options": []
+      }
+    ],
+    "status": "QUEUED",
+    "isApproved": "PENDING",
+    "planName": "BASIC"
+  }
