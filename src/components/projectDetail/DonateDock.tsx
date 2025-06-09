@@ -116,7 +116,7 @@ const DonateDock = () => {
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null)
 
   const [selectedPay, setSelectedPay] = useState<string | null>(null)
-  const [selectedAddress, setSelectedAddress] = useState<string | null>("1")
+  const [selectedAddress, setSelectedAddress] = useState<string | null>(null)
 
   // 배송지 검색 모달 상태
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
@@ -598,14 +598,14 @@ const DonateDock = () => {
   // 결제 처리 함수
   const handlePayment = async () => {
     // 필수 입력값 검증
-    if (!selectedAddress) {
-      setAlertMessage("배송지를 선택해주세요.")
+    if (!selectedPay) {
+      setAlertMessage("결제 수단을 선택해주세요.")
       setIsAlertOpen(true)
       return
     }
 
-    if (!selectedPay) {
-      setAlertMessage("결제 수단을 선택해주세요.")
+    if (!selectedAddress) {
+      setAlertMessage("배송지를 선택해주세요.")
       setIsAlertOpen(true)
       return
     }
@@ -1000,6 +1000,7 @@ const DonateDock = () => {
                     <div className="mt-6 md:mt-8 bg-white pb-6 md:pb-8">
                       <div className="flex justify-end">
                         <PrimaryButton
+                          data-cy="donate-next-step"
                           className={`w-full md:w-auto rounded-lg md:rounded-xl px-6 md:px-8 py-3 md:py-4 text-sm md:text-base font-medium ${
                             selectedOptions.length > 0
                               ? "bg-main-color text-white hover:bg-secondary-color-dark"
@@ -1026,6 +1027,7 @@ const DonateDock = () => {
                             : "border-gray-border hover:border-main-color"
                         }`}
                         onClick={() => handlePaySelect("kakaopay")}
+                        data-cy="pay-kakaopay"
                       >
                         <span className="text-sm md:text-base font-medium">카카오페이</span>
                       </div>
@@ -1045,6 +1047,7 @@ const DonateDock = () => {
                                   : "border-gray-border hover:border-main-color"
                               }`}
                               onClick={() => handleAddressSelect(address.id)}
+                              data-cy={`address-card-${address.id}`}
                             >
                               <div className="flex items-center justify-between mb-2 overflow-hidden">
                                 <h4 className="text-sm md:text-base font-bold line-clamp-1 whitespace-pre-wrap break-words">
@@ -1122,6 +1125,7 @@ const DonateDock = () => {
                     <div className="mt-6 md:mt-8 bg-white pb-6 md:pb-8">
                       <div className="flex flex-col md:flex-row justify-end gap-3 md:gap-4">
                         <PrimaryButton
+                          data-cy="donate-submit"
                           className={`w-full md:w-auto rounded-lg md:rounded-xl bg-main-color px-6 md:px-8 py-3 md:py-4 text-sm md:text-base font-medium text-white hover:bg-secondary-color-dark ${
                             isProcessingPayment ? "opacity-70 cursor-not-allowed" : ""
                           }`}

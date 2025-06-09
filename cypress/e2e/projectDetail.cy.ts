@@ -134,4 +134,108 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
     cy.contains('후기').click();
     cy.contains('아직 리뷰가 없습니다').should('be.visible');
   });
-}) 
+})
+
+describe('프로젝트 상세 결제 플로우', () => {
+  const mockProjectId = 'test'
+  const mockProjectData = {
+    id: 9999,
+    title: '모킹 프로젝트',
+    description: '이것은 Cypress 모킹 테스트용 프로젝트입니다.',
+    goalAmount: 1000000,
+    totalAmount: 500000,
+    markdown: '# 상세 설명\n이 프로젝트는 테스트용입니다.',
+    startAt: '2024-06-01',
+    endAt: '2024-06-30',
+    shippedAt: '2024-07-10',
+    imageUrls: [
+      "/project-test.png",
+      "/project-test2.png",
+      "/project-test3.png"
+    ],
+    sellerResponse: {
+      id: 1,
+      nickname: '테스트판매자',
+      sellerIntroduction: '테스트 판매자 소개',
+      linkUrl: 'https://test.com'
+    },
+    productResponses: [
+      {
+        id: 1,
+        name: '테스트 리워드',
+        description: '테스트 리워드 설명',
+        price: 10000,
+        stock: 10,
+        options: []
+      }
+    ]
+  }
+
+  beforeEach(() => {
+    cy.intercept('GET', `/api/project/${mockProjectId}`, {
+      statusCode: 200,
+      body: { ...mockProjectData }
+    }).as('getProjectDetail')
+    cy.intercept('GET', '/api/delivery/delivery-info', {
+      statusCode: 200,
+      body: []
+    }).as('getDeliveryInfo')
+    cy.intercept('POST', '/api/order', { orderId: 123, totalPrice: 10000, orderedAt: '2024-07-01', items: [{ productId: 1, productName: '테스트 리워드', quantity: 1, price: 10000 }] }).as('order')
+    cy.intercept('POST', '/api/payment/ready/*', { next_redirect_pc_url: 'https://pay.test', tid: 'TID123' }).as('paymentReady')
+    cy.visit('/project/test')
+    cy.wait('@getProjectDetail')
+  })
+
+  it('필수값 누락 시 Alert 노출', () => {
+    cy.contains('후원하기').click()
+    // 상품 미선택 상태: 다음 단계 버튼이 비활성화
+    cy.get('button').contains('다음 단계').should('be.disabled')
+
+    // 상품 선택 후 다음 단계로 이동
+    cy.contains('테스트 리워드').click()
+    cy.get('button').contains('다음 단계').should('not.be.disabled').click()
+    cy.wait('@getDeliveryInfo')
+
+    // 결제수단/배송지 모두 미선택 상태에서 후원하기 클릭
+    cy.get('[data-cy="donate-submit"]').click()
+    cy.contains('결제 수단을 선택해주세요.').should('be.visible')
+    // 모달의 확인 버튼 클릭
+    cy.contains('확인').click()
+
+    // 결제수단만 선택하고 후원하기 클릭
+    cy.get('[data-cy="pay-kakaopay"]').click()
+    cy.get('[data-cy="donate-submit"]').click()
+    cy.contains('배송지를 선택해주세요.').should('be.visible')
+    // 모달의 확인 버튼 클릭
+    cy.contains('확인').click()
+  })
+
+  it('정상 결제 플로우', () => {
+    cy.contains('후원하기').click()
+    cy.contains('테스트 리워드').click()
+    cy.get('button').contains('다음 단계').click()
+    cy.wait('@getDeliveryInfo')
+
+    // 결제수단 선택
+    cy.get('[data-cy="pay-kakaopay"]').click()
+
+    // 배송지 추가 버튼 클릭
+    cy.contains('배송지 추가').click()
+    // 새 배송지 입력
+    cy.get('input[placeholder="\'찾기\'를 눌러서 주소 입력"]').invoke('val', '서울특별시 중구 세종대로 3').trigger('input')
+    cy.get('input[placeholder="상세 주소 입력"]').type('신규 404호')
+    cy.contains('저장').click()
+
+    // 새 배송지 카드가 나타나면 선택
+    cy.get('[data-cy^="address-card-"]').last().click()
+
+    // 결제 버튼 클릭 및 결제 플로우 진행
+    cy.window().then((win) => {
+      cy.stub(win, 'open').as('windowOpen')
+    })
+    cy.get('[data-cy="donate-submit"]').click()
+    cy.wait('@order')
+    cy.wait('@paymentReady')
+    cy.get('@windowOpen').should('be.calledWithMatch', 'https://pay.test')
+  })
+})
