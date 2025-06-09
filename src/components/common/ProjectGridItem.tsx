@@ -69,7 +69,7 @@ export default function ProjectCard({
 
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
       <div onClick={handleCardClick} className="w-full flex flex-col rounded-lg overflow-hidden text-left">
-        <div className="relative overflow-hidden rounded-lg">
+        <div className="relative overflow-hidden rounded-lg aspect-square">
           {/* 판매 완료 오버레이 */}
           {isSoldOut && (
             <div className="absolute inset-0 bg-black/50 z-20 flex flex-col items-center justify-center text-white">
