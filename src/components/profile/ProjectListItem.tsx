@@ -69,7 +69,7 @@ export default function ProjectItem({
           </div>
 
           {/* 판매 완료 오버레이 */}
-          {isCompleted && (
+          {isCompleted || (daysLeft < 0) && (
             <div
               className="absolute inset-0 flex flex-col items-center justify-center text-white cursor-pointer"
               onClick={handleProjectClick}
