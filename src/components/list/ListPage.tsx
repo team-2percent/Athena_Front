@@ -99,13 +99,13 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
         {(!loadError || projects.length > 0) && <ProjectsList projects={projects} isLoading={isLoading} />}
         { 
             !loadError && morePage && 
-            <div className="w-full py-20 flex justify-center items-center" ref={loader}>
+            <div className="w-full py-20 flex justify-center items-center" ref={loader} data-cy="loading-spinner">
                 <Spinner message="더 불러오는 중입니다..." />
             </div>
         }
         {
           loadError &&
-          <ServerErrorComponent message="불러오는 데 실패했습니다. 다시 시도 해주세요." onRetry={loadProjects} />
+          <ServerErrorComponent message="프로젝트를 불러오는 중 오류가 발생했습니다. 다시 시도 해주세요." onRetry={loadProjects} />
         }
     </div>
   )

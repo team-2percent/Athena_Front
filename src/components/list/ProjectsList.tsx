@@ -22,7 +22,10 @@ export default function ProjectsList({ projects, isLoading }: {
         else if (projects.length === 0) return <EmptyMessage message="프로젝트가 없습니다." />
         else 
         return (
-            <div className="w-fit grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-20 gap-x-[10px] justify-items-center">
+            <div
+                className="w-fit grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-20 gap-x-[10px] justify-items-center"
+                data-cy="project-list"
+            >
                 {projects.map((project) => (
                     <ProjectCard
                     className="w-full"

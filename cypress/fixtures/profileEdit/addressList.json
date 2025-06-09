@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "집",
+    "address": "서울시 강남구 테헤란로 123",
+    "detailAddress": "123동 456호",
+    "zipcode": "12345",
+    "isDefault": true
+  },
+  {
+    "id": 2,
+    "name": "회사",
+    "address": "서울시 서초구 서초대로 456",
+    "detailAddress": "789층",
+    "zipcode": "54321",
+    "isDefault": false
+  },
+  {
+    "id": 3,
+    "name": "부모님 집",
+    "address": "경기도 성남시 분당구 판교로 789",
+    "detailAddress": "101동 202호",
+    "zipcode": "67890",
+    "isDefault": false
+  }
+] 

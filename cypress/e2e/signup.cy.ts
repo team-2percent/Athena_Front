@@ -31,6 +31,7 @@ describe("회원가입", () => {
             cy.get('@signupModal').get('[data-cy="signup-button"]').should('not.be.disabled').click()
 
             // then - 회원가입 성공
+            cy.wait('@signup').its('response.statusCode').should('eq', 200)
             cy.get('@signupModal').should('not.exist')
             cy.get('header').get('[data-cy="open-login-modal-button"]').should('be.visible')
             cy.get('header').get('[data-cy="open-signup-modal-button"]').should('be.visible')
@@ -186,13 +187,13 @@ describe("회원가입", () => {
         it("이미 존재하는 이메일 입력 후 회원가입 버튼 클릭하면 회원가입 실패", () => {
             cy.intercept({
                 method: "POST",
-                url: "/api/user/signup"
+                url: "/api/user"
             }, {
                 statusCode: 400,
                 body: {
                     message: "이미 존재하는 이메일입니다."
                 }
-            })
+            }).as('signup')
 
             // when - 회원가입 요청
             cy.get('@signupModal').get('[data-cy="nickname-input"]').type("실패테스트유저")
@@ -202,6 +203,7 @@ describe("회원가입", () => {
             cy.get('@signupModal').get('[data-cy="signup-button"]').should('not.be.disabled').click()
 
             // then - 회원가입 실패
+            cy.wait('@signup').its('response.statusCode').should('eq', 400)
             cy.get('@signupModal').should('exist')
             cy.get('@signupModal').get('[data-cy="signup-error-message"]').should('be.visible')
         })
@@ -209,10 +211,10 @@ describe("회원가입", () => {
         it("서버 오류 시 회원가입 실패", () => {
             cy.intercept({
                 method: "POST",
-                url: "/api/user/signup"
+                url: "/api/user"
             }, {
                 statusCode: 500,
-            })
+            }).as('signup')
 
             // when - 회원가입 요청
             cy.get('@signupModal').get('[data-cy="nickname-input"]').type("실패테스트유저")
@@ -222,6 +224,7 @@ describe("회원가입", () => {
             cy.get('@signupModal').get('[data-cy="signup-button"]').should('not.be.disabled').click()
 
             // then - 회원가입 실패
+            cy.wait('@signup').its('response.statusCode').should('eq', 500)
             cy.get('@signupModal').should('exist')
             cy.get('@signupModal').get('[data-cy="signup-error-message"]').should('be.visible')
         })

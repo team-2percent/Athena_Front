@@ -55,7 +55,7 @@ export default function ProjectItem({
   }
 
   return (
-    <div className="mb-8">
+    <div className="mb-8" data-cy="project-item">
       <div className="flex gap-6 relative">
         {/* 상품 이미지 */}
         <div className="relative w-full h-40 sm:w-60 sm:h-60 flex-shrink-0">
@@ -84,14 +84,14 @@ export default function ProjectItem({
 
         {/* 상품 정보 */}
         <div className="flex-1 flex flex-col w-64">
-          <div className="mb-1 text-sub-gray">{sellerName}</div>
-          <h3 className="text-xl font-medium mb-1">{projectName}</h3>
-          <p className="text-gray-700 mb-2">{createdAt} 에 생성됨</p>
+          <div className="mb-1 text-sub-gray" data-cy="project-seller-name">{sellerName}</div>
+          <h3 className="text-xl font-medium mb-1" data-cy="project-name">{projectName}</h3>
+          <p className="text-gray-700 mb-2" data-cy="project-created-at">{createdAt} 에 생성됨</p>
 
           {/* 달성률 게이지 */}
           <div className="mt-auto">
             <div className="flex justify-between mb-1">
-              <span className={`font-bold ${isCompleted ? "text-sub-gray" : "text-main-color"}`}>
+              <span className={`font-bold ${isCompleted ? "text-sub-gray" : "text-main-color"}`} data-cy="project-achievement-rate">
                 {achievementRate}% 달성{isCompleted ? "" : "!"}
               </span>
             </div>
@@ -104,7 +104,7 @@ export default function ProjectItem({
             </div>
 
             {/* 남은 일수 또는 종료 메시지 */}
-            <div className="text-right mt-1 text-xs sm:text-base">
+            <div className="text-right mt-1 text-xs sm:text-base" data-cy="project-days-left">
               {isCompleted ? (
                 <span className="text-sub-gray" data-cy="project-end-message">종료되었어요.</span>
               ) : (

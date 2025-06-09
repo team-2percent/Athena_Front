@@ -11,6 +11,7 @@ import { TextInput } from "../common/Input"
 import { ADDRESS_DETAIL_MAX_LENGTH } from "@/lib/validationConstant"
 import { addressAddSchema, addressDetailSchema, addressSchema } from "@/lib/validationSchemas"
 import InputInfo from "../common/InputInfo"
+import useErrorToastStore from "@/stores/useErrorToastStore"
 
 interface AddressInfo {
     id: number
@@ -23,6 +24,7 @@ interface AddressInfo {
 
 export default function AddressInfo() {
     const { isLoading, apiCall } = useApi();
+    const { showErrorToast } = useErrorToastStore();
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isDefaultModalOpen, setIsDefaultModalOpen] = useState(false); 
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
@@ -67,12 +69,12 @@ export default function AddressInfo() {
 
     const deleteDelivery = () => {
         if (deleteId === null) return;
-        apiCall(`/api/delivery/delivery-info/${deleteId}`, "DELETE").then(({ error }) => {
+        apiCall(`/api/delivery/delivery-info/${deleteId}`, "DELETE").then(({ error, status }) => {
             if (!error) {
                 loadData();
                 setIsDeleteModalOpen(false)
-            } else {
-                console.log("삭제 실패")
+            } else if (error && status === 500) {
+                showErrorToast("배송지 삭제 실패", "다시 시도해주세요.")
             }
         })
     }
@@ -81,12 +83,12 @@ export default function AddressInfo() {
         if (defaultId === null) return;
         apiCall(`/api/delivery/state`, "PUT", {
             deliveryInfoId: defaultId
-        }).then(({ error }) => {
+        }).then(({ error, status }) => {
             if (!error) {
                 loadData();
                 setIsDefaultModalOpen(false)
-            } else {
-                console.log("기본 배송지 설정 실패")
+            } else if (status === 500) {
+                showErrorToast("기본 배송지 변경 실패", "다시 시도해주세요.")
             }
         })
     }
@@ -140,12 +142,12 @@ export default function AddressInfo() {
             zipcode: newAddress.zipcode,
             address: newAddress.address,
             detailAddress: newAddress.detailAddress,
-        }).then(({ error }) => {
+        }).then(({ error, status }) => {
             if (!error) {
                 loadData()
                 initNewAddress()
-            } else {
-                console.log("배송지 추가 실패")
+            } else if (error && status === 500) {
+                showErrorToast("배송지 추가 실패", "다시 시도해주세요.")
             }
         })
     }
@@ -178,22 +180,35 @@ export default function AddressInfo() {
 
     return (
         <div className="flex gap-4">
-            <ConfirmModal isOpen={isDefaultModalOpen} message={"기본 계좌로 설정할까요?"} onConfirm={setDefaultDelivery} onClose={() => setIsDefaultModalOpen(false)} />
-            <ConfirmModal isOpen={isDeleteModalOpen} message={"계좌를 삭제할까요?"} onConfirm={deleteDelivery} onClose={() => setIsDeleteModalOpen(false)} />
-            <div className="flex-1 bg-white rounded-lg shadow py-6 px-10">
+            <ConfirmModal
+                isOpen={isDefaultModalOpen}
+                message={"기본 계좌로 설정할까요?"}
+                onConfirm={setDefaultDelivery}
+                onClose={() => setIsDefaultModalOpen(false)}
+                dataCy="default-address-confirm-modal"
+            />
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                message={"계좌를 삭제할까요?"}
+                onConfirm={deleteDelivery}
+                onClose={() => setIsDeleteModalOpen(false)}
+                dataCy="delete-address-confirm-modal"
+            />
+            <div className="flex-1 bg-white rounded-lg shadow py-6 px-10" data-cy="address-add-form">
                 <h3 className="text-lg font-medium mb-6">배송지 추가</h3>
                     <div className="flex w-full my-3 gap-2 justify-between items-center my-4">
                         <div className="flex gap-2 items-center">
                             <label className="block text-sm font-medium text-gray-700 whitespace-nowrap">
                                 주소
                             </label>
-                            <p className="block text-sm font-medium text-gray-700">{ newAddress.address.length > 0 && `[${newAddress.zipcode}] ${newAddress.address}`}</p>
-                            {addressAddError.address && <InputInfo errorMessage={addressAddError.address} />}
+                            <p className="block text-sm font-medium text-gray-700" data-cy="address-info">{ newAddress.address.length > 0 && `[${newAddress.zipcode}] ${newAddress.address}`}</p>
+                            {addressAddError.address && <InputInfo errorMessage={addressAddError.address} errorMessageDataCy="address-error-message" />}
                         </div>
                         <PrimaryButton
                             type="button"
                             onClick={handleOpenAddressModal}
                             className="px-2 py-2"
+                            dataCy="address-search-button"
                         >
                             <Search className="w-4 h-4" />
                         </PrimaryButton>
@@ -211,8 +226,9 @@ export default function AddressInfo() {
                                 onChange={handleChangeDetailAddress}
                                 className="w-full"
                                 isError={addressAddError.detailAddress !== ""}
+                                dataCy="address-detail-input"
                             />
-                            <InputInfo errorMessage={addressAddError.detailAddress} />
+                            <InputInfo errorMessage={addressAddError.detailAddress} errorMessageDataCy="detail-address-error-message" />
                         </div>
                         <div className="mt-4 flex justify-end">
                             <PrimaryButton
@@ -220,6 +236,7 @@ export default function AddressInfo() {
                                 onClick={handleAddAddress}
                                 className="flex items-center"
                                 disabled={addButtonDisabled}
+                                dataCy="address-add-button"
                             >
                                 <Plus className="w-4 h-4 mr-1" /> 배송지 추가
                             </PrimaryButton>
@@ -227,7 +244,7 @@ export default function AddressInfo() {
                     </div>
             </div>
 
-            <div className="flex flex-col flex-1 bg-white rounded-lg shadow py-6 px-10">
+            <div className="flex flex-col flex-1 bg-white rounded-lg shadow py-6 px-10" data-cy="address-list">
                 {/* 배송지 목록 */}
                 <h3 className="text-lg font-medium mb-6">등록된 배송지 목록</h3>
                 <div className="flex-1 flex flex-col gap-4">
@@ -236,33 +253,40 @@ export default function AddressInfo() {
                     : 
                         <div className="space-y-4 mt-2">
                             {addresses.map(address => (
-                                <div key={address.id} className="border rounded-md p-4 relative">
+                                <div key={address.id} className="border rounded-md p-4 relative" data-cy="address-list-item">
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-start">
                                             <div>
                                                 <div className="flex items-center">
                                                     <p className="font-medium">{address.address}</p>
                                                 {address.isDefault ? 
-                                                    <span className="ml-2 px-2 py-0.5 bg-pink-100 text-secondary-color-dark text-xs rounded-full">기본</span>
+                                                    <span
+                                                        className="ml-2 px-2 py-0.5 bg-pink-100 text-secondary-color-dark text-xs rounded-full"
+                                                        data-cy="default-address-mark"
+                                                    >기본</span>
                                                     :
                                                     <button
                                                         className="border-box ml-2 px-2 py-0.5 text-xs text-main-color underline"
                                                         onClick={() => handleClickSetDefaultButton(address.id)}
+                                                        data-cy="default-address-change-button"
                                                     >기본 계좌로 설정</button>
                                                 }
                                                 </div>
                                                 <p className="text-sm text-gray-500 mt-1">
-                                                [{address.zipcode}] {address.detailAddress && <p className="text-sm text-gray-500">{address.detailAddress}</p>}
+                                                [{address.zipcode}] {address.detailAddress && <span className="text-sm text-gray-500">{address.detailAddress}</span>}
                                                 </p>
                                             </div>
                                         </div>
+                                        {!address.isDefault && 
                                         <button
                                         type="button"
                                             onClick={() => handleClickDeleteButton(address.id)}
                                             className="text-gray-400 hover:text-red-500"
+                                            data-cy="address-delete-button"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>
+                                        }
                                     </div>
                                 </div>
                             ))}

@@ -1,0 +1,34 @@
+[
+    {
+        "id": 1,
+        "categoryName": "디지털"
+    },
+    {
+        "id": 2,
+        "categoryName": "푸드"
+    },
+    {
+        "id": 3,
+        "categoryName": "패션"
+    },
+    {
+        "id": 4,
+        "categoryName": "생활"
+    },
+    {
+        "id": 5,
+        "categoryName": "예술"
+    },
+    {
+        "id": 6,
+        "categoryName": "출판"
+    },
+    {
+        "id": 7,
+        "categoryName": "게임"
+    },
+    {
+        "id": 8,
+        "categoryName": "기타"
+    }
+]

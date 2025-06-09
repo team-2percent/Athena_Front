@@ -446,7 +446,7 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
               ))}
               {/* 무한 스크롤을 위한 로더 */}
               {sellCursorValue !== null && nextProjectId !== null && (
-                <div className="w-full py-10 flex justify-center items-center" ref={projectsLoader}>
+                <div className="w-full py-10 flex justify-center items-center" ref={projectsLoader} data-cy="scroll-loader">
                   {isLoadingProjects && <Spinner message="더 불러오는 중입니다..." />}
                 </div>
               )}

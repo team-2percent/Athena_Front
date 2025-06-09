@@ -1,0 +1,110 @@
+{
+    "content": [
+      {
+        "id": 55,
+        "title": "dsafasdfasfdsfasdfsadfdsf",
+        "stock": 100000,
+        "price": 5000,
+        "status": "ENDED",
+        "startAt": "2025-06-02T12:00:00",
+        "endAt": "2025-06-02T17:00:00",
+        "expiresAt": "2025-06-03T17:00:00"
+      },
+      {
+        "id": 54,
+        "title": "쿠폰 명",
+        "stock": 5,
+        "price": 3000,
+        "status": "ENDED",
+        "startAt": "2025-05-29T04:25:43.604",
+        "endAt": "2025-05-29T05:25:43.604",
+        "expiresAt": "2025-05-29T06:25:43.604"
+      },
+      {
+        "id": 52,
+        "title": "string",
+        "stock": 1,
+        "price": 40000,
+        "status": "ENDED",
+        "startAt": "2025-05-26T05:30:36.829",
+        "endAt": "2025-05-26T05:30:36.829",
+        "expiresAt": "2025-05-26T05:30:36.829"
+      },
+      {
+        "id": 51,
+        "title": "Ended Coupon 13",
+        "stock": 0,
+        "price": 2200,
+        "status": "ENDED",
+        "startAt": "2025-02-05T00:00:00",
+        "endAt": "2025-02-25T23:59:59",
+        "expiresAt": "2025-03-20T23:59:59"
+      },
+      {
+        "id": 50,
+        "title": "Ended Coupon 12",
+        "stock": 0,
+        "price": 2100,
+        "status": "ENDED",
+        "startAt": "2025-01-25T00:00:00",
+        "endAt": "2025-02-20T23:59:59",
+        "expiresAt": "2025-03-15T23:59:59"
+      },
+      {
+        "id": 49,
+        "title": "Ended Coupon 11",
+        "stock": 0,
+        "price": 2000,
+        "status": "ENDED",
+        "startAt": "2025-02-20T00:00:00",
+        "endAt": "2025-03-15T23:59:59",
+        "expiresAt": "2025-04-10T23:59:59"
+      },
+      {
+        "id": 48,
+        "title": "Ended Coupon 10",
+        "stock": 0,
+        "price": 1900,
+        "status": "ENDED",
+        "startAt": "2025-01-05T00:00:00",
+        "endAt": "2025-01-25T23:59:59",
+        "expiresAt": "2025-02-15T23:59:59"
+      },
+      {
+        "id": 47,
+        "title": "Ended Coupon 09",
+        "stock": 0,
+        "price": 1800,
+        "status": "ENDED",
+        "startAt": "2025-03-01T00:00:00",
+        "endAt": "2025-03-30T23:59:59",
+        "expiresAt": "2025-04-01T23:59:59"
+      },
+      {
+        "id": 46,
+        "title": "Ended Coupon 08",
+        "stock": 0,
+        "price": 1700,
+        "status": "ENDED",
+        "startAt": "2025-02-10T00:00:00",
+        "endAt": "2025-02-28T23:59:59",
+        "expiresAt": "2025-03-10T23:59:59"
+      },
+      {
+        "id": 45,
+        "title": "Ended Coupon 07",
+        "stock": 0,
+        "price": 1600,
+        "status": "ENDED",
+        "startAt": "2025-01-15T00:00:00",
+        "endAt": "2025-02-15T23:59:59",
+        "expiresAt": "2025-03-15T23:59:59"
+      }
+    ],
+    "page": {
+      "size": 10,
+      "number": 0,
+      "totalElements": 48,
+      "totalPages": 5
+    }
+  }

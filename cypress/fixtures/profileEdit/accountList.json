@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "bankName": "국민은행",
+    "bankAccount": "12345678901234567890",
+    "isDefault": true,
+    "accountHolder": "테스트유저"
+  },
+  {
+    "id": 2,
+    "bankName": "신한은행",
+    "bankAccount": "09876543210987654321",
+    "isDefault": false,
+    "accountHolder": "테스트유저"
+  },
+  {
+    "id": 3,
+    "bankName": "우리은행",
+    "bankAccount": "11223344556677889900",
+    "isDefault": false,
+    "accountHolder": "테스트유저"
+  }
+] 

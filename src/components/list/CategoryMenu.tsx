@@ -5,9 +5,16 @@ import { useRouter } from "next/navigation"
 import clsx from "clsx"
 import Spinner from "../common/Spinner"
 import { useApi } from "@/hooks/useApi"
+import ServerErrorComponent from "../common/ServerErrorComponent"
 
-export default function CategoryMenu({ categoryId }: {categoryId : number}) {
+interface CategoryMenuProps {
+    categoryId: number
+    handleCategoryError: () => void
+}
+
+export default function CategoryMenu({ categoryId, handleCategoryError }: CategoryMenuProps) {
     const [categories, setCategories] = useState<{id: number, categoryName: string}[]>([])
+    const [serverError, setServerError] = useState(false)
     const router = useRouter()
     const { isLoading, apiCall } = useApi()
 
@@ -15,8 +22,12 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
     const itemRefs = useRef<Record<number, HTMLDivElement | null>>({})
 
     const loadCategories = () => {
-        apiCall<{id: number, categoryName: string}[]>("/api/category", "GET").then(({data}) => {
+        apiCall<{id: number, categoryName: string}[]>("/api/category", "GET").then(({data, error, status}) => {
             if (data) setCategories(data)
+            else if (error && status === 500) {
+                setServerError(true)
+                handleCategoryError()
+            }
         })
     }
 
@@ -40,8 +51,10 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
         else router.push(`/category/${id}`)
     }
 
+    if (serverError) return <ServerErrorComponent message="카테고리를 불러오는 중 오류가 발생했습니다." onRetry={loadCategories} />
+
     return (
-        <div className="w-full mx-0 py-4">
+        <div className="w-full mx-0 py-4" data-cy="category-list">
         {isLoading ?
             <Spinner message="카테고리를 불러오는 중입니다..." />
         : (
@@ -56,6 +69,7 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
                 }}
                 className={clsx("flex flex-col whitespace-nowrap items-center cursor-pointer p-3 border-b-2 border-gray-border rounded-lg rounded-lg w-20 min-w-20 hover:bg-gray-50", categoryId === 0 && "bg-secondary-color border-main-color")}
                 onClick={() => handleCategoryClick(0)}
+                data-cy="category-list-item"
             >
                 <span className={clsx("text-sm text-center text-gray-500", categoryId === 0 && "text-main-color")}>
                 전체
@@ -69,6 +83,7 @@ export default function CategoryMenu({ categoryId }: {categoryId : number}) {
                 }}
                 className={clsx("flex flex-col whitespace-nowrap items-center cursor-pointer p-3 border-b-2 border-gray-border rounded-lg w-20 min-w-20 hover:bg-gray-50", categoryId === category.id && "bg-secondary-color border-main-color")}
                 onClick={() => handleCategoryClick(category.id)}
+                data-cy="category-list-item"
             >
                 {/* <div
                 className="relative w-16 h-16 overflow-hidden bg-gray-200 mb-2 rounded-lg"

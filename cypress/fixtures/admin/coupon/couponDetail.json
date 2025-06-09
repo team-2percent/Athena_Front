@@ -1,0 +1,11 @@
+{
+    "id": 55,
+    "title": "dsafasdfasfdsfasdfsadfdsf",
+    "content": "sadfasdfdsfasfdfds",
+    "price": 5000,
+    "startAt": "2025-06-02T12:00:00",
+    "endAt": "2025-06-02T17:00:00",
+    "expiresAt": "2025-06-03T17:00:00",
+    "stock": 100000,
+    "status": "ENDED"
+  }

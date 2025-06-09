@@ -18,9 +18,9 @@ export default function CouponList({ coupons }: { coupons: UserCoupon[] }) {
     }
 
     return (
-        <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="flex flex-col gap-3 sm:gap-4" data-cy="coupon-list">
           {coupons.map((coupon) => (
-          <div className="rounded-xl sm:rounded-2xl border border-gray-border flex overflow-hidden min-h-[72px] sm:min-h-[100px]" key={coupon.id}  data-cy="coupon-list">
+          <div className="rounded-xl sm:rounded-2xl border border-gray-border flex overflow-hidden min-h-[72px] sm:min-h-[100px]" key={coupon.id}  data-cy="coupon-item">
             {/* 왼쪽: 퍼센트 아이콘 */}
             <div className={clsx("relative min-w-[48px] sm:min-w-[70px] flex items-stretch", coupon.status === "UNUSED" ? "bg-main-color" : "bg-disabled-background")}> 
               <div className="flex flex-col justify-center h-full w-full">

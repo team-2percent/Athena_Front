@@ -56,7 +56,7 @@ export default function ReviewItem({
             </div>
 
             <div className="flex items-center gap-2 sm:gap-4 mb-2">
-              <div className="text-gray-500 text-xs sm:text-base">{reviewDate} 에 작성</div>
+              <div className="text-gray-500 text-xs sm:text-base" data-cy="review-date">{reviewDate} 에 작성</div>
               <div className="flex items-center gap-2 sm:gap-4">
               </div>
             </div>

@@ -1,0 +1,21 @@
+{
+    "items": [
+      {
+        "productName": "상품31",
+        "totalQuantity": 10,
+        "totalPrice": 550000,
+        "platformFee": 49500,
+        "pgFee": 16500,
+        "vat": 4950,
+        "payoutAmount": 479050
+      }
+    ],
+    "total": {
+      "totalQuantity": 10,
+      "totalPrice": 550000,
+      "platformFee": 49500,
+      "pgFee": 16500,
+      "vat": 4950,
+      "payoutAmount": 479050
+    }
+}

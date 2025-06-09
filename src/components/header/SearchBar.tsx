@@ -99,11 +99,13 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
           onKeyDown={(e) => activeEnter(e)}
           className="w-full h-full focus:outline-none text-sm"
           maxLength={SEARCH_MAX_LENGTH}
+          data-cy="search-input"
         />
         <button
           type="button"
           className=""
           onClick={search}
+          data-cy="search-button"
         >
           <Search className="h-4 w-4 text-gray-500" />
         </button>

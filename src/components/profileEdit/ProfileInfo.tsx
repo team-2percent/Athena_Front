@@ -11,6 +11,7 @@ import TextArea from "../common/TextArea"
 import InputInfo from "../common/InputInfo"
 import { imageSchema, nicknameSchema, profileEditSchema, profileUrlSchema, sellerDescriptionSchema } from "@/lib/validationSchemas"
 import { getByteLength } from "@/lib/utils"
+import useErrorToastStore from "@/stores/useErrorToastStore"
 
 interface Profile {
     nickname: string
@@ -38,6 +39,13 @@ interface LoadResponse {
     linkUrl: string
 }
 
+interface PutResponse {
+    nickname: string
+    imageUrl: string | null
+    sellerDescription: string
+    linkUrl: string
+}
+
 interface ProfileInfoProps {
   onTo: () => void;
 }
@@ -45,7 +53,7 @@ interface ProfileInfoProps {
 export default function ProfileInfo({ onTo }: ProfileInfoProps) {
     const { isLoading, apiCall } = useApi();
     const userId = useAuthStore(s => s.userId)
-
+    const { showErrorToast } = useErrorToastStore();
     const [addingUrl, setAddingUrl] = useState(false)
     const [newUrl, setNewUrl] = useState("")
 
@@ -115,10 +123,18 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
         })], { type: "application/json" }))
         if (profile.imageFile !== null) formData.append("files", profile.imageFile)
 
-        apiCall("/api/user", "PUT", formData).then(({ error }) => {
-            console.log(error);
-            if (!error) {
-                window.location.reload();
+        apiCall<PutResponse>("/api/user", "PUT", formData).then(({ error, data, status }) => {
+            if (error && status === 500) {
+                showErrorToast("프로필 수정 실패", "다시 시도해주세요.")
+            }
+            if (!error && data) {
+                setPrevProfile(prev => ({
+                    ...prev,
+                    nickname: data.nickname,
+                    imageUrl: data.imageUrl,
+                    sellerDescription: data.sellerDescription,
+                    linkUrl: data.linkUrl
+                }))
             }
         })
     }
@@ -312,7 +328,11 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                         className="hidden"
                         id="profile-image"
                     />
-                    <label htmlFor="profile-image" className="cursor-pointer text-main-color font-medium hover:text-secondary-color-dark">
+                    <label
+                        htmlFor="profile-image"
+                        className="cursor-pointer text-main-color font-medium hover:text-secondary-color-dark"
+                        data-cy="profile-image-upload-button"
+                    >
                         프로필 사진 {profile.image ? "변경" : "업로드"}
                     </label>
                 </div>
@@ -328,8 +348,9 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                             designType="outline-rect"
                             value={profile.nickname}
                             onChange={handleChangeNickname}
+                            dataCy="nickname-input"
                         />
-                        <InputInfo errorMessage={profileEditError.nickname} />
+                        <InputInfo errorMessage={profileEditError.nickname} errorMessageDataCy="nickname-error-message"/>
                     </div>
                     </div>
                     <div className="flex justify-start w-full gap-4 items-center">
@@ -339,6 +360,7 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                     <PrimaryButton
                         onClick={onTo}
                         className="w-fit"
+                        dataCy="password-change-button"
                     >
                         비밀번호 변경
                     </PrimaryButton>
@@ -355,14 +377,25 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                         placeholder="소개를 입력하세요"
                         value={profile.sellerDescription}
                         onChange={handleChangeSellerDescription}
+                        dataCy="seller-description-input"
                     />
-                    <InputInfo errorMessage={profileEditError.sellerDescription} showLength length={profile.sellerDescription.length} maxLength={SELLER_DESCRIPTION_MAX_LENGTH} />
+                    <InputInfo
+                        errorMessage={profileEditError.sellerDescription}
+                        showLength
+                        length={profile.sellerDescription.length}
+                        maxLength={SELLER_DESCRIPTION_MAX_LENGTH}
+                        errorMessageDataCy="seller-description-error-message"
+                    />
                 </div>
                 {/* 링크란 */}
                 <div>
                 <h3 className="text-lg font-medium mb-2">링크</h3>
                 <div className="flex gap-4 items-start flex-wrap">
-                    <SecondaryButton className="w-fit rounded-full p-2" onClick={toggleAddingUrl}>
+                    <SecondaryButton
+                        className="w-fit rounded-full p-2"
+                        onClick={toggleAddingUrl} 
+                        dataCy="toggle-link-url-add-form-button"
+                    >
                         <Plus className="w-4 h-4" />
                     </SecondaryButton>
                     {
@@ -374,13 +407,15 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                                     placeholder="링크를 입력하세요"
                                     value={newUrl}
                                     onChange={handleChangeUrl}
+                                    dataCy="link-url-input"
                                 />
-                                <InputInfo errorMessage={profileEditError.urls} />
+                                <InputInfo errorMessage={profileEditError.urls} errorMessageDataCy="link-url-error-message"/>
                             </div>
                             <PrimaryButton
                                 className="w-fit rounded-full p-2"
                                 onClick={handleUrlAdd}
                                 disabled={urlAddButtonDisabled}
+                                dataCy="link-url-add-button"
                             >
                                 <Check className="w-4 h-4" />
                             </PrimaryButton>
@@ -388,11 +423,12 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                     }
                     {profile.linkUrls.map((url, index) => {
                         return (
-                            <div key={index} className="flex gap-2 items-center rounded-full bg-gray-100 pl-4 pr-2 py-1">
+                            <div key={index} className="flex gap-2 items-center rounded-full bg-gray-100 pl-4 pr-2 py-1" data-cy="link">
                                 <span>{url}</span>
                                 <CancelButton 
                                     onClick={() => handleUrlRemove(index)}
                                     className="p-0.5 rounded-full"
+                                    dataCy="link-url-remove-button"
                                 >
                                     <X className="w-3 h-3" />
                                 </CancelButton>
@@ -407,6 +443,7 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                 <PrimaryButton
                     disabled={!saveable}
                     onClick={handleSave}
+                    dataCy="save-button"
                 >
                 저장
                 </PrimaryButton>

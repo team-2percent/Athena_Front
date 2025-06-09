@@ -10,6 +10,7 @@ import { formatDateInAdmin } from "@/lib/utils"
 import Pagination from "@/components/common/Pagination"
 import EmptyMessage from "@/components/common/EmptyMessage"
 import { PrimaryButton } from "@/components/common/Button"
+import ServerErrorComponent from "@/components/common/ServerErrorComponent"
 
 export default function CouponPage() {
     const router = useRouter()
@@ -18,16 +19,21 @@ export default function CouponPage() {
     const [pageSize, setPageSize] = useState<number>(10)
     const [currentPage, setCurrentPage] = useState<number>(0)
     const [couponList, setCouponList] = useState<CouponListItem[]>([])
-    const [totalPageCount, setTotalPageCount] = useState<number>(1)
-    const [loadError, setLoadError] = useState(false);
-    const isEmpty = totalPageCount === 0 && !isLoading && !loadError;
+    const [totalPageCount, setTotalPageCount] = useState<number>(0)
+    const [serverError, setServerError] = useState(false);
+    const isEmpty = totalPageCount === 0 && !isLoading && !serverError;
     const url = `/api/admin/${status !== "ALL" ? "couponByStatus" : "couponList"}?size=${pageSize}&page=${currentPage}${status !== "ALL" ? `&status=${status}` : ""}`
     const loadCouponList = () => {
-        apiCall<CouponListResponse>(url, "GET").then(({ data }) => {
-            if (data?.content) {
+        apiCall<CouponListResponse>(url, "GET").then(({ data, error, status }) => {
+            if (data) {
                 setCouponList(data.content);
                 setTotalPageCount(data.page.totalPages);
                 setCurrentPage(data.page.number);
+            }
+            if (error && status === 500) {
+                setCouponList([]);
+                setServerError(true)
+                return
             }
         })
     }
@@ -62,12 +68,20 @@ export default function CouponPage() {
             <div className="flex justify-between items-center mb-8 border-b pb-2">
                 <h2 className="text-2xl font-medium">쿠폰 목록</h2>
                 <div className="flex gap-4">
-                    <select className="border rounded px-4 py-2" onChange={handlePageSizeChange}>
+                    <select
+                        className="border rounded px-4 py-2"
+                        onChange={handlePageSizeChange}
+                        data-cy="page-size-selector"
+                    >
                         <option value="10">10개씩</option>
                         <option value="20">20개씩</option>
                         <option value="50">50개씩</option>
                     </select>
-                    <select className="border rounded px-4 py-2" onChange={handleStatusChange}>
+                    <select
+                        className="border rounded px-4 py-2"
+                        onChange={handleStatusChange}
+                        data-cy="status-filter"
+                    >
                         {
                             Object.entries(CouponStatus).map(([key, value]) => (
                                 <option key={key} value={key}>{value}</option>
@@ -80,6 +94,7 @@ export default function CouponPage() {
             <div className="flex justify-end mb-6">
                 <PrimaryButton
                     onClick={() => router.push("/admin/coupon/register")}
+                    dataCy="coupon-register-button"
                 >
                     + 쿠폰 등록
                 </PrimaryButton>
@@ -96,19 +111,14 @@ export default function CouponPage() {
                     <th className="p-4 w-[10%]">상태</th>
                 </tr>
                 </thead>
-                <tbody>
-                {isLoading ? (
-                    <tr>
-                        <td colSpan={6} className="p-4">
-                            <Spinner message="쿠폰 목록을 불러오고 있습니다."/>
-                        </td>
-                    </tr>
-                ) : (
+                <tbody data-cy="coupon-list">
+                {
                     couponList.map((coupon) => (
                         <tr
                         key={coupon.id} 
                         className="border-b hover:bg-gray-50"
                         onClick={() => router.push(`/admin/coupon/${coupon.id}`)}
+                        data-cy="coupon-list-item"
                         >
                         <td className="p-4 text-left">{coupon.title}</td>
                         <td className="p-4">{coupon.price} 원</td>
@@ -121,11 +131,12 @@ export default function CouponPage() {
                         <td className="p-4">{coupon.stock}</td>
                         <td className="p-4 flex justify-center"><CouponTag status={coupon.status} /></td>
                         </tr>
-                    ))
-                )}
+                    ))  
+                }
                 </tbody>
             </table>
             {isEmpty && <EmptyMessage message="쿠폰이 없습니다." />}
+            {serverError && <ServerErrorComponent message="쿠폰 목록 조회에 실패했습니다." onRetry={loadCouponList}/>}
             <Pagination totalPages={totalPageCount} currentPage={currentPage} onPageChange={handlePageChange}/>
         </div>
     )

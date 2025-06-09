@@ -73,14 +73,24 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
       return;
     }
     if (data.accessToken && data.userId) {
-      login(data.accessToken, data.userId)
-      // FCM 토큰 발급 및 등록
-      const token = await getFCMToken()
-      if (token) {
-        setFcmToken(token);
-        await apiCall('/api/fcm/register', 'POST', { userId: data.userId, token: token })
+      try { // Firebase 연결 try-catch 처리
+        login(data.accessToken, data.userId);
+      
+        // FCM 토큰 발급 및 등록
+        const token = await getFCMToken();
+        if (token) {
+          setFcmToken(token);
+          await apiCall('/api/fcm/register', 'POST', {
+            userId: data.userId,
+            token: token,
+          });
+        }
+        
+        onClose();
+      } catch (error) {
+        console.error('로그인 후 FCM 등록 중 오류 발생:', error);
+        // 필요하다면 사용자에게 알리거나 fallback 처리
       }
-      onClose()
     }
   }
 

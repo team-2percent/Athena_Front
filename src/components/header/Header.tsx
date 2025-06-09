@@ -211,10 +211,10 @@ const Header = () => {
       {/* 모바일 헤더 (md 미만) */}
       <div className="flex items-center justify-between px-4 py-2 md:hidden">
         {/* 로고 */}
-        <Link href="/" className="flex items-center">
-          <div className="w-10 h-10 overflow-hidden">
-            <img src="/src/athenna_logo.png" alt="Athenna 로고" className="h-10 w-auto object-cover" />
-          </div>
+        <Link href="/" className="flex items-center" data-cy="logo-link">
+            <div className="w-10 h-10 overflow-hidden">
+              <img src="/src/athenna_logo.png" alt="Athenna 로고" className="h-10 w-auto object-cover" />
+            </div>
         </Link>
         {/* 햄버거 메뉴 */}
         <button onClick={() => setShowMobileMenu(true)} aria-label="메뉴 열기">
@@ -229,7 +229,7 @@ const Header = () => {
           {/* 로고와 검색창 */}
           <div className="flex items-center space-x-4">
             <Link href="/" className="flex items-center">
-              <div className="w-10 h-10 overflow-hidden">
+              <div className="w-10 h-10 overflow-hidden" data-cy="logo-link">
                 <img src="/src/athenna_logo.png" alt="Athenna 로고" className="h-10 w-auto object-cover" />
               </div>
             </Link>
@@ -280,6 +280,7 @@ const Header = () => {
                           type="button"
                           onClick={() => router.push("/admin/approval")}
                           className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-start"
+                          data-cy="adminpage-button"
                         >
                           <UserLock className="h-4 w-4" />
                           관리자페이지
