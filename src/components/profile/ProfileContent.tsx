@@ -396,11 +396,9 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
       />
 
       {/* 탭 내용 */}
-      <div className="mx-auto mt-8 relative min-h-[300px]">
+      <div className="mx-auto mt-8 min-h-[300px]">
         {/* 소개 탭 */}
-        <div
-          className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "소개" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
-        >
+        <div className={activeTab === "소개" ? "block" : "hidden"}>
           <div className="mb-8">
             <p className="text-sub-gray mb-8 whitespace-pre-wrap break-words" data-cy="profile-seller-description">{sellerDescription || "소개글이 없습니다."}</p>
             {/* 링크 목록 */}
@@ -419,9 +417,7 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
           </div>
         </div>
         {/* 판매 상품 탭 */}
-        <div
-          className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "판매 상품" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
-        >
+        <div className={activeTab === "판매 상품" ? "block" : "hidden"}>
           {myProjects.length === 0 && !isLoadingProjects ? (
             <EmptyMessage message="판매 중인 상품이 없습니다." />
           ) : (
@@ -454,9 +450,7 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
           )}
         </div>
         {/* 구매 상품 탭 */}
-        <div
-          className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "구매 상품" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
-        >
+        <div className={activeTab === "구매 상품" ? "block" : "hidden"}>
           {myOrders.length === 0 && !isLoadingOrders ? (
             <EmptyMessage message="구매한 상품이 없습니다." />
           ) : (
@@ -489,9 +483,7 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
           )}
         </div>
         {/* 후기/내가 쓴 후기 탭 */}
-        <div
-          className={`absolute inset-0 transition-opacity duration-300 ${(activeTab === "후기" || activeTab === "내가 쓴 후기") ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
-        >
+        <div className={(activeTab === "후기" || activeTab === "내가 쓴 후기") ? "block" : "hidden"}>
           {myReviews.length === 0 && !isLoadingReviews ? (
             <EmptyMessage message="작성한 후기가 없습니다." />
           ) : (
@@ -517,9 +509,7 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
           )}
         </div>
         {/* 쿠폰 탭 */}
-        <div
-          className={`absolute inset-0 transition-opacity duration-300 ${activeTab === "쿠폰" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
-        >
+        <div className={activeTab === "쿠폰" ? "block" : "hidden"}>
           {userCoupons.length === 0 && !isLoadingCoupons ? (
             <EmptyMessage message="쿠폰이 없습니다." />
           ) : (
