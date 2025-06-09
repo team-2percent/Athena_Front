@@ -211,6 +211,27 @@ describe('프로젝트 상세 결제 플로우', () => {
   })
 
   it('정상 결제 플로우', () => {
+    cy.intercept('GET', '/api/delivery/delivery-info', {
+      statusCode: 200,
+      body: [
+        {
+          id: 1,
+          name: '테스트 배송지',
+          address: '서울특별시 중구 세종대로 3',
+          detailAddress: '신규 404호',
+          zipcode: '12345',
+          isDefault: true
+        }
+      ]
+    }).as('getDeliveryInfo')
+    cy.intercept({
+        method: "POST",
+        url: "/api/delivery/delivery-info"
+    }, {
+        statusCode: 200
+    }).as("addAddress")
+
+
     cy.contains('후원하기').click()
     cy.contains('테스트 리워드').click()
     cy.get('button').contains('다음 단계').click()
@@ -224,15 +245,19 @@ describe('프로젝트 상세 결제 플로우', () => {
     // 새 배송지 입력
     cy.get('input[placeholder="\'찾기\'를 눌러서 주소 입력"]').invoke('val', '서울특별시 중구 세종대로 3').trigger('input')
     cy.get('input[placeholder="상세 주소 입력"]').type('신규 404호')
-    cy.contains('저장').click()
+    cy.contains('찾기').click()
 
     // 새 배송지 카드가 나타나면 선택
-    cy.get('[data-cy^="address-card-"]').last().click()
+    // cy.get('[data-cy^="address-card-"]').last().click()
+    cy.get('[data-cy="address-search-modal"]').should('be.visible').as('addressSearchModal')
+    cy.get('[data-cy="mock-postcode"]').should('be.visible').click()
+    cy.contains('저장').click()
 
     // 결제 버튼 클릭 및 결제 플로우 진행
     cy.window().then((win) => {
       cy.stub(win, 'open').as('windowOpen')
     })
+    
     cy.get('[data-cy="donate-submit"]').click()
     cy.wait('@order')
     cy.wait('@paymentReady')

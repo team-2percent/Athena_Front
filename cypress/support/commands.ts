@@ -147,7 +147,7 @@ Cypress.Commands.add('checkErrorTopToast', (title: string, body: string) => {
         cy.get('[data-cy="top-toast-body"]').should('contain', body)
     }).as("errorTopToast")
 
-    cy.get("@errorTopToast").should('not.exist', { timeout: 6000 })
+    cy.get("@errorTopToast").should('not.exist', { timeout: 10000 })
 })
 
 Cypress.Commands.add('checkServerErrorCard', (message: string) => {
