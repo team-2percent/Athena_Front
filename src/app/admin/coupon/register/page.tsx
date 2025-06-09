@@ -206,9 +206,9 @@ export default function CouponRegisterPage() {
             title: couponName,
             content: couponDescription,
             price: couponPrice,
-            startAt: couponStartDateTime.toISOString(),
-            endAt: couponEndDateTime.toISOString(),
-            expiresAt: couponExpireDateTime.toISOString(),
+            startAt: new Date(couponStartDateTime.getTime() - (9 * 60 * 60 * 1000)).toISOString(),
+            endAt: new Date(couponEndDateTime.getTime() - (9 * 60 * 60 * 1000)).toISOString(),
+            expiresAt: new Date(couponExpireDateTime.getTime() - (9 * 60 * 60 * 1000)).toISOString(),
             stock: couponStock,
         }).then(({ error, status }) => {
             if (error && status === 500) {
