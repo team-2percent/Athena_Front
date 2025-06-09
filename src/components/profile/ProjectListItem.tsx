@@ -96,16 +96,16 @@ export default function ProjectItem({
               </span>
             </div>
 
-            <div className={`w-full h-1.5 sm:h-2 rounded-full ${isCompleted ? "bg-sub-gray" : "bg-secondary-color"}`}> 
+            <div className={`w-full h-1.5 sm:h-2 rounded-full ${isCompleted || (daysLeft < 0) ? "bg-sub-gray" : "bg-secondary-color"}`}> 
               <div
-                className={`h-full rounded-full bg-main-color ${isCompleted ? "bg-sub-gray" : "bg-main-color"}`}
+                className={`h-full rounded-full bg-main-color ${isCompleted || (daysLeft < 0) ? "bg-sub-gray" : "bg-main-color"}`}
                 style={{ width: `${progressWidth}%` }}
               ></div>
             </div>
 
             {/* 남은 일수 또는 종료 메시지 */}
             <div className="text-right mt-1 text-xs sm:text-base" data-cy="project-days-left">
-              {isCompleted ? (
+              {isCompleted || (daysLeft < 0) ? (
                 <span className="text-sub-gray" data-cy="project-end-message">종료되었어요.</span>
               ) : (
                 <span className="text-sub-gray" data-cy="project-days-left">{daysLeft}일 남았어요.</span>
