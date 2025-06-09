@@ -80,6 +80,7 @@ export default function TopToast({ title, body, duration = 5000, onClose, classN
             type="button"
             className="inline-flex text-white/70 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
             onClick={() => setIsVisible(false)}
+            data-cy="top-toast-close-button"
           >
             <span className="sr-only">닫기</span>
             <X className="h-6 w-6" aria-hidden="true" />
