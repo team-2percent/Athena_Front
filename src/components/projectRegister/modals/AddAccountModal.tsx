@@ -1,5 +1,6 @@
 import { useState } from "react"
 import Modal from "../../common/Modal"
+import { TextInput } from "@/components/common/Input"
 
 interface AddAccountModalProps {
   isOpen: boolean
@@ -19,7 +20,8 @@ export default function AddAccountModal({ isOpen, onClose, onSave }: AddAccountM
   })
 
   const handleAccountNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^0-9]/g, "")
+    let value = e.target.value.replace(/[^0-9]/g, "")
+    if (value.length > 50) value = value.slice(0, 50)
     setAccountNumber(value)
   }
 
@@ -57,17 +59,17 @@ export default function AddAccountModal({ isOpen, onClose, onSave }: AddAccountM
             htmlFor="accountHolder"
             className={`text-sm ${focusedField === "accountHolder" ? "text-secondary-color-dark" : "text-main-color"}`}
           >
-            예금주
+            예금주 (50자 이하)
           </label>
-          <input
+          <TextInput
             id="accountHolder"
-            type="text"
             value={accountHolder}
-            onChange={(e) => setAccountHolder(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value.length <= 50) setAccountHolder(e.target.value)
+            }}
             placeholder="예금주 이름을 입력하세요"
-            className={`w-full p-2 border-b ${focusedField === "accountHolder" ? "border-secondary-color-dark" : "border-gray-300"} ${errors.accountHolder ? "border-red-500" : ""} focus:outline-none text-lg`}
-            onFocus={() => setFocusedField("accountHolder")}
-            onBlur={() => setFocusedField(null)}
+            className={`w-full p-2 text-lg ${errors.accountHolder ? "border-b border-red-500" : "border-b border-gray-300"}`}
+            designType="underline"
           />
           {errors.accountHolder && <p className="text-red-500 text-xs mt-1">예금주를 입력해주세요</p>}
         </div>
@@ -77,17 +79,17 @@ export default function AddAccountModal({ isOpen, onClose, onSave }: AddAccountM
             htmlFor="bankName"
             className={`text-sm ${focusedField === "bankName" ? "text-secondary-color-dark" : "text-main-color"}`}
           >
-            은행명
+            은행명 (50자 이하)
           </label>
-          <input
+          <TextInput
             id="bankName"
-            type="text"
             value={bankName}
-            onChange={(e) => setBankName(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value.length <= 50) setBankName(e.target.value)
+            }}
             placeholder="은행명을 입력하세요"
-            className={`w-full p-2 border-b ${focusedField === "bankName" ? "border-secondary-color-dark" : "border-gray-300"} ${errors.bankName ? "border-red-500" : ""} focus:outline-none text-lg`}
-            onFocus={() => setFocusedField("bankName")}
-            onBlur={() => setFocusedField(null)}
+            className={`w-full p-2 text-lg ${errors.bankName ? "border-b border-red-500" : "border-b border-gray-300"}`}
+            designType="underline"
           />
           {errors.bankName && <p className="text-red-500 text-xs mt-1">은행명을 입력해주세요</p>}
         </div>
@@ -97,17 +99,15 @@ export default function AddAccountModal({ isOpen, onClose, onSave }: AddAccountM
             htmlFor="accountNumber"
             className={`text-sm ${focusedField === "accountNumber" ? "text-secondary-color-dark" : "text-main-color"}`}
           >
-            계좌번호
+            계좌번호 (50자 이하)
           </label>
-          <input
+          <TextInput
             id="accountNumber"
-            type="text"
             value={accountNumber}
             onChange={handleAccountNumberChange}
             placeholder="계좌번호를 입력하세요 ('-' 없이 숫자만)"
-            className={`w-full p-2 border-b ${focusedField === "accountNumber" ? "border-secondary-color-dark" : "border-gray-300"} ${errors.accountNumber ? "border-red-500" : ""} focus:outline-none text-lg`}
-            onFocus={() => setFocusedField("accountNumber")}
-            onBlur={() => setFocusedField(null)}
+            className={`w-full p-2 text-lg ${errors.accountNumber ? "border-b border-red-500" : "border-b border-gray-300"}`}
+            designType="underline"
           />
           {errors.accountNumber && <p className="text-red-500 text-xs mt-1">계좌번호를 입력해주세요</p>}
         </div>

@@ -2,6 +2,7 @@ import { useState } from "react"
 import Modal from "../../common/Modal"
 import { PrimaryButton } from "../../common/Button"
 import { Plus, Trash2 } from "lucide-react"
+import TextArea from "@/components/common/TextArea"
 
 interface CompositionItem {
   id: number
@@ -42,19 +43,17 @@ export default function CompositionDialog({ isOpen, onClose, composition, onSave
       className="max-w-2xl"
       zIndex={100}
     >
-      <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+      <div className="space-y-2 max-h-[60vh] overflow-y-auto">
         {items.map((item) => (
-          <div key={item.id} className="flex items-end gap-4">
-            <div className="flex-1">
-              <label
-                htmlFor={`item-content-${item.id}`}
-                className={`text-sm ${focusedField === `item-content-${item.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
-              >
-                구성 세부 내용 (100자 이하)
-              </label>
-              <input
-                id={`item-content-${item.id}`}
-                type="text"
+          <div key={item.id} className="space-y-1">
+            <label
+              htmlFor={`item-content-${item.id}`}
+              className={`text-sm ${focusedField === `item-content-${item.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
+            >
+              구성 세부 내용 (100자 이하)
+            </label>
+            <div className="flex flex-row items-center gap-4">
+              <TextArea
                 value={item.content}
                 onChange={(e) => {
                   if (e.target.value.length <= 100) {
@@ -62,19 +61,17 @@ export default function CompositionDialog({ isOpen, onClose, composition, onSave
                   }
                 }}
                 placeholder="구성 세부 내용을 입력하세요"
-                className={`w-full p-2 border-b ${focusedField === `item-content-${item.id}` ? "border-secondary-color-dark" : "border-gray-300"} focus:outline-none text-lg`}
-                onFocus={() => setFocusedField(`item-content-${item.id}`)}
-                onBlur={() => setFocusedField(null)}
+                className="h-24 mt-2 w-full p-2 border-b border-gray-300 focus:outline-none text-lg"
               />
+              <button
+                type="button"
+                onClick={() => removeItem(item.id)}
+                className="p-2 text-gray-400 hover:text-red-500 transition-colors flex items-center justify-center"
+                aria-label="항목 삭제"
+              >
+                <Trash2 className="h-5 w-5" />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => removeItem(item.id)}
-              className="p-2 text-gray-400 hover:text-red-500 transition-colors mb-2"
-              aria-label="항목 삭제"
-            >
-              <Trash2 className="h-5 w-5" />
-            </button>
           </div>
         ))}
         {/* 항목 추가 버튼 */}

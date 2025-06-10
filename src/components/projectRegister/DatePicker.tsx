@@ -158,7 +158,7 @@ export default function DatePicker({ selectedDate, onChange, position = "top", m
           type="text"
           value={formatDate(selectedDate)}
           readOnly
-          className={`w-44 rounded-full border border-gray-300 px-4 py-3 pr-10 focus:border-main-color focus:outline-none cursor-pointer ${
+          className={`w-44 rounded-full border border-gray-300 text-sm px-4 py-3 pr-10 focus:border-main-color focus:outline-none cursor-pointer ${
             !selectedDate ? "text-gray-400" : ""
           }`}
           onClick={() => setIsOpen(!isOpen)}

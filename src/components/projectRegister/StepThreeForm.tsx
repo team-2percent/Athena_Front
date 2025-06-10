@@ -14,6 +14,7 @@ import gsap from "gsap"
 import Modal from "../common/Modal"
 import AddAccountModal from "./modals/AddAccountModal"
 import CompositionDialog from "./modals/CompositionDialog"
+import { TextInput } from "@/components/common/Input"
 
 // 계좌 정보 타입 정의
 interface BankAccount {
@@ -257,7 +258,7 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
           {supportOptions.map((option) => (
             <div
               key={option.id}
-              className="border border-gray-300 rounded-3xl p-4 h-80 flex flex-col justify-between relative"
+              className="border border-gray-300 rounded-3xl p-6 h-full flex flex-col justify-between relative"
             >
               {/* 삭제 버튼은 수정 모드에서 비활성화 */}
               {!isEditMode && (
@@ -283,9 +284,8 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
                   {isEditMode ? (
                     <div className="w-full p-1 border-b border-gray-200 text-base text-gray-400 cursor-not-allowed">{option.name}</div>
                   ) : (
-                    <input
+                    <TextInput
                       id={`option-name-${option.id}`}
-                      type="text"
                       value={option.name}
                       onChange={(e) => {
                         if (e.target.value.length <= 25) {
@@ -293,9 +293,8 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
                         }
                       }}
                       placeholder="상품 이름을 지어주세요."
-                      className={`w-full p-1 border-b ${focusedField === `option-name-${option.id}` ? "border-secondary-color-dark" : "border-gray-300"} focus:outline-none text-base`}
-                      onFocus={() => setFocusedField(`option-name-${option.id}`)}
-                      onBlur={() => setFocusedField(null)}
+                      className="w-full p-1 text-base"
+                      designType="underline"
                     />
                   )}
                 </div>
@@ -311,9 +310,8 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
                   {isEditMode ? (
                     <div className="w-full p-1 border-b border-gray-200 text-base text-gray-400 cursor-not-allowed">{option.description}</div>
                   ) : (
-                    <input
+                    <TextInput
                       id={`option-desc-${option.id}`}
-                      type="text"
                       value={option.description}
                       onChange={(e) => {
                         if (e.target.value.length <= 50) {
@@ -321,9 +319,8 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
                         }
                       }}
                       placeholder="해당 옵션을 자세히 설명해 주세요."
-                      className={`w-full p-1 border-b ${focusedField === `option-desc-${option.id}` ? "border-secondary-color-dark" : "border-gray-300"} focus:outline-none text-base`}
-                      onFocus={() => setFocusedField(`option-desc-${option.id}`)}
-                      onBlur={() => setFocusedField(null)}
+                      className="w-full p-1 text-base"
+                      designType="underline"
                     />
                   )}
                 </div>
@@ -354,63 +351,62 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
                     </div>
                   )}
                 </div>
-              </div>
+                {/* 가격과 재고를 한 줄에 표시 */}
+                <div className="flex gap-4">
+                  {/* 가격 */}
+                  <div className="flex-1">
+                    <label
+                      htmlFor={`option-price-${option.id}`}
+                      className={`text-sm ${isEditMode ? "text-gray-400" : (focusedField === `option-price-${option.id}` ? "text-secondary-color-dark" : "text-main-color")}`}
+                    >
+                      가격 (10억 원 이하)
+                    </label>
+                    {isEditMode ? (
+                      <div className="flex items-center border-gray-200 border-b pb-2 text-base text-gray-400 cursor-not-allowed p-1">
+                        <span className="flex-1 text-right">{formatNumber(option.price)}</span>
+                        <span className="text-gray-400 ml-1">원</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center border-gray-300 focus-within:border-secondary-color-dark">
+                        <TextInput
+                          id={`option-price-${option.id}`}
+                          value={formatNumber(option.price)}
+                          onChange={(e) => handlePriceChange(option.id, e.target.value)}
+                          placeholder="0"
+                          className="w-full p-1 text-base text-right"
+                          designType="underline"
+                          align="right"
+                        />
+                        <span className="text-gray-500 text-sm ml-1">원</span>
+                      </div>
+                    )}
+                  </div>
 
-              {/* 가격과 재고를 한 줄에 표시 */}
-              <div className="flex gap-4">
-                {/* 가격 */}
-                <div className="flex-1">
-                  <label
-                    htmlFor={`option-price-${option.id}`}
-                    className={`text-sm ${isEditMode ? "text-gray-400" : (focusedField === `option-price-${option.id}` ? "text-secondary-color-dark" : "text-main-color")}`}
-                  >
-                    가격 (10억 원 이하)
-                  </label>
-                  {isEditMode ? (
-                    <div className="flex items-center border-b border-gray-200 text-base text-gray-400 cursor-not-allowed p-1">
-                      <span className="flex-1 text-right">{formatNumber(option.price)}</span>
-                      <span className="text-gray-400 ml-1">원</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center border-b border-gray-300 focus-within:border-secondary-color-dark">
-                      <input
-                        id={`option-price-${option.id}`}
-                        type="text"
-                        value={formatNumber(option.price)}
-                        onChange={(e) => handlePriceChange(option.id, e.target.value)}
+                  {/* 재고(수량) */}
+                  <div className="flex-1">
+                    <label
+                      htmlFor={`option-stock-${option.id}`}
+                      className={`text-sm ${focusedField === `option-stock-${option.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
+                    >
+                      수량 (1만 개 이하)
+                    </label>
+                    <div className="flex items-center border-gray-300 focus-within:border-secondary-color-dark">
+                      <TextInput
+                        id={`option-stock-${option.id}`}
+                        value={formatNumber(option.stock)}
+                        onChange={(e) => handleStockChange(option.id, e.target.value)}
                         placeholder="0"
-                        className="w-full p-1 focus:outline-none text-base text-right"
-                        onFocus={() => setFocusedField(`option-price-${option.id}`)}
-                        onBlur={() => setFocusedField(null)}
+                        className="w-full p-1 text-base text-right"
+                        designType="underline"
+                        align="right"
                       />
-                      <span className="text-gray-500 ml-1">원</span>
+                      <span className="text-gray-500 text-sm ml-1">개</span>
                     </div>
-                  )}
-                </div>
-
-                {/* 재고(수량) */}
-                <div className="flex-1">
-                  <label
-                    htmlFor={`option-stock-${option.id}`}
-                    className={`text-sm ${focusedField === `option-stock-${option.id}` ? "text-secondary-color-dark" : "text-main-color"}`}
-                  >
-                    수량 (1만 개 이하)
-                  </label>
-                  <div className="flex items-center border-b border-gray-300 focus-within:border-secondary-color-dark">
-                    <input
-                      id={`option-stock-${option.id}`}
-                      type="text"
-                      value={formatNumber(option.stock)}
-                      onChange={(e) => handleStockChange(option.id, e.target.value)}
-                      placeholder="0"
-                      className="w-full p-1 focus:outline-none text-base text-right"
-                      onFocus={() => setFocusedField(`option-stock-${option.id}`)}
-                      onBlur={() => setFocusedField(null)}
-                    />
-                    <span className="text-gray-500 ml-1">개</span>
                   </div>
                 </div>
               </div>
+
+              
             </div>
           ))}
 

@@ -11,6 +11,7 @@ import { useProjectFormStore, type ImageFile, type Category } from "@/stores/use
 import { VALIDATION_MESSAGES } from "@/lib/validationMessages"
 import { TextInput } from "@/components/common/Input"
 import TextArea from "@/components/common/TextArea"
+import Dropdown, { DropdownOption } from "@/components/common/Dropdown"
 
 interface StepOneFormProps {
   onUpdateFormData: (data: Partial<any>) => void
@@ -313,39 +314,14 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
           카테고리 선택
         </label>
         <div className="w-full max-w-md">
-          <div className="relative">
-            <button
-              type="button"
-              className={`flex w-full items-center justify-between rounded-full border px-4 py-3 text-left focus:outline-none ${getFieldStyle(
-                "categoryId",
-              )} ${getErrorMessage("categoryId") ? "text-red-700" : "text-gray-700"}`}
-              onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-              disabled={categoriesLoading}
-            >
-              {categoriesLoading ? (
-                <span className="text-gray-400">카테고리 로딩 중...</span>
-              ) : category ? (
-                <span>{category}</span>
-              ) : (
-                <span className="text-gray-400">카테고리를 선택해주세요</span>
-              )}
-              <ChevronDown className="h-5 w-5" />
-            </button>
-            {isCategoryDropdownOpen && categories.length > 0 && (
-              <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
-                {categories.map((cat) => (
-                  <div
-                    key={cat.id}
-                    className="flex cursor-pointer items-center justify-between px-4 py-3 hover:bg-gray-100"
-                    onClick={() => handleCategorySelect(cat)}
-                  >
-                    <span>{cat.categoryName}</span>
-                    {category === cat.categoryName && <Check className="h-5 w-5 text-main-color" />}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <Dropdown
+            options={categories.map((cat) => ({ label: cat.categoryName, value: cat.id }))}
+            value={categoryId ?? undefined}
+            onChange={(opt) => handleCategorySelect({ id: opt.value as number, categoryName: opt.label })}
+            placeholder="카테고리를 선택해주세요"
+            disabled={categoriesLoading}
+            className={getFieldStyle("categoryId") + (getErrorMessage("categoryId") ? " text-red-500" : " text-gray-700")}
+          />
           {getErrorMessage("categoryId") && (
             <p className="text-red-500 text-sm mt-1">{getErrorMessage("categoryId")}</p>
           )}
@@ -362,7 +338,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
           <TextInput
             id="title"
             value={title}
-            designType="outline-rect"
+            designType="outline-round"
             onChange={handleTitleChange}
             placeholder="프로젝트 이름을 지어주세요"
             className={getFieldStyle("title") + " w-full px-4 py-3"}
@@ -388,7 +364,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
             value={description}
             onChange={handleDescriptionChange}
             placeholder="프로젝트에 대한 간략한 설명을 입력하세요"
-            className={getFieldStyle("description") + " w-full px-4 py-3 min-h-[150px]"}
+            className={getFieldStyle("description") + " w-full rounded-3xl border px-4 py-3 min-h-[150px]"}
             isError={!!getErrorMessage("description") || !!forceDescriptionMaxError}
           />
           <div className="flex justify-between items-center mt-1">
@@ -525,7 +501,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
         <div className="w-full max-w-md flex items-center">
           <TextInput
             id="targetAmount"
-            designType="outline-rect"
+            designType="outline-round"
             value={formatAmount(targetAmount)}
             onChange={handleAmountChange}
             placeholder="0"

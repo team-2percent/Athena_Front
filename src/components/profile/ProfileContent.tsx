@@ -426,9 +426,9 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
                 <ProjectListItem
                   key={project.projectId}
                   id={project.projectId}
-                  sellerName={project.sellerName || "내 상품"}
+                  sellerName={project.sellerName || "내 프로젝트"}
                   projectName={project.title}
-                  description={project.description || "상품 설명이 여기에 표시됩니다."}
+                  description={project.description || "프로젝트 설명이 여기에 표시됩니다."}
                   createdAt={formatDate(project.createdAt)}
                   endAt={formatDate(project.endAt)}
                   imageUrl={project.imageUrl || "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"}
