@@ -5,7 +5,7 @@ const listType = {
     },
     "deadline": {
         "apiUrl": "/api/project/deadlineList",
-        "sort": ["DEADLINE", "DEADLINE_POPULAR", "DEEADLINE_SUCCESS_RATE"]
+        "sort": ["DEADLINE", "DEADLINE_POPULAR", "DEADLINE_SUCCESS_RATE"]
     },
     "category": {
         "apiUrl": "/api/project/categoryList",
