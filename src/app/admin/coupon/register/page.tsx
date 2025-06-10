@@ -40,6 +40,9 @@ export default function CouponRegisterPage() {
     const [couponExpireDateTime, setCouponExpireDateTime] = useState<Date>(expireHour)
     const [couponStock, setCouponStock] = useState<number>(0)
 
+    const minEndDateTime = new Date(couponStartDateTime.getTime() + (COUPON_EVENT_START_TO_END_MIN_HOUR * 60 * 60 * 1000))
+    const minExpireDateTime = new Date(couponEndDateTime.getTime() + (COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR * 60 * 60 * 1000))
+
     const [couponAddError, setCouponAddError] = useState({
         title: "",
         content: "",
@@ -89,6 +92,7 @@ export default function CouponRegisterPage() {
         setIsModalOpen(true)
     }
 
+    // 입력값 변화 핸들링
     const handleCouponNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const result = validate(e.target.value, couponNameSchema)
         const value = getValidatedString(e.target.value, COUPON_NAME_MAX_LENGTH)
@@ -123,47 +127,45 @@ export default function CouponRegisterPage() {
         setCouponPrice(value)
     }
 
-    const setPeriodError = (startAt: Date, endAt: Date) => {
+    const handleStartDateTimeChange = (date: Date) => {
         const result = validate({
-            startAt: startAt,
-            endAt: endAt,
+            startAt: date,
+            endAt: couponEndDateTime,
         }, couponPeriodSchema)
+            
         if (result.error) {
             setCouponAddError({ ...couponAddError, period: result.message })
         } else {
             setCouponAddError({ ...couponAddError, period: "" })
         }
+        setCouponStartDateTime(date)
     }
 
-    const handleCouponPeriodChange = (startAt: Date) => {
-        setCouponEndDateTime(getValidatedDateHour(couponEndDateTime, startAt, COUPON_EVENT_START_TO_END_MIN_HOUR))
-        setCouponExpireDateTime(getValidatedDateHour(couponExpireDateTime, couponEndDateTime, COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR))
-    }
-
-    const setExpireError = (endAt: Date, expiresAt: Date) => {
-        const result = validate({
-            endAt: endAt,
-            expiresAt: expiresAt,
-        }, couponExpireSchema)
-        if (result.error) {
-            setCouponAddError({ ...couponAddError, expire: result.message })
+    const handleEndDateTimeChange = (date: Date) => {
+        const periodResult = validate({
+            startAt: couponStartDateTime,
+            endAt: date,
+        }, couponPeriodSchema)
+        if (periodResult.error) {
+            setCouponAddError({ ...couponAddError, period: periodResult.message })
         } else {
-            setCouponAddError({ ...couponAddError, expire: "" })
+            setCouponAddError({ ...couponAddError, period: "" })
         }
-    }
 
-    const handleCouponExpireChange = (endAt: Date) => {
-        const result = validate({
-            endAt: endAt,
+        const expireResult = validate({
+            endAt: date,
             expiresAt: couponExpireDateTime,
         }, couponExpireSchema)
-        if (result.error) {
-            setCouponAddError({ ...couponAddError, expire: result.message })
+        if (expireResult.error) {
+            setCouponAddError({ ...couponAddError, expire: expireResult.message })
         } else {
             setCouponAddError({ ...couponAddError, expire: "" })
         }
+        setCouponEndDateTime(date)
+    }
 
-        setCouponExpireDateTime(getValidatedDateHour(couponExpireDateTime, endAt, COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR))
+    const handleExpireDateTimeChange = (date: Date) => {
+        setCouponExpireDateTime(date)
     }
 
     const handleCouponStockChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,30 +180,18 @@ export default function CouponRegisterPage() {
         setCouponStock(value)
     }
 
+    // Number Input 클릭 시 전체 선택
     const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
         e.currentTarget.select();
     };
 
-    const handleCouponStartDateTimeChange = (hour: number) => {
-        setCouponStartDateTime(new Date(couponStartDateTime.setHours(hour)))
-    }
-
-    const handleCouponEndDateTimeChange = (hour: number) => {
-        setCouponEndDateTime(new Date(couponEndDateTime.setHours(hour)))
-    }
-
-    const handleCouponExpireDateTimeChange = (hour: number) => {
-        setCouponExpireDateTime(new Date(couponExpireDateTime.setHours(hour)))
-    }
-
+    // 기간 조정
     useEffect(() => {
-        handleCouponPeriodChange(couponStartDateTime)
-        setPeriodError(couponStartDateTime, couponEndDateTime)
+        setCouponEndDateTime(getValidatedDateHour(couponEndDateTime, couponStartDateTime, COUPON_EVENT_START_TO_END_MIN_HOUR))
     }, [couponStartDateTime])
 
     useEffect(() => {
-        handleCouponExpireChange(couponEndDateTime)
-        setExpireError(couponEndDateTime, couponExpireDateTime)
+        setCouponExpireDateTime(getValidatedDateHour(couponExpireDateTime, couponEndDateTime, COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR))
     }, [couponEndDateTime])
 
     return (
@@ -260,19 +250,19 @@ export default function CouponRegisterPage() {
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">발급 기간</label>
                         <div className="flex gap-4 items-center">
-                            <DatePicker selectedDate={couponStartDateTime} onChange={(date) => setCouponStartDateTime(date)}/>
-                            <TimePicker selectedDateTime={couponStartDateTime} onChange={handleCouponStartDateTimeChange}/>
+                            <DatePicker selectedDate={couponStartDateTime} onChange={handleStartDateTimeChange}/>
+                            <TimePicker selectedDateTime={couponStartDateTime} onChange={handleStartDateTimeChange}/>
                             <span>~</span>
-                            <DatePicker selectedDate={couponEndDateTime} onChange={(date) => setCouponEndDateTime(date)}  minDate={couponStartDateTime}/>
-                            <TimePicker selectedDateTime={couponEndDateTime} onChange={handleCouponEndDateTimeChange} minDateTime={couponStartDateTime}/>
+                            <DatePicker selectedDate={couponEndDateTime} onChange={handleEndDateTimeChange}  minDate={minEndDateTime}/>
+                            <TimePicker selectedDateTime={couponEndDateTime} onChange={handleEndDateTimeChange} minDateTime={minEndDateTime}/>
                         </div>
                         <InputInfo errorMessage={couponAddError.period} />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">만료 기간</label>
                         <div className="flex gap-4 items-center">
-                            <DatePicker selectedDate={couponExpireDateTime} onChange={(date) => setCouponExpireDateTime(date)} minDate={couponEndDateTime}/>
-                            <TimePicker selectedDateTime={couponExpireDateTime} onChange={handleCouponExpireDateTimeChange} minDateTime={couponEndDateTime}/>
+                            <DatePicker selectedDate={couponExpireDateTime} onChange={handleExpireDateTimeChange} minDate={minExpireDateTime}/>
+                            <TimePicker selectedDateTime={couponExpireDateTime} onChange={handleExpireDateTimeChange} minDateTime={minExpireDateTime}/>
                         </div>
                         <InputInfo errorMessage={couponAddError.expire} />
                     </div>
