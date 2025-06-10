@@ -10,6 +10,7 @@ import { PrimaryButton } from "@/components/common/Button";
 import { TextInput } from "@/components/common/Input";
 import { SEARCH_MAX_LENGTH } from "@/lib/validationConstant";
 import ServerErrorComponent from "@/components/common/ServerErrorComponent";
+import { getValidatedString } from "@/lib/validationUtil";
 
 interface Project {
     projectId: number;
@@ -88,12 +89,8 @@ export default function ApprovalPage() {
         })
     }
 
-    const validateSearch = (value: string) => {
-        return value.slice(0, SEARCH_MAX_LENGTH)
-    }
-
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = validateSearch(e.target.value)
+        const value = getValidatedString(e.target.value, SEARCH_MAX_LENGTH)
         setSearch(value);
     }
 
