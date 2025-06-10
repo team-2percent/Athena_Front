@@ -9,6 +9,8 @@ import { useApi } from "@/hooks/useApi"
 
 import { useProjectFormStore, type ImageFile, type Category } from "@/stores/useProjectFormStore"
 import { VALIDATION_MESSAGES } from "@/lib/validationMessages"
+import { TextInput } from "@/components/common/Input"
+import TextArea from "@/components/common/TextArea"
 
 interface StepOneFormProps {
   onUpdateFormData: (data: Partial<any>) => void
@@ -357,15 +359,16 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
           <span className="text-sm text-gray-500 ml-2">(25자 이하)</span>
         </label>
         <div className="w-full">
-          <input
+          <TextInput
             id="title"
-            type="text"
             value={title}
+            designType="outline-rect"
             onChange={handleTitleChange}
             placeholder="프로젝트 이름을 지어주세요"
-            className={`w-full rounded-full border px-4 py-3 focus:outline-none ${getFieldStyle("title")}`}
+            className={getFieldStyle("title") + " w-full px-4 py-3"}
+            isError={!!getErrorMessage("title") || !!forceTitleMaxError}
           />
-          <div className="flex justify-between items-center mt-1">
+          <div className="flex justify-between items-center mt-2">
             {(getErrorMessage("title") || forceTitleMaxError) && (
               <p className="text-red-500 text-sm">{getErrorMessage("title") || VALIDATION_MESSAGES.TITLE_MAX}</p>
             )}
@@ -381,12 +384,12 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
           <span className="text-sm text-gray-500 ml-2">(10자 이상 50자 이하)</span>
         </label>
         <div className="w-full">
-          <textarea
-            id="description"
+          <TextArea
             value={description}
             onChange={handleDescriptionChange}
             placeholder="프로젝트에 대한 간략한 설명을 입력하세요"
-            className={`w-full rounded-3xl border px-4 py-3 min-h-[150px] focus:outline-none ${getFieldStyle("description")}`}
+            className={getFieldStyle("description") + " w-full px-4 py-3 min-h-[150px]"}
+            isError={!!getErrorMessage("description") || !!forceDescriptionMaxError}
           />
           <div className="flex justify-between items-center mt-1">
             {(getErrorMessage("description") || forceDescriptionMaxError) && (
@@ -506,7 +509,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
               </ul>
             </div>
           </div>
-          {getErrorMessage("images") && <p className="text-red-500 text-sm mt-1">{getErrorMessage("images")}</p>}
+          {getErrorMessage("images") && <p className="text-red-500 text-sm mt-2">{getErrorMessage("images")}</p>}
         </div>
       </div>
 
@@ -520,18 +523,20 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
         </div>
 
         <div className="w-full max-w-md flex items-center">
-          <input
+          <TextInput
             id="targetAmount"
-            type="text"
+            designType="outline-rect"
             value={formatAmount(targetAmount)}
             onChange={handleAmountChange}
             placeholder="0"
-            className={`w-full rounded-full border px-4 py-3 focus:outline-none text-right ${getFieldStyle("targetAmount")}`}
+            className={getFieldStyle("targetAmount") + " w-full px-4 py-3 text-right"}
+            isError={!!getErrorMessage("targetAmount") || !!forceTargetAmountMaxError}
+            align="right"
           />
           <span className="ml-2 text-lg">원</span>
         </div>
         {(getErrorMessage("targetAmount") || forceTargetAmountMaxError) && (
-          <p className="text-red-500 text-sm">{getErrorMessage("targetAmount") || VALIDATION_MESSAGES.TARGET_AMOUNT_MAX}</p>
+          <p className="text-red-500 text-sm mt-2">{getErrorMessage("targetAmount") || VALIDATION_MESSAGES.TARGET_AMOUNT_MAX}</p>
         )}
       </div>
 

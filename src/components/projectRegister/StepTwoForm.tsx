@@ -9,6 +9,8 @@ import { PrimaryButton } from "../common/Button"
 import gsap from "gsap"
 import Modal from "../common/Modal"
 import ScheduleDetailsDialog from "./modals/ScheduleDetailsDialog"
+import { TextInput } from "@/components/common/Input"
+import TextArea from "@/components/common/TextArea"
 
 // 예산 항목 타입
 interface BudgetItem {
@@ -309,8 +311,7 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown, isEdi
                             <span className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full mr-2">
                               {index + 1}
                             </span>
-                            <input
-                              type="text"
+                            <TextInput
                               value={item.name}
                               onChange={(e) => handleBudgetNameChange(item.id, e.target.value)}
                               placeholder="항목명"
@@ -354,24 +355,24 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown, isEdi
                             <div className="ml-4 flex items-center">
                               {item.isPercentage ? (
                                 <div className="flex items-center">
-                                  <input
-                                    type="text"
+                                  <TextInput
                                     value={item.percentage?.replace("%", "") || ""}
                                     onChange={(e) => handleBudgetPercentageChange(item.id, e.target.value)}
                                     placeholder="0"
                                     className="w-24 rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none text-right"
+                                    align="right"
                                   />
                                   <span className="ml-2">%</span>
                                   <span className="ml-4 text-gray-500">({item.amount}원)</span>
                                 </div>
                               ) : (
                                 <div className="flex items-center">
-                                  <input
-                                    type="text"
+                                  <TextInput
                                     value={item.amount}
                                     onChange={(e) => handleBudgetAmountChange(item.id, e.target.value)}
                                     placeholder="0"
                                     className="w-40 rounded-full border border-gray-300 px-4 py-3 focus:border-main-color focus:outline-none text-right"
+                                    align="right"
                                   />
                                   <span className="ml-2">원</span>
                                   <span className="ml-4 text-gray-500">(전체의 {item.percentage})</span>
