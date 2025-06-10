@@ -239,7 +239,7 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown, isEdi
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center">
               <h2 className="text-xl font-bold">자동 채우기</h2>
-              <span className="ml-3 text-gray-500 text-sm">* 상품 상세 설명에 내용을 자동으로 채웁니다.</span>
+              <span className="ml-3 text-gray-500 text-sm">* 프로젝트 상세 설명에 내용을 자동으로 채웁니다.</span>
             </div>
             <PrimaryButton
               type="button"
@@ -524,7 +524,7 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown, isEdi
 
       {/* 마크다운 에디터 */}
       <div className="flex flex-col mt-8">
-        <h2 className="text-xl font-bold mb-4">상품 상세 설명</h2>
+        <h2 className="text-xl font-bold mb-4">프로젝트 상세 설명</h2>
           <MarkdownEditor value={markdown} onChange={handleMarkdownChange} />
       </div>
 

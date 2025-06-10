@@ -308,7 +308,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       {/* 카테고리 선택 - 세로 배치로 변경 */}
       <div className="flex flex-col">
         <label htmlFor="category" className="text-xl font-bold mb-4">
-          카테고리 선택 <span className="text-red-500">*</span>
+          카테고리 선택
         </label>
         <div className="w-full max-w-md">
           <div className="relative">
@@ -350,10 +350,10 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
         </div>
       </div>
 
-      {/* 상품 제목 - 세로 배치로 변경 */}
+      {/* 프로젝트 제목 - 세로 배치로 변경 */}
       <div className="flex flex-col">
         <label htmlFor="title" className="text-xl font-bold mb-4">
-          상품 제목 <span className="text-red-500">*</span>
+          프로젝트 제목
           <span className="text-sm text-gray-500 ml-2">(25자 이하)</span>
         </label>
         <div className="w-full">
@@ -362,7 +362,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
             type="text"
             value={title}
             onChange={handleTitleChange}
-            placeholder="상품명을 입력해 주세요."
+            placeholder="프로젝트 이름을 지어주세요"
             className={`w-full rounded-full border px-4 py-3 focus:outline-none ${getFieldStyle("title")}`}
           />
           <div className="flex justify-between items-center mt-1">
@@ -374,10 +374,10 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
         </div>
       </div>
 
-      {/* 상품 요약 - 세로 배치로 변경 */}
+      {/* 프로젝트 요약 - 세로 배치로 변경 */}
       <div className="flex flex-col">
         <label htmlFor="description" className="text-xl font-bold mb-4">
-          상품 요약 <span className="text-red-500">*</span>
+          프로젝트 요약
           <span className="text-sm text-gray-500 ml-2">(10자 이상 50자 이하)</span>
         </label>
         <div className="w-full">
@@ -385,7 +385,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
             id="description"
             value={description}
             onChange={handleDescriptionChange}
-            placeholder="상품에 대한 간략한 설명을 입력하세요"
+            placeholder="프로젝트에 대한 간략한 설명을 입력하세요"
             className={`w-full rounded-3xl border px-4 py-3 min-h-[150px] focus:outline-none ${getFieldStyle("description")}`}
           />
           <div className="flex justify-between items-center mt-1">
@@ -401,7 +401,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       <div className="flex flex-col">
         <div className="flex items-center mb-4">
           <h3 className="text-xl font-bold">
-            대표 이미지 <span className="text-red-500">*</span>
+            대표 이미지
           </h3>
         </div>
         <div className="w-full">
@@ -514,7 +514,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       <div className="flex flex-col">
         <div className="flex items-center mb-4">
           <h3 className="text-xl font-bold">
-            목표 금액 <span className="text-red-500">*</span>
+            목표 금액
           </h3>
           <span className="text-sm text-gray-500 ml-4">* 최대 10억 원까지 입력 가능합니다.</span>
         </div>
@@ -539,7 +539,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       <div className="flex flex-col">
         <div className="flex items-center mb-4">
           <h3 className="text-xl font-bold">
-            펀딩 일정 <span className="text-red-500">*</span>
+            펀딩 일정
           </h3>
           <span className="text-sm text-gray-500 ml-4">* 펀딩 시작일은 오늘의 일주일 뒤부터 선택 가능합니다.</span>
         </div>
@@ -570,7 +570,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       <div className="flex flex-col">
         <div className="flex items-center mb-4">
           <h3 className="text-xl font-bold">
-            배송 예정일 <span className="text-red-500">*</span>
+            배송 예정일
           </h3>
           <span className="text-sm text-gray-500 ml-4">* 펀딩 종료일의 일주일 뒤부터 선택 가능합니다.</span>
         </div>
