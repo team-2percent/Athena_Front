@@ -761,14 +761,15 @@ const DonateDock = () => {
       {canDonate(projectData) && (
         <div className="fixed bottom-0 left-0 z-4 w-full">
           <div className="mx-auto max-w-6xl px-4">
-            <PrimaryButton
+            <button
+              type="button"
               onClick={toggleDock}
               className="mx-auto flex w-40 items-center justify-center rounded-t-xl bg-white py-3 shadow-lg"
-              ariaLabel="후원하기"
+              aria-label="후원하기"
             >
               <ChevronUp className="mr-2 h-6 w-6 text-sub-gray" />
               <span className="text-lg font-medium text-gray-800">후원하기</span>
-            </PrimaryButton>
+            </button>
           </div>
         </div>
       )}
