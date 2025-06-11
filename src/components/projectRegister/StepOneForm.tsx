@@ -12,6 +12,7 @@ import { VALIDATION_MESSAGES } from "@/lib/validationMessages"
 import { TextInput } from "@/components/common/Input"
 import TextArea from "@/components/common/TextArea"
 import Dropdown, { DropdownOption } from "@/components/common/Dropdown"
+import { formatNumberWithComma, parseNumberInput, removeLeadingZeros, limitNumber, formatDate } from "@/lib/utils"
 
 interface StepOneFormProps {
   onUpdateFormData: (data: Partial<any>) => void
@@ -124,12 +125,6 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       setForceTargetAmountMaxError(false)
       onUpdateFormData({ targetAmount: value })
     }
-  }
-
-  // 천 단위 콤마 포맷팅
-  const formatAmount = (amount: string) => {
-    if (!amount) return ""
-    return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
   }
 
   // 시작일 변경 핸들러
@@ -359,13 +354,14 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
           프로젝트 요약
           <span className="text-sm text-gray-500 ml-2">(10자 이상 50자 이하)</span>
         </label>
-        <div className="w-full">
+        <div className="w-full" data-cy="project-description">
           <TextArea
             value={description}
             onChange={handleDescriptionChange}
             placeholder="프로젝트에 대한 간략한 설명을 입력하세요"
             className={getFieldStyle("description") + " w-full rounded-3xl border px-4 py-3 min-h-[150px]"}
             isError={!!getErrorMessage("description") || !!forceDescriptionMaxError}
+            
           />
           <div className="flex justify-between items-center mt-1">
             {(getErrorMessage("description") || forceDescriptionMaxError) && (
@@ -502,7 +498,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
           <TextInput
             id="targetAmount"
             designType="outline-round"
-            value={formatAmount(targetAmount)}
+            value={formatNumberWithComma(targetAmount)}
             onChange={handleAmountChange}
             placeholder="0"
             className={getFieldStyle("targetAmount") + " w-full px-4 py-3 text-right"}

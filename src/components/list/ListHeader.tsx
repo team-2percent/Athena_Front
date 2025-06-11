@@ -63,7 +63,7 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
 
         {/* 필터 드롭다운 */}
         {sort && (
-          <div className="min-w-[120px]">
+          <div className="min-w-[120px]" data-cy="list-header-sort-button">
             <Dropdown
               options={type !== "new" ? listType[type].sort.map((option) => ({ label: sortName[option as keyof typeof sortName], value: option })) : []}
               value={sort}

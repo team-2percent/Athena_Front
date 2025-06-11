@@ -11,6 +11,7 @@ import Modal from "../common/Modal"
 import ScheduleDetailsDialog from "./modals/ScheduleDetailsDialog"
 import { TextInput } from "@/components/common/Input"
 import TextArea from "@/components/common/TextArea"
+import { formatNumberWithComma, formatDate } from "@/lib/utils"
 
 // 예산 항목 타입
 interface BudgetItem {
@@ -37,19 +38,6 @@ interface ScheduleDetailsDialogProps {
   details: string
   onSave: (details: string) => void
   scheduleIndex: number
-}
-
-// 날짜를 YYYY. MM. DD. 형식으로 포맷팅 (한국 시간 기준)
-const formatDate = (date: Date): string => {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, "0")
-  const day = String(date.getDate()).padStart(2, "0")
-  return `${year}. ${month}. ${day}.`
-}
-
-// 천 단위 콤마 포맷팅
-const formatNumber = (value: string) => {
-  return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
 // 인터페이스에 isEditMode 속성 추가
@@ -143,7 +131,7 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown, isEdi
     // 숫자만 입력 가능하도록 처리
     const numericValue = amount.replace(/[^0-9]/g, "")
     // 천 단위 콤마 포맷팅
-    const formattedValue = numericValue ? formatNumber(numericValue) : ""
+    const formattedValue = numericValue ? formatNumberWithComma(numericValue) : ""
 
     // Calculate percentage based on total budget
     const totalNumeric = totalBudget.replace(/[^0-9]/g, "")
@@ -172,7 +160,7 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown, isEdi
     let amount = ""
     if (numericValue && totalNumeric) {
       const amountValue = Math.round((Number.parseInt(numericValue) / 100) * Number.parseInt(totalNumeric))
-      amount = formatNumber(amountValue.toString())
+      amount = formatNumberWithComma(amountValue.toString())
     }
 
     setBudgetItems(
@@ -210,7 +198,7 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown, isEdi
     // 예산 계획 마크다운 생성 - "자동 채우기 사용" 옵션일 때만 추가
     if (budgetInputMethod === "form") {
       result += "## 예산 계획\n\n"
-      result += `**설정한 목표 금액**: ${formatNumber(totalBudget)}원\n\n`
+      result += `**설정한 목표 금액**: ${formatNumberWithComma(totalBudget)}원\n\n`
       result += "| 항목 | 금액 | 비율 |\n"
       result += "|------|------|------|\n"
       budgetItems.forEach((item) => {
@@ -298,7 +286,7 @@ export default function StepTwoForm({ targetAmount = "", onUpdateMarkdown, isEdi
                     <div className="mb-6 flex items-center">
                       <span className="text-lg font-medium mr-4">설정한 목표 금액</span>
                       <div className="flex items-center">
-                        <span className="font-bold text-xl">{formatNumber(totalBudget)}원</span>
+                        <span className="font-bold text-xl">{formatNumberWithComma(totalBudget)}원</span>
                         <span className="ml-4 text-gray-500">* 기본 정보의 목표 금액과 동일합니다.</span>
                       </div>
                     </div>
