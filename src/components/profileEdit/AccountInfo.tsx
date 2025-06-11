@@ -10,6 +10,7 @@ import { ACCOUNT_HOLDER_MAX_LENGTH, BANK_ACCOUNT_MAX_LENGTH, BANK_NAME_MAX_LENGT
 import InputInfo from "../common/InputInfo"
 import { accountAddSchema, accountHolderSchema, bankAccountSchema, bankNameSchema } from "@/lib/validationSchemas"
 import useErrorToastStore from "@/stores/useErrorToastStore"
+import { getValidatedString, validate } from "@/lib/validationUtil"
 
 interface AccountInfo {
     id: number
@@ -86,42 +87,42 @@ export default function AccountInfo() {
     })
   }
 
-  // 새 계좌 정보 변경 핸들러
-  const validateAccount = (name: string, value: string) => {
-    let returnValue = ""
-    let error = ""
-
-    if (name === "accountHolder") {
-      const result = accountHolderSchema.safeParse(value)
-      returnValue = result.success ? value : value.slice(0, ACCOUNT_HOLDER_MAX_LENGTH)
-      error = result.error?.issues[0].message || ""
-    } else if (name === "bankName") {
-      const result = bankNameSchema.safeParse(value)
-      returnValue = result.success ? value : value.slice(0, BANK_NAME_MAX_LENGTH)
-      error = result.error?.issues[0].message || ""
-    } else if (name === "bankAccount") {
-      const result = bankAccountSchema.safeParse(value)
-      returnValue = result.success ? value : value.slice(0, BANK_ACCOUNT_MAX_LENGTH).replace(/[^0-9]/g, "")
-      error = result.error?.issues[0].message || ""
-    }
-
-    return {
-      value: returnValue,
-      error: error
-    }
-  }
-
   const handleNewAccountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    const { value: returnValue, error } = validateAccount(name, value)
-    setNewAccount(prev => ({
-      ...prev,
-      [name]: returnValue,
-    }))
-    setAccountAddError(prev => ({
-      ...prev,
-      [name]: error
-    }))
+    if (name === "accountHolder") {
+      const result = validate(value, accountHolderSchema)
+      if (result.error) {
+        setAccountAddError({ ...accountAddError, accountHolder: result.message })
+      } else {
+        setAccountAddError({ ...accountAddError, accountHolder: "" })
+      }
+      setNewAccount(prev => ({
+        ...prev,
+        accountHolder: getValidatedString(value, ACCOUNT_HOLDER_MAX_LENGTH),
+      }))
+    } else if (name === "bankName") {
+      const result = validate(value, bankNameSchema)
+      if (result.error) {
+        setAccountAddError({ ...accountAddError, bankName: result.message })
+      } else {
+        setAccountAddError({ ...accountAddError, bankName: "" })
+      }
+      setNewAccount(prev => ({
+        ...prev,
+        bankName: getValidatedString(value, BANK_NAME_MAX_LENGTH),
+      }))
+    } else if (name === "bankAccount") {
+      const result = validate(value, bankAccountSchema)
+      if (result.error) {
+        setAccountAddError({ ...accountAddError, bankAccount: result.message })
+      } else {
+        setAccountAddError({ ...accountAddError, bankAccount: "" })
+      }
+      setNewAccount(prev => ({
+        ...prev,
+        bankAccount: getValidatedString(value, BANK_ACCOUNT_MAX_LENGTH),
+      }))
+    }
   }
 
   // 계좌 추가 핸들러
