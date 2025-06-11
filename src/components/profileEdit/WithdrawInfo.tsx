@@ -1,4 +1,5 @@
 import React from "react"
+import { DangerButton } from "../common/Button"
 
 export default function WithdrawInfo() {
     return (
@@ -14,13 +15,12 @@ export default function WithdrawInfo() {
                 <li>탈퇴 후 동일 이메일로 재가입이 제한될 수 있습니다.</li>
                 <li>탈퇴 시 개인정보 및 계좌 정보가 모두 삭제됩니다.</li>
             </ul>
-            <button
-                type="button"
-                className="mt-4 px-8 py-3 rounded-xl bg-red-500 text-white font-bold text-lg hover:bg-red-600 transition"
+            <DangerButton
+                className="mt-4 px-8 py-3 rounded-xl font-bold text-lg transition"
                 disabled
             >
                 회원 탈퇴 (준비중)
-            </button>
+            </DangerButton>
         </div>
     )
 } 
