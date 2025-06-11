@@ -8,7 +8,7 @@ import ConfirmModal from "@/components/common/ConfirmModal"
 import { useApi } from "@/hooks/useApi"
 import TimePicker from "@/components/common/TimePicker"
 import OverlaySpinner from "@/components/common/OverlaySpinner"
-import { PrimaryButton } from "@/components/common/Button"
+import { GhostButton, PrimaryButton } from "@/components/common/Button"
 import { NumberInput, TextInput } from "@/components/common/Input"
 import TextArea from "@/components/common/TextArea"
 import { COUPON_CONTENT_MAX_LENGTH, COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR, COUPON_EVENT_START_TO_END_MIN_HOUR, COUPON_NAME_MAX_LENGTH, COUPON_PRICE_MAX_NUMBER, COUPON_STOCK_MAX_NUMBER } from "@/lib/validationConstant"
@@ -177,10 +177,10 @@ export default function CouponRegisterPage() {
                 isLoading && <OverlaySpinner message="쿠폰 등록 중입니다." />
             }
                 <div className="flex w-full">
-                <button className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.push("/admin/coupon")}>
+                <GhostButton onClick={() => router.push("/admin/coupon")} className="flex gap-1 items-center">
                     <ArrowLeftIcon className="w-4 h-4" />
                     목록으로
-                </button>
+                </GhostButton>
                 </div>
                 <h2 className="text-2xl font-medium border-b pb-2">쿠폰 등록</h2>
                 <div className="flex flex-col gap-4">
