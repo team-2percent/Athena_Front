@@ -79,10 +79,11 @@ export const Large: Story = {
 
 export const Loading: Story = {
   args: {
+    variant: 'primary',
     isLoading: true,
-    children: '버튼',
-  },
-};
+    children: '로그인',
+  }
+}
 
 export const Disabled: Story = {
   args: {
