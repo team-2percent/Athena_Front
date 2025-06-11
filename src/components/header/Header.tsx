@@ -16,7 +16,7 @@ import { useApi } from "@/hooks/useApi";
 import MenuTab from "../common/MenuTab"
 import { getFCMToken } from '@/lib/firebase';
 import useToastStore from "@/stores/useToastStore";
-import { GhostButton } from "../common/Button"
+import { GhostButton, GhostPrimaryButton } from "../common/Button"
 
 const nameToPath: Record<string, string> = {
   "전체": "",
@@ -313,14 +313,14 @@ const Header = () => {
                 </div>
               </>
             ) : (
-              <div className="text-main-color font-medium mr-auto flex items-center gap-2 whitespace-nowrap">
-                <button type="button" aria-label="로그인" onClick={openLoginModal} data-cy="open-login-modal-button">
+              <div className="text-main-color font-medium mr-auto flex items-center gap-1 whitespace-nowrap">
+                <GhostPrimaryButton ariaLabel="로그인" onClick={openLoginModal} dataCy="open-login-modal-button" className="px-2 py-1">
                   로그인
-                </button>
+                </GhostPrimaryButton>
                 /
-                <button type="button" aria-label="로그인" onClick={openSignupModal} data-cy="open-signup-modal-button">
+                <GhostPrimaryButton ariaLabel="회원가입" onClick={openSignupModal} dataCy="open-signup-modal-button" className="px-2 py-1">
                   회원가입
-                </button>
+                </GhostPrimaryButton>
               </div>
             )}
           </div>
