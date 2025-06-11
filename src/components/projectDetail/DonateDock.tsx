@@ -1103,7 +1103,7 @@ const DonateDock = () => {
               {step === 1 ? (
                 <div className="flex justify-end">
                   <PrimaryButton
-                    data-cy="donate-next-step"
+                    dataCy="donate-next-step"
                     className={`w-full md:w-auto rounded-lg md:rounded-xl px-6 md:px-8 py-3 md:py-4 text-sm md:text-base font-medium ${
                       selectedOptions.length > 0
                         ? "bg-main-color text-white hover:bg-secondary-color-dark"

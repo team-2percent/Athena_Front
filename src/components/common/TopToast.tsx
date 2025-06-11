@@ -45,7 +45,7 @@ export default function TopToast({ title, body, duration = 5000, onClose, classN
   }, [isVisible, isMounted, onClose]);
 
   const toastClasses = `
-    fixed top-4 right-4 z-50 // 우측 상단 고정, top/right 여백도 늘림
+    fixed top-4 right-4 z-60 // 우측 상단 고정, top/right 여백도 늘림
     w-88 // 너비 확장 (기존 w-80 → w-96)
     rounded-xl shadow-2xl // 더 둥글고 그림자 강조
     pointer-events-auto
