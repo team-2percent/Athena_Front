@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs"
 import { Input, TextInput, NumberInput, PasswordInput, EmailInput } from "../components/common/Input"
 import { z } from "zod"
 import { useState } from "react"
+import { getRidOfNonNumber, getRidOfZero } from "@/lib/utils"
 
 const meta = {
   title: "Common/Input",
@@ -219,5 +220,25 @@ export const EmailInputWithValidation: Story = {
         )}
       </div>
     )
+  },
+}
+
+export const NumberNotStartWithZero: Story = {
+  args: {
+    type: "number",
+    value: 0,
+    onChange: () => {},
+    placeholder: "0-100 사이의 숫자",
+    designType: "outline-rect",
+  },
+  render: (args) => { 
+    const [value, setValue] = useState("0")
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = +getRidOfZero(e.target.value)
+      setValue(value.toString())
+    }
+
+    return <NumberInput {...args} value={value} onChange={handleChange} />
   },
 }
