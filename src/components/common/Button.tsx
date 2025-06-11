@@ -30,6 +30,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   rightIcon?: ReactNode
   className?: string
   dataCy?: string
+  ariaLabel?: string
 }
 
 // 기본 버튼 컴포넌트
@@ -44,6 +45,7 @@ export const Button = ({
   className,
   disabled,
   dataCy,
+  ariaLabel,
   ...props
 }: ButtonProps) => {
   // disabled 상태에 따라 variant 조정
@@ -62,8 +64,8 @@ export const Button = ({
     "primary-disabled": "bg-primary-disabled text-primary-disabled-foreground cursor-not-allowed border-transparent",
     "secondary-disabled": "bg-secondary-disabled text-secondary-disabled-foreground cursor-not-allowed border-transparent",
     outline: "bg-transparent hover:bg-background text-text border-border",
-    ghost: "bg-transparent hover:bg-gray-50 text-gray-400 border-transparent",
-    ghostDanger: "bg-transparent hover:bg-red-50 text-gray-400 hover:text-red-500 border-transparent",
+    ghost: "bg-transparent hover:bg-gray-400/10 text-gray-400 border-transparent",
+    ghostDanger: "bg-transparent hover:bg-red-400/10 text-gray-400 hover:text-red-500 border-transparent",
     danger: "bg-red-500 text-white hover:bg-red-600",
 
   }
@@ -92,7 +94,7 @@ export const Button = ({
   )
 
   return (
-    <button className={buttonClasses} disabled={disabled || isLoading} data-cy={dataCy} {...props}>
+    <button className={buttonClasses} disabled={disabled || isLoading} data-cy={dataCy} aria-label={ariaLabel} {...props}>
       {isLoading && (
         <svg
           className="animate-spin mx-auto h-4 w-4 text-current"
