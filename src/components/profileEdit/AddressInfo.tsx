@@ -102,17 +102,7 @@ export default function AddressInfo() {
     const handleChangeDetailAddress = (e: React.ChangeEvent<HTMLInputElement>) => { 
         const addressResult = validate(newAddress.address, addressSchema)
         const detailResult = validate(e.target.value, addressDetailSchema)
-
-        if (addressResult.error) {
-            setAddressAddError({ ...addressAddError, address: addressResult.message })
-        } else {
-            setAddressAddError({ ...addressAddError, address: "" })
-        }
-        if (detailResult.error) {
-            setAddressAddError({ ...addressAddError, detailAddress: detailResult.message })
-        } else {
-            setAddressAddError({ ...addressAddError, detailAddress: "" })
-        }
+        setAddressAddError(prev => ({ ...prev, address: addressResult.message, detailAddress: detailResult.message }))
         setNewAddress(prev => ({
             ...prev,
             detailAddress: getValidatedString(e.target.value, ADDRESS_DETAIL_MAX_LENGTH),

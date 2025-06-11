@@ -175,12 +175,10 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
 
     const handleChangeNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
         const result = validate(e.target.value, nicknameSchema)
-        if (result.error) {
-            setProfileEditError(prev => ({
-                ...prev,
-                nickname: result.message
-            }))
-        }
+        setProfileEditError(prev => ({
+            ...prev,
+            nickname: result.message
+        }))
         setProfile(prev => ({
             ...prev,
             nickname: getValidatedString(e.target.value, NICKNAME_MAX_LENGTH)
@@ -209,12 +207,10 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
 
     const handleChangeSellerDescription = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const result = validate(e.target.value, sellerDescriptionSchema)
-        if (result.error) {
-            setProfileEditError(prev => ({
-                ...prev,
-                sellerDescription: result.message
-            }))
-        }
+        setProfileEditError(prev => ({
+            ...prev,
+            sellerDescription: result.message
+        }))
         setProfile(prev => ({
             ...prev,
             sellerDescription: getValidatedString(e.target.value, SELLER_DESCRIPTION_MAX_LENGTH)
@@ -226,12 +222,10 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
             url: e.target.value,
             linkUrl: profile.linkUrls.join(",")
         }, profileUrlSchema)
-        if (result.error) {
-            setProfileEditError(prev => ({
-                ...prev,
-                urls: result.message
-            }))
-        }
+        setProfileEditError(prev => ({
+            ...prev,
+            urls: result.message
+        }))
         const limitBytes = LINK_URLS_MAX_BYTE - getByteLength(profile.linkUrls.join(","))
         setNewUrl(getValidatedStringByte(e.target.value, limitBytes))
     }
