@@ -1,3 +1,5 @@
+import { listType, sortName } from '../../src/lib/listConstant';
+
 describe("마감 임박 프로젝트 목록", () => {
     beforeEach(() => {
         cy.fixture('list/projectList.json').then((projectList) => {
@@ -131,13 +133,13 @@ describe("마감 임박 프로젝트 목록", () => {
             cy.get('[data-cy="list-header-sort-button"]').should('contain', '마감순').click()
 
             cy.get('[data-cy="list-header-sort-dropdown"]').should('be.visible')
-            cy.get('[data-cy="list-header-sort-DEADLINE"]').should('be.visible')
-            cy.get('[data-cy="list-header-sort-DEADLINE_POPULAR"]').should('be.visible')
-            cy.get('[data-cy="list-header-sort-DEEADLINE_SUCCESS_RATE"]').should('be.visible')
+            listType.deadline.sort.forEach((sortKey: string) => {
+                cy.get('[data-cy="list-header-sort-dropdown"]').contains(sortName[sortKey as keyof typeof sortName]).should('be.visible')
+            })
         })
 
         it("정렬 변경 성공", () => {
-            cy.get('[data-cy="list-header-sort-DEADLINE_POPULAR"]').click()
+            cy.get('[data-cy="list-header-sort-dropdown"]').contains(sortName["POPULAR"]).click()
 
             cy.wait('@getDeadlineProjectList').its('response.statusCode').should('eq', 200)
 
@@ -153,7 +155,7 @@ describe("마감 임박 프로젝트 목록", () => {
                 statusCode: 500
             }).as('getNextDeadlineProjectList')
 
-            cy.get('[data-cy="list-header-sort-DEADLINE_POPULAR"]').click()
+            cy.get('[data-cy="list-header-sort-dropdown"]').contains(sortName["POPULAR"]).click()
 
             cy.wait('@getNextDeadlineProjectList').its('response.statusCode').should('eq', 500)
 

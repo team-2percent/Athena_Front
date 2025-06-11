@@ -71,6 +71,7 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
               placeholder="정렬 순서"
               className="text-main-color"
               designType="borderless"
+              dataCy="list-header-sort-dropdown"
             />
           </div>
         )}

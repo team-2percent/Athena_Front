@@ -14,6 +14,7 @@ interface DropdownProps {
   disabled?: boolean
   className?: string
   designType?: "default" | "borderless"
+  dataCy?: string
 }
 
 export default function Dropdown({
@@ -24,6 +25,7 @@ export default function Dropdown({
   disabled = false,
   className = "",
   designType = "default",
+  dataCy
 }: DropdownProps) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -61,7 +63,7 @@ export default function Dropdown({
         <ChevronDown className="h-5 w-5" />
       </button>
       {open && options.length > 0 && (
-        <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl bg-white shadow-lg z-50 border border-gray-300">
+        <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl bg-white shadow-lg z-50 border border-gray-300" {...(dataCy ? { 'data-cy': dataCy } : {})}>
           {options.map((opt) => (
             <div
               key={opt.value}

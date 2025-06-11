@@ -1,3 +1,5 @@
+import { listType, sortName } from '../../src/lib/listConstant';
+
 describe("카테고리 프로젝트 목록", () => {
     beforeEach(() => {
         cy.fixture('list/category.json').then((categoryList) => {
@@ -257,21 +259,21 @@ describe("카테고리 프로젝트 목록", () => {
 
             cy.wait('@getCategoryProjectList').its('response.statusCode').should('eq', 200)
 
-            cy.get('[data-cy="list-header-sort-button"]').should('contain', '최신순').click()
+            cy.get('[data-cy="list-header-sort-button"]').should('contain', sortName["LATEST"]).click()
 
             cy.get('[data-cy="list-header-sort-dropdown"]').should('be.visible')
-            cy.get('[data-cy="list-header-sort-LATEST"]').should('be.visible')
-            cy.get('[data-cy="list-header-sort-POPULAR"]').should('be.visible')
-            cy.get('[data-cy="list-header-sort-SUCCESS_RATE"]').should('be.visible')
+            listType.category.sort.forEach((sortKey: string) => {
+              cy.get('[data-cy="list-header-sort-dropdown"]').contains(sortName[sortKey as keyof typeof sortName]).should('be.visible');
+            });
         })
 
         it("정렬 변경 성공", () => {
-            cy.get('[data-cy="list-header-sort-POPULAR"]').click()
+            cy.get('[data-cy="list-header-sort-dropdown"]').contains(sortName["POPULAR"]).click()
 
             cy.wait('@getCategoryProjectList').its('response.statusCode').should('eq', 200)
 
             cy.get('[data-cy="list-header-sort-dropdown"]').should('not.exist')
-            cy.get('[data-cy="list-header-sort-button"]').should('contain', '인기순')
+            cy.get('[data-cy="list-header-sort-button"]').should('contain', sortName["POPULAR"])
         })
 
         it("서버 오류로 인한 정렬 변경 실패", () => {
@@ -282,7 +284,7 @@ describe("카테고리 프로젝트 목록", () => {
                 statusCode: 500
             }).as('getNextCategoryProjectList')
 
-            cy.get('[data-cy="list-header-sort-POPULAR"]').click()
+            cy.get('[data-cy="list-header-sort-dropdown"]').contains(sortName["POPULAR"]).click()
 
             cy.wait('@getNextCategoryProjectList').its('response.statusCode').should('eq', 500)
 
@@ -290,7 +292,7 @@ describe("카테고리 프로젝트 목록", () => {
             cy.get('[data-cy="server-error-card"]').should('be.visible')
             cy.get('[data-cy="server-error-message"]').should('be.visible').should('contain', '프로젝트를 불러오는 중 오류가 발생했습니다. 다시 시도 해주세요.')
             cy.get('[data-cy="list-header-sort-dropdown"]').should('not.exist')
-            cy.get('[data-cy="list-header-sort-button"]').should('contain', '인기순')
+            cy.get('[data-cy="list-header-sort-button"]').should('contain', sortName["POPULAR"])
         })
     })
 })
