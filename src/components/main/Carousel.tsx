@@ -57,13 +57,19 @@ export default function Carousel({ projects, isLoading }: { projects: MainProjec
     setIsAnimating(true);
     const cardWidth = cardRef.current ? cardRef.current.offsetWidth : 0;
     const move = -(cardWidth + GAP) * dir;
+
+    // 1. 상태 먼저 변경
+    setCurrentIndex((prev) => getIndex(prev + dir));
+
+    // 2. 컨테이너를 반대 방향으로 미리 이동
+    gsap.set(containerRef.current, { x: -move });
+
+    // 3. 애니메이션으로 x=0까지 이동
     gsap.to(containerRef.current, {
-      x: move,
+      x: 0,
       duration,
       ease: "power2.inOut",
       onComplete: () => {
-        setCurrentIndex((prev) => getIndex(prev + dir));
-        gsap.set(containerRef.current, { x: 0 });
         setIsAnimating(false);
         if (onComplete) onComplete();
       }
