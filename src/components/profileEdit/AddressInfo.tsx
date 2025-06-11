@@ -12,6 +12,7 @@ import { ADDRESS_DETAIL_MAX_LENGTH } from "@/lib/validationConstant"
 import { addressAddSchema, addressDetailSchema, addressSchema } from "@/lib/validationSchemas"
 import InputInfo from "../common/InputInfo"
 import useErrorToastStore from "@/stores/useErrorToastStore"
+import { validate, getValidatedString } from "@/lib/validationUtil"
 
 interface AddressInfo {
     id: number
@@ -98,41 +99,13 @@ export default function AddressInfo() {
         setIsAddressModalOpen(true)
     }
 
-    const validateAddress = () => {
-        const result = addressSchema.safeParse(newAddress.address)
-        return result.error ? result.error.issues[0].message : "";
-    }
-
-    const validateDetailAddress = (detailAddress: string) => {
-        const result = addressDetailSchema.safeParse(detailAddress)
-        if (result.success) {
-            return {
-                value: detailAddress,
-                error: ""
-            }
-        } else if (detailAddress.length > ADDRESS_DETAIL_MAX_LENGTH) {
-            return {
-                value: detailAddress.slice(0, ADDRESS_DETAIL_MAX_LENGTH),
-                error: result.error?.issues[0].message
-            }
-        } 
-        return {
-            value: "",
-            error: result.error?.issues[0].message || ""
-        }
-    }
-
     const handleChangeDetailAddress = (e: React.ChangeEvent<HTMLInputElement>) => { 
-        const addressError = validateAddress();
-        const { value, error } = validateDetailAddress(e.target.value)
+        const addressResult = validate(newAddress.address, addressSchema)
+        const detailResult = validate(e.target.value, addressDetailSchema)
+        setAddressAddError(prev => ({ ...prev, address: addressResult.message, detailAddress: detailResult.message }))
         setNewAddress(prev => ({
             ...prev,
-            detailAddress: value,
-        }))
-        setAddressAddError(prev => ({
-            ...prev,
-            address: addressError,
-            detailAddress: error
+            detailAddress: getValidatedString(e.target.value, ADDRESS_DETAIL_MAX_LENGTH),
         }))
     }
 

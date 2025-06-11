@@ -12,6 +12,7 @@ import InputInfo from "../common/InputInfo"
 import { imageSchema, nicknameSchema, profileEditSchema, profileUrlSchema, sellerDescriptionSchema } from "@/lib/validationSchemas"
 import { getByteLength } from "@/lib/utils"
 import useErrorToastStore from "@/stores/useErrorToastStore"
+import { validate, getValidatedString, getValidatedStringByte } from "@/lib/validationUtil"
 
 interface Profile {
     nickname: string
@@ -138,24 +139,6 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
             }
         })
     }
-    
-    // 프로필 이미지 업로드 핸들러
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (file && validateImage(file)) {
-          const reader = new FileReader()
-          reader.onload = (e) => {
-            if (e.target?.result) {
-              setProfile({
-                ...profile,
-                image: e.target.result as string,
-                imageFile: file
-              })
-            }
-          }
-          reader.readAsDataURL(file)
-        }
-    }
 
     // 프로필 이미지 삭제 핸들러
     const handleRemoveImage = () => {
@@ -164,9 +147,7 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
             image: null,
             imageFile: null
         })
-        if (fileInputRef.current) {
-            fileInputRef.current.value = ""
-        }
+        if (fileInputRef.current) fileInputRef.current.value = ""
     }
     
     // 링크 핸들러
@@ -192,84 +173,61 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
         }))
     }
 
-    // 유효성 검사
-    const validateNickname = (nickname: string) => {
-        const result = nicknameSchema.safeParse(nickname)
-        setProfileEditError(prev => ({
-            ...prev,
-            nickname: result.success ? "" : result.error.issues[0].message
-        }))
-
-        return nickname.slice(0, NICKNAME_MAX_LENGTH)
-    }
-
-    const validateImage = (image: File) => {
-        const result = imageSchema.safeParse(image)
-        if (!result.success) {
-            setProfileEditError(prev => ({
-                ...prev,
-                profileImage: result.error.issues[0].message
-            }))
-            return false
-        } 
-        return true
-    }
-
-    const validateSellerDescription = (sellerDescription: string) => {
-        const result = sellerDescriptionSchema.safeParse(sellerDescription)
-
-        setProfileEditError(prev => ({
-            ...prev,
-            sellerDescription: result.error?.issues[0].message || ""
-        }))
-
-        return sellerDescription.slice(0, SELLER_DESCRIPTION_MAX_LENGTH)
-    }
-
-    const validateUrl = (url: string) => {
-        const result = profileUrlSchema.safeParse({
-            url: url,
-            linkUrl: profile.linkUrls.join(",")
-        })
-        return result.success ? "" : result.error?.issues[0].message || ""
-    }
-
     const handleChangeNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const nickname = validateNickname(e.target.value)
+        const result = validate(e.target.value, nicknameSchema)
+        setProfileEditError(prev => ({
+            ...prev,
+            nickname: result.message
+        }))
         setProfile(prev => ({
             ...prev,
-            nickname: nickname
+            nickname: getValidatedString(e.target.value, NICKNAME_MAX_LENGTH)
         }))
+    }
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            const result = validate(file, imageSchema)
+            if (!result.error)  {
+                const reader = new FileReader()
+                reader.onload = (e) => {
+                    if (e.target?.result) {
+                    setProfile({
+                        ...profile,
+                        image: e.target.result as string,
+                        imageFile: file
+                    })
+                    }
+                }
+                reader.readAsDataURL(file)
+            }
+        }
     }
 
     const handleChangeSellerDescription = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const sellerDescription = validateSellerDescription(e.target.value)
+        const result = validate(e.target.value, sellerDescriptionSchema)
+        setProfileEditError(prev => ({
+            ...prev,
+            sellerDescription: result.message
+        }))
         setProfile(prev => ({
             ...prev,
-            sellerDescription: sellerDescription
+            sellerDescription: getValidatedString(e.target.value, SELLER_DESCRIPTION_MAX_LENGTH)
         }))
     }
 
     const handleChangeUrl = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const message = validateUrl(e.target.value)
+        const result = validate({
+            url: e.target.value,
+            linkUrl: profile.linkUrls.join(",")
+        }, profileUrlSchema)
         setProfileEditError(prev => ({
             ...prev,
-            urls: message
+            urls: result.message
         }))
-        
-        const currentUrlsBytes = getByteLength(profile.linkUrls.join(","))
-        const newUrlBytes = getByteLength(e.target.value)
-        
-        if (newUrlBytes + currentUrlsBytes > LINK_URLS_MAX_BYTE - 1) {
-            // 바이트 제한을 초과하지 않는 최대 길이 찾기
-            let slicedUrl = e.target.value
-            while (getByteLength(slicedUrl) + currentUrlsBytes > LINK_URLS_MAX_BYTE - 1) {
-                slicedUrl = slicedUrl.slice(0, -1)
-            }
-            setNewUrl(slicedUrl)
-        } else {
-            setNewUrl(e.target.value)
-        }
+        const limitBytes = LINK_URLS_MAX_BYTE - getByteLength(profile.linkUrls.join(","))
+        setNewUrl(getValidatedStringByte(e.target.value, limitBytes))
     }
     
     // 전체 저장 핸들러

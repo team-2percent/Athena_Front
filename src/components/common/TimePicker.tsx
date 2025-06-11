@@ -6,7 +6,7 @@ import clsx from "clsx"
 
 interface TimePickerProps {
   selectedDateTime: Date
-  onChange: (hour: number) => void
+  onChange: (date: Date) => void
   minDateTime?: Date
 }
 
@@ -17,7 +17,7 @@ export default function TimePicker({ selectedDateTime, onChange, minDateTime }: 
 
   const handleTimeSelect = (hour: string) => {
     const koreaHour = Number.parseInt(hour)
-    onChange(koreaHour)
+    onChange(new Date(selectedDateTime.setHours(koreaHour, 0, 0, 0)))
   }
 
   const isBeforeMinTime = (hour: string) => {
