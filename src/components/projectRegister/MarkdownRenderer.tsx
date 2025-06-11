@@ -320,9 +320,6 @@ export default function MarkdownRenderer({ content, markdownImages = [] }: Markd
                       title={title}
                       {...props}
                     />
-                    {alt && (
-                      <span className="block text-center text-sm text-[var(--color-sub-gray)] mt-2 italic">{alt}</span>
-                    )}
                   </>
                 )
               }
@@ -343,9 +340,6 @@ export default function MarkdownRenderer({ content, markdownImages = [] }: Markd
                   title={title}
                   {...props}
                 />
-                {alt && (
-                  <span className="block text-center text-sm text-[var(--color-sub-gray)] mt-2 italic">{alt}</span>
-                )}
               </>
             )
           },
