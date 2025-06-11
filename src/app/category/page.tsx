@@ -2,7 +2,6 @@
 
 import CategoryMenu from "@/components/list/CategoryMenu";
 import ListPage from "@/components/list/ListPage";
-import { useParams } from "next/navigation";
 import { useState } from "react";
 
 export default function CategoryPage() {

@@ -1,6 +1,7 @@
 import { useState } from "react"
 import Modal from "../../common/Modal"
 import { TextInput } from "@/components/common/Input"
+import { PrimaryButton } from "@/components/common/Button"
 
 interface AddAccountModalProps {
   isOpen: boolean
@@ -113,13 +114,12 @@ export default function AddAccountModal({ isOpen, onClose, onSave }: AddAccountM
         </div>
       </div>
       <div className="mt-6 flex justify-end">
-        <button
-          type="button"
+        <PrimaryButton  
           onClick={handleSubmit}
-          className="bg-main-color hover:bg-secondary-color-dark text-white font-bold py-2 px-6 rounded-full"
+          className="py-2 px-6 rounded-full"
         >
           추가하기
-        </button>
+        </PrimaryButton>
       </div>
     </Modal>
   )

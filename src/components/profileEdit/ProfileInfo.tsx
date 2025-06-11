@@ -5,7 +5,7 @@ import { Camera, Check, Plus, X } from "lucide-react"
 import { TextInput } from "../common/Input"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
-import { CancelButton, PrimaryButton, SecondaryButton } from "../common/Button"
+import { CancelButton, DangerButton, PrimaryButton, SecondaryButton } from "../common/Button"
 import { LINK_URLS_MAX_BYTE, NICKNAME_MAX_LENGTH, SELLER_DESCRIPTION_MAX_LENGTH } from "@/lib/validationConstant"
 import TextArea from "../common/TextArea"
 import InputInfo from "../common/InputInfo"
@@ -257,13 +257,12 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                 <div className="flex flex-col items-center bg-white rounded-lg shadow py-6 px-10 space-y-4">
                     <h3 className="text-lg font-medium">프로필 이미지</h3>                            
                     <div className="relative w-fit">
-                        <button
-                            type="button"
-                            className="bg-red-500 p-1 rounded-full absolute top-0 right-0"
+                        <DangerButton
+                            className="p-1 rounded-full absolute top-0 right-0"
                             onClick={handleRemoveImage}
                         >
-                            <X className="h-3 w-3 text-white"/>
-                        </button>
+                            <X className="h-3 w-3"/>
+                        </DangerButton>
                         <div className="relative w-32 h-32 overflow-hidden rounded-full mb-4">
                             {profile.image ? (
                             <img

@@ -4,7 +4,7 @@ import { useApi } from "@/hooks/useApi"
 
 import ConfirmModal from "../common/ConfirmModal"
 import AlertModal from "../common/AlertModal"
-import { PrimaryButton } from "../common/Button"
+import { GhostDangerButton, PrimaryButton } from "../common/Button"
 import { TextInput } from "../common/Input"
 import { ACCOUNT_HOLDER_MAX_LENGTH, BANK_ACCOUNT_MAX_LENGTH, BANK_NAME_MAX_LENGTH } from "@/lib/validationConstant"
 import InputInfo from "../common/InputInfo"
@@ -255,14 +255,13 @@ export default function AccountInfo() {
                         </div>
                         {
                           !account.isDefault &&
-                          <button
-                              type="button"
+                          <GhostDangerButton
                               onClick={() => handleClickDeleteButton(account.id)}
-                              className="text-sub-gray hover:text-red-500"
-                              data-cy="account-delete-button"
+                              className="w-fit h-fit p-2 rounded-full"
+                              dataCy="account-delete-button"
                           >
                               <Trash2 className="w-4 h-4" />
-                          </button>
+                          </GhostDangerButton>
                         }
                         </div>
                     ))}  

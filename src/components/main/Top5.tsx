@@ -5,7 +5,6 @@ import { useApi } from "@/hooks/useApi"
 import { MainProject } from "@/lib/projectInterface"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation";
-import ProjectGridItem from "../common/ProjectGridItem"
 import ProjectOverlayItem from "../common/ProjectOverlayItem"
 import { SecondaryButton } from "../common/Button"
 

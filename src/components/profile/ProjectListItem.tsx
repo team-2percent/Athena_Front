@@ -1,8 +1,6 @@
 "use client"
 
 import type React from "react"
-
-import Image from "next/image"
 import { Heart, Check, Pencil, Trash } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { PrimaryButton, SecondaryButton } from "../common/Button"

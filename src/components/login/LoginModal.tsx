@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
 import Modal from "@/components/common/Modal"
