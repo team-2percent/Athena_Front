@@ -99,7 +99,7 @@ export default function Pagination({ totalPages, currentPage, onPageChange }: Pa
             key={`page-${item.value}`}
             onClick={() => onPageChange(item.value - 1)} // 오류 생길 수 있으니 잘 보고 고쳐주세여...
             className={cn(
-              "w-8 h-8 flex items-center justify-center rounded-full",
+              "min-w-8 w-fit h-8 px-2 flex items-center justify-center rounded-full",
               currentPage + 1 === item.value ? "bg-main-color text-white font-medium" : "text-black hover:bg-gray-100",
             )}
             data-cy="page-button"
