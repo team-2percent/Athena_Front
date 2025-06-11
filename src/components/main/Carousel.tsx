@@ -101,18 +101,21 @@ export default function Carousel({ projects, isLoading }: { projects: MainProjec
   const resetAutoSlide = () => {
     if (autoSlideRef.current) clearInterval(autoSlideRef.current);
     autoSlideRef.current = setInterval(() => {
-      slideTo(1);
+      if (!isAnimating) slideTo(1);
     }, 7000);
   };
 
   // 자동 슬라이드 useEffect
   useEffect(() => {
     if (!projects || projects.length === 0) return;
-    resetAutoSlide();
+    if (autoSlideRef.current) clearInterval(autoSlideRef.current);
+    autoSlideRef.current = setInterval(() => {
+      if (!isAnimating) slideTo(1);
+    }, 7000);
     return () => {
       if (autoSlideRef.current) clearInterval(autoSlideRef.current);
     };
-  }, [currentIndex, CARD_WIDTH, GAP, projects]);
+  }, [CARD_WIDTH, GAP, projects]);
 
   if (!projects || projects.length === 0) {
     return <div className="flex justify-center items-center h-80">로딩 중입니다.</div>
