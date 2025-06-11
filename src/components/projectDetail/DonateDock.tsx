@@ -9,7 +9,7 @@ import { useApi } from "@/hooks/useApi"
 
 // 1. 상단에 AlertModal import 추가
 import AlertModal from "../common/AlertModal"
-import { CancelButton, PrimaryButton } from "../common/Button"
+import { CancelButton, GhostButton, PrimaryButton } from "../common/Button"
 import AddressAddModal from "./AddressAddModal"
 import Modal from "../common/Modal"
 
@@ -742,12 +742,12 @@ const DonateDock = () => {
           <Check className="h-8 w-8 text-green-500" />
         </div>
         <p className="mb-6 text-center text-sub-gray">결제가 성공적으로 완료되었습니다.</p>
-        <button
+        <PrimaryButton
           onClick={() => window.location.reload()}
-          className="rounded-xl bg-main-color px-8 py-3 font-medium text-white hover:bg-secondary-color-dark"
+          className="rounded-xl px-8 py-3 font-medium"
         >
           확인
-        </button>
+        </PrimaryButton>
       </div>
     </Modal>
   )
@@ -761,14 +761,14 @@ const DonateDock = () => {
       {canDonate(projectData) && (
         <div className="fixed bottom-0 left-0 z-4 w-full">
           <div className="mx-auto max-w-6xl px-4">
-            <button
+            <PrimaryButton
               onClick={toggleDock}
               className="mx-auto flex w-40 items-center justify-center rounded-t-xl bg-white py-3 shadow-lg"
-              aria-label="후원하기"
+              ariaLabel="후원하기"
             >
               <ChevronUp className="mr-2 h-6 w-6 text-sub-gray" />
               <span className="text-lg font-medium text-gray-800">후원하기</span>
-            </button>
+            </PrimaryButton>
           </div>
         </div>
       )}
@@ -790,9 +790,9 @@ const DonateDock = () => {
             {/* 상단 헤더 sticky */}
             <div className="sticky top-0 z-10 bg-white pb-2 pt-6 px-6 flex items-center justify-between rounded-t-3xl">
               <h2 className="text-lg md:text-2xl font-bold">후원하기</h2>
-              <button onClick={toggleDock} className="rounded-full p-0.5 md:p-1 hover:bg-gray-100" aria-label="닫기">
+              <GhostButton onClick={toggleDock} className="rounded-full p-0.5 md:p-1" aria-label="닫기">
                 <ChevronDown className="h-5 w-5 md:h-6 md:w-6" />
-              </button>
+              </GhostButton>
             </div>
 
             {/* 스크롤되는 컨텐츠 */}
@@ -1199,9 +1199,9 @@ const DonateDock = () => {
       >
         <div className="flex justify-between items-center mb-3">
           <h4 className="text-lg font-medium">전체 주문 항목</h4>
-          <button onClick={() => setShowOrderSummaryPopover(false)} className="text-sub-gray hover:text-sub-gray">
+          <GhostButton onClick={() => setShowOrderSummaryPopover(false)} className="p-1 rounded-full">
             <X className="h-5 w-5" />
-          </button>
+          </GhostButton>
         </div>
         <div className="max-h-[300px] overflow-y-auto">
           <div className="space-y-1">
