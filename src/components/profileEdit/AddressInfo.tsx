@@ -155,14 +155,14 @@ export default function AddressInfo() {
         <div className="flex gap-4">
             <ConfirmModal
                 isOpen={isDefaultModalOpen}
-                message={"기본 계좌로 설정할까요?"}
+                message={"기본 배송지로 설정할까요?"}
                 onConfirm={setDefaultDelivery}
                 onClose={() => setIsDefaultModalOpen(false)}
                 dataCy="default-address-confirm-modal"
             />
             <ConfirmModal
                 isOpen={isDeleteModalOpen}
-                message={"계좌를 삭제할까요?"}
+                message={"배송지를 삭제할까요?"}
                 onConfirm={deleteDelivery}
                 onClose={() => setIsDeleteModalOpen(false)}
                 dataCy="delete-address-confirm-modal"
@@ -242,7 +242,7 @@ export default function AddressInfo() {
                                                         className="border-box ml-2 px-2 py-0.5 text-xs text-main-color underline"
                                                         onClick={() => handleClickSetDefaultButton(address.id)}
                                                         data-cy="default-address-change-button"
-                                                    >기본 계좌로 설정</button>
+                                                    >기본 배송지로 설정</button>
                                                 }
                                                 </div>
                                                 <p className="text-sm text-gray-500 mt-1">
@@ -253,7 +253,7 @@ export default function AddressInfo() {
                                         {!address.isDefault && 
                                         <GhostDangerButton
                                             onClick={() => handleClickDeleteButton(address.id)}
-                                            className="text-gray-400 hover:text-red-500"
+                                            className="w-fit h-fit p-2 rounded-full"
                                             dataCy="address-delete-button"
                                         >
                                             <Trash2 className="w-4 h-4" />
