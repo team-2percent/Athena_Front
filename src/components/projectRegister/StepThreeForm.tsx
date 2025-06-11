@@ -15,6 +15,7 @@ import Modal from "../common/Modal"
 import AddAccountModal from "./modals/AddAccountModal"
 import CompositionDialog from "./modals/CompositionDialog"
 import { TextInput } from "@/components/common/Input"
+import { formatNumberWithComma, parseNumberInput, removeLeadingZeros, limitNumber } from "@/lib/utils"
 
 // 계좌 정보 타입 정의
 interface BankAccount {
@@ -194,12 +195,12 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
 
     // 10억 원 제한 - 초과 시 최댓값으로 설정
     if (numericNumber > 1000000000) {
-      const formattedValue = formatNumber("1000000000")
+      const formattedValue = formatNumberWithComma("1000000000")
       updateSupportOption(id, "price", formattedValue)
       return
     }
 
-    const formattedValue = numericValue ? formatNumber(numericValue) : ""
+    const formattedValue = numericValue ? formatNumberWithComma(numericValue) : ""
     updateSupportOption(id, "price", formattedValue)
   }
 
@@ -216,18 +217,13 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
 
     // 1만 개 제한 - 초과 시 최댓값으로 설정
     if (numericNumber > 10000) {
-      const formattedValue = formatNumber("10000")
+      const formattedValue = formatNumberWithComma("10000")
       updateSupportOption(id, "stock", formattedValue)
       return
     }
 
-    const formattedValue = numericValue ? formatNumber(numericValue) : ""
+    const formattedValue = numericValue ? formatNumberWithComma(numericValue) : ""
     updateSupportOption(id, "stock", formattedValue)
-  }
-
-  // 천 단위 콤마 포맷팅
-  const formatNumber = (value: string) => {
-    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
   }
 
   // 후원 옵션 삭제
@@ -363,14 +359,14 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
                     </label>
                     {isEditMode ? (
                       <div className="flex items-center border-gray-200 border-b pb-2 text-base text-gray-400 cursor-not-allowed p-1">
-                        <span className="flex-1 text-right">{formatNumber(option.price)}</span>
+                        <span className="flex-1 text-right">{formatNumberWithComma(option.price)}</span>
                         <span className="text-gray-400 ml-1">원</span>
                       </div>
                     ) : (
                       <div className="flex items-center border-gray-300 focus-within:border-secondary-color-dark">
                         <TextInput
                           id={`option-price-${option.id}`}
-                          value={formatNumber(option.price)}
+                          value={formatNumberWithComma(option.price)}
                           onChange={(e) => handlePriceChange(option.id, e.target.value)}
                           placeholder="0"
                           className="w-full p-1 text-base text-right"
@@ -393,7 +389,7 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
                     <div className="flex items-center border-gray-300 focus-within:border-secondary-color-dark">
                       <TextInput
                         id={`option-stock-${option.id}`}
-                        value={formatNumber(option.stock)}
+                        value={formatNumberWithComma(option.stock)}
                         onChange={(e) => handleStockChange(option.id, e.target.value)}
                         placeholder="0"
                         className="w-full p-1 text-base text-right"

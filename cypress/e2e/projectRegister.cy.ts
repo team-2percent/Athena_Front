@@ -89,7 +89,7 @@ describe('프로젝트 등록 플로우', () => {
     cy.contains('디지털').click();
 
     cy.get('input#title').type('E2E 테스트 프로젝트');
-    cy.get('textarea#description').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
+    cy.get('[data-cy="project-description"]').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
 
     // 대표 이미지 업로드 (fixtures 폴더에 test.jpg 필요)
     cy.get('input[type="file"]').first().selectFile('cypress/fixtures/example.jpg', { force: true });
@@ -145,7 +145,7 @@ describe('프로젝트 등록 플로우', () => {
     cy.contains('디지털').click();
 
     // cy.get('input#title').type('E2E 테스트 프로젝트'); // 상품 제목 미입력
-    cy.get('textarea#description').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
+    cy.get('[data-cy="project-description"]').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
 
     cy.get('input[type="file"]').first().selectFile('cypress/fixtures/example.jpg', { force: true });
     cy.get('input#targetAmount').clear().type('1000000');
@@ -178,7 +178,7 @@ describe('프로젝트 등록 플로우', () => {
     cy.contains('카테고리를 선택해주세요').click();
     cy.contains('디지털').click();
     // cy.get('input#title').type('E2E 테스트 프로젝트'); // 상품 제목 미입력
-    cy.get('textarea#description').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
+    cy.get('[data-cy="project-description"]').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
     cy.get('input[type="file"]').first().selectFile('cypress/fixtures/example.jpg', { force: true });
     cy.get('input#targetAmount').clear().type('1000000');
     selectDynamicDates();
@@ -204,7 +204,7 @@ describe('프로젝트 등록 플로우', () => {
     cy.contains('카테고리를 선택해주세요').click();
     cy.contains('디지털').click();
     cy.get('input#title').type('E2E 테스트 프로젝트');
-    cy.get('textarea#description').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
+    cy.get('[data-cy="project-description"]').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
     cy.get('input[type="file"]').first().selectFile('cypress/fixtures/example.jpg', { force: true });
     // cy.get('input#targetAmount').clear().type('1000000'); // 목표 금액 미입력
     selectDynamicDates();
@@ -230,7 +230,7 @@ describe('프로젝트 등록 플로우', () => {
     cy.contains('카테고리를 선택해주세요').click();
     cy.contains('디지털').click();
     cy.get('input#title').type('E2E 테스트 프로젝트');
-    cy.get('textarea#description').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
+    cy.get('[data-cy="project-description"]').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
     cy.get('input[type="file"]').first().selectFile('cypress/fixtures/example.jpg', { force: true });
     cy.get('input#targetAmount').clear().type('1000000');
 
@@ -325,7 +325,7 @@ describe('프로젝트 등록 플로우', () => {
     cy.contains('카테고리를 선택해주세요').click();
     cy.contains('디지털').click();
     cy.get('input#title').type('E2E 테스트 프로젝트');
-    cy.get('textarea#description').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
+    cy.get('[data-cy="project-description"]').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
     // cy.get('input[type="file"]').first().selectFile('cypress/fixtures/example.jpg', { force: true }); // 대표 이미지 미입력
     cy.get('input#targetAmount').clear().type('1000000');
     selectDynamicDates();
@@ -351,7 +351,7 @@ describe('프로젝트 등록 플로우', () => {
     cy.contains('카테고리를 선택해주세요').click();
     cy.contains('디지털').click();
     cy.get('input#title').type('E2E 테스트 프로젝트');
-    cy.get('textarea#description').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
+    cy.get('[data-cy="project-description"]').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
     cy.get('input[type="file"]').first().selectFile('cypress/fixtures/example.jpg', { force: true });
     cy.get('input#targetAmount').clear().type('1000000');
     selectDynamicDates();
@@ -378,7 +378,7 @@ describe('프로젝트 등록 플로우', () => {
     cy.contains('카테고리를 선택해주세요').click();
     cy.contains('디지털').click();
     cy.get('input#title').type('E2E 테스트 프로젝트');
-    cy.get('textarea#description').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
+    cy.get('[data-cy="project-description"]').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
     cy.get('input[type="file"]').first().selectFile('cypress/fixtures/example.jpg', { force: true });
     cy.get('input#targetAmount').clear().type('1000000');
     selectDynamicDates();
@@ -404,7 +404,7 @@ describe('프로젝트 등록 플로우', () => {
     cy.contains('카테고리를 선택해주세요').click();
     cy.contains('디지털').click();
     cy.get('input#title').type('E2E 테스트 프로젝트');
-    cy.get('textarea#description').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
+    cy.get('[data-cy="project-description"]').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
     cy.get('input[type="file"]').first().selectFile('cypress/fixtures/example.jpg', { force: true });
     cy.get('input#targetAmount').clear().type('1000000');
     selectDynamicDates();
@@ -438,7 +438,7 @@ describe('프로젝트 등록 플로우', () => {
     cy.contains('카테고리를 선택해주세요').click();
     cy.contains('디지털').click();
     cy.get('input#title').type('E2E 테스트 프로젝트');
-    cy.get('textarea#description').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
+    cy.get('[data-cy="project-description"]').type('이것은 Cypress E2E 테스트용 프로젝트입니다.');
     cy.get('input[type="file"]').first().selectFile('cypress/fixtures/example.jpg', { force: true });
     cy.get('input#targetAmount').clear().type('1000000');
     selectDynamicDates();
@@ -556,15 +556,15 @@ describe('프로젝트 입력란 유효성 검사', () => {
 
   describe('상품 요약', () => {
     it('10자 미만 입력 시 에러 메시지 노출', () => {
-      cy.get('textarea#description').clear().type('짧다');
+      cy.get('[data-cy="project-description"]').type('짧다');
       cy.contains(VALIDATION_MESSAGES.DESCRIPTION_MIN).should('be.visible');
     });
     it('50자 초과 입력 시 에러 메시지 노출', () => {
-      cy.get('textarea#description').clear().type('A'.repeat(51));
+      cy.get('[data-cy="project-description"]').type('A'.repeat(51));
       cy.contains(VALIDATION_MESSAGES.DESCRIPTION_MAX).should('be.visible');
     });
     it('정상 입력 시 에러 메시지 미노출', () => {
-      cy.get('textarea#description').clear().type('이것은 정상적인 상품 요약입니다.');
+      cy.get('[data-cy="project-description"]').type('이것은 정상적인 상품 요약입니다.');
       cy.contains(VALIDATION_MESSAGES.DESCRIPTION_MIN).should('not.exist');
       cy.contains(VALIDATION_MESSAGES.DESCRIPTION_MAX).should('not.exist');
     });
