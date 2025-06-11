@@ -1,6 +1,7 @@
 import clsx from "clsx"
 import { useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
+import { getRidOfNonNumber } from "@/lib/utils"
 
 interface InputProps {
   id?: string
@@ -17,6 +18,7 @@ interface InputProps {
   onClick?: (e: React.MouseEvent<HTMLInputElement>) => void
   dataCy?: string
   readOnly?: boolean
+  inputMode?: "numeric" | "decimal" | "email" | "url" | "tel" | "search" | "text" | "password"
 }
 
 export function Input({
@@ -29,6 +31,7 @@ export function Input({
   align = "left",
   placeholder,
   isError = false,
+  inputMode,
   onChange,
   onKeyDown,
   onClick,
@@ -75,11 +78,21 @@ export const TextInput = ({
   ...props
 }: Omit<InputProps, "type"> & { showCharCount?: boolean }) => (
   <Input {...props} type="text" />
-)
+) 
 
-export const NumberInput = (props: Omit<InputProps, "type">) => (
-  <Input {...props} type="number" onClick={handleClick} />
-)
+export const NumberInput = (props: Omit<InputProps, "type">) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = getRidOfNonNumber(e.target.value)
+    props.onChange({
+      ...e,
+      target: {
+        ...e.target,
+        value: value,
+      },
+    })
+  } 
+  return <Input {...props} type="text" inputMode="numeric" onClick={handleClick} onChange={handleChange}/>
+}
 
 export const PasswordInput = ({
   className,

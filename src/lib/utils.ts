@@ -22,3 +22,11 @@ export function getByteLength(str: string): number {
   const encoded = encoder.encode(str);
   return encoded.length;
 }
+
+export function getRidOfNonNumber(str: string): string {
+  return str.replace(/[^\d]/g, "")
+}
+
+export function getRidOfZero(str: string): string {
+  return str.replace(/^0+/, "")
+}

@@ -1,4 +1,5 @@
 import { RefreshCcw } from "lucide-react"
+import { PrimaryButton } from "@/components/common/Button"
 
 interface ServerErrorComponentProps {
     message: string
@@ -9,14 +10,14 @@ export default function ServerErrorComponent({ message, onRetry }: ServerErrorCo
     return (
         <div className="flex flex-col items-center justify-center gap-2 px-10 py-5 rounded-md" data-cy="server-error-card">
             <p className="text-gray-500" data-cy="server-error-message">{message}</p>
-            <button 
-                className="bg-blue-500 text-white px-4 py-2 rounded-md flex items-center gap-2" 
+            <PrimaryButton 
+                className="w-fit h-fit flex gap-1 items-center"
                 onClick={() => onRetry()}
-                data-cy="retry-button"
+                dataCy="retry-button"
             >
                 <RefreshCcw className="w-4 h-4" />
                 다시 시도
-            </button>
+            </PrimaryButton>
         </div>
     )
 }

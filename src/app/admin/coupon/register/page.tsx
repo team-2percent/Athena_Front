@@ -16,6 +16,7 @@ import { couponAddSchema, couponContentSchema, couponExpireSchema, couponNameSch
 import InputInfo from "@/components/common/InputInfo"
 import useErrorToastStore from "@/stores/useErrorToastStore"
 import { getValidatedDateHour, getValidatedNumber, getValidatedString, validate } from "@/lib/validationUtil"
+import { getRidOfZero } from "@/lib/utils"
 export default function CouponRegisterPage() {
     const router = useRouter();
     const { apiCall } = useApi();
@@ -96,34 +97,22 @@ export default function CouponRegisterPage() {
     const handleCouponNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const result = validate(e.target.value, couponNameSchema)
         const value = getValidatedString(e.target.value, COUPON_NAME_MAX_LENGTH)
-        if (result.error) {
-            setCouponAddError({ ...couponAddError, title: result.message })
-        } else {
-            setCouponAddError({ ...couponAddError, title: "" })
-        }
+        setCouponAddError({ ...couponAddError, title: result.message })
         setCouponName(value)
     }
 
     const handleCouponDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const result = validate(e.target.value, couponContentSchema)
         const value = getValidatedString(e.target.value, COUPON_CONTENT_MAX_LENGTH)
-        if (result.error) {
-            setCouponAddError({ ...couponAddError, content: result.message })
-        } else {
-            setCouponAddError({ ...couponAddError, content: "" })
-        }
+        setCouponAddError({ ...couponAddError, content: result.message })
         setCouponDescription(value)
     }
 
     const handleCouponPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const price = +e.target.value.replace(/^0+/, '')
+        const price = +getRidOfZero(e.target.value)
         const result = validate(price, couponPriceSchema)
         const value = getValidatedNumber(price, COUPON_PRICE_MAX_NUMBER)
-        if (result.error) {
-            setCouponAddError({ ...couponAddError, price: result.message })
-        } else {
-            setCouponAddError({ ...couponAddError, price: "" })
-        }
+        setCouponAddError({ ...couponAddError, price: result.message })
         setCouponPrice(value)
     }
 
@@ -133,11 +122,7 @@ export default function CouponRegisterPage() {
             endAt: couponEndDateTime,
         }, couponPeriodSchema)
             
-        if (result.error) {
-            setCouponAddError({ ...couponAddError, period: result.message })
-        } else {
-            setCouponAddError({ ...couponAddError, period: "" })
-        }
+        setCouponAddError({ ...couponAddError, period: result.message })
         setCouponStartDateTime(date)
     }
 
@@ -156,11 +141,7 @@ export default function CouponRegisterPage() {
             endAt: date,
             expiresAt: couponExpireDateTime,
         }, couponExpireSchema)
-        if (expireResult.error) {
-            setCouponAddError({ ...couponAddError, expire: expireResult.message })
-        } else {
-            setCouponAddError({ ...couponAddError, expire: "" })
-        }
+        setCouponAddError({ ...couponAddError, expire: expireResult.message })
         setCouponEndDateTime(date)
     }
 
@@ -169,14 +150,10 @@ export default function CouponRegisterPage() {
     }
 
     const handleCouponStockChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const stock = +e.target.value.replace(/^0+/, '')
+        const stock = +getRidOfZero(e.target.value)
         const result = validate(stock, couponStockSchema)
         const value = getValidatedNumber(stock, COUPON_STOCK_MAX_NUMBER)
-        if (result.error) {
-            setCouponAddError({ ...couponAddError, stock: result.message })
-        } else {
-            setCouponAddError({ ...couponAddError, stock: "" })
-        }
+        setCouponAddError({ ...couponAddError, stock: result.message })
         setCouponStock(value)
     }
 
@@ -273,7 +250,7 @@ export default function CouponRegisterPage() {
                                 className="w-32"
                                 placeholder="수량을 입력하세요"
                                 designType="outline-round"
-                                value={couponStock}
+                                value={couponStock.toString()}
                                 onClick={handleClick}
                                 onChange={handleCouponStockChange}
                                 isError={couponAddError.stock !== ""}

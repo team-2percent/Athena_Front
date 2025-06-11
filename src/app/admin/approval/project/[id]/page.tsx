@@ -219,7 +219,7 @@ export default function ProjectApprovalDetailPage() {
                     <div className="flex items-center gap-4">
                         <button className="h-16 w-16 overflow-hidden rounded-full">
                             <img
-                                src={project.sellerResponse.linkUrl}
+                                src={project.sellerResponse.linkUrl || "/images/default-profile.png"}
                                 alt="프로필 이미지"
                                 className="h-full w-full object-cover"
                             />
