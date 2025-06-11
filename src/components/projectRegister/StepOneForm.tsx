@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import { Upload, ChevronDown, Check, Trash2 } from "lucide-react"
+import { Upload, Trash2 } from "lucide-react"
 import DatePicker from "./DatePicker"
 import { useApi } from "@/hooks/useApi"
 
@@ -11,8 +11,8 @@ import { useProjectFormStore, type ImageFile, type Category } from "@/stores/use
 import { VALIDATION_MESSAGES } from "@/lib/validationMessages"
 import { TextInput } from "@/components/common/Input"
 import TextArea from "@/components/common/TextArea"
-import Dropdown, { DropdownOption } from "@/components/common/Dropdown"
-import { formatNumberWithComma, parseNumberInput, removeLeadingZeros, limitNumber, formatDate } from "@/lib/utils"
+import Dropdown from "@/components/common/Dropdown"
+import { formatNumberWithComma } from "@/lib/utils"
 
 interface StepOneFormProps {
   onUpdateFormData: (data: Partial<any>) => void

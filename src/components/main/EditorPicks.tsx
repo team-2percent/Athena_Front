@@ -1,8 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useState, useRef, useEffect } from "react"
 import { MainProject } from "@/lib/projectInterface"
 import { useRouter } from "next/navigation"
 import ProjectGridItem from "../common/ProjectGridItem"

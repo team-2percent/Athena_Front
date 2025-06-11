@@ -2,7 +2,7 @@
 
 import { useApi } from "@/hooks/useApi";
 import { PasswordInput } from "../common/Input";
-import { Check, X } from "lucide-react";
+import { Check } from "lucide-react";
 import { useState } from "react";
 import { PrimaryButton, CancelButton } from "../common/Button";
 import { newPasswordSchema, passwordEditSchema, passwordMatchSchema, passwordSchema } from "@/lib/validationSchemas";

@@ -1,10 +1,8 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { ChevronDown, ChevronUp } from "lucide-react"
-import clsx from "clsx"
 import { listType, sortName } from "@/lib/listConstant"
-import Dropdown, { DropdownOption } from "@/components/common/Dropdown"
+import Dropdown from "@/components/common/Dropdown"
 
 interface ListHeaderProps {
   type: "category" | "search" | "new" | "deadline"

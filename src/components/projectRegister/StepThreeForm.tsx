@@ -2,20 +2,18 @@
 
 import type React from "react"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { Plus, Check, X, Trash2 } from "lucide-react"
 import { useProjectFormStore } from "@/stores/useProjectFormStore"
 import type { CompositionItem, SupportOption } from "@/stores/useProjectFormStore"
 import { useApi } from "@/hooks/useApi"
-import { GhostDangerButton, PrimaryButton } from "../common/Button"
+import { GhostDangerButton } from "../common/Button"
 import PlanSelection from "./PlanSelection"
 import AlertModal from "../common/AlertModal"
-import gsap from "gsap"
-import Modal from "../common/Modal"
 import AddAccountModal from "./modals/AddAccountModal"
 import CompositionDialog from "./modals/CompositionDialog"
 import { TextInput } from "@/components/common/Input"
-import { formatNumberWithComma, parseNumberInput, removeLeadingZeros, limitNumber } from "@/lib/utils"
+import { formatNumberWithComma } from "@/lib/utils"
 
 // 계좌 정보 타입 정의
 interface BankAccount {

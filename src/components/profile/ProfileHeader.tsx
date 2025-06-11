@@ -1,6 +1,3 @@
-import { cn } from "@/lib/utils"
-import Image from "next/image"
-
 interface ProfileHeaderProps {
   nickname: string
   profileImage: string
