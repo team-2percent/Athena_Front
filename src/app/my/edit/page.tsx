@@ -8,6 +8,7 @@ import { ArrowLeftIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import UserInfo from "@/components/profileEdit/UserInfo"
 import WithdrawInfo from "@/components/profileEdit/WithdrawInfo"
+import { GhostButton } from "@/components/common/Button"
 
 export default function EditPage() {
     const [activeTab, setActiveTab] = useState("프로필")
@@ -19,10 +20,10 @@ export default function EditPage() {
 
     return <div className="h-full mt-8 w-[var(--content-width)] mx-auto">
         <div className="flex w-full mb-5">
-          <button type="button" className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.push("/my")}>
+          <GhostButton onClick={() => router.push("/my")} className="flex gap-1 items-center">
               <ArrowLeftIcon className="w-4 h-4" />
               프로필로 돌아가기
-          </button>
+          </GhostButton>
         </div>
         <MenuTab tabs={["프로필", "계좌", "배송지", "탈퇴하기"]} activeTab={activeTab} onClickTab={onMenuChange} className="border-b border-gray-border"/>
         <div className="w-full ax-w-6xl h-full relative min-h-[300px]">
