@@ -238,8 +238,7 @@ export const emailSchema = z.string()
   .refine((val) => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i.test(val), "올바른 이메일 형식이 아닙니다.")
 
 export const passwordSchema = z.string()
-  .max(PASSWORD_MAX_LENGTH, `${PASSWORD_MAX_LENGTH}자 이내로 입력해주세요.`)
-  .min(PASSWORD_MIN_LENGTH, `${PASSWORD_MIN_LENGTH}자 이상 입력해주세요.`)
+  .min(1, "비밀번호를 입력해주세요.")
 
 export const newPasswordSchema = z.string()
   .max(PASSWORD_MAX_LENGTH, `${PASSWORD_MAX_LENGTH}자 이내로 입력해주세요.`)
@@ -328,6 +327,7 @@ export const signupSchema = z.object({
   email: emailSchema,
   password: newPasswordSchema,
   passwordConfirm: passwordSchema,
+  passwordMatch: passwordMatchSchema,
 })
 
 // 프로필 수정 스키마
