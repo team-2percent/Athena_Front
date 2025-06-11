@@ -113,7 +113,7 @@ export const Button = ({
         </svg>
       )}
       {leftIcon && !isLoading && <span className="mr-2">{leftIcon}</span>}
-      <div className={isLoading ? "opacity-0" : "opacity-100"}>{children}</div>
+      <div className={isLoading ? "opacity-0" : "opacity-100" + " flex gap-2 justify-center items-center"}>{children}</div>
       {rightIcon && <span className="ml-2">{rightIcon}</span>}
     </button>
   )
