@@ -11,8 +11,9 @@ export type ButtonVariant =
   | "outline"
   | "danger"
   | "ghost"
-  | "ghostDanger"
-
+  | "ghost-primary"
+  | "ghost-danger"
+  
 // 버튼 크기(size) 타입 정의
 export type ButtonSize = "sm" | "md" | "lg"
 
@@ -65,7 +66,8 @@ export const Button = ({
     "secondary-disabled": "bg-secondary-disabled text-secondary-disabled-foreground cursor-not-allowed border-transparent",
     outline: "bg-transparent hover:bg-background text-text border-border",
     ghost: "bg-transparent hover:bg-gray-400/10 text-gray-400 border-transparent",
-    ghostDanger: "bg-transparent hover:bg-red-400/10 text-gray-400 hover:text-red-500 border-transparent",
+    "ghost-primary": "bg-transparent hover:bg-main-color/10 text-main-color border-transparent",
+    "ghost-danger": "bg-transparent hover:bg-red-400/10 text-gray-400 hover:text-red-500 border-transparent",
     danger: "bg-red-500 text-white hover:bg-red-600",
 
   }
@@ -142,9 +144,14 @@ export const GhostButton = (props: Omit<ButtonProps, "variant">) => {
   return <Button variant="ghost" {...props} />
 }
 
+// GhostMainColor 버튼
+export const GhostPrimaryButton = (props: Omit<ButtonProps, "variant">) => {
+  return <Button variant="ghost-primary" {...props} />
+}
+
 // GhostDanger 버튼
 export const GhostDangerButton = (props: Omit<ButtonProps, "variant">) => {
-  return <Button variant="ghostDanger" {...props} />
+  return <Button variant="ghost-danger" {...props} />
 }
 
 // Danger 버튼

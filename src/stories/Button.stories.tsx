@@ -99,9 +99,17 @@ export const Ghost: Story = {
   },
 };
 
+export const GhostPrimary: Story = {
+  args: {
+    variant: 'ghost-primary',
+    children: '버튼',
+    size: 'md',
+  },
+};
+
 export const GhostDanger: Story = {
   args: {
-    variant: 'ghostDanger',
+    variant: 'ghost-danger',
     children: '버튼',
     size: 'md',
   },
