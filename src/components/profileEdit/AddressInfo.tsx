@@ -6,7 +6,7 @@ import AddressModal from "./AddressModal"
 import { useApi } from "@/hooks/useApi"
 
 import ConfirmModal from "../common/ConfirmModal"
-import { PrimaryButton } from "../common/Button"
+import { GhostDangerButton, PrimaryButton } from "../common/Button"
 import { TextInput } from "../common/Input"
 import { ADDRESS_DETAIL_MAX_LENGTH } from "@/lib/validationConstant"
 import { addressAddSchema, addressDetailSchema, addressSchema } from "@/lib/validationSchemas"
@@ -251,14 +251,13 @@ export default function AddressInfo() {
                                             </div>
                                         </div>
                                         {!address.isDefault && 
-                                        <button
-                                        type="button"
+                                        <GhostDangerButton
                                             onClick={() => handleClickDeleteButton(address.id)}
                                             className="text-gray-400 hover:text-red-500"
-                                            data-cy="address-delete-button"
+                                            dataCy="address-delete-button"
                                         >
                                             <Trash2 className="w-4 h-4" />
-                                        </button>
+                                        </GhostDangerButton>
                                         }
                                     </div>
                                 </div>
