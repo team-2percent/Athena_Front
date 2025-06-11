@@ -16,6 +16,7 @@ import { useApi } from "@/hooks/useApi";
 import MenuTab from "../common/MenuTab"
 import { getFCMToken } from '@/lib/firebase';
 import useToastStore from "@/stores/useToastStore";
+import { GhostButton } from "../common/Button"
 
 const nameToPath: Record<string, string> = {
   "전체": "",
@@ -247,9 +248,12 @@ const Header = () => {
             />
             {isLoggedIn ? (
               <>
-                <button type="button" aria-label="쿠폰" onClick={handleCouponClick} data-cy="coupon-event-modal-button">
+                <GhostButton
+                  className="w-fit h-fit p-2 rounded-full"
+                  onClick={handleCouponClick}
+                  dataCy="coupon-event-modal-button">
                   <Percent className="h-6 w-6 text-sub-gray" />
-                </button>
+                </GhostButton>
                 <div className="relative flex items-center space-x-3">
                   {!isLoading ? (
                     <span className="text-sm font-medium whitespace-nowrap" data-cy="user-nickname">{user?.nickname}</span>
