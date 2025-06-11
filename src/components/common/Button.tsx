@@ -68,7 +68,7 @@ export const Button = ({
     ghost: "bg-transparent hover:bg-gray-400/10 text-gray-400 border-transparent",
     "ghost-primary": "bg-transparent hover:bg-main-color/10 text-main-color border-transparent",
     "ghost-danger": "bg-transparent hover:bg-red-400/10 text-gray-400 hover:text-red-500 border-transparent",
-    danger: "bg-red-500 text-white hover:bg-red-600",
+    danger: "bg-red-500 text-white hover:bg-red-600 border-transparent",
 
   }
 

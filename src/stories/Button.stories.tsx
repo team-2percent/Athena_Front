@@ -114,3 +114,11 @@ export const GhostDanger: Story = {
     size: 'md',
   },
 };
+
+export const Danger: Story = {
+  args: {
+    variant: 'danger',
+    children: '버튼',
+    size: 'md',
+  },
+};
