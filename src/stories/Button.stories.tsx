@@ -90,3 +90,19 @@ export const Disabled: Story = {
     children: '버튼',
   },
 };
+
+export const Ghost: Story = {
+  args: {
+    variant: 'ghost',
+    children: '버튼',
+    size: 'md',
+  },
+};
+
+export const GhostDanger: Story = {
+  args: {
+    variant: 'ghostDanger',
+    children: '버튼',
+    size: 'md',
+  },
+};
