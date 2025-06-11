@@ -189,11 +189,11 @@ describe('프로젝트 상세 결제 플로우', () => {
   it('필수값 누락 시 Alert 노출', () => {
     cy.contains('후원하기').click()
     // 상품 미선택 상태: 다음 단계 버튼이 비활성화
-    cy.get('[data-cy="donate-next-step"]').contains('다음 단계').should('be.disabled')
+    cy.get('[data-cy="donate-next-step"]').should('be.disabled')
 
     // 상품 선택 후 다음 단계로 이동
     cy.contains('테스트 리워드').click()
-    cy.get('button').contains('다음 단계').should('not.be.disabled').click()
+    cy.get('[data-cy="donate-next-step"]').should('not.be.disabled').click()
     cy.wait('@getDeliveryInfo')
 
     // 결제수단/배송지 모두 미선택 상태에서 후원하기 클릭
@@ -234,7 +234,7 @@ describe('프로젝트 상세 결제 플로우', () => {
 
     cy.contains('후원하기').click()
     cy.contains('테스트 리워드').click()
-    cy.get('[data-cy="donate-next-step"]').contains('다음 단계').click()
+    cy.get('[data-cy="donate-next-step"]').click()
     cy.wait('@getDeliveryInfo')
 
     // 결제수단 선택
