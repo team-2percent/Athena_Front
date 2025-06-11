@@ -8,7 +8,7 @@ import ProjectTabs from "./ProjectTabs"
 import { useApi } from "@/hooks/useApi"
 import { useParams } from "next/navigation"
 
-import { OutlineButton, PrimaryButton } from "../common/Button"
+import { GhostButton, OutlineButton, PrimaryButton } from "../common/Button"
 import gsap from "gsap"
 
 // ProjectData 인터페이스 추가
@@ -161,7 +161,7 @@ const ProjectDetail = () => {
       setTimeout(() => {
         setCopySuccess(false)
         setShowSharePopover(false)
-      }, 2000)
+      }, 3000)
     } catch (err) {
       console.error("URL 복사 실패:", err)
       // fallback for older browsers
@@ -435,9 +435,9 @@ const ProjectDetail = () => {
                 >
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-medium text-gray-900">프로젝트 공유하기</h3>
-                    <button onClick={() => setShowSharePopover(false)} className="text-gray-400 hover:text-gray-600">
+                    <GhostButton onClick={() => setShowSharePopover(false)} className="p-1 rounded-full">
                       <X className="h-4 w-4" />
-                    </button>
+                    </GhostButton>
                   </div>
 
                   <div className="space-y-3">
@@ -447,11 +447,9 @@ const ProjectDetail = () => {
                       </span>
                     </div>
 
-                    <button
+                    <PrimaryButton
                       onClick={copyToClipboard}
-                      className={`w-full flex items-center justify-center gap-2 text-white py-2 px-4 rounded-lg transition-colors
-                        ${copySuccess ? 'bg-secondary-color-dark' : 'bg-main-color hover:bg-secondary-color-dark'}
-                      `}
+                      className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg transition-colors"
                       disabled={copySuccess}
                     >
                       {copySuccess ? (
@@ -465,7 +463,7 @@ const ProjectDetail = () => {
                           URL 복사하기
                         </>
                       )}
-                    </button>
+                    </PrimaryButton>
                   </div>
                 </div>
               </div>

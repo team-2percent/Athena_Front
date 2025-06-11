@@ -1,16 +1,13 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { Plus, Trash2, X, ChevronDown, ChevronUp } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react"
 import MarkdownEditor from "./MarkdownEditor"
 import DatePicker from "./DatePicker"
 import { useProjectFormStore } from "@/stores/useProjectFormStore"
 import { PrimaryButton } from "../common/Button"
-import gsap from "gsap"
-import Modal from "../common/Modal"
 import ScheduleDetailsDialog from "./modals/ScheduleDetailsDialog"
 import { TextInput } from "@/components/common/Input"
-import TextArea from "@/components/common/TextArea"
 import { formatNumberWithComma, formatDate } from "@/lib/utils"
 
 // 예산 항목 타입

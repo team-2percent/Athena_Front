@@ -8,7 +8,7 @@ import { useApi } from "@/hooks/useApi"
 import { useParams } from "next/navigation";
 import OverlaySpinner from "@/components/common/OverlaySpinner"
 import { formatDateInAdmin } from "@/lib/utils"
-import { SecondaryButton } from "@/components/common/Button"
+import { GhostButton, SecondaryButton } from "@/components/common/Button"
 import Pagination from "@/components/common/Pagination"
 import ServerErrorComponent from "@/components/common/ServerErrorComponent"
 
@@ -327,13 +327,10 @@ export default function SettlementDetailPage() {
     return (
         <div className="flex flex-col mx-auto w-[var(--content-width)] py-8 gap-6">
             <div className="flex w-full">
-                <button 
-                    className="text-sm text-gray-500 flex items-center gap-2" 
-                    onClick={() => router.push("/admin/settlement")}
-                >
+                <GhostButton onClick={() => router.push("/admin/settlement")} className="flex gap-1 items-center">
                     <ArrowLeftIcon className="w-4 h-4" />
                     목록으로
-                </button>
+                </GhostButton>
             </div>
             {render()}
         </div>

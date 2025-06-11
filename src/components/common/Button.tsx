@@ -11,7 +11,9 @@ export type ButtonVariant =
   | "outline"
   | "danger"
   | "ghost"
-
+  | "ghost-primary"
+  | "ghost-danger"
+  
 // 버튼 크기(size) 타입 정의
 export type ButtonSize = "sm" | "md" | "lg"
 
@@ -29,6 +31,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   rightIcon?: ReactNode
   className?: string
   dataCy?: string
+  ariaLabel?: string
 }
 
 // 기본 버튼 컴포넌트
@@ -43,6 +46,7 @@ export const Button = ({
   className,
   disabled,
   dataCy,
+  ariaLabel,
   ...props
 }: ButtonProps) => {
   // disabled 상태에 따라 variant 조정
@@ -61,8 +65,11 @@ export const Button = ({
     "primary-disabled": "bg-primary-disabled text-primary-disabled-foreground cursor-not-allowed border-transparent",
     "secondary-disabled": "bg-secondary-disabled text-secondary-disabled-foreground cursor-not-allowed border-transparent",
     outline: "bg-transparent hover:bg-background text-text border-border",
-    ghost: "bg-transparent hover:bg-background text-text border-transparent",
-    danger: "bg-red-500 text-white hover:bg-red-600",
+    ghost: "bg-transparent hover:bg-gray-400/10 text-gray-400 border-transparent",
+    "ghost-primary": "bg-transparent hover:bg-main-color/10 text-main-color border-transparent",
+    "ghost-danger": "bg-transparent hover:bg-red-400/10 text-gray-400 hover:text-red-500 border-transparent",
+    danger: "bg-red-500 text-white hover:bg-red-600 border-transparent",
+
   }
 
   // size에 따른 스타일 클래스
@@ -80,7 +87,7 @@ export const Button = ({
 
   // 최종 클래스 이름 생성
   const buttonClasses = cn(
-    "font-medium border transition-colors duration-200 whitespace-nowrap",
+    "relative font-medium border transition-colors duration-200 whitespace-nowrap",
     variantClasses[finalVariant as keyof typeof variantClasses],
     sizeClasses[size],
     widthClasses[width],
@@ -89,10 +96,10 @@ export const Button = ({
   )
 
   return (
-    <button className={buttonClasses} disabled={disabled || isLoading} data-cy={dataCy} {...props}>
+    <button className={buttonClasses} disabled={disabled || isLoading} data-cy={dataCy} aria-label={ariaLabel} {...props}>
       {isLoading && (
         <svg
-          className="animate-spin mx-auto h-4 w-4 text-current"
+          className="animate-spin mx-auto h-4 w-4 text-current absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -106,7 +113,7 @@ export const Button = ({
         </svg>
       )}
       {leftIcon && !isLoading && <span className="mr-2">{leftIcon}</span>}
-      {!isLoading && children}
+      <div className={isLoading ? "opacity-0" : "opacity-100"}>{children}</div>
       {rightIcon && <span className="ml-2">{rightIcon}</span>}
     </button>
   )
@@ -135,6 +142,16 @@ export const OutlineButton = (props: Omit<ButtonProps, "variant">) => {
 // Ghost 버튼
 export const GhostButton = (props: Omit<ButtonProps, "variant">) => {
   return <Button variant="ghost" {...props} />
+}
+
+// GhostMainColor 버튼
+export const GhostPrimaryButton = (props: Omit<ButtonProps, "variant">) => {
+  return <Button variant="ghost-primary" {...props} />
+}
+
+// GhostDanger 버튼
+export const GhostDangerButton = (props: Omit<ButtonProps, "variant">) => {
+  return <Button variant="ghost-danger" {...props} />
 }
 
 // Danger 버튼

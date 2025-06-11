@@ -1,5 +1,5 @@
 import Modal from "../common/Modal"
-import { CancelButton, PrimaryButton, SecondaryButton } from "../common/Button"
+import { CancelButton, GhostButton, PrimaryButton, SecondaryButton } from "../common/Button"
 import { X } from "lucide-react"
 import AddressModal from "../profileEdit/AddressModal"
 
@@ -43,9 +43,9 @@ const AddressAddModal = ({
     >
       <div className="mb-6 flex items-center justify-between">
         <h4 className="text-xl font-bold">새 배송지 추가</h4>
-        <button onClick={onClose} className="rounded-full p-1 hover:bg-gray-100">
+        <GhostButton onClick={onClose} className="rounded-full p-1">
           <X className="h-6 w-6" />
-        </button>
+        </GhostButton>
       </div>
       <div className="space-y-4">
         <div>

@@ -1,11 +1,10 @@
 "use client"
 
 import type React from "react"
-import { Heart, Check, MessageSquare } from "lucide-react"
+import { Check, MessageSquare } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import ReviewForm from "./ReviewForm"
-import { cn } from "@/lib/utils"
 import { PrimaryButton } from "../common/Button"
 
 interface PurchasedProjectItemProps {

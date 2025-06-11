@@ -2,20 +2,18 @@
 
 import type React from "react"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { Plus, Check, X, Trash2 } from "lucide-react"
 import { useProjectFormStore } from "@/stores/useProjectFormStore"
 import type { CompositionItem, SupportOption } from "@/stores/useProjectFormStore"
 import { useApi } from "@/hooks/useApi"
-import { PrimaryButton } from "../common/Button"
+import { GhostDangerButton } from "../common/Button"
 import PlanSelection from "./PlanSelection"
 import AlertModal from "../common/AlertModal"
-import gsap from "gsap"
-import Modal from "../common/Modal"
 import AddAccountModal from "./modals/AddAccountModal"
 import CompositionDialog from "./modals/CompositionDialog"
 import { TextInput } from "@/components/common/Input"
-import { formatNumberWithComma, parseNumberInput, removeLeadingZeros, limitNumber } from "@/lib/utils"
+import { formatNumberWithComma } from "@/lib/utils"
 
 // 계좌 정보 타입 정의
 interface BankAccount {
@@ -258,14 +256,13 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
             >
               {/* 삭제 버튼은 수정 모드에서 비활성화 */}
               {!isEditMode && (
-                <button
-                  type="button"
+                <GhostDangerButton
                   onClick={() => removeSupportOption(option.id)}
-                  className="absolute right-4 top-4 p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-gray-100"
+                  className="absolute right-4 top-4 p-1.5 rounded-full"
                   aria-label="옵션 삭제"
                 >
                   <Trash2 className="h-5 w-5" />
-                </button>
+                </GhostDangerButton>
               )}
 
               <div className="flex flex-col space-y-4">
@@ -479,14 +476,13 @@ export default function StepThreeForm({ initialData, isEditMode = false }: StepT
                       </div>
                     </div>
                   </div>
-                  <button
-                    type="button"
+                  <GhostDangerButton
                     onClick={(e) => handleDeleteAccount(account.id, e)}
-                    className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-gray-100"
-                    aria-label="계좌 삭제"
+                    className="p-1.5 rounded-full"
+                    ariaLabel="계좌 삭제"
                   >
                     <X className="h-4 w-4" />
-                  </button>
+                  </GhostDangerButton>
                 </div>
               </div>
             ))

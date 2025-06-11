@@ -10,7 +10,7 @@ import { useParams } from "next/navigation";
 import OverlaySpinner from "@/components/common/OverlaySpinner"
 import { useEffect } from "react";
 import { formatDateInAdmin } from "@/lib/utils"
-import { PrimaryButton, SecondaryButton } from "@/components/common/Button";
+import { GhostButton, PrimaryButton, SecondaryButton } from "@/components/common/Button";
 import useErrorToastStore from "@/stores/useErrorToastStore";
 import ServerErrorComponent from "@/components/common/ServerErrorComponent";
 
@@ -247,10 +247,10 @@ export default function ProjectApprovalDetailPage() {
         <div className="flex flex-col gap-6 mx-auto w-[var(--content-width)] py-8">
             {isLoading && <OverlaySpinner message="처리 중입니다."/>}
             <div className="flex w-full">
-            <button className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.back()}>
-                <ArrowLeftIcon className="w-4 h-4" />
-                목록으로
-            </button>
+                <GhostButton onClick={() => router.push("/admin/approval")} className="flex gap-1 items-center">
+                    <ArrowLeftIcon className="w-4 h-4" />
+                    목록으로
+                </GhostButton>
             </div>
             
             {renderProject()}

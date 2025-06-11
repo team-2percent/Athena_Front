@@ -7,6 +7,7 @@ import EmptyMessage from "../common/EmptyMessage";
 import { Percent } from "lucide-react";
 import clsx from "clsx";
 import { formatDateInAdmin } from "@/lib/utils";
+import { Button } from "../common/Button";
 
 export default function CouponList() {
     const { apiCall, isLoading } = useApi();
@@ -77,15 +78,16 @@ export default function CouponList() {
             <p className="mt-0.5 text-xs text-sub-gray">{formatDateInAdmin(coupon.expiresAt) + ' 만료'}</p>
             </div>
             <div className="flex flex-col items-end">
-            <button
-                type="button"
-                className={clsx("rounded-full w-fit px-4 py-1.5 text-sm font-medium", coupon.userIssued || coupon.stock === 0? "pointer-events-none bg-disabled-background text-disabled-color" : "bg-main-color text-white")}
+            <Button
+                variant={coupon.userIssued || coupon.stock === 0 ? "primary-disabled" : "primary"}
+                className={clsx("rounded-full w-fit px-4 py-1.5 text-sm font-medium", coupon.userIssued || coupon.stock === 0? "pointer-events-none" : "")}
                 onClick={() => handleGetCoupon(coupon.couponId)}
                 disabled={coupon.userIssued || coupon.stock === 0}
-                data-cy="coupon-issue-button"
+                dataCy="coupon-issue-button"
+
             >
                 {coupon.userIssued ? "발급완료" : coupon.stock === 0 ? "발급종료" : "발급받기"}
-            </button>
+            </Button>
             <div className="mt-1 text-xs text-sub-gray">
                 {coupon.stock}개 남음
             </div>
