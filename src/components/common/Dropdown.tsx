@@ -13,6 +13,7 @@ interface DropdownProps {
   placeholder?: string
   disabled?: boolean
   className?: string
+  designType?: "default" | "borderless"
 }
 
 export default function Dropdown({
@@ -22,6 +23,7 @@ export default function Dropdown({
   placeholder = "선택하세요",
   disabled = false,
   className = "",
+  designType = "default",
 }: DropdownProps) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -43,7 +45,11 @@ export default function Dropdown({
     <div className={`relative ${className}`} ref={ref}>
       <button
         type="button"
-        className={`flex w-full items-center justify-between rounded-full border border-gray-300 px-4 py-3 text-sm text-left focus:border-main-color bg-white ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+        className={`flex w-full items-center justify-between rounded-full px-4 py-3 text-sm text-left bg-white ${
+          designType === "borderless"
+            ? "border-none shadow-none"
+            : "border border-gray-300 focus:border-main-color"
+        } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
         onClick={() => !disabled && setOpen((v) => !v)}
         disabled={disabled}
       >
@@ -55,7 +61,7 @@ export default function Dropdown({
         <ChevronDown className="h-5 w-5" />
       </button>
       {open && options.length > 0 && (
-        <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl border border-gray-300 bg-white shadow-lg">
+        <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl bg-white shadow-lg z-50 border border-gray-300">
           {options.map((opt) => (
             <div
               key={opt.value}

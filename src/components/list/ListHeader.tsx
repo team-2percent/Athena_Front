@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import clsx from "clsx"
 import { listType, sortName } from "@/lib/listConstant"
+import Dropdown, { DropdownOption } from "@/components/common/Dropdown"
 
 interface ListHeaderProps {
   type: "category" | "search" | "new" | "deadline"
@@ -62,40 +63,16 @@ export default function ListHeader({ type, count, searchWord, sort, onClickSort,
 
         {/* 필터 드롭다운 */}
         {sort && (
-            <div className="relative">
-            <button
-                ref={buttonRef}
-                className="flex items-center text-main-color font-normal"
-                onClick={() => setIsOpen(!isOpen)}
-                data-cy="list-header-sort-button"
-            >
-                {sortName[sort as keyof typeof sortName]} {isOpen ? <ChevronUp className="ml-1 h-5 w-5" /> : <ChevronDown className="ml-1 h-5 w-5" />}
-            </button>
-
-            {/* 드롭다운 메뉴 */}
-            {isOpen && (
-                <div
-                ref={dropdownRef}
-                className="fixed bg-white z-50 flex flex-col items-center space-y-3 py-3 px-4 rounded-xl"
-                style={{
-                    top: buttonRef.current ? buttonRef.current.getBoundingClientRect().bottom + 8 : 0,
-                    right: buttonRef.current ? window.innerWidth - buttonRef.current.getBoundingClientRect().right : 0,
-                }}
-                data-cy="list-header-sort-dropdown"
-                >
-                {type !== "new" && listType[type].sort.map((option) => (
-                    <button
-                    key={option}
-                    className={clsx("font-normal", sort === option ? "text-main-color" : "text-gray-500")}
-                    onClick={() => handleSortClick(option as "deadline" | "recommend" | "view" | "achievement")}
-                    data-cy={`list-header-sort-${option}`}
-                    >
-                    {sortName[option as keyof typeof sortName]}
-                    </button>
-                ))}
-                </div>
-            )}
-            </div>
+          <div className="min-w-[100px]">
+            <Dropdown
+              options={type !== "new" ? listType[type].sort.map((option) => ({ label: sortName[option as keyof typeof sortName], value: option })) : []}
+              value={sort}
+              onChange={(opt) => handleSortClick(opt.value as string)}
+              placeholder="정렬 순서"
+              className="text-main-color"
+              designType="borderless"
+            />
+          </div>
         )}
     </div>
   )
