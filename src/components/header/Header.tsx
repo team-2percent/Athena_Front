@@ -154,14 +154,15 @@ const Header = () => {
   // 로그아웃
   const handleLogout = () => {
     apiCall("/api/user/logout", "POST").then(() => {
-      logout();
+      setShowAuthMenu(false)
+      logout()
       router.push("/")
     })
   }
 
   const handleClickMyPage = () => {
     router.push("/my")
-    setShowAuthMenu(false);
+    setShowAuthMenu(false)
   }
 
   const handleTestToast = () => {

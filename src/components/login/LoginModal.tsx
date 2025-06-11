@@ -30,6 +30,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
     email: "",
     password: ""
   })
+  const [isLoading, setIsLoading] = useState(false)
 
   const disabled: boolean = validate({ email, password }, loginSchema).error
 
@@ -55,8 +56,9 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
+    setIsLoading(true)
     const { data, error } = await apiCall<any>("/api/user/login", "POST", { email, password })
+    setIsLoading(false)
     if (error) {
       setErrorMessage("로그인에 실패했습니다.")
       return;
@@ -115,12 +117,15 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
 
           {/* Login Button */}
           <PrimaryButton
-            type="submit"
-            disabled={disabled}
-            className="w-full py-4"
-            size="lg"
-            dataCy="login-button"
-          >로그인</PrimaryButton>
+              type="submit"
+              disabled={disabled}
+              className="w-full py-4"
+              size="lg"
+              dataCy="login-button"
+              isLoading={isLoading}
+          >
+            로그인
+          </PrimaryButton>
           <div className="h-[1.25rem] text-center mb-2">
             <span className="w-full text-red-500 text-xs">{errorMessage}</span>
           </div>
