@@ -219,18 +219,18 @@ export default function SettlementDetailPage() {
                 <h2 className="text-2xl font-medium border-b pb-2">판매자 정보</h2>
                 <div className="flex items-center mt-4 justify-between">
                     <div className="flex items-center gap-4">
-                        <button className="h-16 w-16 overflow-hidden rounded-full">
+                        {/* <button className="h-16 w-16 overflow-hidden rounded-full">
                             <img
-                                src="/abstract-profile.png"
+                                src={info.sellerProfileUrl || "/images/default-profile.png"}
                                 alt="프로필 이미지"
                                 width={64}
                                 height={64}
                                 className="h-full w-full object-cover"
                             />
-                        </button>
+                        </button> */}
                         <div className="flex flex-col">
                             <span className="text-xl font-medium">{info.sellerNickname}</span>
-                            <span className="text-sm text-gray-500">판매자 소개</span>
+                            {/* <span className="text-sm text-gray-500">판매자 소개</span> */}
                         </div>
                     </div>
                     
