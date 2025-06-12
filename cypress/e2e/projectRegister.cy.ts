@@ -241,9 +241,9 @@ describe('프로젝트 등록 플로우', () => {
     const deliveryDate = new Date(today); deliveryDate.setDate(today.getDate() + 21);
 
     cy.get('[data-cy="datepicker-end"]').click();
-    cy.contains(endDate.getDate().toString()).click();
+    cy.get('button').filter(`:contains(${endDate.getDate().toString()})`).not(':disabled').first().click();
     cy.get('[data-cy="datepicker-delivery"]').click();
-    cy.contains(deliveryDate.getDate().toString()).click();
+    cy.get('button').filter(`:contains(${deliveryDate.getDate().toString()})`).not(':disabled').first().click();
 
     cy.contains('다음 단계로').click();
     cy.get('textarea').type('상세 설명 마크다운 입력 E2E 테스트');
