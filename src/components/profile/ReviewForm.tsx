@@ -45,9 +45,10 @@ export default function ReviewForm({ isOpen, onClose, projectId, projectName, se
 
     try {
       const { data, error, status } = await apiCall(
-        `/api/comment/create?projectId=${projectId}`,
+        "/api/comment/create",
         "POST",
         {
+          projectId: projectId,
           content: reviewContent
         }
       )
@@ -80,6 +81,7 @@ export default function ReviewForm({ isOpen, onClose, projectId, projectName, se
         <div className="mb-4">
           <TextArea
             value={reviewContent}
+            className="h-36"
             onChange={handleChangeReviewContent}
             placeholder="상품에 대한 후기를 작성해주세요."
             isError={!!reviewsError}
@@ -106,6 +108,7 @@ export default function ReviewForm({ isOpen, onClose, projectId, projectName, se
             type="submit"
             dataCy="submit-button"
             disabled={!reviewContent.trim() || !!reviewsError}
+            isLoading={apiLoading}
           >
             등록하기
           </PrimaryButton>

@@ -43,7 +43,7 @@ interface LoadResponse {
 interface PutResponse {
     nickname: string
     imageUrl: string | null
-    sellerDescription: string
+    sellerIntroduction: string
     linkUrl: string
 }
 
@@ -133,7 +133,7 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                     ...prev,
                     nickname: data.nickname,
                     imageUrl: data.imageUrl,
-                    sellerDescription: data.sellerDescription,
+                    sellerDescription: data.sellerIntroduction,
                     linkUrl: data.linkUrl
                 }))
             }
@@ -401,6 +401,7 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                     disabled={!saveable}
                     onClick={handleSave}
                     dataCy="save-button"
+                    isLoading={isLoading}
                 >
                 저장
                 </PrimaryButton>

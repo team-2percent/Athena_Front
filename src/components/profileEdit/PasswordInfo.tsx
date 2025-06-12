@@ -143,6 +143,7 @@ export default function PasswordInfo({ onBack }: PasswordInfoProps) {
                                         className="px-3 py-2"
                                         dataCy="password-confirm-button"
                                         disabled={!!passwordEditError.password || !password}
+                                        isLoading={isLoading}
                                     >확인</PrimaryButton>
                                 </div>
                             }
@@ -184,6 +185,7 @@ export default function PasswordInfo({ onBack }: PasswordInfoProps) {
                         onClick={handleNewPasswordApply}
                         dataCy="password-save-button"
                         disabled={!disabled.success}
+                        isLoading={isLoading}
                     >
                         저장
                     </PrimaryButton>

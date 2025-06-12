@@ -313,6 +313,7 @@ export default function ProjectApprovalDetailPage() {
                     onConfirm={handleConfirm}
                     onClose={() => setIsModalOpen(false)}
                     dataCy="project-approve-modal"
+                    isLoading={isLoading}
                 />
             }
         </div>

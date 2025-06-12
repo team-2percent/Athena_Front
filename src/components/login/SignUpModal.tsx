@@ -23,6 +23,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
   const disabled = validate({
     nickname,
@@ -87,7 +88,9 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   // 회원가입 로직
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    setIsLoading(true)
     apiCall("/api/user", "POST", { nickname, email, password }).then(({ error }: { data: any, error: string | null }) => {
+      setIsLoading(false)
       if (error) {
         setErrorMessage(error)
       } else {
@@ -177,9 +180,10 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
           {/* Signup Button */}
           <PrimaryButton
             type="submit"
-            className="relative w-full py-4"
+            className="w-full py-4"
             disabled={disabled}
             dataCy="signup-button"
+            isLoading={isLoading}
           >
             가입하기
           </PrimaryButton>

@@ -8,6 +8,7 @@ interface DeleteModalProps {
   deleteError: boolean
   deleteSuccess: boolean
   itemType?: string
+  isDeleting?: boolean
 }
 
 export default function DeleteModal({
@@ -17,6 +18,7 @@ export default function DeleteModal({
   deleteError,
   deleteSuccess,
   itemType = "상품",
+  isDeleting = false,
 }: DeleteModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`${itemType} 삭제`} size="sm" dataCy="delete-modal">
@@ -30,7 +32,7 @@ export default function DeleteModal({
               <Modal.Button variant="secondary" onClick={onClose} dataCy="cancel-button">
                 취소
               </Modal.Button>
-              <Modal.Button variant="danger" onClick={onConfirm} dataCy="confirm-button">
+              <Modal.Button variant="danger" onClick={onConfirm} dataCy="confirm-button" isLoading={isDeleting} disabled={isDeleting}>
                 삭제
               </Modal.Button>
             </div>

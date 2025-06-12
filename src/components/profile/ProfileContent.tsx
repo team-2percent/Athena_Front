@@ -113,6 +113,7 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
   const [deleteError, setDeleteError] = useState(false)
   const [deleteSuccess, setDeleteSuccess] = useState(false)
   const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   // 판매 상품 불러오기
   const loadMyProjects = async () => {
@@ -268,14 +269,17 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
 
   const handleConfirmDelete = async () => {
     if (deleteId !== null) {
+      setIsDeleting(true)
       try {
         // 판매 상품 삭제
         await apiCall(`/api/project/${deleteId}`, "DELETE")
         setMyProjects((prev) => prev.filter((project) => project.projectId !== deleteId))
         setDeleteSuccess(true)
+        setIsDeleting(false)
       } catch (error) {
         console.error("상품 삭제에 실패했습니다.", error)
         setDeleteError(true)
+        setIsDeleting(false)
       }
     }
   }
@@ -383,6 +387,7 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
           deleteError={deleteError}
           deleteSuccess={deleteSuccess}
           itemType="상품"
+          isDeleting={isDeleting}
         />
       )}
 
