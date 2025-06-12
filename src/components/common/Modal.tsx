@@ -5,6 +5,7 @@ import { X } from "lucide-react"
 import clsx from "clsx"
 import gsap from "gsap"
 import ReactDOM from "react-dom"
+import { Button } from "./Button"
 
 // 버튼 타입 정의 추가
 type ButtonVariant = "primary" | "secondary" | "danger" | "outline"
@@ -28,25 +29,17 @@ interface ModalTextProps {
 
 // Modal 컴포넌트 내부에 다음 컴포넌트들을 추가합니다 (export default function Modal 위에 추가)
 function ModalButton({ onClick, variant = "primary", children, className = "", disabled = false, dataCy }: ModalButtonProps) {
-  const baseStyles = "px-4 py-2 rounded-lg font-medium transition-colors"
-
-  const variantStyles = {
-    primary: "bg-main-color text-white hover:bg-secondary-color-dark",
-    secondary: "bg-gray-200 text-gray-700 hover:bg-gray-300",
-    danger: "bg-red-500 text-white hover:bg-red-600",
-    outline: "border border-main-color text-main-color hover:bg-secondary-color/10",
-  }
-
   return (
-    <button
+    <Button
       type="button"
       onClick={onClick}
+      variant={variant}
       disabled={disabled}
-      className={clsx(baseStyles, variantStyles[variant], disabled && "opacity-50 cursor-not-allowed", className)}
-      data-cy={dataCy}
+      className={className}
+      dataCy={dataCy}
     >
       {children}
-    </button>
+    </Button>
   )
 }
 
