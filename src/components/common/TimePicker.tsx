@@ -50,7 +50,7 @@ export default function TimePicker({ selectedDateTime, onChange, minDateTime }: 
         onClick={() => setIsOpen(!isOpen)}
       >
         <Clock className="w-5 h-5 text-gray-500 absolute left-4 top-1/2 -translate-y-1/2" />
-        <span>
+        <span className="text-sm">
           {new Date(selectedDateTime.getTime() + 9 * 60 * 60 * 1000).getUTCHours().toString().padStart(2, "0")}:00
         </span>
       </div>

@@ -264,6 +264,7 @@ export default function CouponRegisterPage() {
                             disabled={disabled}
                             onClick={handleModalOpen}
                             dataCy="coupon-submit-button"
+                            isLoading={isLoading}
                         >
                             등록
                         </PrimaryButton>
@@ -275,6 +276,7 @@ export default function CouponRegisterPage() {
                     onConfirm={handleAddCoupon}
                     onClose={() => setIsModalOpen(false)}
                     dataCy="coupon-confirm-modal"
+                    isLoading={isLoading}
                 />
             </div>
     )

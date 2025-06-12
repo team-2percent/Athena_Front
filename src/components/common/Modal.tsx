@@ -18,6 +18,7 @@ interface ModalButtonProps {
   className?: string
   disabled?: boolean
   dataCy?: string
+  isLoading?: boolean
 }
 
 // 텍스트 스타일 컴포넌트 추가
@@ -28,7 +29,7 @@ interface ModalTextProps {
 }
 
 // Modal 컴포넌트 내부에 다음 컴포넌트들을 추가합니다 (export default function Modal 위에 추가)
-function ModalButton({ onClick, variant = "primary", children, className = "", disabled = false, dataCy }: ModalButtonProps) {
+function ModalButton({ onClick, variant = "primary", children, className = "", disabled = false, dataCy, isLoading = false }: ModalButtonProps) {
   return (
     <Button
       type="button"
@@ -37,6 +38,7 @@ function ModalButton({ onClick, variant = "primary", children, className = "", d
       disabled={disabled}
       className={className}
       dataCy={dataCy}
+      isLoading={isLoading}
     >
       {children}
     </Button>

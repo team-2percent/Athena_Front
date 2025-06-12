@@ -167,8 +167,8 @@ export default function AccountInfo() {
     return <div className="flex gap-4 w-full">
       {/* 5. 컴포넌트 return 문 내부 최상단에 AlertModal 컴포넌트 추가 */}
       <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={() => setIsAlertOpen(false)} />
-      <ConfirmModal isOpen={isDefaultModalOpen} message={"기본 계좌로 설정할까요?"} onConfirm={setDefaultAccount} onClose={() => setIsDefaultModalOpen(false)} dataCy="default-account-confirm-modal"/>
-      <ConfirmModal isOpen={isDeleteModalOpen} message={"계좌를 삭제할까요?"} onConfirm={deleteAccount} onClose={() => setIsDeleteModalOpen(false)} dataCy="delete-account-confirm-modal"/>
+      <ConfirmModal isOpen={isDefaultModalOpen} message={"기본 계좌로 설정할까요?"} onConfirm={setDefaultAccount} onClose={() => setIsDefaultModalOpen(false)} dataCy="default-account-confirm-modal" isLoading={isLoading}/>
+      <ConfirmModal isOpen={isDeleteModalOpen} message={"계좌를 삭제할까요?"} onConfirm={deleteAccount} onClose={() => setIsDeleteModalOpen(false)} dataCy="delete-account-confirm-modal" isLoading={isLoading}/>
         {/* 계좌 추가 폼 */}
         <div className="flex-1 bg-white rounded-lg shadow py-6 px-10" data-cy="account-add-form">
             <h3 className="text-lg font-medium mb-6">새 계좌 추가</h3>
@@ -217,8 +217,9 @@ export default function AccountInfo() {
                 className="flex items-center appearance-none"
                 disabled={addButtonDisabled}
                 dataCy="account-add-button"
+                isLoading={isLoading}
               >
-                <Plus className="w-4 h-4 mr-1" /> 계좌 추가
+                계좌 추가
               </PrimaryButton>
             </div>
           </div>

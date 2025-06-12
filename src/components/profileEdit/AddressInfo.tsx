@@ -159,6 +159,7 @@ export default function AddressInfo() {
                 onConfirm={setDefaultDelivery}
                 onClose={() => setIsDefaultModalOpen(false)}
                 dataCy="default-address-confirm-modal"
+                isLoading={isLoading}
             />
             <ConfirmModal
                 isOpen={isDeleteModalOpen}
@@ -166,6 +167,7 @@ export default function AddressInfo() {
                 onConfirm={deleteDelivery}
                 onClose={() => setIsDeleteModalOpen(false)}
                 dataCy="delete-address-confirm-modal"
+                isLoading={isLoading}
             />
             <div className="flex-1 bg-white rounded-lg shadow py-6 px-10" data-cy="address-add-form">
                 <h3 className="text-lg font-medium mb-6">배송지 추가</h3>
@@ -210,8 +212,9 @@ export default function AddressInfo() {
                                 className="flex items-center"
                                 disabled={addButtonDisabled}
                                 dataCy="address-add-button"
+                                isLoading={isLoading}
                             >
-                                <Plus className="w-4 h-4 mr-1" /> 배송지 추가
+                                배송지 추가
                             </PrimaryButton>
                         </div>
                     </div>
