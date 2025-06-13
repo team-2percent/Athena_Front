@@ -118,7 +118,30 @@ export default function Carousel({ projects, isLoading }: { projects: MainProjec
   }, [CARD_WIDTH, GAP, projects]);
 
   if (!projects || projects.length === 0) {
-    return <div className="flex justify-center items-center h-80">로딩 중입니다.</div>
+    return (
+      <div className="w-full bg-secondary-color flex flex-col items-center justify-center py-16 select-none">
+        <div
+          className="relative w-full max-w-full mx-auto flex items-center justify-center overflow-hidden"
+          style={{ height: CARD_HEIGHT }}
+        >
+          <div className="flex items-center justify-center mx-auto gap-4 w-full">
+            {[0,1,2,3,4].map(i => (
+              <div
+                key={i}
+                className="rounded-2xl bg-gray-200 animate-pulse flex-shrink-0 relative shadow-xl"
+                style={{
+                  width: '60%',
+                  height: CARD_HEIGHT,
+                  aspectRatio: '16/12',
+                  marginLeft: i === 0 ? 0 : 16,
+                  marginRight: i === 4 ? 0 : 16,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
