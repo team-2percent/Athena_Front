@@ -58,7 +58,7 @@ export default function CategoryMenu({ categoryId, handleCategoryError }: Catego
         {isLoading ?
             <div className="flex gap-4">
                 {[...Array(3)].map((_, i) => (
-                    <div key={i} className="w-20 h-12 rounded-lg bg-gray-200 animate-pulse" />
+                    <div key={i} className={`w-20 h-12 rounded-lg bg-gray-${3 - i}00 animate-pulse`} />
                 ))}
             </div>
         : (

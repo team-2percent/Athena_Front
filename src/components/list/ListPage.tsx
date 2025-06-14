@@ -17,7 +17,7 @@ interface ListPageProps {
 
 export default function ListPage({ type, categoryId, searchWord }: ListPageProps) {
   const { isLoading, apiCall } = useApi();
-  const [projects, setProjects] = useState<listProject[]>([]);
+  const [projects, setProjects] = useState<listProject[] | undefined>(undefined);
   const [cursorValue, setCursorValue] = useState<string | null>(null);
   const [lastProjectId, setLastProjectId] = useState<number | null>(null);
   const [totalCount, setTotalCount] = useState(0);
@@ -38,7 +38,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
       if(sort === newSort) return;
       setCursorValue(null);
       setLastProjectId(null);
-      setProjects([]);
+      setProjects(undefined);
       setSort(newSort);
   }
 
@@ -49,7 +49,8 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
         console.log(error);
         setLoadError(true);
       } else {
-        if ("content" in data) setProjects([...projects, ...(data.content as listProject[])]);
+        if ("content" in data) setProjects(prev => prev ? [...prev, ...(data.content as listProject[])] : [...(data.content as listProject[])]);
+        else setProjects([]);
         if ("nextCursorValue" in data) setCursorValue(data.nextCursorValue as string | null);
         if ("nextProjectId" in data) setLastProjectId(data.nextProjectId as number | null); 
         if (totalCount === 0 && "total" in data) setTotalCount(data.total as number);
@@ -82,6 +83,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
     const resetAndLoad = async () => {
       setCursorValue(null);
       setLastProjectId(null);
+      setProjects(undefined);
       loadProjects();
     };
     resetAndLoad();
@@ -96,7 +98,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
             sort={sort}
             onClickSort={handleSortClick}
         /> 
-        {(!loadError || projects.length > 0) && <ProjectsList projects={projects} isLoading={isLoading} />}
+        {(!loadError || (projects && projects.length > 0)) && <ProjectsList projects={projects} isLoading={isLoading} />}
         { 
             !loadError && morePage && 
             <div className="w-full py-20 flex justify-center items-center" ref={loader} data-cy="loading-spinner">

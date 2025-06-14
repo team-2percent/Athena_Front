@@ -52,7 +52,7 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
         gsap.to(card, { scale: 0.84, zIndex: 0, duration: 0.3, ease: 'power2.out' })
       }
     })
-  }, [hoveredIndex])
+  }, [hoveredIndex, projects])
 
   // 무한 슬라이드용: 리스트 2배 복제
   const infiniteProjects = [...projects, ...projects]
@@ -98,6 +98,7 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
     return (
       <div className="w-full max-w-7xl mx-auto py-12">
         <div className="flex flex-col lg:flex-row items-start lg:items-center">
+          
           {/* Title */}
           <h2 className="text-left font-bold mb-8 lg:mb-0 lg:min-w-[300px] pl-4 text-base sm:text-lg md:text-xl lg:text-3xl">
             <span className="block lg:hidden">
@@ -109,6 +110,7 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
               확인해보세요
             </span>
           </h2>
+
           {/* Carousel Container */}
           <div className="relative flex-1 w-full min-w-[min(100vw,900px)] overflow-hidden">
             <div className="pointer-events-none absolute left-0 top-0 h-full w-60 bg-gradient-to-r from-white to-transparent z-4" />
@@ -118,11 +120,13 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
                 <div
                   key={i}
                   className="flex flex-col items-start animate-pulse"
-                  style={{ minWidth: '220px', width: 220 }}
+                  style={{ minWidth: '220px', width: 220, transform: 'scale(0.92)' }}
                 >
                   <div className="w-full aspect-square bg-gray-200 rounded-lg mb-3" />
-                  <div className="h-5 w-2/3 bg-gray-200 rounded mb-2" />
-                  <div className="h-4 w-1/2 bg-gray-100 rounded" />
+                  <div className="h-3 w-1/3 bg-gray-100 rounded mb-2" />
+                  <div className="h-3 w-full bg-gray-200 rounded mb-3" />
+                  <div className="h-6 w-full bg-gray-100 rounded mb-2" />
+                  <div className="h-3 w-1/4 bg-gray-200 rounded mb-2" />
                 </div>
               ))}
             </div>
@@ -161,7 +165,7 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
                 className="w-full project-card-anim transition-transform"
                 onMouseEnter={() => setHoveredIndex(index % projects.length)}
                 onMouseLeave={() => setHoveredIndex(null)}
-                style={{ willChange: 'transform', minWidth: '220px', maxWidth: '1fr' }}
+                style={{ willChange: 'transform', minWidth: '220px', maxWidth: '1fr', transform: 'scale(0.92)' }}
               >
                 <ProjectGridItem
                   className="w-full"

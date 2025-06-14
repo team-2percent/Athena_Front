@@ -117,28 +117,54 @@ export default function Carousel({ projects, isLoading }: { projects: MainProjec
     };
   }, [CARD_WIDTH, GAP, projects]);
 
+  // 스켈레톤 높이만 동적으로 적용
+  const [skeletonHeight, setSkeletonHeight] = useState(0); // 초기값 0
+  useEffect(() => {
+    const getHeight = () => {
+      if (typeof window !== 'undefined') {
+        if (window.innerWidth < 640) return 165;
+        if (window.innerWidth < 1024) return 240;
+      }
+      return 300;
+    };
+    setSkeletonHeight(getHeight());
+    const handleResize = () => setSkeletonHeight(getHeight());
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   if (!projects || projects.length === 0) {
     return (
       <div className="w-full bg-secondary-color flex flex-col items-center justify-center py-16 select-none">
         <div
           className="relative w-full max-w-full mx-auto flex items-center justify-center overflow-hidden"
-          style={{ height: CARD_HEIGHT }}
+          style={{ height: skeletonHeight || undefined }}
         >
-          <div className="flex items-center justify-center mx-auto gap-4 w-full">
+          <div className="flex items-center justify-center mx-auto w-full gap-2 sm:gap-4 lg:gap-8">
             {[0,1,2,3,4].map(i => (
               <div
                 key={i}
-                className="rounded-2xl bg-gray-200 animate-pulse flex-shrink-0 relative shadow-xl"
+                className="rounded-2xl bg-gray-200 animate-pulse flex-shrink-0 relative shadow-xl h-[165px] sm:h-[240px] lg:h-[300px]"
                 style={{
                   width: '60%',
-                  height: CARD_HEIGHT,
+                  height: skeletonHeight || undefined,
                   aspectRatio: '16/12',
-                  marginLeft: i === 0 ? 0 : 16,
-                  marginRight: i === 4 ? 0 : 16,
                 }}
               />
             ))}
           </div>
+        </div>
+        {/* 인디케이터 스켈레톤 */}
+        <div className="flex justify-center gap-2 mt-8">
+          {[0,1,2,3,4].map(i => (
+            <div
+              key={i}
+              className="w-3 h-3 rounded-full bg-gray-200 animate-pulse"
+              style={{
+                width: i === 2 ? '24px' : '12px'  // 중앙 인디케이터는 더 길게
+              }}
+            />
+          ))}
         </div>
       </div>
     );
@@ -173,11 +199,11 @@ export default function Carousel({ projects, isLoading }: { projects: MainProjec
             const project = projects[idx];
             if (!project) return null;
             // i === 2가 중앙, i === 1/3이 양옆, i === 0/4가 바깥쪽
-            let scale = 0.92, opacity = 0.7, zIndex = 1, boxShadow = '0 4px 16px 0 rgba(0,0,0,0.10)';
+            let opacity = 0.7, zIndex = 1, boxShadow = '0 4px 16px 0 rgba(0,0,0,0.10)';
             if (i === 2) {
-              scale = 1; opacity = 1; zIndex = 2; boxShadow = '0 8px 32px 0 rgba(0,0,0,0.18)';
+              opacity = 1; zIndex = 2; boxShadow = '0 8px 32px 0 rgba(0,0,0,0.18)';
             } else if (i === 1 || i === 3) {
-              scale = 0.96; opacity = 0.85; zIndex = 1; boxShadow = '0 4px 16px 0 rgba(0,0,0,0.10)';
+              opacity = 0.85; zIndex = 1; boxShadow = '0 4px 16px 0 rgba(0,0,0,0.10)';
             }
             return (
               <div
@@ -190,7 +216,6 @@ export default function Carousel({ projects, isLoading }: { projects: MainProjec
                 style={{
                   width: '60%',
                   height: CARD_HEIGHT,
-                  transform: `scale(${scale})`,
                   opacity,
                   zIndex,
                   boxShadow,
