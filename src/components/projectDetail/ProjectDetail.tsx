@@ -235,10 +235,9 @@ const ProjectDetail = () => {
           {/* 왼쪽: 이미지 캐러셀 스켈레톤 */}
           <div className="flex flex-col">
             <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-gray-200 animate-pulse flex items-center justify-center">
-              <div className="w-1/2 h-1/2 bg-gray-300 rounded-xl" />
             </div>
             <div className="mt-4 flex justify-center gap-4">
-              {[0,1,2].map(idx => (
+              {[0,1,2,3,4].map(idx => (
                 <div key={idx} className="h-20 w-20 bg-gray-200 rounded-xl animate-pulse" />
               ))}
             </div>

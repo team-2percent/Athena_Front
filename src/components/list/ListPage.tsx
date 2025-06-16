@@ -17,7 +17,7 @@ interface ListPageProps {
 
 export default function ListPage({ type, categoryId, searchWord }: ListPageProps) {
   const { isLoading, apiCall } = useApi();
-  const [projects, setProjects] = useState<listProject[]>([]);
+  const [projects, setProjects] = useState<listProject[] | undefined>(undefined);
   const [cursorValue, setCursorValue] = useState<string | null>(null);
   const [lastProjectId, setLastProjectId] = useState<number | null>(null);
   const [totalCount, setTotalCount] = useState(0);
@@ -36,9 +36,6 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
 
   const handleSortClick = (newSort: string) => {
       if(sort === newSort) return;
-      setCursorValue(null);
-      setLastProjectId(null);
-      setProjects([]);
       setSort(newSort);
   }
 
@@ -49,7 +46,8 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
         console.log(error);
         setLoadError(true);
       } else {
-        if ("content" in data) setProjects([...projects, ...(data.content as listProject[])]);
+        if ("content" in data) setProjects(prev => prev ? [...prev, ...(data.content as listProject[])] : [...(data.content as listProject[])]);
+        else setProjects([]);
         if ("nextCursorValue" in data) setCursorValue(data.nextCursorValue as string | null);
         if ("nextProjectId" in data) setLastProjectId(data.nextProjectId as number | null); 
         if (totalCount === 0 && "total" in data) setTotalCount(data.total as number);
@@ -73,19 +71,20 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
     return () => observer.disconnect();
   }, [isLoading, morePage]);
 
-
+  // 정렬 조건이 바뀌면 상태만 초기화
   useEffect(() => {
-    loadProjects();
-  }, []);
+    setCursorValue(null);
+    setLastProjectId(null);
+    setProjects(undefined);
+  }, [sort]);
 
+  // cursorValue, lastProjectId가 null로 초기화된 후에만 loadProjects 실행
   useEffect(() => {
-    const resetAndLoad = async () => {
-      setCursorValue(null);
-      setLastProjectId(null);
+    if (cursorValue === null && lastProjectId === null) {
       loadProjects();
-    };
-    resetAndLoad();
-  }, [sort])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cursorValue, lastProjectId, sort]);
 
   return (
     <div className="w-full w-[var(--content-width)]">
@@ -96,7 +95,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
             sort={sort}
             onClickSort={handleSortClick}
         /> 
-        {(!loadError || projects.length > 0) && <ProjectsList projects={projects} isLoading={isLoading} />}
+        {(!loadError || (projects && projects.length > 0)) && <ProjectsList projects={projects} isLoading={isLoading} />}
         { 
             !loadError && morePage && 
             <div className="w-full py-20 flex justify-center items-center" ref={loader} data-cy="loading-spinner">

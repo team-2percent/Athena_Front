@@ -85,8 +85,8 @@ export default function ProjectCard({
 
         <div className="flex flex-col flex-1 justify-between p-1 pt-2">
           <div>
-            <p className={clsx("text-sub-gray", sizeDesign.sellerName[size])}>{sellerName}</p>
-            <p className={clsx("font-medium line-clamp-2", sizeDesign.projectName[size])}>{projectName}</p>
+            <p className={clsx("text-sub-gray line-clamp-1", sizeDesign.sellerName[size])}>{sellerName}</p>
+            <p className={clsx("font-medium line-clamp-1", sizeDesign.projectName[size])}>{projectName}</p>
             <p className={clsx("text-sub-gray mt-1 line-clamp-2", sizeDesign.description[size])}>{description}</p>
             { !showProgressBar && <p
               className={cn("font-bold mt-1", isOverAchieved ? "text-point-color" : "text-main-color", isSoldOut ? "text-sub-gray" : "text-main-color", sizeDesign.achievement[size])}
