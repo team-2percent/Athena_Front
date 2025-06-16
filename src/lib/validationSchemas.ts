@@ -334,7 +334,7 @@ export const signupSchema = z.object({
 export const profileEditSchema = z.object({
   nickname: nicknameSchema,
   sellerDescription: sellerDescriptionSchema,
-  profileImage: imageSchema.nullable(),
+  profileImage: imageSchema.optional(),
   linkUrl: linkUrlsSchema,
 })
 
