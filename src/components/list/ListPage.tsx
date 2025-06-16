@@ -36,9 +36,6 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
 
   const handleSortClick = (newSort: string) => {
       if(sort === newSort) return;
-      setCursorValue(null);
-      setLastProjectId(null);
-      setProjects(undefined);
       setSort(newSort);
   }
 
@@ -74,20 +71,20 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
     return () => observer.disconnect();
   }, [isLoading, morePage]);
 
-
+  // 정렬 조건이 바뀌면 상태만 초기화
   useEffect(() => {
-    loadProjects();
-  }, []);
+    setCursorValue(null);
+    setLastProjectId(null);
+    setProjects(undefined);
+  }, [sort]);
 
+  // cursorValue, lastProjectId가 null로 초기화된 후에만 loadProjects 실행
   useEffect(() => {
-    const resetAndLoad = async () => {
-      setCursorValue(null);
-      setLastProjectId(null);
-      setProjects(undefined);
+    if (cursorValue === null && lastProjectId === null) {
       loadProjects();
-    };
-    resetAndLoad();
-  }, [sort])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cursorValue, lastProjectId, sort]);
 
   return (
     <div className="w-full w-[var(--content-width)]">
