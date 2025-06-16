@@ -381,9 +381,9 @@ export const couponPeriodSchema = z.object({
 
 export const couponExpireSchema = z.object({
   endAt: z.date(),
-  expiresAt: z.date(),
+  expireAt: z.date(),
 }).refine((data) => {
-    const hourDiff = (data.expiresAt.getTime() - data.endAt.getTime()) / (1000 * 60 * 60);
+    const hourDiff = (data.expireAt.getTime() - data.endAt.getTime()) / (1000 * 60 * 60);
     return hourDiff >= COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR;
 }, {
     message: `만료 기간은 발급 종료일로부터 최소 ${COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR}시간 이상이어야 합니다.`
