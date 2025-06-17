@@ -134,6 +134,52 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
     cy.contains('후기').click();
     cy.contains('아직 리뷰가 없습니다').should('be.visible');
   });
+
+  it('프로젝트 조회 중 스켈레톤이 노출된다', () => {
+    cy.intercept('GET', `/api/project/${mockProjectId}`, (req) => new Promise(resolve => {
+      setTimeout(() => {
+        req.reply({ statusCode: 200, body: { ...mockProjectData } });
+        resolve();
+      }, 1000);
+    })).as('getProjectDetailDelay');
+    cy.visit(`/project/${mockProjectId}`);
+    cy.get('.animate-pulse').should('exist');
+    cy.wait('@getProjectDetailDelay');
+  });
+
+  it('프로젝트 조회 실패 시 에러 메시지와 다시 시도 버튼 노출', () => {
+    cy.intercept('GET', `/api/project/${mockProjectId}`, { statusCode: 500 }).as('getProjectDetailError');
+    cy.visit(`/project/${mockProjectId}`);
+    cy.get('.bg-red-50').should('be.visible');
+    cy.contains('다시 시도').click();
+    cy.wait('@getProjectDetailError');
+  });
+
+  it('이미지 캐러셀 동작 및 인덱스 버튼 클릭 시 이미지 변경', () => {
+    cy.visit(`/project/${mockProjectId}`);
+    cy.get('[data-cy="project-image"]').first().should('have.attr', 'src', '/project-test.png');
+    cy.get('button[aria-label="다음 이미지"]').click();
+    cy.get('[data-cy="project-image"]').first().should('have.attr', 'src', '/project-test2.png');
+  });
+
+  it('재고가 0일 때 후원 불가 버튼이 노출된다', () => {
+    cy.intercept('GET', `/api/project/${mockProjectId}`, {
+      statusCode: 200,
+      body: { ...mockProjectData, productResponses: [{ ...mockProjectData.productResponses[0], stock: 0 }] }
+    }).as('getProjectDetailNoStock');
+    cy.visit(`/project/${mockProjectId}`);
+    cy.contains('후원 불가').should('exist').and('be.disabled')
+  });
+
+  it('펀딩 마감/종료 시 상태 메시지가 노출된다', () => {
+    cy.intercept('GET', `/api/project/${mockProjectId}`, {
+      statusCode: 200,
+      body: { ...mockProjectData, endAt: '2023-01-01' }
+    }).as('getProjectDetailEnded');
+    cy.visit(`/project/${mockProjectId}`);
+    cy.contains('마감임박').should('be.visible');
+    cy.contains('펀딩 종료').should('be.visible');
+  });
 })
 
 describe('프로젝트 상세 결제 플로우', () => {
@@ -263,4 +309,16 @@ describe('프로젝트 상세 결제 플로우', () => {
     cy.wait('@paymentReady')
     cy.get('@windowOpen').should('be.calledWithMatch', 'https://pay.test')
   })
+
+  it('옵션 해제, 수량 증감, 결제 금액 변화가 정상 동작한다', () => {
+    cy.contains('후원하기').click();
+    cy.contains('테스트 리워드').click();
+    cy.contains('테스트 리워드').should('exist');
+    cy.get('button').contains('+').click();
+    cy.contains('20,000원').should('exist');
+    cy.get('button').contains('-').click();
+    cy.contains('10,000원').should('exist');
+    cy.contains('테스트 리워드').click();
+    cy.contains('테스트 리워드').should('not.exist');
+  });
 })

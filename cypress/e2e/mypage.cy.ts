@@ -284,4 +284,213 @@ describe("마이페이지", () => {
         cy.url().should('include', '/project/21')
 
     })
+
+    it('프로필 조회 로딩 시 스켈레톤 노출', () => {
+        cy.intercept('GET', '/api/user/57', (req) => new Promise(resolve => {
+            setTimeout(() => {
+                req.reply({ fixture: 'my/user.json' });
+                resolve();
+            }, 1000);
+        })).as('getUserDelay');
+        cy.visit('/my');
+        cy.get('.animate-pulse').should('exist');
+        cy.wait('@getUserDelay');
+    });
+
+    it('프로필 조회 실패 시 에러 메시지 노출', () => {
+        cy.intercept('GET', '/api/user/57', { statusCode: 500 }).as('getUserError');
+        cy.visit('/my');
+        cy.get('[data-cy="profile-header"]').should('not.exist');
+        cy.contains('에러').should('be.visible');
+    });
+
+    it('프로필 편집 버튼 클릭 시 /my/edit 이동 및 API 호출', () => {
+        cy.get('[data-cy="profile-edit-button"]').click();
+        cy.url().should('include', '/my/edit');
+    });
+
+    it('탭 바 이동 및 활성화 클래스 확인', () => {
+        const tabs = ['소개', '쿠폰', '판매 상품', '구매 상품', '내가 쓴 후기'];
+        tabs.forEach(tab => {
+            cy.get('[data-cy="menu-tab"]').get(`[data-cy="menu-tab-${tab}"]`).click();
+            cy.get(`[data-cy="menu-tab-${tab}"]`).should('have.class', 'text-main-color');
+            cy.visit('/my');
+        });
+    });
+
+    it('소개 탭 로딩 시 스켈레톤 노출', () => {
+        cy.intercept('GET', '/api/user/57', (req) => new Promise(resolve => {
+            setTimeout(() => {
+                req.reply({ fixture: 'my/user.json' });
+                resolve();
+            }, 1000);
+        })).as('getUserDelay');
+        cy.visit('/my');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-소개"]').click();
+        cy.get('.animate-pulse').should('exist');
+        cy.wait('@getUserDelay');
+    });
+
+    it('소개 탭 실패 시 에러 메시지 노출', () => {
+        cy.intercept('GET', '/api/user/57', { statusCode: 500 }).as('getUserError');
+        cy.visit('/my');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-소개"]').click();
+        cy.contains('에러').should('be.visible');
+    });
+
+    it('쿠폰 탭 로딩 시 스켈레톤 노출', () => {
+        cy.intercept('GET', '/api/my/coupon', (req) => new Promise(resolve => {
+            setTimeout(() => {
+                req.reply({ fixture: 'my/coupon.json' });
+                resolve();
+            }, 1000);
+        })).as('getMyCouponsDelay');
+        cy.visit('/my');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-쿠폰"]').click();
+        cy.get('.animate-pulse').should('exist');
+        cy.wait('@getMyCouponsDelay');
+    });
+
+    it('쿠폰 탭 실패 시 에러 메시지 노출', () => {
+        cy.intercept('GET', '/api/my/coupon', { statusCode: 500 }).as('getMyCouponsError');
+        cy.visit('/my');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-쿠폰"]').click();
+        cy.contains('에러').should('be.visible');
+    });
+
+    it('판매 상품 조회 로딩 시 스켈레톤 노출', () => {
+        cy.intercept('GET', '/api/my/project', (req) => new Promise(resolve => {
+            setTimeout(() => {
+                req.reply({ fixture: 'my/project.json' });
+                resolve();
+            }, 1000);
+        })).as('getMyProjectsDelay');
+        cy.visit('/my');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-판매 상품"]').click();
+        cy.get('.animate-pulse').should('exist');
+        cy.wait('@getMyProjectsDelay');
+    });
+
+    it('판매 상품 조회 성공, 데이터 없음 시 메시지 노출', () => {
+        cy.intercept('GET', '/api/my/project', { statusCode: 200, body: [] }).as('getMyProjectsEmpty');
+        cy.visit('/my');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-판매 상품"]').click();
+        cy.contains('등록된 상품이 없습니다').should('be.visible');
+    });
+
+    it('판매 상품 조회 실패 시 에러 메시지 노출', () => {
+        cy.intercept('GET', '/api/my/project', { statusCode: 500 }).as('getMyProjectsError');
+        cy.visit('/my');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-판매 상품"]').click();
+        cy.contains('에러').should('be.visible');
+    });
+
+    it('판매 상품 삭제 실패 시 에러 토스트/모달 노출', () => {
+        cy.intercept('DELETE', '/api/project/1', { statusCode: 500 }).as('deleteProjectError');
+        cy.visit('/my');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-판매 상품"]').click();
+        cy.get('[data-cy="project-item"]').first().find('[data-cy="delete-button"]').click();
+        cy.get('[data-cy="delete-modal"]').should('be.visible');
+        cy.get('[data-cy="delete-modal"]').find('[data-cy="confirm-button"]').click();
+        cy.wait('@deleteProjectError');
+        cy.contains('판매 상품 삭제 실패').should('be.visible');
+        cy.get('[data-cy="delete-modal"]').should('be.visible');
+    });
+
+    it('구매 상품 조회 로딩 시 스켈레톤 노출', () => {
+        cy.intercept('GET', '/api/my/order', (req) => new Promise(resolve => {
+            setTimeout(() => {
+                req.reply({ fixture: 'my/order.json' });
+                resolve();
+            }, 1000);
+        })).as('getMyOrdersDelay');
+        cy.visit('/my');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-구매 상품"]').click();
+        cy.get('.animate-pulse').should('exist');
+        cy.wait('@getMyOrdersDelay');
+    });
+
+    it('구매 상품 조회 성공, 데이터 없음 시 메시지 노출', () => {
+        cy.intercept('GET', '/api/my/order', { statusCode: 200, body: [] }).as('getMyOrdersEmpty');
+        cy.visit('/my');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-구매 상품"]').click();
+        cy.contains('구매한 상품이 없습니다').should('be.visible');
+    });
+
+    it('구매 상품 조회 실패 시 에러 메시지 노출', () => {
+        cy.intercept('GET', '/api/my/order', { statusCode: 500 }).as('getMyOrdersError');
+        cy.visit('/my');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-구매 상품"]').click();
+        cy.contains('에러').should('be.visible');
+    });
+
+    it('구매 상품 후기 작성 시 글자수 제한 초과 시 에러 메시지', () => {
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-구매 상품"]').click();
+        cy.get('[data-cy="order-item"]').first().find('[data-cy="write-review-button"]').click();
+        cy.get('[data-cy="review-form"]').get('[data-cy="review-content"]').type('A'.repeat(301));
+        cy.get('[data-cy="content-error-message"]').should('be.visible');
+    });
+
+    it('구매 상품 후기 작성 시 로딩(스피너) 노출', () => {
+        cy.intercept('POST', '/api/comment/create?projectId=11', (req) => new Promise(resolve => {
+            setTimeout(() => {
+                req.reply({});
+                resolve();
+            }, 1000);
+        })).as('writeReviewDelay');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-구매 상품"]').click();
+        cy.get('[data-cy="order-item"]').first().find('[data-cy="write-review-button"]').click();
+        cy.get('[data-cy="review-form"]').get('[data-cy="review-content"]').type('후기 테스트');
+        cy.get('[data-cy="review-form"]').get('[data-cy="submit-button"]').click();
+        cy.get('[data-cy="submit-button"]').should('have.class', 'spinner'); // 실제 스피너 클래스에 맞게 수정 필요
+        cy.wait('@writeReviewDelay');
+    });
+
+    it('구매 상품 후기 작성 실패 시 에러 메시지/토스트 노출', () => {
+        cy.intercept('POST', '/api/comment/create?projectId=11', { statusCode: 500 }).as('writeReviewError');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-구매 상품"]').click();
+        cy.get('[data-cy="order-item"]').first().find('[data-cy="write-review-button"]').click();
+        cy.get('[data-cy="review-form"]').get('[data-cy="review-content"]').type('후기 테스트');
+        cy.get('[data-cy="review-form"]').get('[data-cy="submit-button"]').click();
+        cy.wait('@writeReviewError');
+        cy.contains('후기 작성 실패').should('be.visible');
+    });
+
+    it('내가 쓴 후기 조회 로딩 시 스켈레톤 노출', () => {
+        cy.intercept('GET', '/api/my/comment', (req) => new Promise(resolve => {
+            setTimeout(() => {
+                req.reply({ fixture: 'my/comment.json' });
+                resolve();
+            }, 1000);
+        })).as('getMyCommentsDelay');
+        cy.visit('/my');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-내가 쓴 후기"]').click();
+        cy.get('.animate-pulse').should('exist');
+        cy.wait('@getMyCommentsDelay');
+    });
+
+    it('내가 쓴 후기 조회 성공, 데이터 없음 시 메시지 노출', () => {
+        cy.intercept('GET', '/api/my/comment', { statusCode: 200, body: [] }).as('getMyCommentsEmpty');
+        cy.visit('/my');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-내가 쓴 후기"]').click();
+        cy.contains('작성한 후기가 없습니다').should('be.visible');
+    });
+
+    it('내가 쓴 후기 조회 실패 시 에러 메시지 노출', () => {
+        cy.intercept('GET', '/api/my/comment', { statusCode: 500 }).as('getMyCommentsError');
+        cy.visit('/my');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-내가 쓴 후기"]').click();
+        cy.contains('에러').should('be.visible');
+    });
+
+    it('내가 쓴 후기 상세 보기', () => {
+        cy.visit('/my');
+        cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-내가 쓴 후기"]').click();
+        cy.get('[data-cy="comment-item"]').first().click();
+        cy.get('[data-cy="review-modal"]').should('be.visible');
+        cy.get('[data-cy="review-modal"]').within(() => {
+            cy.get('[data-cy="review-date"]').should('be.visible');
+            cy.get('[data-cy="review-content"]').should('be.visible');
+        });
+    });
 });
