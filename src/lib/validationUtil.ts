@@ -17,18 +17,13 @@ const getValidatedString = (value: string, maxLength: number): string => {
 }
 
 const getValidatedStringByte = (value: string, maxByte: number): string => {
-    const currentBytes = getByteLength(value)
-    const newBytes = getByteLength(value)
-        
-    if (newBytes + currentBytes > maxByte - 1) {
-            // 바이트 제한을 초과하지 않는 최대 길이 찾기
-            let slicedValue = value
-            while (getByteLength(slicedValue) + currentBytes > maxByte - 1) {
-                slicedValue = slicedValue.slice(0, -1)
-            }
-            return slicedValue
+    if (getByteLength(value) <= maxByte) return value
+
+    let end = value.length
+    while (getByteLength(value.slice(0, end)) > maxByte) {
+        end--
     }
-    return value
+    return value.slice(0, end)
 }
 
 const getValidatedNumber = (value: number, maxNumber: number): number => {
