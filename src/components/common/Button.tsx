@@ -97,7 +97,7 @@ export const Button = ({
   )
 
   return (
-    <button className={buttonClasses} disabled={disabled || isLoading} data-cy={dataCy} aria-label={ariaLabel} {...props}>
+    <button className={buttonClasses} disabled={disabled || isLoading} data-cy={isLoading ? `${dataCy}-loading` : dataCy} aria-label={ariaLabel} {...props}>
       {isLoading && (
         <svg
           className="animate-spin mx-auto h-4 w-4 text-current absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
