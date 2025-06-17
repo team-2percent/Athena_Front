@@ -7,7 +7,6 @@ interface AuthStore {
   isLoggedIn: boolean;
   role: UserRole;
   userId: number | null;
-  hydrated: boolean;
   fcmToken: string | null;
   setLoggedIn: (loggedIn: boolean) => void;
   setRole: (role: string) => void;
@@ -15,14 +14,12 @@ interface AuthStore {
   setFcmToken: (fcmToken: string | null) => void;
   login: (accessToken: string, userId: number) => void;
   logout: () => void;
-  setHydrated: (hydrated: boolean) => void;
 }
 
 const useAuthStore = create<AuthStore>((set) => ({
   isLoggedIn: false,
   role: "",
   userId: null,
-  hydrated: false,
   fcmToken: null,
   setLoggedIn: (loggedIn) => set({ isLoggedIn: loggedIn }),
   setRole: (role) => {
@@ -57,7 +54,6 @@ const useAuthStore = create<AuthStore>((set) => ({
     }
     set({ isLoggedIn: false, role: "", userId: null, fcmToken: null })
   },
-  setHydrated: (hydrated) => set({ hydrated }),
 }))
 
 export default useAuthStore

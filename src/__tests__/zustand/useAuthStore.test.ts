@@ -8,7 +8,6 @@ describe('useAuthStore', () => {
             isLoggedIn: false,
             role: "",
             userId: null,
-            hydrated: false,
             fcmToken: null
         });
     });
