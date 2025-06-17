@@ -8,9 +8,10 @@ interface TimePickerProps {
   selectedDateTime: Date
   onChange: (date: Date) => void
   minDateTime?: Date
+  dataCy?: string
 }
 
-export default function TimePicker({ selectedDateTime, onChange, minDateTime }: TimePickerProps) {
+export default function TimePicker({ selectedDateTime, onChange, minDateTime, dataCy }: TimePickerProps) {
   const [isOpen, setIsOpen] = useState(false)
   const timePickerRef = useRef<HTMLDivElement>(null)
   const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"))
@@ -48,6 +49,7 @@ export default function TimePicker({ selectedDateTime, onChange, minDateTime }: 
       <div
         className="flex rounded-full border border-gray-300 px-4 py-3 pl-10 focus:border-main-color focus:outline-none cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
+        data-cy={dataCy}
       >
         <Clock className="w-5 h-5 text-gray-500 absolute left-4 top-1/2 -translate-y-1/2" />
         <span className="text-sm">

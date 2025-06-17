@@ -63,14 +63,13 @@ export default function CouponRegisterPage() {
         },
         expire: {
             endAt: couponEndDateTime,
-            expiresAt: couponExpireDateTime,
+            expireAt: couponExpireDateTime,
         },
         stock: couponStock,
     }, couponAddSchema).error
 
     const handleAddCoupon = () => {
-        // 쿠폰 등록 추가
-        setIsModalOpen(false);
+        // 쿠폰 등록 추가 
         setIsLoading(true)
         apiCall("/api/coupon/create", "POST", {
             title: couponName,
@@ -78,12 +77,13 @@ export default function CouponRegisterPage() {
             price: couponPrice,
             startAt: new Date(couponStartDateTime.getTime() + (9 * 60 * 60 * 1000)).toISOString(),
             endAt: new Date(couponEndDateTime.getTime() + (9 * 60 * 60 * 1000)).toISOString(),
-            expiresAt: new Date(couponExpireDateTime.getTime() + (9 * 60 * 60 * 1000)).toISOString(),
+            expireAt: new Date(couponExpireDateTime.getTime() + (9 * 60 * 60 * 1000)).toISOString(),
             stock: couponStock,
         }).then(({ error, status }) => {
             if (error && status === 500) {
                 showErrorToast("쿠폰 등록 실패", "다시 시도해 주세요.")
             } else if (!error) {
+                setIsModalOpen(false);
                 router.push('/admin/coupon')
             }
         })
@@ -139,7 +139,7 @@ export default function CouponRegisterPage() {
 
         const expireResult = validate({
             endAt: date,
-            expiresAt: couponExpireDateTime,
+            expireAt: couponExpireDateTime,
         }, couponExpireSchema)
         setCouponAddError({ ...couponAddError, expire: expireResult.message })
         setCouponEndDateTime(date)
@@ -173,11 +173,8 @@ export default function CouponRegisterPage() {
 
     return (
         <div className="flex flex-col mx-auto w-[var(--content-width)] py-8 gap-6">
-            {
-                isLoading && <OverlaySpinner message="쿠폰 등록 중입니다." />
-            }
                 <div className="flex w-full">
-                <GhostButton onClick={() => router.push("/admin/coupon")} className="flex gap-1 items-center">
+                <GhostButton onClick={() => router.push("/admin/coupon")} className="flex gap-1 items-center" dataCy="back-to-list-button">
                     <ArrowLeftIcon className="w-4 h-4" />
                     목록으로
                 </GhostButton>
@@ -194,7 +191,12 @@ export default function CouponRegisterPage() {
                             isError={couponAddError.title !== ""}
                             dataCy="coupon-name-input"
                         />
-                        <InputInfo errorMessage={couponAddError.title} showLength length={couponName.length} maxLength={COUPON_NAME_MAX_LENGTH} />
+                        <InputInfo
+                            errorMessage={couponAddError.title}
+                            showLength length={couponName.length}
+                            maxLength={COUPON_NAME_MAX_LENGTH}
+                            errorMessageDataCy="coupon-name-error"
+                        />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">쿠폰 설명</label>
@@ -206,7 +208,13 @@ export default function CouponRegisterPage() {
                             isError={couponAddError.content !== ""}
                             dataCy="coupon-description-input"
                         />
-                        <InputInfo errorMessage={couponAddError.content} showLength length={couponDescription.length} maxLength={COUPON_CONTENT_MAX_LENGTH} />
+                        <InputInfo
+                            errorMessage={couponAddError.content}
+                            showLength
+                            length={couponDescription.length}
+                            maxLength={COUPON_CONTENT_MAX_LENGTH}
+                            errorMessageDataCy="coupon-description-error"
+                        />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">가격</label>
@@ -221,27 +229,36 @@ export default function CouponRegisterPage() {
                                 isError={couponAddError.price !== ""}
                                 dataCy="coupon-price-input"
                             />
-                            <InputInfo errorMessage={couponAddError.price} />
+                            <InputInfo
+                                errorMessage={couponAddError.price}
+                                errorMessageDataCy="coupon-price-error"
+                            />
                         </div>
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">발급 기간</label>
                         <div className="flex gap-4 items-center">
-                            <DatePicker selectedDate={couponStartDateTime} onChange={handleStartDateTimeChange}/>
-                            <TimePicker selectedDateTime={couponStartDateTime} onChange={handleStartDateTimeChange}/>
+                            <DatePicker selectedDate={couponStartDateTime} onChange={handleStartDateTimeChange} dataCy="coupon-period-start-input"/>
+                            <TimePicker selectedDateTime={couponStartDateTime} onChange={handleStartDateTimeChange} dataCy="coupon-period-start-time-input"/>
                             <span>~</span>
-                            <DatePicker selectedDate={couponEndDateTime} onChange={handleEndDateTimeChange}  minDate={minEndDateTime}/>
-                            <TimePicker selectedDateTime={couponEndDateTime} onChange={handleEndDateTimeChange} minDateTime={minEndDateTime}/>
+                            <DatePicker selectedDate={couponEndDateTime} onChange={handleEndDateTimeChange}  minDate={minEndDateTime} dataCy="coupon-period-end-input"/>
+                            <TimePicker selectedDateTime={couponEndDateTime} onChange={handleEndDateTimeChange} minDateTime={minEndDateTime} dataCy="coupon-period-end-time-input"/>
                         </div>
-                        <InputInfo errorMessage={couponAddError.period} />
+                        <InputInfo
+                            errorMessage={couponAddError.period}
+                            errorMessageDataCy="coupon-period-error"
+                        />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">만료 기간</label>
                         <div className="flex gap-4 items-center">
-                            <DatePicker selectedDate={couponExpireDateTime} onChange={handleExpireDateTimeChange} minDate={minExpireDateTime}/>
+                            <DatePicker selectedDate={couponExpireDateTime} onChange={handleExpireDateTimeChange} minDate={minExpireDateTime} dataCy="coupon-expiration-input"/>
                             <TimePicker selectedDateTime={couponExpireDateTime} onChange={handleExpireDateTimeChange} minDateTime={minExpireDateTime}/>
                         </div>
-                        <InputInfo errorMessage={couponAddError.expire} />
+                        <InputInfo
+                            errorMessage={couponAddError.expire}
+                            errorMessageDataCy="coupon-expiration-error"
+                        />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-sm text-sub-gray">수량</label>
@@ -256,7 +273,7 @@ export default function CouponRegisterPage() {
                                 isError={couponAddError.stock !== ""}
                                 dataCy="coupon-stock-input"
                             />
-                            <InputInfo errorMessage={couponAddError.stock} />
+                            <InputInfo errorMessage={couponAddError.stock} errorMessageDataCy="coupon-stock-error"/>
                         </div>
                     </div>
                     <div className="flex justify-end">
