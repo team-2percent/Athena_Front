@@ -479,9 +479,13 @@ const ProjectDetail = () => {
                   후원하기
                 </PrimaryButton>
               ) : (
-                <div className="w-full md:w-2/3 rounded-xl bg-gray-300 px-4 md:px-8 py-3 md:py-4 text-base md:text-xl font-bold text-gray-500 cursor-not-allowed text-center">
+                <PrimaryButton
+                  className="w-full md:w-2/3 rounded-xl px-4 md:px-8 py-3 md:py-4 text-base md:text-xl font-bold"
+                  disabled
+                  data-cy="donate-disabled"
+                >
                   후원 불가
-                </div>
+                </PrimaryButton>
               )}
             </div>
           </div>

@@ -168,7 +168,7 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
       body: { ...mockProjectData, productResponses: [{ ...mockProjectData.productResponses[0], stock: 0 }] }
     }).as('getProjectDetailNoStock');
     cy.visit(`/project/${mockProjectId}`);
-    cy.contains('후원 불가').should('exist').and('be.disabled')
+    cy.get('[data-cy="donate-disabled"]').should('exist').and('be.disabled');
   });
 
   it('펀딩 마감/종료 시 상태 메시지가 노출된다', () => {
@@ -313,12 +313,14 @@ describe('프로젝트 상세 결제 플로우', () => {
   it('옵션 해제, 수량 증감, 결제 금액 변화가 정상 동작한다', () => {
     cy.contains('후원하기').click();
     cy.contains('테스트 리워드').click();
+    // 오른쪽 영역에 선택된 상품이 보이는지 검증
+    cy.get('[data-cy="expand-selected-product"]').should('be.visible');
     cy.contains('테스트 리워드').should('exist');
     cy.get('button').contains('+').click();
     cy.contains('20,000원').should('exist');
     cy.get('button').contains('-').click();
     cy.contains('10,000원').should('exist');
     cy.contains('테스트 리워드').click();
-    cy.contains('테스트 리워드').should('not.exist');
+    cy.get('[data-cy="expand-selected-product"]').should('not.exist');
   });
 })
