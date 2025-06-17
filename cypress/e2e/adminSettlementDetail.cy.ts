@@ -31,7 +31,7 @@ describe('정산 상세 페이지', () => {
         it('조회 성공 시 상세 정보 정상 표시', () => {
             cy.visit(`/admin/settlement/${settlementId}`)
 
-            cy.wait('@getSettlementDetail')
+            cy.wait('@getSettlementDetail').its('response.statusCode').should('eq', 200)
 
             // 정산 상세 정보 표시 확인
             cy.get('[data-cy="settlement-detail-project-title"]').should('be.visible')
@@ -67,7 +67,7 @@ describe('정산 상세 페이지', () => {
         it('조회 성공 시 상품 정보 정상 표시', () => {
             cy.visit(`/admin/settlement/${settlementId}`)
 
-            cy.wait('@getSettlementProducts')
+            cy.wait('@getSettlementProducts').its('response.statusCode').should('eq', 200)
 
             // 상품 리스트 표시 확인
             cy.get('[data-cy="settlement-detail-product-list"]').should('exist')
@@ -142,11 +142,11 @@ describe('정산 상세 페이지', () => {
 
             cy.visit(`/admin/settlement/${settlementId}`)
 
-            cy.wait('@getSettlementHistory')
+            cy.wait('@getSettlementHistory').its('response.statusCode').should('eq', 200)
 
             cy.get('[data-cy="back-to-list-button"]').click()
 
-            cy.wait('@getSettlementList')
+            cy.wait('@getSettlementList').its('response.statusCode').should('eq', 200)
             cy.url().should('eq', Cypress.config().baseUrl + '/admin/settlement')
         })
     })

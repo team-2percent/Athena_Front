@@ -27,7 +27,8 @@ describe('쿠폰 상세 페이지', () => {
             }).as('getCouponDetail')
 
             cy.visit('/admin/coupon/1')
-            cy.wait('@getCouponDetail')
+
+            cy.wait('@getCouponDetail').its('response.statusCode').should('eq', 200)
 
             // 상세 정보 표시 확인
             cy.get('[data-cy="coupon-name"]').should('be.visible')
@@ -53,7 +54,7 @@ describe('쿠폰 상세 페이지', () => {
             }).as('getCouponDetailError')
 
             cy.visit('/admin/coupon/1')
-            cy.wait('@getCouponDetailError')
+            cy.wait('@getCouponDetailError').its('response.statusCode').should('eq', 500)
 
             // 에러 메시지 표시 확인
             cy.checkServerErrorCard('쿠폰 정보 조회에 실패했습니다.')
@@ -80,7 +81,7 @@ describe('쿠폰 상세 페이지', () => {
             }).as('getCouponList')
 
             cy.visit('/admin/coupon/1')
-            cy.wait('@getCouponDetail')
+            cy.wait('@getCouponDetail').its('response.statusCode').should('eq', 200)
 
             // 목록으로 버튼 클릭
             cy.get('[data-cy="back-to-list-button"]').click()

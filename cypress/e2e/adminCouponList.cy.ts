@@ -12,91 +12,91 @@ describe('쿠폰 목록 페이지', () => {
         
     })
 
-    // describe('쿠폰 목록', () => {
-    //     it('정상 조회 시 쿠폰 목록 정상 표시', () => {
-    //         cy.visit('/admin/coupon')
-    //         cy.wait('@getCouponList')
+    describe('쿠폰 목록', () => {
+        it('정상 조회 시 쿠폰 목록 정상 표시', () => {
+            cy.visit('/admin/coupon')
+            cy.wait('@getCouponList').its('response.statusCode').should('eq', 200)
 
-    //         // 쿠폰 목록 표시 확인
-    //         cy.get('[data-cy="coupon-list"]').should('be.visible')
+            // 쿠폰 목록 표시 확인
+            cy.get('[data-cy="coupon-list"]').should('be.visible')
             
-    //         // 쿠폰 정보 표시 확인
-    //         cy.get('[data-cy="coupon-name"]').should('be.visible')
-    //         cy.get('[data-cy="coupon-price"]').should('be.visible')
-    //         cy.get('[data-cy="coupon-period"]').should('be.visible')
-    //         cy.get('[data-cy="coupon-expiration-date"]').should('be.visible')
-    //         cy.get('[data-cy="coupon-amount"]').should('be.visible')
-    //         cy.get('[data-cy="coupon-status"]').should('be.visible')
+            // 쿠폰 정보 표시 확인
+            cy.get('[data-cy="coupon-name"]').should('be.visible')
+            cy.get('[data-cy="coupon-price"]').should('be.visible')
+            cy.get('[data-cy="coupon-period"]').should('be.visible')
+            cy.get('[data-cy="coupon-expiration-date"]').should('be.visible')
+            cy.get('[data-cy="coupon-amount"]').should('be.visible')
+            cy.get('[data-cy="coupon-status"]').should('be.visible')
 
-    //         // 쿠폰 개수 확인
-    //         cy.get('[data-cy="coupon-list-item"]').should('have.length', 10)
-    //     })
+            // 쿠폰 개수 확인
+            cy.get('[data-cy="coupon-list-item"]').should('have.length', 10)
+        })
 
-    //     it('서버 에러 시 서버에러 메시지 표시', () => {
-    //         cy.intercept('GET', '/api/admin/couponList?size=10&page=*', {
-    //             statusCode: 500
-    //         }).as('getCouponListError')
+        it('서버 에러 시 서버에러 메시지 표시', () => {
+            cy.intercept('GET', '/api/admin/couponList?size=10&page=*', {
+                statusCode: 500
+            }).as('getCouponListError')
 
-    //         cy.visit('/admin/coupon')
-    //         cy.wait('@getCouponListError')
+            cy.visit('/admin/coupon')
+            cy.wait('@getCouponListError').its('response.statusCode').should('eq', 500)
 
-    //         cy.checkServerErrorCard('쿠폰 목록 조회에 실패했습니다.')
-    //         cy.get('[data-cy="retry-button"]').should('be.visible')
-    //     })
-    // })
+            cy.checkServerErrorCard('쿠폰 목록 조회에 실패했습니다.')
+            cy.get('[data-cy="retry-button"]').should('be.visible')
+        })
+    })
 
-    // describe('상태 필터', () => {
-    //     beforeEach(() => {
-    //         cy.visit('/admin/coupon')
-    //         cy.wait('@getCouponList')
-    //     })
+    describe('상태 필터', () => {
+        beforeEach(() => {
+            cy.visit('/admin/coupon')
+            cy.wait('@getCouponList').its('response.statusCode').should('eq', 200)
+        })
 
-    //     it('상태 select 표시', () => {
-    //         cy.get('[data-cy="status-select"]').should('be.visible')
-    //             .and('contain', '전체')
+        it('상태 select 표시', () => {
+            cy.get('[data-cy="status-select"]').should('be.visible')
+                .and('contain', '전체')
             
-    //         cy.get('[data-cy="status-select"]').select('전체')
+            cy.get('[data-cy="status-select"]').select('전체')
             
-    //         // 상태 옵션 확인
-    //         cy.get('[data-cy="status-select"] option').should('have.length', 5)
-    //         cy.get('[data-cy="status-select"] option').eq(0).should('have.value', 'ALL')
-    //         cy.get('[data-cy="status-select"] option').eq(1).should('have.value', 'PREVIOUS')
-    //         cy.get('[data-cy="status-select"] option').eq(2).should('have.value', 'IN_PROGRESS')
-    //         cy.get('[data-cy="status-select"] option').eq(3).should('have.value', 'COMPLETED')
-    //         cy.get('[data-cy="status-select"] option').eq(4).should('have.value', 'ENDED')
-    //     })
+            // 상태 옵션 확인
+            cy.get('[data-cy="status-select"] option').should('have.length', 5)
+            cy.get('[data-cy="status-select"] option').eq(0).should('have.value', 'ALL')
+            cy.get('[data-cy="status-select"] option').eq(1).should('have.value', 'PREVIOUS')
+            cy.get('[data-cy="status-select"] option').eq(2).should('have.value', 'IN_PROGRESS')
+            cy.get('[data-cy="status-select"] option').eq(3).should('have.value', 'COMPLETED')
+            cy.get('[data-cy="status-select"] option').eq(4).should('have.value', 'ENDED')
+        })
 
-    //     it('상태 현재 상태 클릭 시 요청 없음', () => {
-    //         cy.get('[data-cy="status-select"]').select('전체')
-    //         cy.get('[data-cy="status-select"]').should('have.value', 'ALL')
-    //     })
+        it('상태 현재 상태 클릭 시 요청 없음', () => {
+            cy.get('[data-cy="status-select"]').select('전체')
+            cy.get('[data-cy="status-select"]').should('have.value', 'ALL')
+        })
 
-    //     it('상태 다른 상태 클릭 시 리로드', () => {
-    //         cy.fixture('admin/coupon/couponList.json').then((couponList) => {
-    //             const filteredCouponListContent = couponList.content.filter((coupon: any) => coupon.status === 'IN_PROGRESS')
-    //             cy.intercept('GET', '/api/admin/couponByStatus?size=10&page=0&status=IN_PROGRESS', {
-    //                 statusCode: 200,
-    //                 body: {
-    //                     content: filteredCouponListContent,
-    //                     totalElements: filteredCouponListContent.length,
-    //                     totalPages: 1,
-    //                     size: 10,
-    //                     number: 0
-    //                 }
-    //             }).as('getIssuingCouponList')
-    //         })
+        it('상태 다른 상태 클릭 시 리로드', () => {
+            cy.fixture('admin/coupon/couponList.json').then((couponList) => {
+                const filteredCouponListContent = couponList.content.filter((coupon: any) => coupon.status === 'IN_PROGRESS')
+                cy.intercept('GET', '/api/admin/couponByStatus?size=10&page=0&status=IN_PROGRESS', {
+                    statusCode: 200,
+                    body: {
+                        content: filteredCouponListContent,
+                        totalElements: filteredCouponListContent.length,
+                        totalPages: 1,
+                        size: 10,
+                        number: 0
+                    }
+                }).as('getIssuingCouponList')
+            })
 
-    //         cy.get('[data-cy="status-select"]').select('IN_PROGRESS')
+            cy.get('[data-cy="status-select"]').select('IN_PROGRESS')
             
-    //         cy.wait('@getIssuingCouponList')
-    //         cy.get('[data-cy="status-select"]').should('have.value', 'IN_PROGRESS')
-    //     })
-    // })
+            cy.wait('@getIssuingCouponList').its('response.statusCode').should('eq', 200)
+            cy.get('[data-cy="status-select"]').should('have.value', 'IN_PROGRESS')
+        })
+    })
 
     describe('페이지 사이즈', () => {
         beforeEach(() => {
             cy.visit('/admin/coupon')
-            cy.wait('@getCouponList')
+            cy.wait('@getCouponList').its('response.statusCode').should('eq', 200)
         })
 
         it('페이지 사이즈 select 표시', () => {
@@ -127,7 +127,7 @@ describe('쿠폰 목록 페이지', () => {
         
             cy.get('[data-cy="page-size-select"]').select('20')
             
-            cy.wait('@getCouponListWithSize20')
+            cy.wait('@getCouponListWithSize20').its('response.statusCode').should('eq', 200)
             cy.get('[data-cy="page-size-select"]').should('have.value', '20')
             cy.get('[data-cy="coupon-list-item"]').should('have.length', 20)
         })
@@ -136,7 +136,7 @@ describe('쿠폰 목록 페이지', () => {
     describe('페이지네이션', () => {
         beforeEach(() => {
             cy.visit('/admin/coupon')
-            cy.wait('@getCouponList')
+            cy.wait('@getCouponList').its('response.statusCode').should('eq', 200)
         })
 
         it('첫 페이지에서는 다른 페이지와 마지막 페이지 이동, 다음 페이지 이동 버튼만 활성화', () => {
@@ -183,7 +183,7 @@ describe('쿠폰 목록 페이지', () => {
             cy.scrollTo('bottom')
             cy.get('[data-cy="last-page-button"]').click()
 
-            cy.wait('@getCouponListLastPage')
+            cy.wait('@getCouponListLastPage').its('response.statusCode').should('eq', 200)
         
             cy.get('[data-cy="first-page-button"]').should('not.be.disabled')
             cy.get('[data-cy="prev-page-button"]').should('not.be.disabled')
@@ -200,7 +200,7 @@ describe('쿠폰 목록 페이지', () => {
 
             cy.get('[data-cy="coupon-list-item"]').first().click()
             
-            cy.wait('@getCouponDetail')
+            cy.wait('@getCouponDetail').its('response.statusCode').should('eq', 200)
             cy.url().should('include', '/admin/coupon/')
         })
 
