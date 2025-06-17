@@ -1,6 +1,36 @@
 {
     "content": [
       {
+        "settlementId": 10,
+        "projectTitle": "켄싱턴 트랙볼",
+        "totalSales": 550000,
+        "platformFee": 49500,
+        "payOutAmount": 479050,
+        "sellerName": "User7",
+        "requestedAt": "2025-05-21T00:17:18.304621",
+        "status": "PENDING"
+      },
+      {
+        "settlementId": 9,
+        "projectTitle": "켄싱턴 트랙볼",
+        "totalSales": 550000,
+        "platformFee": 49500,
+        "payOutAmount": 479050,
+        "sellerName": "User7",
+        "requestedAt": "2025-05-21T00:17:18.304621",
+        "status": "PENDING"
+      },
+      {
+        "settlementId": 8,
+        "projectTitle": "켄싱턴 트랙볼",
+        "totalSales": 550000,
+        "platformFee": 49500,
+        "payOutAmount": 479050,
+        "sellerName": "User7",
+        "requestedAt": "2025-05-21T00:17:18.304621",
+        "status": "PENDING"
+      },
+      {
         "settlementId": 7,
         "projectTitle": "켄싱턴 트랙볼",
         "totalSales": 550000,
@@ -72,7 +102,7 @@
       }
     ],
     "pageInfo": {
-      "currentPage": 0,
-      "totalPages": 1
+      "currentPage": 1,
+      "totalPages": 6
     }
   }
