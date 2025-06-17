@@ -294,7 +294,7 @@ describe("마이페이지", () => {
         })).as('getUserDelay');
         cy.visit('/my');
         cy.get('.animate-pulse').should('exist');
-        cy.wait('@getUserDelay');
+        cy.wait('@getUserDelay'); // 200 확인하는 것을 넣는 것이 권장됨
     });
 
     it('프로필 조회 실패 시 에러 메시지 노출', () => {
@@ -375,7 +375,7 @@ describe("마이페이지", () => {
         cy.intercept('GET', '/api/my/project', { statusCode: 200, body: [] }).as('getMyProjectsEmpty');
         cy.visit('/my');
         cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-판매 상품"]').click();
-        cy.contains('등록된 상품이 없습니다').should('be.visible');
+        cy.contains('판매 중인 상품이 없습니다.').should('be.visible');
     });
 
     it('판매 상품 조회 실패 시 에러 메시지 노출', () => {

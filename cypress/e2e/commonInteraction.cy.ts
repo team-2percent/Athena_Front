@@ -4,17 +4,17 @@ describe('공통 상호작용', () => {
   });
 
   it('로고 클릭 시 메인 페이지로 이동', () => {
-    cy.get('[data-cy="logo-link"]').first().click();
+    cy.get('[data-cy="logo-link"]').filter(':visible').click();
     cy.url().should('eq', 'http://localhost:3000/');
   });
 
   it('검색바 입력 및 검색 버튼/엔터 동작', () => {
     cy.get('[data-cy="search-input"]').type('테스트');
     cy.get('[data-cy="search-button"]').click();
-    cy.url().should('include', '/search?query=테스트');
+    cy.url().should('include', `/search?query=${encodeURIComponent('테스트')}`);
     cy.visit('/');
     cy.get('[data-cy="search-input"]').type('엔터검색{enter}');
-    cy.url().should('include', '/search?query=엔터검색');
+    cy.url().should('include', `/search?query=${encodeURIComponent('엔터검색')}`);
   });
 
   it('검색바에 아무것도 없으면 검색 버튼 disabled', () => {

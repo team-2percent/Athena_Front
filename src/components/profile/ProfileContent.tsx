@@ -14,6 +14,7 @@ import Spinner from "../common/Spinner"
 import EmptyMessage from "../common/EmptyMessage"
 import DeleteModal from "./DeleteModal"
 import MenuTab from "../common/MenuTab"
+import ProfileSkeleton from "./ProfileSkeleton"
 
 interface ProfileContentProps {
   isMy?: boolean
@@ -404,26 +405,32 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
       <div className="mx-auto mt-8 min-h-[300px]">
         {/* 소개 탭 */}
         <div className={activeTab === "소개" ? "block" : "hidden"}>
-          <div className="mb-8">
-            <p className="text-sub-gray mb-8 whitespace-pre-wrap break-words" data-cy="profile-seller-description">{sellerDescription || "소개글이 없습니다."}</p>
-            {/* 링크 목록 */}
-            <div className="flex flex-wrap gap-3 sm:gap-4" data-cy="profile-link-list">
-              {linkUrl && linkUrl.split(",").map(url => (
-                <Link
-                  href={`${url}`}
-                  target="_blank"
-                  data-cy="profile-link"
-                  className="px-3 py-2 sm:px-6 sm:py-3 border border-main-color text-main-color rounded-full hover:bg-secondary-color transition-colors text-sm sm:text-base border-[1px] sm:border-2"
-                >
-                  {url}
-                </Link>
-              ))}
+          {isLoading ? (
+            <ProfileSkeleton type="intro" />
+          ) : (
+            <div className="mb-8">
+              <p className="text-sub-gray mb-8 whitespace-pre-wrap break-words" data-cy="profile-seller-description">{sellerDescription || "소개글이 없습니다."}</p>
+              {/* 링크 목록 */}
+              <div className="flex flex-wrap gap-3 sm:gap-4" data-cy="profile-link-list">
+                {linkUrl && linkUrl.split(",").map(url => (
+                  <Link
+                    href={`${url}`}
+                    target="_blank"
+                    data-cy="profile-link"
+                    className="px-3 py-2 sm:px-6 sm:py-3 border border-main-color text-main-color rounded-full hover:bg-secondary-color transition-colors text-sm sm:text-base border-[1px] sm:border-2"
+                  >
+                    {url}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
         {/* 판매 상품 탭 */}
         <div className={activeTab === "판매 상품" ? "block" : "hidden"}>
-          {myProjects.length === 0 && !isLoadingProjects ? (
+          {isLoadingProjects ? (
+            <ProfileSkeleton type="selling" />
+          ) : myProjects.length === 0 ? (
             <EmptyMessage message="판매 중인 상품이 없습니다." />
           ) : (
             <>
@@ -456,7 +463,9 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
         </div>
         {/* 구매 상품 탭 */}
         <div className={activeTab === "구매 상품" ? "block" : "hidden"}>
-          {myOrders.length === 0 && !isLoadingOrders ? (
+          {isLoadingOrders ? (
+            <ProfileSkeleton type="purchased" />
+          ) : myOrders.length === 0 ? (
             <EmptyMessage message="구매한 상품이 없습니다." />
           ) : (
             <>
@@ -489,7 +498,9 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
         </div>
         {/* 후기/내가 쓴 후기 탭 */}
         <div className={(activeTab === "후기" || activeTab === "내가 쓴 후기") ? "block" : "hidden"}>
-          {myReviews.length === 0 && !isLoadingReviews ? (
+          {isLoadingReviews ? (
+            <ProfileSkeleton type="review" />
+          ) : myReviews.length === 0 ? (
             <EmptyMessage message="작성한 후기가 없습니다." />
           ) : (
             <>
@@ -515,7 +526,9 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
         </div>
         {/* 쿠폰 탭 */}
         <div className={activeTab === "쿠폰" ? "block" : "hidden"}>
-          {userCoupons.length === 0 && !isLoadingCoupons ? (
+          {isLoadingCoupons ? (
+            <ProfileSkeleton type="coupon" />
+          ) : userCoupons.length === 0 ? (
             <EmptyMessage message="쿠폰이 없습니다." />
           ) : (
             <>

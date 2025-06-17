@@ -17,12 +17,14 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
 
   // 검색
   const search = () => {
-    onSearch(searchWord);
+    if (searchWord.trim()) {
+      onSearch(searchWord);
+    }
   }
 
   // 엔터키로 검색
   const activeEnter = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && searchWord.trim()) {
       e.preventDefault();
       onSearch(searchWord);
     }
@@ -33,7 +35,6 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
       <div className="flex gap-2 rounded-full border border-gray-300 px-4 py-3 h-full">
         <input
           type="text"
-          placeholder="제목, 작가로 검색"
           value={searchWord}
           onChange={(e) => onSearchChange(e.target.value)}
           onKeyDown={(e) => activeEnter(e)}
@@ -43,8 +44,9 @@ export default function SearchBar({ isLogin, searchWord, onSearchChange, onSearc
         />
         <button
           type="button"
-          className=""
+          className={`${!searchWord.trim() ? 'cursor-not-allowed' : ''}`}
           onClick={search}
+          disabled={!searchWord.trim()}
           data-cy="search-button"
         >
           <Search className="h-4 w-4 text-gray-500" />
