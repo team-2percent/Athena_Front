@@ -7,8 +7,8 @@ describe('쿠폰 상세 페이지', () => {
             }, {
                 statusCode: 200,
                 body: couponDetail
-            })
-        }).as('getCouponDetail')
+            }).as('getCouponDetail')
+        })
 
         cy.visitMainPage();
         cy.adminLogin();
@@ -51,11 +51,14 @@ describe('쿠폰 상세 페이지', () => {
     describe('목록 페이지 이동', () => {
         it('목록 이동', () => {
             cy.fixture('admin/coupon/couponList.json').then((couponList) => {
-                cy.intercept('GET', '/api/admin/couponList?size=10&page=*', {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/couponList?size=10&page=*'
+                }, {
                     statusCode: 200,
                     body: couponList
-                })
-            }).as('getCouponList')
+                }).as('getCouponList')
+            })
 
             cy.visit('/admin/coupon/1')
             cy.wait('@getCouponDetail').its('response.statusCode').should('eq', 200)

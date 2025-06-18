@@ -1,7 +1,10 @@
 describe('쿠폰 목록 페이지', () => {
     beforeEach(() => {
         cy.fixture('admin/coupon/couponList.json').then((couponList) => {
-            cy.intercept('GET', '/api/admin/couponList?size=10&page=*', {
+            cy.intercept({
+                method: 'GET',
+                url: '/api/admin/couponList?size=10&page=*'
+            }, {
                 statusCode: 200,
                 body: couponList
             }).as('getCouponList')
@@ -33,7 +36,10 @@ describe('쿠폰 목록 페이지', () => {
         })
 
         it('서버 에러 시 서버에러 메시지 표시', () => {
-            cy.intercept('GET', '/api/admin/couponList?size=10&page=*', {
+            cy.intercept({
+                method: 'GET',
+                url: '/api/admin/couponList?size=10&page=*'
+            }, {
                 statusCode: 500
             }).as('getCouponListError')
 
@@ -74,7 +80,10 @@ describe('쿠폰 목록 페이지', () => {
         it('상태 다른 상태 클릭 시 리로드', () => {
             cy.fixture('admin/coupon/couponList.json').then((couponList) => {
                 const filteredCouponListContent = couponList.content.filter((coupon: any) => coupon.status === 'IN_PROGRESS')
-                cy.intercept('GET', '/api/admin/couponByStatus?size=10&page=0&status=IN_PROGRESS', {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/couponByStatus?size=10&page=0&status=IN_PROGRESS'
+                }, {
                     statusCode: 200,
                     body: {
                         content: filteredCouponListContent,
@@ -121,7 +130,10 @@ describe('쿠폰 목록 페이지', () => {
 
         it('페이지 사이즈 다른 상태 클릭 시 리로드', () => {
             cy.fixture('admin/coupon/couponList20.json').then((couponList) => {
-                cy.intercept('GET', '/api/admin/couponList?size=20&page=0', {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/couponList?size=20&page=0'
+                }, {
                     statusCode: 200,
                     body: couponList
                 }).as('getCouponListWithSize20')
@@ -156,7 +168,10 @@ describe('쿠폰 목록 페이지', () => {
             cy.fixture('admin/coupon/couponList.json').then((couponList) => {
                 const newCouponList = couponList
                 newCouponList.page.number = 1
-                cy.intercept('GET', '/api/admin/couponList?size=10&page=1', {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/couponList?size=10&page=1'
+                }, {
                     statusCode: 200,
                     body: newCouponList
                 }).as('getCouponListPage2')
@@ -178,7 +193,10 @@ describe('쿠폰 목록 페이지', () => {
             cy.fixture('admin/coupon/couponList20.json').then((couponList) => {
                 const newCouponList = couponList
                 newCouponList.page.number = newCouponList.page.totalPages - 1
-                cy.intercept('GET', '/api/admin/couponList?size=10&page=5', {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/couponList?size=10&page=5'
+                }, {
                     statusCode: 200,
                     body: newCouponList
                 }).as('getCouponListLastPage')
@@ -197,7 +215,10 @@ describe('쿠폰 목록 페이지', () => {
         })
 
         it('상세 페이지 진입', () => {
-            cy.intercept('GET', '/api/admin/*', {
+            cy.intercept({
+                method: 'GET',
+                url: '/api/admin/*'
+            }, {
                 statusCode: 200,
                 body: {}
             }).as('getCouponDetail')
