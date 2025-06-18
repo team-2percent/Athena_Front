@@ -20,7 +20,7 @@ export default function EditPage() {
 
     return <div className="h-full mt-8 w-[var(--content-width)] mx-auto">
         <div className="flex w-full mb-5">
-          <GhostButton onClick={() => router.push("/my")} className="flex gap-1 items-center">
+          <GhostButton onClick={() => router.push("/my")} className="flex gap-1 items-center" data-cy="back-button">
               <ArrowLeftIcon className="w-4 h-4" />
               프로필로 돌아가기
           </GhostButton>
