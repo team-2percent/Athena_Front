@@ -160,16 +160,18 @@ describe('쿠폰 목록 페이지', () => {
                     statusCode: 200,
                     body: newCouponList
                 }).as('getCouponListPage2')
-            })
 
-            cy.scrollTo('bottom')
-            cy.get('[data-cy="page-button"]').eq(1).click()
-            
-            cy.get('[data-cy="first-page-button"]').should('not.be.disabled')
-            cy.get('[data-cy="prev-page-button"]').should('not.be.disabled')
-            cy.get('[data-cy="page-button"]').eq(1).should('be.disabled')
-            cy.get('[data-cy="next-page-button"]').should('not.be.disabled')
-            cy.get('[data-cy="last-page-button"]').should('not.be.disabled')
+                cy.scrollTo('bottom')
+                cy.get('[data-cy="page-button"]').eq(1).click()
+
+                cy.wait('@getCouponListPage2').its('response.statusCode').should('eq', 200)
+                
+                cy.get('[data-cy="first-page-button"]').should('not.be.disabled')
+                cy.get('[data-cy="prev-page-button"]').should('not.be.disabled')
+                cy.get('[data-cy="page-button"]').eq(1).should('be.disabled')
+                cy.get('[data-cy="next-page-button"]').should('not.be.disabled')
+                cy.get('[data-cy="last-page-button"]').should('not.be.disabled')
+            })
         })
 
         it('마지막 페이지에서는 다른 페이지와 첫 페이지 이동, 이전 페이지 이동 버튼만 활성화', () => {
@@ -180,18 +182,18 @@ describe('쿠폰 목록 페이지', () => {
                     statusCode: 200,
                     body: newCouponList
                 }).as('getCouponListLastPage')
-            })
 
-            cy.scrollTo('bottom')
-            cy.get('[data-cy="last-page-button"]').click()
+                cy.scrollTo('bottom')
+                cy.get('[data-cy="last-page-button"]').click()
 
-            cy.wait('@getCouponListLastPage').its('response.statusCode').should('eq', 200)
-        
-            cy.get('[data-cy="first-page-button"]').should('not.be.disabled')
-            cy.get('[data-cy="prev-page-button"]').should('not.be.disabled')
-            cy.get('[data-cy="page-button"]').eq(2).should('be.disabled')
-            cy.get('[data-cy="next-page-button"]').should('be.disabled')
-            cy.get('[data-cy="last-page-button"]').should('be.disabled')
+                cy.wait('@getCouponListLastPage').its('response.statusCode').should('eq', 200)
+            
+                cy.get('[data-cy="first-page-button"]').should('not.be.disabled')
+                cy.get('[data-cy="prev-page-button"]').should('not.be.disabled')
+                cy.get('[data-cy="page-button"]').eq(2).should('be.disabled')
+                cy.get('[data-cy="next-page-button"]').should('be.disabled')
+                cy.get('[data-cy="last-page-button"]').should('be.disabled')
+            })            
         })
 
         it('상세 페이지 진입', () => {

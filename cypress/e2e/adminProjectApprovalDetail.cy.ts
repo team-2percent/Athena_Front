@@ -4,116 +4,116 @@ describe("관리자 프로젝트 승인 상세 페이지", () => {
             cy.intercept('GET', '/api/admin/project/*', {
                 statusCode: 200,
                 body: projectDetail
-            })
-        }).as('getProjectDetail')
+            }).as('getProjectDetail')
+        })
 
         cy.visitMainPage();
         cy.adminLogin();
     })
 
-    // describe("프로젝트 상세 정보", () => {
-    //     beforeEach(() => {
-    //         cy.visit('/admin/approval/project/101')
-    //         cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
-    //     })
+    describe("프로젝트 상세 정보", () => {
+        beforeEach(() => {
+            cy.visit('/admin/approval/project/101')
+            cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
+        })
 
-    //     it("상세 정보 정상 표시", () => {
-    //         cy.get('[data-cy="project-detail-info"]').should('be.visible')
-    //         cy.get('[data-cy="project-detail-markdown"]').should('be.visible')
-    //         cy.get('[data-cy="project-detail-product"]').should('be.visible')
-    //     })
+        it("상세 정보 정상 표시", () => {
+            cy.get('[data-cy="project-detail-info"]').should('be.visible')
+            cy.get('[data-cy="project-detail-markdown"]').should('be.visible')
+            cy.get('[data-cy="project-detail-product"]').should('be.visible')
+        })
 
-    //     it("서버 에러 시 서버에러 메시지 표시", () => {
-    //         cy.intercept({
-    //             method: 'GET',
-    //             url: '/api/admin/project/*',
-    //         }, {
-    //             statusCode: 500,
-    //         }).as('getProjectDetailError')
+        it("서버 에러 시 서버에러 메시지 표시", () => {
+            cy.intercept({
+                method: 'GET',
+                url: '/api/admin/project/*',
+            }, {
+                statusCode: 500,
+            }).as('getProjectDetailError')
 
-    //         cy.visit('/admin/approval/project/101')
-    //         cy.wait('@getProjectDetailError').its('response.statusCode').should("eq", 500)
-    //         cy.checkServerErrorCard('프로젝트 상세 조회에 실패했습니다.')
-    //         cy.get('[data-cy="retry-button"]').should("be.visible")
-    //     })
-    // })
+            cy.visit('/admin/approval/project/101')
+            cy.wait('@getProjectDetailError').its('response.statusCode').should("eq", 500)
+            cy.checkServerErrorCard('프로젝트 상세 조회에 실패했습니다.')
+            cy.get('[data-cy="retry-button"]').should("be.visible")
+        })
+    })
 
-    // describe("상품 정보", () => {
-    //     beforeEach(() => {
-    //         cy.visit('/admin/approval/project/101')
-    //         cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
-    //     })
+    describe("상품 정보", () => {
+        beforeEach(() => {
+            cy.visit('/admin/approval/project/101')
+            cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
+        })
 
-    //     it("상품 정보 정상 표시", () => {
-    //         cy.get('[data-cy="project-detail-product"]').should('be.visible')
-    //     })
+        it("상품 정보 정상 표시", () => {
+            cy.get('[data-cy="project-detail-product"]').should('be.visible')
+        })
 
-    //     it("서버 에러 시 서버에러 메시지 표시", () => {
-    //         cy.intercept({
-    //             method: 'GET',
-    //             url: '/api/admin/project/*',
-    //         }, {
-    //             statusCode: 500,
-    //         }).as('getProjectDetailError')
+        it("서버 에러 시 서버에러 메시지 표시", () => {
+            cy.intercept({
+                method: 'GET',
+                url: '/api/admin/project/*',
+            }, {
+                statusCode: 500,
+            }).as('getProjectDetailError')
 
-    //         cy.visit('/admin/approval/project/101')
-    //         cy.wait('@getProjectDetailError').its('response.statusCode').should("eq", 500)
-    //         cy.checkServerErrorCard('프로젝트 상세 조회에 실패했습니다.')
-    //         cy.get('[data-cy="retry-button"]').should("be.visible")
-    //     })
-    // })
+            cy.visit('/admin/approval/project/101')
+            cy.wait('@getProjectDetailError').its('response.statusCode').should("eq", 500)
+            cy.checkServerErrorCard('프로젝트 상세 조회에 실패했습니다.')
+            cy.get('[data-cy="retry-button"]').should("be.visible")
+        })
+    })
 
-    // describe("판매자 정보", () => {
-    //     beforeEach(() => {
-    //         cy.visit('/admin/approval/project/101')
-    //         cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
-    //     })
+    describe("판매자 정보", () => {
+        beforeEach(() => {
+            cy.visit('/admin/approval/project/101')
+            cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
+        })
 
-    //     it("판매자 정보 정상 표시", () => {
-    //         cy.get('[data-cy="project-detail-seller"]').should('be.visible')
-    //     })
+        it("판매자 정보 정상 표시", () => {
+            cy.get('[data-cy="project-detail-seller"]').should('be.visible')
+        })
 
-    //     it("서버 에러 시 서버에러 메시지 표시", () => {
-    //         cy.intercept({
-    //             method: 'GET',
-    //             url: '/api/admin/project/*',
-    //         }, {
-    //             statusCode: 500,
-    //         }).as('getProjectDetailError')
+        it("서버 에러 시 서버에러 메시지 표시", () => {
+            cy.intercept({
+                method: 'GET',
+                url: '/api/admin/project/*',
+            }, {
+                statusCode: 500,
+            }).as('getProjectDetailError')
 
-    //         cy.visit('/admin/approval/project/101')
-    //         cy.wait('@getProjectDetailError').its('response.statusCode').should("eq", 500)
-    //         cy.checkServerErrorCard('프로젝트 상세 조회에 실패했습니다.')
-    //         cy.get('[data-cy="retry-button"]').should("be.visible")
-    //     })
-    // })
+            cy.visit('/admin/approval/project/101')
+            cy.wait('@getProjectDetailError').its('response.statusCode').should("eq", 500)
+            cy.checkServerErrorCard('프로젝트 상세 조회에 실패했습니다.')
+            cy.get('[data-cy="retry-button"]').should("be.visible")
+        })
+    })
 
-    // describe("승인 폼", () => {
-    //     it("미승인 시 승인 폼 표시", () => {
-    //         cy.visit('/admin/approval/project/101')
-    //         cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
-    //         cy.get('[data-cy="project-approve-form"]').should('be.visible')
-    //     })
+    describe("승인 폼", () => {
+        it("미승인 시 승인 폼 표시", () => {
+            cy.visit('/admin/approval/project/101')
+            cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
+            cy.get('[data-cy="project-approve-form"]').should('be.visible')
+        })
 
-    //     it("승인 시 승인 폼 미표시", () => {
-    //         cy.fixture('admin/approval/projectDetail.json').then((projectDetail) => {
-    //             cy.intercept({
-    //                 method: 'GET',
-    //                 url: '/api/admin/project/101'
-    //             }, {
-    //                 statusCode: 200,
-    //                 body: {
-    //                     ...projectDetail,
-    //                     isApproved: 'APPROVED'
-    //                 }
-    //             }).as('getProjectDetail')
-    //         })
+        it("승인 시 승인 폼 미표시", () => {
+            cy.fixture('admin/approval/projectDetail.json').then((projectDetail) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project/101'
+                }, {
+                    statusCode: 200,
+                    body: {
+                        ...projectDetail,
+                        isApproved: 'APPROVED'
+                    }
+                }).as('getProjectDetail')
+            })
 
-    //         cy.visit('/admin/approval/project/101')
-    //         cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
-    //         cy.get('[data-cy="project-approve-form"]').should('not.exist')
-    //     })
-    // })
+            cy.visit('/admin/approval/project/101')
+            cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
+            cy.get('[data-cy="project-approve-form"]').should('not.exist')
+        })
+    })
 
     describe("승인/반려 처리", () => {
         beforeEach(() => {
@@ -141,7 +141,7 @@ describe("관리자 프로젝트 승인 상세 페이지", () => {
             cy.get('[data-cy="project-approve-modal"]').should('be.visible')
             cy.get('[data-cy="confirm-button"]').click()
             cy.get('[data-cy="confirm-button-loading"]').should('be.visible')
-            cy.wait('@updateProjectApproval')
+            cy.wait('@updateProjectApproval').its('response.statusCode').should("eq", 200)
         })
 
         it("승인 성공 시 모달 닫고 프로젝트 리로드", () => {
@@ -279,8 +279,8 @@ describe("관리자 프로젝트 승인 상세 페이지", () => {
                 cy.intercept('GET', '/api/admin/project?page=0&direction=*', {
                     statusCode: 200,
                     body: projectList
-                })
-            }).as('getProjectList')
+                }).as('getProjectList')
+            })
 
             cy.visit('/admin/approval/project/101')
             cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)

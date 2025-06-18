@@ -3,7 +3,7 @@ describe('쿠폰 상세 페이지', () => {
         cy.fixture('admin/coupon/couponDetail.json').then((couponDetail) => {
             cy.intercept({
                 method: 'GET',
-                url: '/api/admin/55'
+                url: '/api/admin/*'
             }, {
                 statusCode: 200,
                 body: couponDetail
@@ -16,16 +16,6 @@ describe('쿠폰 상세 페이지', () => {
 
     describe('상세 조회 성공', () => {
         it('상세 정보 정상 표시', () => {
-            cy.fixture('admin/coupon/couponDetail.json').then((couponDetail) => {
-                cy.intercept({
-                    method: 'GET',
-                    url: '/api/admin/*'
-                }, {
-                    statusCode: 200,
-                    body: couponDetail
-                })
-            }).as('getCouponDetail')
-
             cy.visit('/admin/coupon/1')
 
             cy.wait('@getCouponDetail').its('response.statusCode').should('eq', 200)
@@ -43,14 +33,11 @@ describe('쿠폰 상세 페이지', () => {
 
     describe('상세 조회 실패', () => {
         it('에러 메시지 표시', () => {
-            cy.fixture('admin/coupon/couponDetail.json').then((couponDetail) => {
-                cy.intercept({
-                    method: 'GET',
-                    url: '/api/admin/*'
-                }, {
-                    statusCode: 500,
-                    body: couponDetail
-                })
+            cy.intercept({
+                method: 'GET',
+                url: '/api/admin/*'
+            }, {
+                statusCode: 500,
             }).as('getCouponDetailError')
 
             cy.visit('/admin/coupon/1')
@@ -63,18 +50,8 @@ describe('쿠폰 상세 페이지', () => {
 
     describe('목록 페이지 이동', () => {
         it('목록 이동', () => {
-            cy.fixture('admin/coupon/couponDetail.json').then((couponDetail) => {
-                cy.intercept({
-                    method: 'GET',
-                    url: '/api/admin/*'
-                }, {
-                    statusCode: 200,
-                    body: couponDetail
-                })
-            }).as('getCouponDetail')
-
             cy.fixture('admin/coupon/couponList.json').then((couponList) => {
-                cy.intercept('GET', '/api/admin/coupon?page=0&direction=*', {
+                cy.intercept('GET', '/api/admin/couponList?size=10&page=*', {
                     statusCode: 200,
                     body: couponList
                 })
