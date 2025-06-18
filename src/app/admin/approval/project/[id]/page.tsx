@@ -213,7 +213,7 @@ export default function ProjectApprovalDetailPage() {
             </div>
 
             {/* 판매자 정보 */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4" data-cy="project-detail-seller">
                 <h2 className="text-2xl font-medium border-b pb-2">판매자 정보</h2>
                 <div className="flex items-center mt-4 justify-between">
                     <div className="flex items-center gap-4">
@@ -247,7 +247,7 @@ export default function ProjectApprovalDetailPage() {
         <div className="flex flex-col gap-6 mx-auto w-[var(--content-width)] py-8">
             {isLoading && <OverlaySpinner message="처리 중입니다."/>}
             <div className="flex w-full">
-                <GhostButton onClick={() => router.push("/admin/approval")} className="flex gap-1 items-center">
+                <GhostButton onClick={() => router.push("/admin/approval")} className="flex gap-1 items-center" dataCy="back-to-list-button">
                     <ArrowLeftIcon className="w-4 h-4" />
                     목록으로
                 </GhostButton>

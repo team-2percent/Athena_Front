@@ -71,7 +71,7 @@ export default function CouponPage() {
                     <select
                         className="border rounded px-4 py-2"
                         onChange={handlePageSizeChange}
-                        data-cy="page-size-selector"
+                        data-cy="page-size-select"
                     >
                         <option value="10">10개씩</option>
                         <option value="20">20개씩</option>
@@ -80,7 +80,7 @@ export default function CouponPage() {
                     <select
                         className="border rounded px-4 py-2"
                         onChange={handleStatusChange}
-                        data-cy="status-filter"
+                        data-cy="status-select"
                     >
                         {
                             Object.entries(CouponStatus).map(([key, value]) => (
@@ -120,16 +120,16 @@ export default function CouponPage() {
                         onClick={() => router.push(`/admin/coupon/${coupon.id}`)}
                         data-cy="coupon-list-item"
                         >
-                        <td className="p-4 text-left">{coupon.title}</td>
-                        <td className="p-4">{coupon.price} 원</td>
-                        <td className="p-4">
+                        <td className="p-4 text-left" data-cy="coupon-name">{coupon.title}</td>
+                        <td className="p-4" data-cy="coupon-price">{coupon.price} 원</td>
+                        <td className="p-4" data-cy="coupon-period">
                             {formatDateInAdmin(coupon.startAt)} ~ {formatDateInAdmin(coupon.endAt)}
                         </td>
-                        <td className="p-4">
-                            {formatDateInAdmin(coupon.expiresAt)}
+                        <td className="p-4" data-cy="coupon-expiration-date">
+                            {formatDateInAdmin(coupon.expireAt)}
                         </td>
-                        <td className="p-4">{coupon.stock}</td>
-                        <td className="p-4 flex justify-center"><CouponTag status={coupon.status} /></td>
+                        <td className="p-4" data-cy="coupon-amount">{coupon.stock}</td>
+                        <td className="p-4 flex justify-center" data-cy="coupon-status"><CouponTag status={coupon.status} /></td>
                         </tr>
                     ))  
                 }

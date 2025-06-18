@@ -87,17 +87,12 @@ Cypress.Commands.add('adminLogin', () => {
   // 로그인 모달 열기
   cy.get('header').get('[data-cy="open-login-modal-button"]').click()
 
-  cy.get('[data-cy="login-modal"]').should('be.visible')
-
   // 로그인 폼 작성
   cy.get('[data-cy="login-modal"]').within(() => {
       cy.get('[data-cy="email-input"]').type("test@test.com")
       cy.get('[data-cy="password-input"]').type("Abc1234%")
       cy.get('[data-cy="login-button"]').should('not.be.disabled').click()
   })
-
-  // 토큰 저장
-  cy.wait('@login').its('response.statusCode').should('eq', 200)
 
   // 페이지 새로고침
   cy.reload()

@@ -5,7 +5,7 @@ interface CouponEvent {
     content: string;
     price: number;
     stock: number;
-    expiresAt: string;
+    expireAt: string;
     userIssued: boolean;
 }
 

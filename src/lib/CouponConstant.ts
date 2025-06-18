@@ -7,7 +7,7 @@ interface CouponDetail {
     price: number;
     startAt: string;
     endAt: string;
-    expiresAt: string;
+    expireAt: string;
     stock: number;
     status: CouponStatusType;
 }
@@ -18,7 +18,7 @@ interface CouponListItem {
     price: number;
     startAt: string;
     endAt: string;
-    expiresAt: string;
+    expireAt: string;
     stock: number;
     status: CouponStatusType;
 }
