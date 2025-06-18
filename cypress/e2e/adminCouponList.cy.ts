@@ -78,10 +78,12 @@ describe('쿠폰 목록 페이지', () => {
                     statusCode: 200,
                     body: {
                         content: filteredCouponListContent,
-                        totalElements: filteredCouponListContent.length,
-                        totalPages: 1,
-                        size: 10,
-                        number: 0
+                        page: {
+                            totalElements: filteredCouponListContent.length,
+                            totalPages: 1,
+                            size: 10,
+                            number: 0
+                        } 
                     }
                 }).as('getIssuingCouponList')
             })
