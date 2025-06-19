@@ -41,13 +41,13 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
   }
 
   beforeEach(() => {
-    cy.intercept('GET', `/api/project/${mockProjectId}`, {
+    cy.intercept({ method: 'GET', url: `/api/project/${mockProjectId}` }, {
       statusCode: 200,
       body: { ...mockProjectData }
     }).as('getProjectDetail')
 
     // 후기 API 인터셉트
-    cy.intercept('GET', '/api/comment/test', {
+    cy.intercept({ method: 'GET', url: '/api/comment/test' }, {
       statusCode: 200,
       body: [
         {
@@ -129,10 +129,56 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
   });
 
   it('프로젝트 후기 탭에 리뷰가 없을 때 안내 메시지가 노출된다', () => {
-    cy.intercept('GET', '/api/comment/*', { statusCode: 200, body: [] });
+    cy.intercept({ method: 'GET', url: '/api/comment/*' }, { statusCode: 200, body: [] });
     cy.reload();
     cy.contains('후기').click();
     cy.contains('아직 리뷰가 없습니다').should('be.visible');
+  });
+
+  it('프로젝트 조회 중 스켈레톤이 노출된다', () => {
+    cy.intercept({ method: 'GET', url: `/api/project/${mockProjectId}` }, (req) => new Promise(resolve => {
+      setTimeout(() => {
+        req.reply({ statusCode: 200, body: { ...mockProjectData } });
+        resolve();
+      }, 1000);
+    })).as('getProjectDetailDelay');
+    cy.visit(`/project/${mockProjectId}`);
+    cy.get('.animate-pulse').should('exist');
+    cy.wait('@getProjectDetailDelay');
+  });
+
+  it('프로젝트 조회 실패 시 에러 메시지와 다시 시도 버튼 노출', () => {
+    cy.intercept({ method: 'GET', url: `/api/project/${mockProjectId}` }, { statusCode: 500 }).as('getProjectDetailError');
+    cy.visit(`/project/${mockProjectId}`);
+    cy.get('.bg-red-50').should('be.visible');
+    cy.contains('다시 시도').click();
+    cy.wait('@getProjectDetailError');
+  });
+
+  it('이미지 캐러셀 동작 및 인덱스 버튼 클릭 시 이미지 변경', () => {
+    cy.visit(`/project/${mockProjectId}`);
+    cy.get('[data-cy="project-image"]').first().should('have.attr', 'src', '/project-test.png');
+    cy.get('button[aria-label="다음 이미지"]').click();
+    cy.get('[data-cy="project-image"]').first().should('have.attr', 'src', '/project-test2.png');
+  });
+
+  it('재고가 0일 때 후원 불가 버튼이 노출된다', () => {
+    cy.intercept({ method: 'GET', url: `/api/project/${mockProjectId}` }, {
+      statusCode: 200,
+      body: { ...mockProjectData, productResponses: [{ ...mockProjectData.productResponses[0], stock: 0 }] }
+    }).as('getProjectDetailNoStock');
+    cy.visit(`/project/${mockProjectId}`);
+    cy.get('[data-cy="donate-disabled"]').should('exist').and('be.disabled');
+  });
+
+  it('펀딩 마감/종료 시 상태 메시지가 노출된다', () => {
+    cy.intercept({ method: 'GET', url: `/api/project/${mockProjectId}` }, {
+      statusCode: 200,
+      body: { ...mockProjectData, endAt: '2023-01-01' }
+    }).as('getProjectDetailEnded');
+    cy.visit(`/project/${mockProjectId}`);
+    cy.contains('마감임박').should('be.visible');
+    cy.contains('펀딩 종료').should('be.visible');
   });
 })
 
@@ -172,16 +218,24 @@ describe('프로젝트 상세 결제 플로우', () => {
   }
 
   beforeEach(() => {
-    cy.intercept('GET', `/api/project/${mockProjectId}`, {
+    cy.intercept({ method: 'GET', url: `/api/project/${mockProjectId}` }, {
       statusCode: 200,
       body: { ...mockProjectData }
     }).as('getProjectDetail')
-    cy.intercept('GET', '/api/delivery/delivery-info', {
+    cy.intercept({ method: 'GET', url: '/api/delivery/delivery-info' }, {
       statusCode: 200,
       body: []
     }).as('getDeliveryInfo')
-    cy.intercept('POST', '/api/order', { orderId: 123, totalPrice: 10000, orderedAt: '2024-07-01', items: [{ productId: 1, productName: '테스트 리워드', quantity: 1, price: 10000 }] }).as('order')
-    cy.intercept('POST', '/api/payment/ready/*', { next_redirect_pc_url: 'https://pay.test', tid: 'TID123' }).as('paymentReady')
+    cy.intercept({ method: 'POST', url: '/api/order' }, { 
+      orderId: 123, 
+      totalPrice: 10000, 
+      orderedAt: '2024-07-01', 
+      items: [{ productId: 1, productName: '테스트 리워드', quantity: 1, price: 10000 }] 
+    }).as('order')
+    cy.intercept({ method: 'POST', url: '/api/payment/ready/*' }, { 
+      next_redirect_pc_url: 'https://pay.test', 
+      tid: 'TID123' 
+    }).as('paymentReady')
     cy.visit('/project/test')
     cy.wait('@getProjectDetail')
   })
@@ -211,7 +265,7 @@ describe('프로젝트 상세 결제 플로우', () => {
   })
 
   it('정상 결제 플로우', () => {
-    cy.intercept('GET', '/api/delivery/delivery-info', {
+    cy.intercept({ method: 'GET', url: '/api/delivery/delivery-info' }, {
       statusCode: 200,
       body: [
         {
@@ -225,12 +279,11 @@ describe('프로젝트 상세 결제 플로우', () => {
       ]
     }).as('getDeliveryInfo')
     cy.intercept({
-        method: "POST",
-        url: "/api/delivery/delivery-info"
+      method: "POST",
+      url: "/api/delivery/delivery-info"
     }, {
-        statusCode: 200
+      statusCode: 200
     }).as("addAddress")
-
 
     cy.contains('후원하기').click()
     cy.contains('테스트 리워드').click()
@@ -263,4 +316,18 @@ describe('프로젝트 상세 결제 플로우', () => {
     cy.wait('@paymentReady')
     cy.get('@windowOpen').should('be.calledWithMatch', 'https://pay.test')
   })
+
+  it('옵션 해제, 수량 증감, 결제 금액 변화가 정상 동작한다', () => {
+    cy.contains('후원하기').click();
+    cy.contains('테스트 리워드').click();
+    // 오른쪽 영역에 선택된 상품이 보이는지 검증
+    cy.get('[data-cy="expand-selected-product"]').should('be.visible');
+    cy.contains('테스트 리워드').should('exist');
+    cy.get('button').contains('+').click();
+    cy.contains('20,000원').should('exist');
+    cy.get('button').contains('-').click();
+    cy.contains('10,000원').should('exist');
+    cy.contains('테스트 리워드').click();
+    cy.get('[data-cy="expand-selected-product"]').should('not.exist');
+  });
 })
