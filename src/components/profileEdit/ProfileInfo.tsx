@@ -13,6 +13,9 @@ import { imageSchema, nicknameSchema, profileEditSchema, profileUrlSchema, selle
 import { getByteLength } from "@/lib/utils"
 import useErrorToastStore from "@/stores/useErrorToastStore"
 import { validate, getValidatedString, getValidatedStringByte } from "@/lib/validationUtil"
+import OverlaySpinner from "../common/OverlaySpinner"
+import ServerError from "../common/ServerErrorComponent"
+import AlertModal from "../common/AlertModal"
 
 interface Profile {
     nickname: string
@@ -57,6 +60,8 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
     const { showErrorToast } = useErrorToastStore();
     const [addingUrl, setAddingUrl] = useState(false)
     const [newUrl, setNewUrl] = useState("")
+    const [error, setError] = useState(false)
+    const [isFileError, setIsFileError] = useState(false)
 
     const [prevProfile, setPrevProfile] = useState<Profile>({
         nickname: "",
@@ -78,17 +83,21 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     // 저장 가능 여부
+    const validationError = validate({
+        nickname: profile.nickname,
+        sellerDescription: profile.sellerDescription,
+        linkUrl: profile.linkUrls.join(","),
+        profileImage: profile.imageFile ? profile.imageFile : null,
+    }, profileEditSchema)
+    
     const saveable = (profile.nickname !== prevProfile.nickname || 
         profile.email !== prevProfile.email || 
         profile.sellerDescription !== prevProfile.sellerDescription || 
-        profile.linkUrls.join(",") !== prevProfile.linkUrl.split(",").join(","))
+        profile.linkUrls.join(",") !== prevProfile.linkUrl.split(",").join(",") ||
+        profile.imageFile !== null
+    )
         &&
-        profileEditSchema.safeParse({
-            nickname: profile.nickname,
-            sellerDescription: profile.sellerDescription,
-            profileImage: profile.imageFile,
-            linkUrl: profile.linkUrls.join(","),
-        }).success
+        !validationError.error
 
     const [profileEditError, setProfileEditError] = useState({
         nickname: "",
@@ -101,7 +110,10 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
 
     // 정보 조회
     const loadData = () => {
-        apiCall<LoadResponse>(`/api/user/${userId}`, "GET").then(({ data }) => {
+        apiCall<LoadResponse>(`/api/user/${userId}`, "GET").then(({ data, error, status }) => {
+            if (error && status === 500) {
+                setError(true)
+            }
             if (data) {
                 setPrevProfile({
                     nickname: data.nickname,
@@ -157,7 +169,6 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
     }
 
     const handleUrlAdd = () => {
-        if (profileEditError.urls) return;
         setProfile(prev => ({
             ...prev,
             linkUrls: [...prev.linkUrls, newUrl]
@@ -201,6 +212,8 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                     }
                 }
                 reader.readAsDataURL(file)
+            } else {
+                setIsFileError(true)
             }
         }
     }
@@ -235,24 +248,12 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
         saveData();
     }
 
-    useEffect(() => {
-        if (userId) loadData();
-    }, [userId])
-
-    useEffect(() => {
-        setProfile(prev => ({
-            ...prev,
-            nickname: prevProfile.nickname,
-            email: prevProfile.email,
-            image: prevProfile.imageUrl,
-            sellerDescription: prevProfile.sellerDescription,
-            linkUrls: prevProfile.linkUrl === "" ? [] : prevProfile.linkUrl.split(",")
-        }))
-    }, [prevProfile])
-
-    return (
-        <div className="flex flex-col gap-4">
-            <div className="flex gap-5 flex-wrap justify-center">
+    const render = () => {
+        if (isLoading) return <OverlaySpinner message="프로필 정보를 불러오는 중입니다." />
+        else if (error) return <ServerError message="프로필 정보를 불러오는 중에 오류가 발생했습니다." onRetry={loadData} />
+        else return (
+            <div className="flex flex-col gap-4">
+                <div className="flex gap-5 flex-wrap justify-center">
                 {/* 프로필 이미지 섹션 */}
                 <div className="flex flex-col items-center bg-white rounded-lg shadow py-6 px-10 space-y-4">
                     <h3 className="text-lg font-medium">프로필 이미지</h3>                            
@@ -284,6 +285,7 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                         onChange={handleImageUpload}
                         className="hidden"
                         id="profile-image"
+                        data-cy="profile-image-input"
                     />
                     <label
                         htmlFor="profile-image"
@@ -405,7 +407,36 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                 >
                 저장
                 </PrimaryButton>
-            </div>  
-        </div>
+            </div>
+            </div>
+        )
+    }
+
+    useEffect(() => {
+        if (userId) loadData();
+    }, [userId])
+
+    useEffect(() => {
+        setProfile(prev => ({
+            ...prev,
+            nickname: prevProfile.nickname,
+            email: prevProfile.email,
+            image: prevProfile.imageUrl,
+            sellerDescription: prevProfile.sellerDescription,
+            linkUrls: prevProfile.linkUrl === "" ? [] : prevProfile.linkUrl.split(",")
+        }))
+    }, [prevProfile])
+
+    return (
+        <>
+            <AlertModal
+                isOpen={isFileError}
+                message="파일 형식이 올바르지 않습니다."
+                onClose={() => setIsFileError(false)}
+                dataCy="file-upload-error-modal"
+            />
+            {render()}
+        </>
     )
+    
 }

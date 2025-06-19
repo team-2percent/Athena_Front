@@ -23,7 +23,7 @@ describe('프로필 수정 페이지', () => {
     cy.fixture('profileEdit/accountList.json').then((account) => {
         cy.intercept({
             method: "GET",
-            url: "/api/my/bankAccount"
+            url: "/api/bankAccount"
         }, {
             statusCode: 200,
             body: account
@@ -33,7 +33,7 @@ describe('프로필 수정 페이지', () => {
     cy.fixture('profileEdit/addressList.json').then((shipping) => {
         cy.intercept({
             method: "GET",
-            url: "/api/my/delivery-info"
+            url: "/api/delivery/delivery-info"
         }, {
             statusCode: 200,
             body: shipping
