@@ -148,14 +148,14 @@ describe('비밀번호 수정', () => {
         url: '/api/my/checkPassword'
       }, {
         statusCode: 200,
-        delay: 1000,
+        delay: 2000,
         body: true
       }).as('verifyPassword')
 
       cy.get('[data-cy="password-input"]').type('Abc1234%')
       cy.get('[data-cy="password-verify-button"]').click()
-      cy.wait('@verifyPassword').its('response.statusCode').should('eq', 200)
       cy.get('[data-cy="password-verify-button-loading"]').should('be.visible')
+      cy.wait('@verifyPassword').its('response.statusCode').should('eq', 200)
     })
 
     it('비밀번호 확인 성공', () => {
