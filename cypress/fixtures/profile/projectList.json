@@ -1,0 +1,30 @@
+{
+  "content": [
+    {
+      "projectId": 1,
+      "title": "테스트 프로젝트 1",
+      "isCompleted": false,
+      "createdAt": "2024-07-01T12:00:00Z",
+      "endAt": "2024-08-01T12:00:00Z",
+      "sellerName": "테스트유저",
+      "description": "테스트 프로젝트 설명 1",
+      "imageUrl": "/project-test.png",
+      "achievementRate": 80,
+      "daysLeft": 10
+    },
+    {
+      "projectId": 2,
+      "title": "테스트 프로젝트 2",
+      "isCompleted": true,
+      "createdAt": "2024-06-01T12:00:00Z",
+      "endAt": "2024-07-01T12:00:00Z",
+      "sellerName": "테스트유저",
+      "description": "테스트 프로젝트 설명 2",
+      "imageUrl": "/project-test2.png",
+      "achievementRate": 100,
+      "daysLeft": 0
+    }
+  ],
+  "nextCursorValue": null,
+  "nextProjectId": null
+} 

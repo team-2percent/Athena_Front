@@ -1,0 +1,8 @@
+{
+  "id": 99,
+  "email": "testuser@example.com",
+  "nickname": "테스트유저",
+  "imageUrl": "/profile-test.png",
+  "sellerDescription": "이것은 테스트용 소개글입니다.",
+  "linkUrl": "https://test.com"
+} 

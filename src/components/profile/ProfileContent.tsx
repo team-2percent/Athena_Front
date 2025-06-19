@@ -15,12 +15,15 @@ import EmptyMessage from "../common/EmptyMessage"
 import DeleteModal from "./DeleteModal"
 import MenuTab from "../common/MenuTab"
 import ProfileSkeleton from "./ProfileSkeleton"
+import ServerErrorComponent from "../common/ServerErrorComponent"
 
 interface ProfileContentProps {
   isMy?: boolean
   userId?: number
   sellerDescription: string,
-  linkUrl: string
+  linkUrl: string,
+  isIntroLoading?: boolean,
+  introError?: boolean
 }
 
 interface MyProject {
@@ -79,7 +82,7 @@ interface MyReview {
 }
 
 // ProfileContent 함수 선언부 수정
-export default function ProfileContent({ isMy, userId, sellerDescription, linkUrl }: ProfileContentProps) {
+export default function ProfileContent({ isMy, userId, sellerDescription, linkUrl, isIntroLoading, introError }: ProfileContentProps) {
   const { isLoading, apiCall } = useApi()
   const [activeTab, setActiveTab] = useState("소개")
   
@@ -104,6 +107,7 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
   const [totalCoupons, setTotalCoupons] = useState(0)
   const [isLoadingCoupons, setIsLoadingCoupons] = useState(false)
   const couponsLoader = useRef(null)
+  const [couponError, setCouponError] = useState(false)
 
   // 후기 상태
   const [myReviews, setMyReviews] = useState<MyReview[]>([])
@@ -116,31 +120,32 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  // 소개 탭은 별도 API가 없으므로, 예시로만 추가(실제 API가 있다면 적용)
+  const [projectError, setProjectError] = useState(false)
+  const [orderError, setOrderError] = useState(false)
+  const [reviewError, setReviewError] = useState(false)
+
   // 판매 상품 불러오기
   const loadMyProjects = async () => {
     if (isLoadingProjects) return
-
     setIsLoadingProjects(true)
-
+    setProjectError(false)
     try {
-      // 자신의 프로필이면 /api/my/projects, 다른 사용자의 프로필이면 /api/user/{userId}/projects
       const baseUrl = isMy ? "/api/my/project" : `/api/user/${userId}/project`
       const url = `${baseUrl}${sellCursorValue && nextProjectId ? `?nextCursorValue=${sellCursorValue}&nextProjectId=${nextProjectId}` : ""}`
       const response = await apiCall(url, "GET")
-
-      // API 응답 구조에 맞게 데이터 처리
+      if (response.error) {
+        setProjectError(true)
+        return
+      }
       const responseData = response.data as MyProjectsResponse
-      console.log("판매 상품 데이터:", responseData)
-
       if (responseData && responseData.content) {
-        // 기존 프로젝트에 새로운 프로젝트 추가
         setMyProjects((prev) => [...prev, ...responseData.content])
-
-        // 다음 페이지 정보 설정
         setSellCursorValue(responseData.nextCursorValue)
         setNextProjectId(responseData.nextProjectId)
       }
     } catch (error) {
+      setProjectError(true)
       console.error("판매 상품 조회에 실패했습니다.", error)
     } finally {
       setIsLoadingProjects(false)
@@ -150,26 +155,23 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
   // 구매 상품 불러오기
   const loadMyOrders = async () => {
     if (isLoadingOrders) return
-
     setIsLoadingOrders(true)
-
+    setOrderError(false)
     try {
       const url = `/api/my/order${orderCursorValue && lastOrderId ? `?nextCursorValue=${orderCursorValue}&nextOrderId=${lastOrderId}` : ""}`
       const response = await apiCall(url, "GET")
-
-      // API 응답 구조에 맞게 데이터 처리
+      if (response.error) {
+        setOrderError(true)
+        return
+      }
       const responseData = response.data as MyOrdersResponse
-      console.log("구매 상품 데이터:", responseData)
-
       if (responseData && responseData.content) {
-        // 기존 주문에 새로운 주문 추가
         setMyOrders((prev) => [...prev, ...responseData.content])
-
-        // 다음 페이지 정보 설정
         setOrderCursorValue(responseData.nextCursorValue)
         setLastOrderId(responseData.nextOrderId)
       }
     } catch (error) {
+      setOrderError(true)
       console.error("구매 상품 조회에 실패했습니다.", error)
     } finally {
       setIsLoadingOrders(false)
@@ -207,26 +209,23 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
   // 쿠폰 불러오기
   const loadUserCoupons = async () => {
     if (isLoadingCoupons) return
-
     setIsLoadingCoupons(true)
-
+    setCouponError(false)
     try {
       const url = `/api/my/coupon${nextCouponId ? `?cursorId=${nextCouponId}` : ""}`
       const response = await apiCall(url, "GET")
-
-      // API 응답 구조에 맞게 데이터 처리
+      if (response.error) {
+        setCouponError(true)
+        return
+      }
       const responseData = response.data as MyCouponsResponse
-      console.log("쿠폰 데이터:", responseData)
-
       if (responseData && responseData.content) {
-        // 기존 쿠폰에 새로운 쿠폰 추가
         setUserCoupons((prev) => [...prev, ...responseData.content])
-
-        // 다음 페이지 정보 설정
         setNextCouponId(responseData.nextCouponId)
         setTotalCoupons(responseData.total)
       }
     } catch (error) {
+      setCouponError(true)
       console.error("쿠폰 조회에 실패했습니다.", error)
     } finally {
       setIsLoadingCoupons(false)
@@ -236,17 +235,19 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
   // 후기 불러오기
   const loadMyReviews = async () => {
     if (isLoadingReviews) return
-
     setIsLoadingReviews(true)
-
+    setReviewError(false)
     try {
       const response = await apiCall("/api/my/comment", "GET")
-
+      if (response.error) {
+        setReviewError(true)
+        return
+      }
       if (response && response.data) {
-        console.log("후기 데이터:", response.data)
         setMyReviews(response.data as MyReview[])
       }
     } catch (error) {
+      setReviewError(true)
       console.error("후기 조회에 실패했습니다.", error)
     } finally {
       setIsLoadingReviews(false)
@@ -273,9 +274,13 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
       setIsDeleting(true)
       try {
         // 판매 상품 삭제
-        await apiCall(`/api/project/${deleteId}`, "DELETE")
-        setMyProjects((prev) => prev.filter((project) => project.projectId !== deleteId))
-        setDeleteSuccess(true)
+        const res = await apiCall(`/api/project/${deleteId}`, "DELETE")
+        if (res.error) {
+          setDeleteError(true)
+        } else {
+          setMyProjects((prev) => prev.filter((project) => project.projectId !== deleteId))
+          setDeleteSuccess(true)
+        }
         setIsDeleting(false)
       } catch (error) {
         console.error("상품 삭제에 실패했습니다.", error)
@@ -405,8 +410,10 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
       <div className="mx-auto mt-8 min-h-[300px]">
         {/* 소개 탭 */}
         <div className={activeTab === "소개" ? "block" : "hidden"}>
-          {isLoading ? (
+          {isIntroLoading ? (
             <ProfileSkeleton type="intro" />
+          ) : introError ? (
+            <ServerErrorComponent message="소개 정보를 불러오는 중 오류가 발생했습니다." onRetry={() => window.location.reload()} />
           ) : (
             <div className="mb-8">
               <p className="text-sub-gray mb-8 whitespace-pre-wrap break-words" data-cy="profile-seller-description">{sellerDescription || "소개글이 없습니다."}</p>
@@ -430,6 +437,8 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
         <div className={activeTab === "판매 상품" ? "block" : "hidden"}>
           {isLoadingProjects ? (
             <ProfileSkeleton type="selling" />
+          ) : projectError ? (
+            <ServerErrorComponent message="판매 상품을 불러오는 중 오류가 발생했습니다." onRetry={loadMyProjects} />
           ) : myProjects.length === 0 ? (
             <EmptyMessage message="판매 중인 상품이 없습니다." />
           ) : (
@@ -465,6 +474,8 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
         <div className={activeTab === "구매 상품" ? "block" : "hidden"}>
           {isLoadingOrders ? (
             <ProfileSkeleton type="purchased" />
+          ) : orderError ? (
+            <ServerErrorComponent message="구매 상품을 불러오는 중 오류가 발생했습니다." onRetry={loadMyOrders} />
           ) : myOrders.length === 0 ? (
             <EmptyMessage message="구매한 상품이 없습니다." />
           ) : (
@@ -500,6 +511,8 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
         <div className={(activeTab === "후기" || activeTab === "내가 쓴 후기") ? "block" : "hidden"}>
           {isLoadingReviews ? (
             <ProfileSkeleton type="review" />
+          ) : reviewError ? (
+            <ServerErrorComponent message="후기를 불러오는 중 오류가 발생했습니다." onRetry={loadMyReviews} />
           ) : myReviews.length === 0 ? (
             <EmptyMessage message="작성한 후기가 없습니다." />
           ) : (
@@ -528,6 +541,8 @@ export default function ProfileContent({ isMy, userId, sellerDescription, linkUr
         <div className={activeTab === "쿠폰" ? "block" : "hidden"}>
           {isLoadingCoupons ? (
             <ProfileSkeleton type="coupon" />
+          ) : couponError ? (
+            <ServerErrorComponent message="쿠폰을 불러오는 중 오류가 발생했습니다." onRetry={loadUserCoupons} />
           ) : userCoupons.length === 0 ? (
             <EmptyMessage message="쿠폰이 없습니다." />
           ) : (
