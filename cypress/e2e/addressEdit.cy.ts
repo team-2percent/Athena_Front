@@ -1,15 +1,33 @@
 describe("사용자 배송지 수정", () => {
     beforeEach(() => {
         cy.fixture('profileEdit/user.json').then((user) => {
-            cy.intercept('GET', '/api/user/*', user).as('getUserInfo');
+            cy.intercept({
+                method: 'GET',
+                url: '/api/user/*'
+            }, {
+                body: user,
+                statusCode: 200
+            }).as('getUserInfo');
         });
     
         cy.fixture('profileEdit/accountList.json').then((account) => {
-            cy.intercept('GET', '/api/bankAccount', account).as('getBankAccount');
+            cy.intercept({
+                method: 'GET',
+                url: '/api/bankAccount'
+            }, {
+                body: account,
+                statusCode: 200
+            }).as('getBankAccount');
         });
     
         cy.fixture('profileEdit/addressList.json').then((address) => {
-            cy.intercept('GET', '/api/delivery/delivery-info', address).as('getAddressList');
+            cy.intercept({
+                method: 'GET',
+                url: '/api/delivery/delivery-info'
+            }, {
+                body: address,
+                statusCode: 200
+            }).as('getAddressList');
         });
 
         cy.visitMainPage()
@@ -34,7 +52,13 @@ describe("사용자 배송지 수정", () => {
         })
 
         it("배송지 조회 성공 - 비어있음", () => {
-            cy.intercept('GET', '/api/delivery/delivery-info', []).as('getEmptyAddressList')
+            cy.intercept({
+                method: 'GET',
+                url: '/api/delivery/delivery-info'
+            }, {
+                body: [],
+                statusCode: 200
+            }).as('getEmptyAddressList')
             
             cy.visit("/my/edit")
             cy.wait('@getEmptyAddressList').its('response.statusCode').should('eq', 200)
@@ -43,7 +67,11 @@ describe("사용자 배송지 수정", () => {
         })
 
         it("배송지 조회 실패", () => {
-            cy.intercept('GET', '/api/delivery/delivery-info', {
+            cy.intercept({
+                method: 'GET',
+                url: '/api/delivery/delivery-info'
+            }, {
+                body: [],
                 statusCode: 500
             }).as('getAddressListError')
             
