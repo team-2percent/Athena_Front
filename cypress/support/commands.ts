@@ -94,6 +94,8 @@ Cypress.Commands.add('adminLogin', () => {
       cy.get('[data-cy="login-button"]').should('not.be.disabled').click()
   })
 
+  cy.wait('@login').its('response.statusCode').should('eq', 200)
+
   // 페이지 새로고침
   cy.reload()
 })
