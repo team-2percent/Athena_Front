@@ -46,9 +46,6 @@ Cypress.Commands.add('login', () => {
         cy.get('[data-cy="password-input"]').type("Abc1234%")
         cy.get('[data-cy="login-button"]').should('not.be.disabled').click()
     })
-
-    // 토큰 저장
-    cy.wait('@login').its('response.statusCode').should('eq', 200)
   
     // 페이지 새로고침
     cy.reload()

@@ -11,6 +11,8 @@ import InputInfo from "../common/InputInfo"
 import { accountAddSchema, accountHolderSchema, bankAccountSchema, bankNameSchema } from "@/lib/validationSchemas"
 import useErrorToastStore from "@/stores/useErrorToastStore"
 import { getValidatedString, validate } from "@/lib/validationUtil"
+import ServerErrorComponent from "../common/ServerErrorComponent"
+import EmptyMessage from "../common/EmptyMessage"
 
 interface AccountInfo {
     id: number
@@ -49,10 +51,15 @@ export default function AccountInfo() {
   const [alertMessage, setAlertMessage] = useState<string>("")
   const [isAlertOpen, setIsAlertOpen] = useState(false)
 
+  const [error, setError] = useState<boolean>(false)
+
   const loadAccounts = () => {
-    apiCall<AccountInfo[]>("/api/bankAccount", "GET").then(({ data }) => {
+    setError(false)
+    apiCall<AccountInfo[]>("/api/bankAccount", "GET").then(({ data, error, status }) => {
       if (data) {
         setAccounts(data)
+      } else if (error && status === 500) {
+        setError(true)
       }
     })
   }
@@ -159,10 +166,53 @@ export default function AccountInfo() {
     setIsDefaultModalOpen(true)
   }
 
+  const renderAccountList = () => {
+    if (error) return <ServerErrorComponent message="계좌 조회에 실패했습니다." onRetry={loadAccounts} />
+    if (accounts.length === 0) return <EmptyMessage message="등록된 계좌가 없습니다." />
+    return (
+      <div className="space-y-3 mt-2">
+        {accounts.map((account) => (
+            <div key={account.id} className="flex items-center justify-between border-b pb-3" data-cy="account-list-item">
+            <div className="flex items-center">
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium" data-cy="account-bank">{account.bankName}</p>
+                    <p className="text-sm text-sub-gray" data-cy="account-name">{account.accountHolder}</p>
+                  </div>
+                  <p className="text-sm text-sub-gray" data-cy="account-number">{account.bankAccount}</p>
+                </div>
+                {account.isDefault ? 
+                <span
+                  className="ml-2 px-2 py-0.5 bg-secondary-color text-main-color text-xs rounded-full"
+                  data-cy="account-default-badge"
+                >기본</span>
+                :
+                <button
+                  className="border-box ml-2 px-2 py-0.5 text-xs text-main-color underline"
+                  onClick={() => handleClickSetDefaultButton(account.id)}
+                  data-cy="default-change-button"
+                >기본 계좌로 설정</button>
+                }
+            </div>
+            {
+              !account.isDefault &&
+              <GhostDangerButton
+                  onClick={() => handleClickDeleteButton(account.id)}
+                  className="w-fit h-fit p-2 rounded-full"
+                  dataCy="account-delete-button"
+              >
+                  <Trash2 className="w-4 h-4" />
+              </GhostDangerButton>
+            }
+            </div>
+        ))}  
+        </div>
+    )
+  }
+
   useEffect(() => {
     loadAccounts();
   }, []);
-
 
     return <div className="flex gap-4 w-full">
       {/* 5. 컴포넌트 return 문 내부 최상단에 AlertModal 컴포넌트 추가 */}
@@ -227,47 +277,7 @@ export default function AccountInfo() {
         <div className="flex-1 flex flex-col bg-white rounded-lg shadow py-6 px-10 justify-between" data-cy="account-list">
             <h3 className="text-lg font-medium mb-6">등록된 계좌 목록</h3>
             <div className="flex-1 flex flex-col gap-4" data-cy="account-list">
-            {accounts.length === 0 ? (
-                    <p className="text-sub-gray text-center py-4">등록된 계좌가 없습니다.</p>
-                ) : (
-                    <div className="space-y-3 mt-2">
-                    {accounts.map((account) => (
-                        <div key={account.id} className="flex items-center justify-between border-b pb-3" data-cy="account-list-item">
-                        <div className="flex items-center">
-                            <div className="flex flex-col">
-                              <div className="flex items-center gap-2">
-                                <p className="font-medium">{account.bankName}</p>
-                                <p className="text-sm text-sub-gray">{account.accountHolder}</p>
-                              </div>
-                              <p className="text-sm text-sub-gray">{account.bankAccount}</p>
-                            </div>
-                            {account.isDefault ? 
-                            <span
-                              className="ml-2 px-2 py-0.5 bg-secondary-color text-main-color text-xs rounded-full"
-                              data-cy="account-default-mark"
-                            >기본</span>
-                            :
-                            <button
-                              className="border-box ml-2 px-2 py-0.5 text-xs text-main-color underline"
-                              onClick={() => handleClickSetDefaultButton(account.id)}
-                              data-cy="account-default-change-button"
-                            >기본 계좌로 설정</button>
-                            }
-                        </div>
-                        {
-                          !account.isDefault &&
-                          <GhostDangerButton
-                              onClick={() => handleClickDeleteButton(account.id)}
-                              className="w-fit h-fit p-2 rounded-full"
-                              dataCy="account-delete-button"
-                          >
-                              <Trash2 className="w-4 h-4" />
-                          </GhostDangerButton>
-                        }
-                        </div>
-                    ))}  
-                    </div>
-                )}
+            {renderAccountList()}
             </div>
         </div>
         </div>

@@ -18,6 +18,7 @@ export default function WithdrawInfo() {
             <DangerButton
                 className="mt-4 px-8 py-3 rounded-xl font-bold text-lg transition"
                 disabled
+                data-cy="withdraw-button"
             >
                 회원 탈퇴 (준비중)
             </DangerButton>

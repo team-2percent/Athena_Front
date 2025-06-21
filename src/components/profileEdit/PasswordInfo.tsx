@@ -134,21 +134,21 @@ export default function PasswordInfo({ onBack }: PasswordInfoProps) {
                             <div className="flex items-center">
                             {
                                 passwordConfirmed ?
-                                <Check className="w-4 h-4 text-green-500" data-cy="password-confirm-success"/>
+                                <Check className="w-4 h-4 text-green-500" data-cy="password-verify-success"/>
                                 :
                                 <div className="flex gap-2 items-center">
                                     <PrimaryButton
                                         type="submit"
                                         onClick={handlePasswordConfirm}
                                         className="px-3 py-2"
-                                        dataCy="password-confirm-button"
+                                        dataCy="password-verify-button"
                                         disabled={!!passwordEditError.password || !password}
                                         isLoading={isLoading}
                                     >확인</PrimaryButton>
                                 </div>
                             }
                             </div>
-                            <InputInfo errorMessage={passwordConfirmError ||passwordEditError.password} errorMessageDataCy="password-error-message" />
+                            <InputInfo errorMessage={passwordConfirmError ||passwordEditError.password} errorMessageDataCy="password-verify-error-message" />
                         </div>
                     </div>
                     
