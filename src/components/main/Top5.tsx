@@ -29,12 +29,19 @@ export default function TopFive() {
   const [categoryProjects, setCategoryProjects] = useState<{ [key: number]: MainProject[] }>({
     0: []
   })
+  const [hasError, setHasError] = useState(false)
   const rank1Project = categoryProjects[activeTab] ? categoryProjects[activeTab][0] : null;
   const restProject = categoryProjects[activeTab] ? categoryProjects[activeTab].slice(1) : [];
   const top5Projects = categoryProjects[activeTab] || [];
 
   const loadProjects = () => {
-    apiCall<Response>("/api/project/categoryRankingView", "GET").then(({ data }) => {
+    setHasError(false);
+    apiCall<Response>("/api/project/categoryRankingView", "GET").then(({ data, error }) => {
+      if (error) {
+        console.error('Failed to load category ranking view:', error);
+        setHasError(true);
+        return;
+      }
       if (data?.allTopView && data.categoryTopView) {
         setCategoryProjects({
           ...categoryProjects,
@@ -67,9 +74,14 @@ export default function TopFive() {
     loadProjects();
   }, [])
 
+  // 에러가 있으면 아무것도 렌더링하지 않음
+  if (hasError) {
+    return null;
+  }
+
   if (isLoading || top5Projects.length === 0) {
     return (
-      <div className="w-full max-w-7xl mx-auto px-4 py-12">
+      <div className="w-full max-w-7xl mx-auto px-4 py-12" data-cy="category-top5-skeleton">
         <div className="flex items-center mb-8">
           <h2 className="text-2xl font-bold">
             BEST <span className="text-main-color">TOP 5</span> <span className="text-2xl">🏆</span>
@@ -102,7 +114,7 @@ export default function TopFive() {
   }
   
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-12">
+    <div className="w-full max-w-7xl mx-auto px-4 py-12" data-cy="category-top5">
       <div className="flex items-center mb-8">
         <h2 className="text-2xl font-bold">
           BEST <span className="text-main-color">TOP 5</span> <span className="text-2xl">🏆</span>
