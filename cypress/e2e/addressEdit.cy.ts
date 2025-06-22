@@ -123,7 +123,7 @@ describe("사용자 배송지 수정", () => {
             cy.get('[data-cy="default-address-confirm-modal"]').should('be.visible')
 
             cy.get('[data-cy="confirm-button"]').click()
-            cy.get('[data-cy="confirm-button-loading"]').should('be.visible')
+            cy.get('[data-cy="confirm-button"]').should('have.attr', 'data-loading', 'true')
         })
 
         it("기본 배송지 변경 성공", () => {
@@ -196,7 +196,7 @@ describe("사용자 배송지 수정", () => {
             cy.get('[data-cy="delete-address-confirm-modal"]').should('be.visible')
 
             cy.get('[data-cy="confirm-button"]').click()
-            cy.get('[data-cy="confirm-button-loading"]').should('be.visible')
+            cy.get('[data-cy="confirm-button"]').should('have.attr', 'data-loading', 'true')
         })
 
         it("배송지 삭제 성공", () => {
@@ -302,7 +302,7 @@ describe("사용자 배송지 수정", () => {
                 cy.get('[data-cy="address-detail-input"]').type("테스트 상세주소")
                 cy.get('[data-cy="address-add-button"]').click()
                 
-                cy.get('[data-cy="address-add-button-loading"]').should('be.visible')
+                cy.get('[data-cy="address-add-button"]').should('have.attr', 'data-loading', 'true')
             })
 
             it("배송지 추가 성공", () => {

@@ -154,7 +154,7 @@ describe('비밀번호 수정', () => {
 
       cy.get('[data-cy="password-input"]').type('Abc1234%')
       cy.get('[data-cy="password-verify-button"]').click()
-      cy.get('[data-cy="password-verify-button-loading"]').should('be.visible')
+      cy.get('[data-cy="password-verify-button"]').should('have.attr', 'data-loading', 'true')
       cy.wait('@verifyPassword').its('response.statusCode').should('eq', 200)
     })
 
@@ -230,7 +230,7 @@ describe('비밀번호 수정', () => {
       cy.get('[data-cy="new-password-input"]').type('NewPass123%')
       cy.get('[data-cy="new-password-confirm-input"]').type('NewPass123%')
       cy.get('[data-cy="password-save-button"]').click()
-      cy.get('[data-cy="password-save-button-loading"]').should('be.visible')
+      cy.get('[data-cy="password-save-button"]').should('have.attr', 'data-loading', 'true')
       cy.wait('@changePassword').its('response.statusCode').should('eq', 200)
     })
 

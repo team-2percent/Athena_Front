@@ -140,7 +140,7 @@ describe("관리자 프로젝트 승인 상세 페이지", () => {
             cy.get('[data-cy="project-save-button"]').click()
             cy.get('[data-cy="project-approve-modal"]').should('be.visible')
             cy.get('[data-cy="confirm-button"]').click()
-            cy.get('[data-cy="confirm-button-loading"]').should('be.visible')
+            cy.get('[data-cy="confirm-button"]').should('have.attr', 'data-loading', 'true')
             cy.wait('@updateProjectApproval').its('response.statusCode').should("eq", 200)
         })
 
@@ -219,7 +219,7 @@ describe("관리자 프로젝트 승인 상세 페이지", () => {
             cy.get('[data-cy="project-save-button"]').click()
             cy.get('[data-cy="project-approve-modal"]').should('be.visible')
             cy.get('[data-cy="confirm-button"]').click()
-            cy.get('[data-cy="confirm-button-loading"]').should('be.visible')
+            cy.get('[data-cy="confirm-button"]').should('have.attr', 'data-loading', 'true')
             cy.wait('@updateProjectReject')
         })
 

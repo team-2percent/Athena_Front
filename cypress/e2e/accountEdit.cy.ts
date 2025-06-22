@@ -124,7 +124,7 @@ describe("사용자 계좌 수정", () => {
             cy.get('[data-cy="default-account-confirm-modal"]').should('be.visible')
 
             cy.get('[data-cy="confirm-button"]').click()
-            cy.get('[data-cy="confirm-button-loading"]').should('be.visible')
+            cy.get('[data-cy="confirm-button"]').should('have.attr', 'data-loading', 'true')
         })
 
         it("기본 계좌 변경 성공", () => {
@@ -197,7 +197,7 @@ describe("사용자 계좌 수정", () => {
             cy.get('[data-cy="delete-account-confirm-modal"]').should('be.visible')
 
             cy.get('[data-cy="confirm-button"]').click()
-            cy.get('[data-cy="confirm-button-loading"]').should('be.visible')
+            cy.get('[data-cy="confirm-button"]').should('have.attr', 'data-loading', 'true')
         })
 
         it("계좌 삭제 성공", () => {
@@ -316,7 +316,7 @@ describe("사용자 계좌 수정", () => {
                 cy.get('[data-cy="account-number-input"]').type("12345678901234567890")
                 cy.get('[data-cy="account-add-button"]').click()
                 
-                cy.get('[data-cy="account-add-button-loading"]').should('be.visible')
+                cy.get('[data-cy="account-add-button"]').should('have.attr', 'data-loading', 'true')
             })
 
             it("계좌 추가 성공", () => {
