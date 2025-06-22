@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Percent, X, LogOut, User, UserLock, Menu } from "lucide-react"
 import CouponModal from "./CouponModal"
 import SearchBar from "./SearchBar"
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import LoginModal from "../login/LoginModal"
 import SignupModal from "../login/SignUpModal"
 import useAuthStore from "@/stores/auth"
@@ -46,6 +46,7 @@ const Header = () => {
   const authMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const pathFirst = pathname.split("/")[1];
   const activeTab = pathToName[pathFirst]
   const showUnderline = (
@@ -58,6 +59,14 @@ const Header = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [sidebarAnim, setSidebarAnim] = useState(false);
+
+  // URL의 query 파라미터에서 검색어를 읽어와서 searchWord 상태 초기화
+  useEffect(() => {
+    const query = searchParams.get('query');
+    if (query) {
+      setSearchWord(query);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

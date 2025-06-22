@@ -20,7 +20,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
   const [projects, setProjects] = useState<listProject[] | undefined>(undefined);
   const [cursorValue, setCursorValue] = useState<string | null>(null);
   const [lastProjectId, setLastProjectId] = useState<number | null>(null);
-  const [totalCount, setTotalCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(-1);
   const [loadError, setLoadError] = useState(false);
   const loader = useRef(null);
   const [sort, setSort] = useState(type === "new" ? null : listType[type].sort[0]);
@@ -44,13 +44,14 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
     apiCall(url + nextPageQueryParam, "GET").then(({ data, error }: { data: any, error: string | null }) => {
       if (error) {
         console.log(error);
+        setTotalCount(-1);
         setLoadError(true);
       } else {
         if ("content" in data) setProjects(prev => prev ? [...prev, ...(data.content as listProject[])] : [...(data.content as listProject[])]);
         else setProjects([]);
         if ("nextCursorValue" in data) setCursorValue(data.nextCursorValue as string | null);
         if ("nextProjectId" in data) setLastProjectId(data.nextProjectId as number | null); 
-        if (totalCount === 0 && "total" in data) setTotalCount(data.total as number);
+        if ("total" in data) setTotalCount(data.total as number);
       }
     })
   }
@@ -94,6 +95,7 @@ export default function ListPage({ type, categoryId, searchWord }: ListPageProps
             searchWord={searchWord}
             sort={sort}
             onClickSort={handleSortClick}
+            isLoading={isLoading}
         /> 
         {(!loadError || (projects && projects.length > 0)) && <ProjectsList projects={projects} isLoading={isLoading} />}
         { 
