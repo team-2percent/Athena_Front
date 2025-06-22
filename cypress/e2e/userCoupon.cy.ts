@@ -283,17 +283,6 @@ describe("사용자 쿠폰 이벤트 조회 및 발급", () => {
 
     describe("발급 실패 시 에러 토스트 표시", () => {
       it("쿠폰 조회 API 500", () => {
-        // given - 쿠폰 리스트 API 응답 설정
-        cy.fixture('couponEvent.json').then((couponEvent) => {
-          cy.intercept({
-            method: "GET",
-            url: "/api/coupon/getInProgress"
-          }, {
-            statusCode: 200,
-            body: couponEvent
-          }).as('getCouponEvent')
-        })
-
         // given - 쿠폰 발급 API 응답 설정 (서버 에러)
         cy.intercept({
           method: "POST",
@@ -302,8 +291,7 @@ describe("사용자 쿠폰 이벤트 조회 및 발급", () => {
           statusCode: 500
         }).as('issueCoupon')
 
-        // when - 쿠폰 조회 API 500, 발급 버튼 클릭
-        cy.wait('@getCouponEvent').its('response.statusCode').should('eq', 200)
+        // when -  발급 버튼 클릭
         cy.get('[data-cy="coupon-issue-button"]').first().click()
 
         // then - 쿠폰 발급 API 500 확인, 에러토스트 visible '쿠폰 발급 실패' 확인, 쿠폰 발급 버튼 활성화 확인, 쿠폰 발급 버튼 text '발급하기' 확인
