@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, Suspense } from "react"
 import Link from "next/link"
 import { Percent, X, LogOut, User, UserLock, Menu } from "lucide-react"
 import CouponModal from "./CouponModal"
@@ -32,7 +32,7 @@ interface HeaderResponse {
   imageUrl: string
 }
 
-const Header = () => {
+const HeaderContent = () => {
   const { isLoggedIn, role, logout, userId } = useAuthStore();
   const isAdmin = role === "ROLE_ADMIN";
   const { isLoading, apiCall } = useApi();
@@ -415,6 +415,14 @@ const Header = () => {
       <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} moveToSignupModal={openSignupModalInLoginModal} />
       <SignupModal isOpen={showSignupModal} onClose={closeSignupModal} />
     </header>
+  )
+}
+
+const Header = () => {
+  return (
+    <Suspense>
+      <HeaderContent />
+    </Suspense>
   )
 }
 
