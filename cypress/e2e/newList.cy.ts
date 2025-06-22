@@ -2,7 +2,13 @@ describe("신규 프로젝트 조회", () => {
     beforeEach(() => {
         // given - 신규 프로젝트 페이지 방문
         cy.fixture('list/projectList.json').then((projectList) => {
-            cy.intercept('GET', '/api/project/recentList', projectList).as('getProjectList')
+            cy.intercept({
+                method: 'GET',
+                url: '/api/project/recentList',
+            }, {
+                statusCode: 200,
+                body: projectList,
+            }).as('getProjectList')
         })
         cy.visit('/new')
         cy.wait('@getProjectList').its('response.statusCode').should('eq', 200)
@@ -13,7 +19,10 @@ describe("신규 프로젝트 조회", () => {
             it("프로젝트 GET 요청 중", () => {
                 // given - API 응답 설정 (지연 포함)
                 cy.fixture('list/projectList.json').then((projectList) => {
-                    cy.intercept('GET', '/api/project/recentList', {
+                    cy.intercept({
+                        method: 'GET',
+                        url: '/api/project/recentList',
+                    }, {
                         ...projectList,
                         delay: 1000
                     }).as('getProjectList')
@@ -32,7 +41,13 @@ describe("신규 프로젝트 조회", () => {
             it("프로젝트 GET 요청 200", () => {
                 // given - API 응답 설정
                 cy.fixture('list/projectList.json').then((projectList) => {
-                    cy.intercept('GET', '/api/project/recentList', projectList).as('getProjectList')
+                    cy.intercept({
+                        method: 'GET',
+                        url: '/api/project/recentList',
+                    }, {
+                        statusCode: 200,
+                        body: projectList,
+                    }).as('getProjectList')
                 })
 
                 // when - 페이지 방문
@@ -49,10 +64,19 @@ describe("신규 프로젝트 조회", () => {
             it("프로젝트 추가 GET 요청 200", () => {
                 // given - API 응답 설정
                 cy.fixture('list/projectList.json').then((projectList) => {
-                    cy.intercept('GET', '/api/project/recentList', projectList).as('getProjectList')
+                    cy.intercept({
+                        method: 'GET',
+                        url: '/api/project/recentList',
+                    }, {
+                        statusCode: 200,
+                        body: projectList,
+                    }).as('getProjectList')
                 })
                 cy.fixture('list/nextProjectList.json').then((nextProjectList) => {
-                    cy.intercept('GET', '/api/project/recentList?cursorValue=*&lastProjectId=*', nextProjectList).as('getNextProjectList')
+                    cy.intercept('GET', '/api/project/recentList?cursorValue=*&lastProjectId=*', {
+                        statusCode: 200,
+                        body: nextProjectList,
+                    }).as('getNextProjectList')
                 })
 
                 // given - 페이지 방문 및 초기 로딩 완료
@@ -73,7 +97,10 @@ describe("신규 프로젝트 조회", () => {
         describe("데이터가 없을 시 프로젝트 건수를 0으로 표시하고, 비어있음 메시지 표시", () => {
             it("프로젝트 GET 요청 200, 데이터 없음", () => {
                 // given - API 응답 설정 (빈 데이터)
-                cy.intercept('GET', '/api/project/recentList', {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/project/recentList',
+                }, {
                     statusCode: 200,
                     body: {
                         content: [],
@@ -98,7 +125,10 @@ describe("신규 프로젝트 조회", () => {
         describe("서버 에러 시 프로젝트 건수를 -으로 표시하고, 서버에러 메시지 표시", () => {
             it("프로젝트 GET 요청 500", () => {
                 // given - API 응답 설정 (서버 에러)
-                cy.intercept('GET', '/api/project/recentList', {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/project/recentList',
+                }, {
                     statusCode: 500
                 }).as('getProjectList')
 

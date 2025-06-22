@@ -59,7 +59,13 @@ describe("카테고리 당 프로젝트 조회", () => {
       it("옵션 '인기순' 클릭", () => {
         // given - API 응답 설정
         cy.fixture('list/projectList.json').then((projectList) => {
-          cy.intercept('GET', '/api/project/categoryList?sortType=POPULAR', projectList).as('getPopularCategoryProjectList')
+          cy.intercept({
+            method: 'GET',
+            url: '/api/project/categoryList?sortType=POPULAR',
+          }, {
+            statusCode: 200,
+            body: projectList,
+          }).as('getPopularCategoryProjectList')
         })
 
         // given - 정렬 select 클릭
@@ -80,7 +86,13 @@ describe("카테고리 당 프로젝트 조회", () => {
       it("옵션 '달성률순' 클릭", () => {
         // given - API 응답 설정
         cy.fixture('list/projectList.json').then((projectList) => {
-          cy.intercept('GET', '/api/project/categoryList?sortType=SUCCESS_RATE', projectList).as('getAchievementRateCategoryProjectList')
+          cy.intercept({
+            method: 'GET',
+            url: '/api/project/categoryList?sortType=SUCCESS_RATE',
+          }, {
+            statusCode: 200,
+            body: projectList,
+          }).as('getAchievementRateCategoryProjectList')
         })
 
         // given - 정렬 select 클릭
@@ -103,7 +115,10 @@ describe("카테고리 당 프로젝트 조회", () => {
       it("카테고리 GET 요청 중", () => {
         // given - API 응답 설정 (지연 포함)
         cy.fixture('list/category.json').then((categoryList) => {
-          cy.intercept('GET', '/api/category', {
+          cy.intercept({
+            method: 'GET',
+            url: '/api/category',
+          }, {
             ...categoryList,
             delay: 1000
           }).as('getCategoryList')
@@ -121,7 +136,13 @@ describe("카테고리 당 프로젝트 조회", () => {
       it("카테고리 GET 요청 200", () => {
         // given - API 응답 설정
         cy.fixture('list/category.json').then((categoryList) => {
-          cy.intercept('GET', '/api/category', categoryList).as('getCategoryList')
+          cy.intercept({
+            method: 'GET',
+            url: '/api/category',
+          }, {
+            statusCode: 200,
+            body: categoryList,
+          }).as('getCategoryList')
         })
 
         // when - 페이지 방문
@@ -137,7 +158,10 @@ describe("카테고리 당 프로젝트 조회", () => {
     describe("카테고리 조회 실패", () => {
       it("카테고리 GET 요청 500", () => {
         // given - API 응답 설정 (서버 에러)
-        cy.intercept('GET', '/api/category', {
+        cy.intercept({
+          method: 'GET',
+          url: '/api/category',
+        }, {
           statusCode: 500
         }).as('getCategoryList')
 
@@ -155,7 +179,13 @@ describe("카테고리 당 프로젝트 조회", () => {
       it("카테고리 클릭", () => {
         // given - API 응답 설정
         cy.fixture('list/projectList.json').then((projectList) => {
-          cy.intercept('GET', '/api/project/categoryList?categoryId=1&sortType=*', projectList).as('getCategoryProjectList')
+        cy.intercept({
+            method: 'GET',
+            url: '/api/project/categoryList?categoryId=1&sortType=*',
+          }, {
+            statusCode: 200,
+            body: projectList,
+          }).as('getCategoryProjectList')
         })
 
         // when - 카테고리 클릭
@@ -174,7 +204,10 @@ describe("카테고리 당 프로젝트 조회", () => {
       it("프로젝트 GET 요청 중", () => {
         // given - API 응답 설정 (지연 포함)
         cy.fixture('list/projectList.json').then((projectList) => {
-          cy.intercept('GET', '/api/project/categoryList?sortType=*', {
+          cy.intercept({
+            method: 'GET',
+            url: '/api/project/categoryList?sortType=*',
+          }, {
             ...projectList,
             delay: 1000
           }).as('getCategoryProjectList')
@@ -193,7 +226,13 @@ describe("카테고리 당 프로젝트 조회", () => {
       it("프로젝트 GET 요청 200", () => {
         // given - API 응답 설정
         cy.fixture('list/projectList.json').then((projectList) => {
-          cy.intercept('GET', '/api/project/categoryList?sortType=*', projectList).as('getCategoryProjectList')
+          cy.intercept({
+            method: 'GET',
+            url: '/api/project/categoryList?sortType=*',
+          }, {
+            statusCode: 200,
+            body: projectList,
+          }).as('getCategoryProjectList')
         })
 
         // when - 페이지 방문
@@ -210,10 +249,19 @@ describe("카테고리 당 프로젝트 조회", () => {
       it("프로젝트 추가 GET 요청 200", () => {
         // given - API 응답 설정
         cy.fixture('list/projectList.json').then((projectList) => {
-          cy.intercept('GET', '/api/project/categoryList?sortType=*', projectList).as('getCategoryProjectList')
+          cy.intercept({
+            method: 'GET',
+            url: '/api/project/categoryList?sortType=*',
+          }, {
+            statusCode: 200,
+            body: projectList,
+          }).as('getCategoryProjectList')
         })
         cy.fixture('list/nextProjectList.json').then((nextProjectList) => {
-          cy.intercept('GET', '/api/project/categoryList?sortType=*&cursorValue=*&cursorId=*', nextProjectList).as('getNextCategoryProjectList')
+          cy.intercept('GET', '/api/project/categoryList?sortType=*&cursorValue=*&cursorId=*', {
+            statusCode: 200,
+            body: nextProjectList,
+          }).as('getNextCategoryProjectList')
         })
 
         // given - 페이지 방문 및 초기 로딩 완료
@@ -234,7 +282,10 @@ describe("카테고리 당 프로젝트 조회", () => {
     describe("데이터가 없을 시 프로젝트 건수를 0으로 표시하고, 비어있음 메시지 표시", () => {
       it("프로젝트 GET 요청 200, 데이터 없음", () => {
         // given - API 응답 설정 (빈 데이터)
-        cy.intercept('GET', '/api/project/categoryList?sortType=*', {
+        cy.intercept({
+          method: 'GET',
+          url: '/api/project/categoryList?sortType=*',
+        }, {
           statusCode: 200,
           body: {
             content: [],
@@ -259,7 +310,10 @@ describe("카테고리 당 프로젝트 조회", () => {
     describe("서버 에러 시 프로젝트 건수를 -으로 표시하고, 서버에러 메시지 표시", () => {
       it("프로젝트 GET 요청 500", () => {
         // given - API 응답 설정 (서버 에러)
-        cy.intercept('GET', '/api/project/categoryList?sortType=*', {
+        cy.intercept({
+          method: 'GET',
+          url: '/api/project/categoryList?sortType=*',
+        }, {
           statusCode: 500
         }).as('getCategoryProjectList')
 
