@@ -2,7 +2,7 @@ import { defineConfig } from "cypress";
 import { unlink } from 'fs/promises';
 
 export default defineConfig({
-  // projectId: "7ovivy", // Cypress Cloud 연결 비활성화
+  projectId: "7ovivy",
 
   e2e: {
     setupNodeEvents(on, config) {
