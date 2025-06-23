@@ -1,12 +1,5 @@
 describe("마이페이지", () => {
     beforeEach(() => {
-        // 인터셉트 정리
-        cy.clearIntercepts();
-        
-        // 공통 인터셉트 설정
-        cy.setupCommonIntercepts();
-
-        // 마이페이지 전용 인터셉트 설정
         cy.intercept({
             method: "GET",
             url: "/api/user/Header"
@@ -49,21 +42,15 @@ describe("마이페이지", () => {
             fixture: "my/comment.json"
         }).as("getMyComments");
 
-        // 로그인 및 마이페이지 접근 (타임아웃 증가)
+        // given - 로그인, 마이페이지 접근
+
         cy.visitMainPage();
         cy.login();
-        
-        // 로그인 후 안정화 대기
-        cy.wait(1000);
-        
-        // 마이페이지 접근 (타임아웃 설정)
-        cy.visit("/my", { timeout: 30000 });
+        cy.visit("/my");
 
-        // 사용자 정보 로딩 대기
-        cy.wait('@getUser', { timeout: 10000 }).its('response.statusCode').should('eq', 200);
+        cy.wait('@getUser').its('response.statusCode').should('eq', 200);
 
-        // 프로필 헤더 로딩 확인
-        cy.get('[data-cy="profile-header"]', { timeout: 10000 }).should("be.visible").within(() => {
+        cy.get('[data-cy="profile-header"]').should("be.visible").within(() => {
             cy.get('[data-cy="profile-image"]').should("be.visible");
             cy.get('[data-cy="profile-nickname"]').should("be.visible");
         });
