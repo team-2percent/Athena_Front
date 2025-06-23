@@ -46,9 +46,8 @@ Cypress.Commands.add('login', () => {
         cy.get('[data-cy="password-input"]').type("Abc1234%")
         cy.get('[data-cy="login-button"]').should('not.be.disabled').click()
     })
-  
-    // 페이지 새로고침
-    cy.reload()
+
+    cy.wait('@login').its('response.statusCode').should('eq', 200)
 })
 
 Cypress.Commands.add('adminLogin', () => {
@@ -91,8 +90,7 @@ Cypress.Commands.add('adminLogin', () => {
       cy.get('[data-cy="login-button"]').should('not.be.disabled').click()
   })
 
-  // 페이지 새로고침
-  cy.reload()
+  cy.wait('@login').its('response.statusCode').should('eq', 200)
 })
 
 Cypress.Commands.add('visitMainPage', () => {
