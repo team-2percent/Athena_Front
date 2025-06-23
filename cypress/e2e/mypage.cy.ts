@@ -68,8 +68,8 @@ describe("마이페이지", () => {
                 }, 1000);
             })).as('getUserDelay');
             
-            // 새 페이지 방문 (로딩 상태 확인을 위해)
-            cy.visit('/my');
+            // 현재 페이지에서 새로고침하여 로딩 상태 확인
+            cy.reload();
             cy.get('.animate-pulse').should('exist');
             cy.wait('@getUserDelay');
         });
@@ -84,7 +84,7 @@ describe("마이페이지", () => {
         
         it("서버에러로 인한 프로필 조회 실패", () => {
             cy.intercept({ method: 'GET', url: '/api/user/57' }, { statusCode: 500 }).as('getUserError');
-            cy.visit('/my');
+            cy.reload();
             cy.get('[data-cy="profile-header"]').should('not.exist');
             cy.contains('프로필 정보를 불러오는 중 오류가 발생했습니다.').should('be.visible');
         });
@@ -124,7 +124,7 @@ describe("마이페이지", () => {
                     resolve();
                 }, 1000);
             })).as('getUserDelay');
-            cy.visit('/my');
+            cy.reload();
             cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-소개"]').click();
             cy.get('.animate-pulse').should('exist');
             cy.wait('@getUserDelay');
@@ -132,7 +132,7 @@ describe("마이페이지", () => {
         
         it('조회 실패 시 에러 메시지 노출', () => {
             cy.intercept({ method: 'GET', url: '/api/user/57' }, { statusCode: 500 }).as('getUserError');
-            cy.visit('/my');
+            cy.reload();
             cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-소개"]').click();
             cy.contains('소개 정보를 불러오는 중 오류가 발생했습니다.').should('be.visible');
         });
@@ -157,7 +157,7 @@ describe("마이페이지", () => {
                     resolve();
                 }, 1000);
             })).as('getMyCouponsDelay');
-            cy.visit('/my');
+            cy.reload();
             cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-쿠폰"]').click();
             cy.get('.animate-pulse').should('exist');
             cy.wait('@getMyCouponsDelay');
@@ -165,7 +165,7 @@ describe("마이페이지", () => {
         
         it('조회 실패 시 에러 메시지 노출', () => {
             cy.intercept({ method: 'GET', url: '/api/my/coupon' }, { statusCode: 500 }).as('getMyCouponsError');
-            cy.visit('/my');
+            cy.reload();
             cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-쿠폰"]').click();
             cy.contains('쿠폰을 불러오는 중 오류가 발생했습니다.').should('be.visible');
         });
@@ -387,7 +387,7 @@ describe("마이페이지", () => {
         
         it('데이터 없음 시 메시지 노출', () => {
             cy.intercept({ method: 'GET', url: '/api/my/order' }, { statusCode: 200, body: [] }).as('getMyOrdersEmpty');
-            cy.visit('/my');
+            cy.reload();
             cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-구매 상품"]').click();
             cy.contains('구매한 상품이 없습니다').should('be.visible');
         });
@@ -457,7 +457,7 @@ describe("마이페이지", () => {
                     resolve();
                 }, 1000);
             })).as('getMyCommentsDelay');
-            cy.visit('/my');
+            cy.reload();
             cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-내가 쓴 후기"]').click();
             cy.get('.animate-pulse').should('exist');
             cy.wait('@getMyCommentsDelay').its('response.statusCode').should('eq', 200);
@@ -465,7 +465,7 @@ describe("마이페이지", () => {
         
         it('조회 실패 시 에러 메시지 노출', () => {
             cy.intercept({ method: 'GET', url: '/api/my/comment' }, { statusCode: 500 }).as('getMyCommentsError');
-            cy.visit('/my');
+            cy.reload();
             cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-내가 쓴 후기"]').click();
             cy.contains('후기를 불러오는 중 오류가 발생했습니다.').should('be.visible');
         });
