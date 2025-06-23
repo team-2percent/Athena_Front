@@ -42,31 +42,6 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
 
   beforeEach(() => {
     cy.visit(`/project/${mockProjectId}`)
-    // 페이지가 완전히 로드될 때까지 기다림
-    cy.get('body').should('be.visible')
-    // 프로젝트 제목이 로드될 때까지 기다림
-    cy.contains(mockProjectData.title).should('be.visible')
-
-    cy.intercept({ method: 'GET', url: `/api/project/${mockProjectId}` }, {
-      statusCode: 200,
-      body: { ...mockProjectData }
-    }).as('getProjectDetail')
-
-    // 후기 API 인터셉트
-    cy.intercept({ method: 'GET', url: '/api/comment/test' }, {
-      statusCode: 200,
-      body: [
-        {
-          id: 1,
-          userName: '테스트유저',
-          content: '이것은 테스트용 후기입니다.',
-          createdAt: '2024-06-30T12:00:00Z',
-          imageUrl: '/profile-test.png'
-        }
-      ]
-    }).as('getProjectComments')
-
-    cy.wait('@getProjectDetail')
   })
 
   it('메타데이터가 정상적으로 노출된다', () => {
@@ -223,30 +198,6 @@ describe('프로젝트 상세 결제 플로우', () => {
 
   beforeEach(() => {
     cy.visit('/project/test')
-    // 페이지가 완전히 로드될 때까지 기다림
-    cy.get('body').should('be.visible')
-    // 프로젝트 제목이 로드될 때까지 기다림
-    cy.contains(mockProjectData.title).should('be.visible')
-    
-    cy.intercept({ method: 'GET', url: `/api/project/${mockProjectId}` }, {
-      statusCode: 200,
-      body: { ...mockProjectData }
-    }).as('getProjectDetail')
-    cy.intercept({ method: 'GET', url: '/api/delivery/delivery-info' }, {
-      statusCode: 200,
-      body: []
-    }).as('getDeliveryInfo')
-    cy.intercept({ method: 'POST', url: '/api/order' }, { 
-      orderId: 123, 
-      totalPrice: 10000, 
-      orderedAt: '2024-07-01', 
-      items: [{ productId: 1, productName: '테스트 리워드', quantity: 1, price: 10000 }] 
-    }).as('order')
-    cy.intercept({ method: 'POST', url: '/api/payment/ready/*' }, { 
-      next_redirect_pc_url: 'https://pay.test', 
-      tid: 'TID123' 
-    }).as('paymentReady')
-    cy.wait('@getProjectDetail')
   })
 
   it('필수값 누락 시 Alert 노출', () => {
