@@ -16,14 +16,20 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 
-// 전역 테스트 격리 설정 (안전한 방식)
+// 전역 테스트 격리 설정
 beforeEach(() => {
+  // 모든 인터셉트 정리
+  cy.clearIntercepts()
+  
+  // 공통 인터셉트 설정
+  cy.setupCommonIntercepts()
+  
   // 로컬 스토리지 및 세션 스토리지 정리
   cy.clearLocalStorage()
   cy.clearCookies()
-  
-  // 공통 인터셉트 설정 (기본적인 것만)
-  cy.setupCommonIntercepts()
 })
 
-// afterEach에서 인터셉트 정리 제거 (개별 테스트에서 관리하도록)
+afterEach(() => {
+  // 테스트 후 인터셉트 정리
+  cy.clearIntercepts()
+})
