@@ -85,6 +85,7 @@ describe("로그인", () => {
       // given - 유효한 입력값 작성
       cy.get('@loginModal').get('[data-cy="email-input"]').type("test@test.com")
       cy.get('@loginModal').get('[data-cy="password-input"]').type("Abc1234%")
+      cy.get('@loginModal').get('[data-cy="login-button"]').should('not.be.disabled')
     })
 
     describe("로그인 로딩", () => {
@@ -99,7 +100,7 @@ describe("로그인", () => {
             userId: 57,
           },
           delay: 1000
-        }).as('login')
+        }).as('loginLoading')
 
         cy.intercept({
           method: "POST",
@@ -173,13 +174,13 @@ describe("로그인", () => {
           url: "/api/user/login"
         }, {
           statusCode: 401
-        }).as('login')
+        }).as('loginError401')
 
         // when - 로그인 버튼 클릭
         cy.get('@loginModal').get('[data-cy="login-button"]').click()
 
         // then - API 응답 대기 및 에러메세지 확인
-        cy.wait('@login').its('response.statusCode').should('eq', 401)
+        cy.wait('@loginError401').its('response.statusCode').should('eq', 401)
         cy.contains("로그인에 실패했습니다.").should('be.visible')
       })
 
@@ -190,13 +191,13 @@ describe("로그인", () => {
           url: "/api/user/login"
         }, {
           statusCode: 500
-        }).as('login')
+        }).as('loginError500')
 
         // when - 로그인 버튼 클릭
         cy.get('@loginModal').get('[data-cy="login-button"]').click()
 
         // then - API 응답 대기 및 에러메세지 확인
-        cy.wait('@login').its('response.statusCode').should('eq', 500)
+        cy.wait('@loginError500').its('response.statusCode').should('eq', 500)
         cy.contains("로그인에 실패했습니다.").should('be.visible')
       })
     })

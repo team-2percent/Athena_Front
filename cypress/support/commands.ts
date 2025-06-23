@@ -49,6 +49,7 @@ Cypress.Commands.add('login', () => {
   
     // 페이지 새로고침
     cy.reload()
+    cy.wait('@getHeader').its('response.statusCode').should('eq', 200)
 })
 
 Cypress.Commands.add('adminLogin', () => {
@@ -93,6 +94,7 @@ Cypress.Commands.add('adminLogin', () => {
 
   // 페이지 새로고침
   cy.reload()
+  cy.wait('@getHeader').its('response.statusCode').should('eq', 200)
 })
 
 Cypress.Commands.add('visitMainPage', () => {

@@ -1,19 +1,4 @@
 describe("신규 프로젝트 조회", () => {
-    beforeEach(() => {
-        // given - 신규 프로젝트 페이지 방문
-        cy.fixture('list/projectList.json').then((projectList) => {
-            cy.intercept({
-                method: 'GET',
-                url: '/api/project/recentList',
-            }, {
-                statusCode: 200,
-                body: projectList,
-            }).as('getProjectList')
-        })
-        cy.visit('/new')
-        cy.wait('@getProjectList').its('response.statusCode').should('eq', 200)
-    })
-
     describe("리스트", () => {
         describe("조회 로딩 중 프로젝트 건수 표시 문구, 프로젝트 리스트에 스켈레톤 위치", () => {
             it("프로젝트 GET 요청 중", () => {

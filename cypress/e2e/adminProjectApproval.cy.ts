@@ -7,7 +7,10 @@ describe("관리자 프로젝트 승인 페이지", () => {
     describe("프로젝트 목록", () => {
         it("정상 조회 시 프로젝트 목록 정상 표시", () => {
             cy.fixture('admin/approval/projectList.json').then((projectList) => {
-                cy.intercept('GET', '/api/admin/project?page=0&direction=*', {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=0&direction=*'
+                }, {
                     statusCode: 200,
                     body: projectList
                 })
@@ -42,7 +45,10 @@ describe("관리자 프로젝트 승인 페이지", () => {
 
         it('프로젝트 클릭 시 상세 페이지로 이동', () => {
             cy.fixture('admin/approval/projectList.json').then((projectList) => {
-                cy.intercept('GET', '/api/admin/project?page=0&direction=*', {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=0&direction=*'
+                }, {
                     statusCode: 200,
                     body: projectList
                 })
@@ -66,7 +72,10 @@ describe("관리자 프로젝트 승인 페이지", () => {
     describe("정렬", () => {
         beforeEach(() => {
             cy.fixture('admin/approval/projectList.json').then((projectList) => {
-                cy.intercept('GET', '/api/admin/project?page=0&direction=*', {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=0&direction=*'
+                }, {
                     statusCode: 200,
                     body: projectList
                 })
@@ -99,7 +108,10 @@ describe("관리자 프로젝트 승인 페이지", () => {
     describe("검색", () => {
         beforeEach(() => {
             cy.fixture('admin/approval/projectList.json').then((projectList) => {
-                cy.intercept('GET', '/api/admin/project?page=0&direction=*', {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=0&direction=*'
+                }, {
                     statusCode: 200,
                     body: projectList
                 })
@@ -128,7 +140,10 @@ describe("관리자 프로젝트 승인 페이지", () => {
 
         it("검색창 입력 후 검색 시 리로드", () => {
             cy.fixture('admin/approval/projectList.json').then((projectList) => {
-                cy.intercept('GET', '/api/admin/project?page=0&direction=*&keyword=*', {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=0&direction=*&keyword=*'
+                }, {
                     statusCode: 200,
                     body: projectList
                 })
@@ -143,7 +158,10 @@ describe("관리자 프로젝트 승인 페이지", () => {
     describe("페이지네이션", () => {
         beforeEach(() => {
             cy.fixture('admin/approval/projectList.json').then((projectList) => {
-                cy.intercept('GET', '/api/admin/project?page=0&direction=*', {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=0&direction=*'
+                }, {
                     statusCode: 200,
                     body: projectList
                 })
@@ -165,7 +183,10 @@ describe("관리자 프로젝트 승인 페이지", () => {
 
         it("중간 페이지에서는 현재 페이지 제외 모두 활성화", () => {
             cy.fixture('admin/approval/nextProjectList.json').then((nextProjectList) => {
-                cy.intercept('GET', '/api/admin/project?page=1&direction=*', {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=1&direction=*'
+                }, {
                     statusCode: 200,
                     body: nextProjectList
                 })
@@ -183,7 +204,10 @@ describe("관리자 프로젝트 승인 페이지", () => {
         it("마지막 페이지에서는 다른 페이지와 첫 페이지 이동, 이전 페이지 이동 버튼만 활성화", () => {
             cy.fixture('admin/approval/nextProjectList.json').then((nextProjectList) => {
                 const lastProjectList = {...nextProjectList, pageInfo: {currentPage: 8, totalPages: 9}}
-                cy.intercept('GET', '/api/admin/project?page=8&direction=*', {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=8&direction=*'
+                }, {
                     statusCode: 200,
                     body: lastProjectList
                 })

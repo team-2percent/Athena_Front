@@ -1,22 +1,19 @@
-import { listType, sortName } from '../../src/lib/listConstant';
 
 describe("마감임박 프로젝트 조회", () => {
-    beforeEach(() => {
-        // given - 마감임박 프로젝트 페이지 방문
-        cy.fixture('list/projectList.json').then((projectList) => {
-            cy.intercept({
-                method: 'GET',
-                url: '/api/project/deadlineList?sortTypeDeadline=*',
-            }, {
-                statusCode: 200,
-                body: projectList,
-            }).as('getDeadlineProjectList')
-        })
-        cy.visit('/deadline')
-        cy.wait('@getDeadlineProjectList').its('response.statusCode').should('eq', 200)
-    })
-
     describe("정렬 select 선택", () => {
+        beforeEach(() => {
+            cy.fixture('list/projectList.json').then((projectList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/project/deadlineList?sortTypeDeadline=*',
+                }, {
+                    statusCode: 200,
+                    body: projectList,
+                }).as('getDeadlineProjectList')
+            })
+            cy.visit('/deadline')
+            cy.wait('@getDeadlineProjectList').its('response.statusCode').should('eq', 200)
+        })
         describe("정렬 표시", () => {
             it("'/deadline' 방문", () => {
                 // then - 정렬 select visible 확인, 최신순 텍스트 확인
@@ -183,7 +180,10 @@ describe("마감임박 프로젝트 조회", () => {
                 })
 
                 cy.fixture('list/nextProjectList.json').then((nextProjectList) => {
-                    cy.intercept('GET', '/api/project/deadlineList?sortTypeDeadline=*&cursorValue=*&lastProjectId=*', {
+                    cy.intercept({
+                        method: 'GET',
+                        url: '/api/project/deadlineList?sortTypeDeadline=*&cursorValue=*&lastProjectId=*',
+                    }, {
                         statusCode: 200,
                         body: nextProjectList,
                     }).as('getNextProjectList')

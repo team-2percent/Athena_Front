@@ -1,5 +1,3 @@
-import { PASSWORD_MIN_LENGTH } from "../../src/lib/validationConstant"
-
 describe("회원가입", () => {
     beforeEach(() => {
         // given - 회원가입 모달 오픈, 회원가입 버튼 disabled 확인
@@ -177,6 +175,7 @@ describe("회원가입", () => {
             cy.get('@signupModal').get('[data-cy="email-input"]').type("test@test.com")
             cy.get('@signupModal').get('[data-cy="password-input"]').type("Abc1234%")
             cy.get('@signupModal').get('[data-cy="confirm-password-input"]').type("Abc1234%")
+            cy.get('@signupModal').get('[data-cy="signup-button"]').should('not.be.disabled')
         })
 
         describe("회원가입 로딩", () => {

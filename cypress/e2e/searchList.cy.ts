@@ -2,22 +2,23 @@ import { listType, sortName } from '../../src/lib/listConstant';
 
 describe("검색 결과 프로젝트 조회", () => {
   beforeEach(() => {
-    // given - 검색 페이지 방문
-    cy.fixture('list/projectList.json').then((projectList) => {
-      cy.intercept({
-        method: 'GET',
-        url: '/api/project/search?sortType=LATEST&searchTerm=*'
-      }, {
-        statusCode: 200,
-        body: projectList,
-      }).as('getSearchProjectList')
-    })
-    cy.visit('/search?query=%ED%85%8C%EC%8A%A4%ED%8A%B8')
-    cy.wait('@getSearchProjectList').its('response.statusCode').should('eq', 200)
+    
   })
 
   describe("헤더 검색 Input에서 검색어 표시", () => {
     it("검색 Input 내용과 query 일치", () => {
+      // given - 검색 페이지 방문
+      cy.fixture('list/projectList.json').then((projectList) => {
+        cy.intercept({
+          method: 'GET',
+          url: '/api/project/search?sortType=LATEST&searchTerm=*'
+        }, {
+          statusCode: 200,
+          body: projectList,
+        }).as('getSearchProjectList')
+      })
+      cy.visit('/search?query=%ED%85%8C%EC%8A%A4%ED%8A%B8')
+      cy.wait('@getSearchProjectList').its('response.statusCode').should('eq', 200)
       // then - 검색 Input 내용과 query 일치 확인
       cy.get('[data-cy="search-input"]').should('have.value', '테스트')
     })
@@ -25,12 +26,38 @@ describe("검색 결과 프로젝트 조회", () => {
 
   describe("리스트 헤더에서 검색어 표시", () => {
     it("리스트 헤더 검색어 내용과 query 일치", () => {
+      // given - 검색 페이지 방문
+      cy.fixture('list/projectList.json').then((projectList) => {
+        cy.intercept({
+          method: 'GET',
+          url: '/api/project/search?sortType=LATEST&searchTerm=*'
+        }, {
+          statusCode: 200,
+          body: projectList,
+        }).as('getSearchProjectList')
+      })
+      cy.visit('/search?query=%ED%85%8C%EC%8A%A4%ED%8A%B8')
+      cy.wait('@getSearchProjectList').its('response.statusCode').should('eq', 200)
       // then - 리스트 헤더 검색어 내용과 query 일치 확인
       cy.get('[data-cy="list-header-search-word"]').should('be.visible').should('contain', '테스트')
     })
   })
 
   describe("정렬 select 선택", () => {
+    beforeEach(() => {
+      // given - 검색 페이지 방문
+      cy.fixture('list/projectList.json').then((projectList) => {
+        cy.intercept({
+          method: 'GET',
+          url: '/api/project/search?sortType=LATEST&searchTerm=*'
+        }, {
+          statusCode: 200,
+          body: projectList,
+        }).as('getSearchProjectList')
+      })
+      cy.visit('/search?query=%ED%85%8C%EC%8A%A4%ED%8A%B8')
+      cy.wait('@getSearchProjectList').its('response.statusCode').should('eq', 200)
+    })
     describe("정렬 표시", () => {
       it("정렬 select visible 확인, 최신순 텍스트 확인 성공", () => {
         // when - 정렬 select 클릭
@@ -164,6 +191,17 @@ describe("검색 결과 프로젝트 조회", () => {
     describe("마지막 추가 조회 시 20개 이내의 다음 프로젝트를 표시하고, loading bar 없음 확인", () => {
       it("프로젝트 추가 GET 요청 200", () => {
         // given - API 응답 설정
+        // given - 검색 페이지 방문
+        cy.fixture('list/projectList.json').then((projectList) => {
+          cy.intercept({
+            method: 'GET',
+            url: '/api/project/search?sortType=LATEST&searchTerm=*'
+          }, {
+            statusCode: 200,
+            body: projectList,
+          }).as('getSearchProjectList')
+        })
+    
         cy.fixture('list/nextProjectList.json').then((nextProjectList) => {
           cy.intercept({
             method: 'GET',
@@ -173,6 +211,10 @@ describe("검색 결과 프로젝트 조회", () => {
             body: nextProjectList,
           }).as('getNextSearchProjectList')
         })
+
+        // given - 페이지 방문
+        cy.visit('/search?query=%ED%85%8C%EC%8A%A4%ED%8A%B8')
+        cy.wait('@getSearchProjectList').its('response.statusCode').should('eq', 200)
 
         // when - 맨 아래로 스크롤
         cy.scrollTo('bottom')
