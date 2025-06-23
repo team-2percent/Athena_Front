@@ -43,7 +43,6 @@ describe("마이페이지", () => {
         }).as("getMyComments");
 
         // given - 로그인, 마이페이지 접근
-
         cy.visitMainPage();
         cy.login();
         cy.visit("/my");
