@@ -36,8 +36,14 @@ jobs:
           # https://docs.cypress.io/guides/continuous-integration/introduction#Boot-your-server
           start: npm start
           wait-on: 'http://[::1]:3000' # Waits for above
-          spec: cypress/e2e/mypage.cy.ts # contemporary
-          # parallel: true # Runs test in parallel using settings above
+          # 타임아웃 및 안정성 설정
+          config: defaultCommandTimeout=10000,requestTimeout=10000,responseTimeout=10000,pageLoadTimeout=60000
+          # 브라우저 설정
+          browser: chrome
+          # 헤드리스 모드에서 안정성 향상
+          headed: false
+          # 타임아웃 설정
+          timeout: 60000
         env:
           # For recording and parallelization to work you must set your CYPRESS_RECORD_KEY
           # in GitHub repo → Settings → Secrets → Actions

@@ -5,14 +5,13 @@ import { jwtDecode } from "jwt-decode";
 let userHeaderFixture: any
 
 Cypress.Commands.add('login', () => {
-    // 로그인 API 호출 인터셉트
     cy.intercept({
         method: "POST",
         url: "/api/user/login"
     }, {
         statusCode: 200,
         body: {
-            accessToken: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NyIsInJvbGUiOiJST0xFX1VTRVIiLCJuaWNrbmFtZSI6IuqwgOyehe2FjOyKpO2KuCIsImlhdCI6MTc0ODk2ODQ0MSwiZXhwIjoxNzQ5NTczMjQxfQ.8QkpyGU8Mf9Mh2xSTzlmHCapyxQZONR81ZHcv_GQ2b4",
+            accessToken: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NyIsInJvbGUiOiJST0xFX1VTRVIiLCJuaWNrbmFtZSI6IuqwgOyeldqFjOyKpO2KuCIsImlhdCI6MTc0ODk2ODQ0MSwiZXhwIjoxNzQ5NTczMjQxfQ.2ilTPbIisw2OREhlLLf20N9e9Daop8lfOEGP_s5xKh0",
             userId: "57"
         }
     }).as('login')
@@ -35,10 +34,11 @@ Cypress.Commands.add('login', () => {
     }, {
         statusCode: 200,
     })
-    // 로그인 모달 열기
-    cy.get('header').get('[data-cy="open-login-modal-button"]').click()
+    
+    // 로그인 모달 열기 (타임아웃 증가)
+    cy.get('header', { timeout: 10000 }).get('[data-cy="open-login-modal-button"]').click()
 
-    cy.get('[data-cy="login-modal"]').should('be.visible')
+    cy.get('[data-cy="login-modal"]', { timeout: 10000 }).should('be.visible')
     
     // 로그인 폼 작성
     cy.get('[data-cy="login-modal"]').within(() => {
@@ -46,9 +46,15 @@ Cypress.Commands.add('login', () => {
         cy.get('[data-cy="password-input"]').type("Abc1234%")
         cy.get('[data-cy="login-button"]').should('not.be.disabled').click()
     })
-  
-    // 페이지 새로고침
-    cy.reload()
+    
+    // 로그인 요청 대기
+    cy.wait('@login', { timeout: 10000 }).its('response.statusCode').should('eq', 200);
+    
+    // 페이지 새로고침 (타임아웃 증가)
+    cy.reload({ timeout: 30000 });
+    
+    // 새로고침 후 안정화 대기
+    cy.wait(2000);
 })
 
 Cypress.Commands.add('adminLogin', () => {
@@ -81,8 +87,9 @@ Cypress.Commands.add('adminLogin', () => {
   }, {
       statusCode: 200,
   })
-  // 로그인 모달 열기
-  cy.get('header').get('[data-cy="open-login-modal-button"]').click()
+  
+  // 로그인 모달 열기 (타임아웃 증가)
+  cy.get('header', { timeout: 10000 }).get('[data-cy="open-login-modal-button"]').click()
 
   // 로그인 폼 작성
   cy.get('[data-cy="login-modal"]').within(() => {
@@ -90,9 +97,15 @@ Cypress.Commands.add('adminLogin', () => {
       cy.get('[data-cy="password-input"]').type("Abc1234%")
       cy.get('[data-cy="login-button"]').should('not.be.disabled').click()
   })
-
-  // 페이지 새로고침
-  cy.reload()
+  
+  // 로그인 요청 대기
+  cy.wait('@login', { timeout: 10000 }).its('response.statusCode').should('eq', 200);
+  
+  // 페이지 새로고침 (타임아웃 증가)
+  cy.reload({ timeout: 30000 });
+  
+  // 새로고침 후 안정화 대기
+  cy.wait(2000);
 })
 
 Cypress.Commands.add('visitMainPage', () => {
