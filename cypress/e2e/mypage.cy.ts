@@ -208,7 +208,7 @@ describe("마이페이지", () => {
             cy.get('[data-cy="delete-modal"]').should('be.visible')
         });
         
-        it("판매상품 수정로 이동", () => {
+        it("판매상품 수정으로 이동", () => {
             // when - 수정, 삭제 버튼 확인
             cy.get('[data-cy="project-item"]').first().within(() => {
                 cy.get('[data-cy="edit-button"]').should('be.visible')
@@ -265,36 +265,46 @@ describe("마이페이지", () => {
         });
         
         it('로딩 시 스켈레톤 노출', () => {
+            // 기존 인터셉트를 덮어쓰기 위해 새로운 인터셉트 설정
             cy.intercept({ method: 'GET', url: '/api/my/project' }, (req) => new Promise(resolve => {
                 setTimeout(() => {
                     req.reply({ fixture: 'my/project.json' });
                     resolve();
                 }, 1000);
             })).as('getMyProjectsDelay');
-            cy.visit('/my');
+            
+            // 현재 탭에서 새로고침하여 로딩 상태 확인
+            cy.reload();
             cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-판매 상품"]').click();
             cy.get('.animate-pulse').should('exist');
             cy.wait('@getMyProjectsDelay');
         });
         
         it('조회 실패 시 에러 메시지 노출', () => {
+            // 기존 인터셉트를 덮어쓰기 위해 새로운 인터셉트 설정
             cy.intercept({ method: 'GET', url: '/api/my/project' }, { statusCode: 500 }).as('getMyProjectsError');
-            cy.visit('/my');
+            
+            // 현재 탭에서 새로고침하여 에러 상태 확인
+            cy.reload();
             cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-판매 상품"]').click();
             cy.contains('판매 상품을 불러오는 중 오류가 발생했습니다.').should('be.visible');
         });
         
         it('데이터 없음 시 메시지 노출', () => {
+            // 기존 인터셉트를 덮어쓰기 위해 새로운 인터셉트 설정
             cy.intercept({ method: 'GET', url: '/api/my/project' }, { statusCode: 200, body: [] }).as('getMyProjectsEmpty');
-            cy.visit('/my');
+            
+            // 현재 탭에서 새로고침하여 빈 데이터 상태 확인
+            cy.reload();
             cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-판매 상품"]').click();
             cy.contains('판매 중인 상품이 없습니다.').should('be.visible');
         });
         
         it('삭제 실패 시 에러 토스트/모달 노출', () => {
+            // 기존 인터셉트를 덮어쓰기 위해 새로운 인터셉트 설정
             cy.intercept({ method: 'DELETE', url: '/api/project/1' }, { statusCode: 500 }).as('deleteProjectError');
-            cy.visit('/my');
-            cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-판매 상품"]').click();
+            
+            // 현재 탭에서 삭제 버튼 클릭
             cy.get('[data-cy="project-item"]').first().find('[data-cy="delete-button"]').click();
             cy.get('[data-cy="delete-modal"]').should('be.visible');
             cy.get('[data-cy="delete-modal"]').find('[data-cy="confirm-button"]').click();
@@ -350,21 +360,27 @@ describe("마이페이지", () => {
         });
         
         it('로딩 시 스켈레톤 노출', () => {
+            // 기존 인터셉트를 덮어쓰기 위해 새로운 인터셉트 설정
             cy.intercept({ method: 'GET', url: '/api/my/order' }, (req) => new Promise(resolve => {
                 setTimeout(() => {
                     req.reply({ fixture: 'my/order.json' });
                     resolve();
                 }, 1000);
             })).as('getMyOrdersDelay');
-            cy.visit('/my');
+            
+            // 현재 탭에서 새로고침하여 로딩 상태 확인
+            cy.reload();
             cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-구매 상품"]').click();
             cy.get('.animate-pulse').should('exist');
             cy.wait('@getMyOrdersDelay');
         });
         
         it('조회 실패 시 에러 메시지 노출', () => {
+            // 기존 인터셉트를 덮어쓰기 위해 새로운 인터셉트 설정
             cy.intercept({ method: 'GET', url: '/api/my/order' }, { statusCode: 500 }).as('getMyOrdersError');
-            cy.visit('/my');
+            
+            // 현재 탭에서 새로고침하여 에러 상태 확인
+            cy.reload();
             cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-구매 상품"]').click();
             cy.contains('구매 상품을 불러오는 중 오류가 발생했습니다.').should('be.visible');
         });
