@@ -61,6 +61,7 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
     }).as('getProjectComments')
 
     cy.visit(`/project/${mockProjectId}`)
+    cy.wait(500)
     cy.wait('@getProjectDetail')
     cy.wait(2000)
   })
@@ -237,6 +238,7 @@ describe('프로젝트 상세 결제 플로우', () => {
       tid: 'TID123' 
     }).as('paymentReady')
     cy.visit('/project/test')
+    cy.wait(500)
     cy.wait('@getProjectDetail')
   })
 
