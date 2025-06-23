@@ -154,6 +154,52 @@ Cypress.Commands.add('checkEmptyMessageCard', (message: string) => {
   cy.get('[data-cy="empty-message-card"]').should('be.visible')
   cy.get('[data-cy="empty-message"]').should('be.visible').should('contain', message)
 })
+
+// 테스트 간 격리를 위한 인터셉트 정리 함수
+Cypress.Commands.add('clearIntercepts', () => {
+  // 모든 인터셉트를 제거
+  cy.intercept('*', (req) => {
+    // 기본 동작 (인터셉트 없음)
+  }).as('clearAll');
+});
+
+// 공통 API 인터셉트 설정 함수
+Cypress.Commands.add('setupCommonIntercepts', () => {
+  // 로그인 관련 기본 인터셉트
+  cy.intercept('POST', '/api/auth/login', {
+    statusCode: 200,
+    body: {
+      accessToken: 'mock-access-token',
+      refreshToken: 'mock-refresh-token',
+      user: {
+        id: 1,
+        email: 'test@example.com',
+        nickname: '테스트유저'
+      }
+    }
+  }).as('login');
+
+  // 사용자 정보 관련 기본 인터셉트
+  cy.intercept('GET', '/api/user', {
+    statusCode: 200,
+    body: {
+      id: 1,
+      email: 'test@example.com',
+      nickname: '테스트유저'
+    }
+  }).as('getUserInfo');
+});
+
+// TypeScript 타입 정의
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      clearIntercepts(): Chainable<void>
+      setupCommonIntercepts(): Chainable<void>
+    }
+  }
+}
+
 //
 //
 // -- This is a child command --
