@@ -34,7 +34,7 @@ Cypress.Commands.add('login', () => {
         url: "/api/fcm/register"
     }, {
         statusCode: 200,
-    })
+    }).as('fcmRegister')
     // 로그인 모달 열기
     cy.get('header').get('[data-cy="open-login-modal-button"]').click()
 
@@ -48,6 +48,8 @@ Cypress.Commands.add('login', () => {
     })
 
     cy.wait('@login').its('response.statusCode').should('eq', 200)
+    cy.wait('@getHeader').its('response.statusCode').should('eq', 200)
+    cy.wait('@fcmRegister').its('response.statusCode').should('eq', 200)
 })
 
 Cypress.Commands.add('adminLogin', () => {
@@ -79,7 +81,7 @@ Cypress.Commands.add('adminLogin', () => {
       url: "/api/fcm/register"
   }, {
       statusCode: 200,
-  })
+  }).as('fcmRegister')
   // 로그인 모달 열기
   cy.get('header').get('[data-cy="open-login-modal-button"]').click()
 
@@ -91,6 +93,8 @@ Cypress.Commands.add('adminLogin', () => {
   })
 
   cy.wait('@login').its('response.statusCode').should('eq', 200)
+  cy.wait('@getHeader').its('response.statusCode').should('eq', 200)
+  cy.wait('@fcmRegister').its('response.statusCode').should('eq', 200)
 })
 
 Cypress.Commands.add('visitMainPage', () => {
