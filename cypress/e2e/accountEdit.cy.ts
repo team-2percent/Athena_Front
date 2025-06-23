@@ -3,21 +3,11 @@ describe("사용자 계좌 수정", () => {
         cy.fixture('profileEdit/user.json').then((user) => {
             cy.intercept({
                 method: 'GET',
-                url: '/api/user/*'
+                url: '/api/user/57'
             }, {
                 body: user,
                 statusCode: 200
             }).as('getUserInfo');
-        });
-
-        cy.fixture('profileEdit/accountList.json').then((account) => {
-            cy.intercept({
-                method: 'GET',
-                url: '/api/bankAccount'
-            }, {
-                body: account,
-                statusCode: 200
-            }).as('getBankAccount');
         });
     
         cy.fixture('profileEdit/addressList.json').then((address) => {
@@ -36,6 +26,16 @@ describe("사용자 계좌 수정", () => {
 
     describe("프로필 탭 활성화", () => {
         it("계좌 탭 클릭", () => {
+            cy.fixture('profileEdit/accountList.json').then((account) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/bankAccount'
+                }, {
+                    body: account,
+                    statusCode: 200
+                }).as('getBankAccount');
+            });
+
             cy.visit("/my/edit")
             cy.wait('@getUserInfo').its('response.statusCode').should('eq', 200)
             cy.get('[data-cy="menu-tab-계좌"]').click()
@@ -45,6 +45,15 @@ describe("사용자 계좌 수정", () => {
 
     describe("계좌 조회", () => {
         it("계좌 조회 성공", () => {
+            cy.fixture('profileEdit/accountList.json').then((account) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/bankAccount'
+                }, {
+                    body: account,
+                    statusCode: 200
+                }).as('getBankAccount');
+            });
             cy.visit("/my/edit")
             cy.wait('@getBankAccount').its('response.statusCode').should('eq', 200)
             cy.get('[data-cy="menu-tab-계좌"]').click()
@@ -81,6 +90,15 @@ describe("사용자 계좌 수정", () => {
         })
 
         it("계좌 리스트 내 계좌 표시", () => {
+            cy.fixture('profileEdit/accountList.json').then((account) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/bankAccount'
+                }, {
+                    body: account,
+                    statusCode: 200
+                }).as('getBankAccount');
+            });
             cy.visit("/my/edit")
             cy.wait('@getBankAccount').its('response.statusCode').should('eq', 200)
             cy.get('[data-cy="menu-tab-계좌"]').click()
@@ -106,6 +124,15 @@ describe("사용자 계좌 수정", () => {
 
     describe("기본 계좌 변경", () => {
         beforeEach(() => {
+            cy.fixture('profileEdit/accountList.json').then((account) => {
+            cy.intercept({
+                method: 'GET',
+                url: '/api/bankAccount'
+            }, {
+                body: account,
+                statusCode: 200
+            }).as('getBankAccount');
+            });
             cy.visit("/my/edit")
             cy.wait('@getBankAccount').its('response.statusCode').should('eq', 200)
             cy.get('[data-cy="menu-tab-계좌"]').click()
@@ -179,6 +206,15 @@ describe("사용자 계좌 수정", () => {
 
     describe("계좌 삭제", () => {
         beforeEach(() => {
+            cy.fixture('profileEdit/accountList.json').then((account) => {
+            cy.intercept({
+                method: 'GET',
+                url: '/api/bankAccount'
+            }, {
+                body: account,
+                statusCode: 200
+            }).as('getBankAccount');
+            });
             cy.visit("/my/edit")
             cy.wait('@getBankAccount').its('response.statusCode').should('eq', 200)
             cy.get('[data-cy="menu-tab-계좌"]').click()
@@ -244,6 +280,15 @@ describe("사용자 계좌 수정", () => {
 
     describe("계좌 추가", () => {
         beforeEach(() => {
+            cy.fixture('profileEdit/accountList.json').then((account) => {
+            cy.intercept({
+                method: 'GET',
+                url: '/api/bankAccount'
+            }, {
+                body: account,
+                statusCode: 200
+            }).as('getBankAccount');
+            });
             cy.visit("/my/edit")
             cy.wait('@getBankAccount').its('response.statusCode').should('eq', 200)
             cy.get('[data-cy="menu-tab-계좌"]').click()

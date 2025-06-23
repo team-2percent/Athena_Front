@@ -19,16 +19,6 @@ describe("사용자 배송지 수정", () => {
                 statusCode: 200
             }).as('getBankAccount');
         });
-    
-        cy.fixture('profileEdit/addressList.json').then((address) => {
-            cy.intercept({
-                method: 'GET',
-                url: '/api/delivery/delivery-info'
-            }, {
-                body: address,
-                statusCode: 200
-            }).as('getAddressList');
-        });
 
         cy.visitMainPage()
         cy.login()
@@ -36,6 +26,15 @@ describe("사용자 배송지 수정", () => {
 
     describe("프로필 탭 활성화", () => {
         it("배송지 탭 클릭", () => {
+            cy.fixture('profileEdit/addressList.json').then((address) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/delivery/delivery-info'
+                }, {
+                    body: address,
+                    statusCode: 200
+                }).as('getAddressList');
+            });
             cy.visit("/my/edit")
             cy.wait('@getUserInfo').its('response.statusCode').should('eq', 200)
             cy.get('[data-cy="menu-tab-배송지"]').click()
@@ -45,6 +44,15 @@ describe("사용자 배송지 수정", () => {
 
     describe("배송지 조회", () => {
         it("배송지 조회 성공", () => {
+            cy.fixture('profileEdit/addressList.json').then((address) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/delivery/delivery-info'
+                }, {
+                    body: address,
+                    statusCode: 200
+                }).as('getAddressList');
+            });
             cy.visit("/my/edit")
             cy.wait('@getAddressList').its('response.statusCode').should('eq', 200)
             cy.get('[data-cy="menu-tab-배송지"]').click()
@@ -82,6 +90,15 @@ describe("사용자 배송지 수정", () => {
         })
 
         it("배송지 리스트 내 배송지 표시", () => {
+            cy.fixture('profileEdit/addressList.json').then((address) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/delivery/delivery-info'
+                }, {
+                    body: address,
+                    statusCode: 200
+                }).as('getAddressList');
+            });
             cy.visit("/my/edit")
             cy.wait('@getAddressList').its('response.statusCode').should('eq', 200)
             cy.get('[data-cy="menu-tab-배송지"]').click()
@@ -105,6 +122,15 @@ describe("사용자 배송지 수정", () => {
 
     describe("기본 배송지 변경", () => {
         beforeEach(() => {
+            cy.fixture('profileEdit/addressList.json').then((address) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/delivery/delivery-info'
+                }, {
+                    body: address,
+                    statusCode: 200
+                }).as('getAddressList');
+            });
             cy.visit("/my/edit")
             cy.wait('@getAddressList').its('response.statusCode').should('eq', 200)
             cy.get('[data-cy="menu-tab-배송지"]').click()
@@ -178,6 +204,15 @@ describe("사용자 배송지 수정", () => {
 
     describe("배송지 삭제", () => {
         beforeEach(() => {
+            cy.fixture('profileEdit/addressList.json').then((address) => {
+            cy.intercept({
+                method: 'GET',
+                url: '/api/delivery/delivery-info'
+            }, {
+                body: address,
+                statusCode: 200
+            }).as('getAddressList');
+            });
             cy.visit("/my/edit")
             cy.wait('@getAddressList').its('response.statusCode').should('eq', 200)
             cy.get('[data-cy="menu-tab-배송지"]').click()
@@ -243,6 +278,15 @@ describe("사용자 배송지 수정", () => {
 
     describe("배송지 추가", () => {
         beforeEach(() => {
+            cy.fixture('profileEdit/addressList.json').then((address) => {
+            cy.intercept({
+                method: 'GET',
+                url: '/api/delivery/delivery-info'
+            }, {
+                body: address,
+                statusCode: 200
+            }).as('getAddressList');
+            });
             cy.visit("/my/edit")
             cy.wait('@getAddressList').its('response.statusCode').should('eq', 200)
             cy.get('[data-cy="menu-tab-배송지"]').click()

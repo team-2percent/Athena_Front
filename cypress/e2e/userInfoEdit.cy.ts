@@ -1,35 +1,24 @@
 describe('사용자 정보 수정', () => {
   beforeEach(() => {
-    cy.fixture('profileEdit/user.json').then((profileEdit) => {
-      cy.intercept({
-        method: 'GET',
-        url: '/api/user/*'
-      }, {
-        statusCode: 200,
-        body: profileEdit
-      }).as("getUser");
-    })
-
     cy.fixture('profileEdit/accountList.json').then((account) => {
-        cy.intercept({
-            method: "GET",
-            url: "/api/bankAccount"
-        }, {
-            statusCode: 200,
-            body: account
-        }).as("getAccount");
-    })
+      cy.intercept({
+          method: "GET",
+          url: "/api/bankAccount"
+      }, {
+          statusCode: 200,
+          body: account
+      }).as("getAccount");
+  })
 
-    cy.fixture('profileEdit/addressList.json').then((shipping) => {
-        cy.intercept({
-            method: "GET",
-            url: "/api/delivery/delivery-info"
-        }, {
-            statusCode: 200,
-            body: shipping
-        }).as("getAddress");
-    })
-
+  cy.fixture('profileEdit/addressList.json').then((shipping) => {
+      cy.intercept({
+          method: "GET",
+          url: "/api/delivery/delivery-info"
+      }, {
+          statusCode: 200,
+          body: shipping
+      }).as("getAddress");
+  })
     cy.visitMainPage()
     cy.adminLogin()
   })
@@ -46,12 +35,12 @@ describe('사용자 정보 수정', () => {
         cy.fixture('profileEdit/user.json').then((profileEdit) => {
           cy.intercept({
             method: 'GET',
-            url: '/api/user/*'
+            url: '/api/user/57'
           }, {
             statusCode: 200,
             body: profileEdit,
-            delay: 1000
-          },).as("getUser");
+            delay: 2000
+          }).as("getUser");
         })
         
         cy.visit('/my/edit')
@@ -60,6 +49,15 @@ describe('사용자 정보 수정', () => {
     })
 
     it('사용자 정보 조회 성공', () => {
+      cy.fixture('profileEdit/user.json').then((profileEdit) => {
+        cy.intercept({
+          method: 'GET',
+          url: '/api/user/57'
+        }, {
+          statusCode: 200,
+          body: profileEdit
+        }).as("getUser");
+      })
         cy.visit('/my/edit')
         cy.wait('@getUser').its('response.statusCode').should('eq', 200)
 
@@ -70,7 +68,7 @@ describe('사용자 정보 수정', () => {
     it('서버 에러로 인한 사용자 정보 조회 실패', () => {
       cy.intercept({
         method: 'GET',
-        url: '/api/user/*'
+        url: '/api/user/57'
       }, {
         statusCode: 500,
         body: {
@@ -87,6 +85,16 @@ describe('사용자 정보 수정', () => {
 
   describe('입력값 유효성 검증', () => {
     beforeEach(() => {
+      cy.fixture('profileEdit/user.json').then((profileEdit) => {
+        cy.intercept({
+          method: 'GET',
+          url: '/api/user/57'
+        }, {
+          statusCode: 200,
+          body: profileEdit
+        }).as("getUser");
+      })
+
       cy.visit('/my/edit')
       cy.wait('@getUser').its('response.statusCode').should('eq', 200)
     })
@@ -110,6 +118,15 @@ describe('사용자 정보 수정', () => {
 
     describe('입력 형식 오류', () => {
       beforeEach(() => {
+        cy.fixture('profileEdit/user.json').then((profileEdit) => {
+          cy.intercept({
+            method: 'GET',
+            url: '/api/user/57'
+          }, {
+            statusCode: 200,
+            body: profileEdit
+          }).as("getUser");
+        })
         cy.visit('/my/edit')
         cy.wait('@getUser').its('response.statusCode').should('eq', 200)
       })
@@ -144,6 +161,15 @@ describe('사용자 정보 수정', () => {
 
     describe('입력란 제한 초과', () => {
       beforeEach(() => {
+        cy.fixture('profileEdit/user.json').then((profileEdit) => {
+          cy.intercept({
+            method: 'GET',
+            url: '/api/user/57'
+          }, {
+            statusCode: 200,
+            body: profileEdit
+          }).as("getUser");
+        })
         cy.visit('/my/edit')
         cy.wait('@getUser').its('response.statusCode').should('eq', 200)
       })
@@ -169,48 +195,26 @@ describe('사용자 정보 수정', () => {
 
       it('닉네임 길이 제한 초과할 시 슬라이싱', () => {
         // 기존 닉네임 값을 가져오기 위해 input의 value 속성 확인
-        const longNickname = 'a'.repeat(50)   
-        cy.get('[data-cy="nickname-input"]').then(($input) => {
-            const currentValue = $input.val();
-            const expected = `${currentValue}${longNickname}`.substring(0, 50);
-          
-            // 강제 값 주입 후 input 이벤트 트리거
-            cy.wrap($input)
-              .invoke('val', expected)
-              .trigger('input');
-          
-            // 렌더링 지연 대비: 값이 확실히 반영될 때까지 기다리기
-            cy.get('[data-cy="nickname-input"]')
-              .should(($el) => {
-                expect($el.val()).to.equal(expected);
-              });
-          
-            // 에러 메시지 표시까지 기다리기
-            cy.get('[data-cy="nickname-error-message"]').should('be.visible');
-          });
+        const longNickname = 'test' + 'a'.repeat(50)   
+        cy.get('[data-cy="nickname-input"]').clear()
+        cy.get('[data-cy="nickname-input"]').type(longNickname)
+        cy.get('[data-cy="nickname-input"]').should('have.value', longNickname.substring(0, 50))
+        cy.get('[data-cy="nickname-error-message"]').should('be.visible');
       })
 
       it('판매자 설명 길이 제한 초과할 시 슬라이싱', () => {
         // 기존 설명 값을 가져오기 위해 textarea의 value 속성 확인
-        const longDescription = 'a'.repeat(200)
-        cy.get('[data-cy="seller-description-input"]')
-            .then(($input) => {
-            const currentValue = $input.val();
-            const expected = `${currentValue}${longDescription}`.substring(0, 200);
-            
-            cy.wrap($input)
-                .invoke('val', expected)
-                .trigger('input');
-            });
-        
-            cy.get('[data-cy="seller-description-error-message"]').should('be.visible')
+        const longDescription = 'test' + 'a'.repeat(200)
+        cy.get('[data-cy="seller-description-input"]').clear()
+        cy.get('[data-cy="seller-description-input"]').type(longDescription)
+        cy.get('[data-cy="seller-description-input"]').should('have.value', longDescription.substring(0, 200))
+        cy.get('[data-cy="seller-description-error-message"]').should('be.visible');
       })
 
       it('링크 바이트 제한 초과할 시 슬라이싱', () => {
         cy.get('[data-cy="toggle-link-url-add-form-button"]').click()
         // 이모지는 한 글자당 4바이트이므로 16383번 반복하면 65535바이트가 됨
         const longLink = 'http://naver.com/' + 'a'.repeat(65535)
-        console.log(new Blob([longLink]).size);
         cy.get('[data-cy="link-url-input"]')
             .then(($input) => {
             cy.wrap($input)
@@ -229,6 +233,15 @@ describe('사용자 정보 수정', () => {
 
   describe('변경 사항 인식', () => {
     beforeEach(() => {
+      cy.fixture('profileEdit/user.json').then((profileEdit) => {
+        cy.intercept({
+          method: 'GET',
+          url: '/api/user/57'
+        }, {
+          statusCode: 200,
+          body: profileEdit
+        }).as("getUser");
+      })
       cy.visit('/my/edit')
       cy.wait('@getUser').its('response.statusCode').should('eq', 200)
     })
@@ -258,6 +271,15 @@ describe('사용자 정보 수정', () => {
 
   describe('수정 사항 저장', () => {
     beforeEach(() => {
+      cy.fixture('profileEdit/user.json').then((profileEdit) => {
+        cy.intercept({
+          method: 'GET',
+          url: '/api/user/57'
+        }, {
+          statusCode: 200,
+          body: profileEdit
+        }).as("getUser");
+      })
       cy.visit('/my/edit')
       cy.wait('@getUser').its('response.statusCode').should('eq', 200)      
     })

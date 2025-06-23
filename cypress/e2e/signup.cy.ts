@@ -187,13 +187,8 @@ describe("회원가입", () => {
                     url: "/api/user"
                 }, {
                     statusCode: 200,
-                    body: {
-                        userId: 123,
-                        email: "test@test.com",
-                        nickname: "테스트유저"
-                    },
                     delay: 1000
-                }).as('signup')
+                }).as('signupLoading')
 
                 // when - 회원가입 버튼 클릭
                 cy.get('@signupModal').get('[data-cy="signup-button"]').click()
@@ -211,11 +206,6 @@ describe("회원가입", () => {
                     url: "/api/user"
                 }, {
                     statusCode: 200,
-                    body: {
-                        userId: 123,
-                        email: "test@test.com",
-                        nickname: "테스트유저"
-                    }
                 }).as('signup')
 
                 // when - 회원가입 버튼 클릭
@@ -242,13 +232,13 @@ describe("회원가입", () => {
                     body: {
                         message: "이미 존재하는 이메일입니다."
                     }
-                }).as('signup')
+                }).as('signupError400')
 
                 // when - 회원가입 버튼 클릭
                 cy.get('@signupModal').get('[data-cy="signup-button"]').click()
 
                 // then - API 응답 대기 및 에러메세지 확인
-                cy.wait('@signup').its('response.statusCode').should('eq', 400)
+                cy.wait('@signupError400').its('response.statusCode').should('eq', 400)
                 cy.get('@signupModal').should('exist')
                 cy.get('@signupModal').get('[data-cy="signup-error-message"]').should('be.visible')
             })
@@ -260,13 +250,13 @@ describe("회원가입", () => {
                     url: "/api/user"
                 }, {
                     statusCode: 500
-                }).as('signup')
+                }).as('signupError500')
 
                 // when - 회원가입 버튼 클릭
                 cy.get('@signupModal').get('[data-cy="signup-button"]').click()
 
                 // then - API 응답 대기 및 에러메세지 확인
-                cy.wait('@signup').its('response.statusCode').should('eq', 500)
+                cy.wait('@signupError500').its('response.statusCode').should('eq', 500)
                 cy.get('@signupModal').should('exist')
                 cy.get('@signupModal').get('[data-cy="signup-error-message"]').should('be.visible')
             })
