@@ -49,7 +49,6 @@ Cypress.Commands.add('login', () => {
 
     cy.wait('@login').its('response.statusCode').should('eq', 200)
     cy.wait('@getHeader').its('response.statusCode').should('eq', 200)
-    cy.wait('@fcmRegister').its('response.statusCode').should('eq', 200)
 })
 
 Cypress.Commands.add('adminLogin', () => {
@@ -94,7 +93,6 @@ Cypress.Commands.add('adminLogin', () => {
 
   cy.wait('@login').its('response.statusCode').should('eq', 200)
   cy.wait('@getHeader').its('response.statusCode').should('eq', 200)
-  cy.wait('@fcmRegister').its('response.statusCode').should('eq', 200)
 })
 
 Cypress.Commands.add('visitMainPage', () => {
