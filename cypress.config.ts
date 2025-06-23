@@ -17,5 +17,7 @@ export default defineConfig({
     },
     baseUrl: "http://localhost:3000",
     defaultCommandTimeout: 5000,
+    screenshotOnRunFailure: false,
+    video: false,
   },
 });
