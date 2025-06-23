@@ -2,7 +2,7 @@ import { defineConfig } from "cypress";
 import { unlink } from 'fs/promises';
 
 export default defineConfig({
-  projectId: "rsnppr",
+  projectId: "7ovivy",
 
   e2e: {
     setupNodeEvents(on, config) {
