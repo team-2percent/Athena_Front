@@ -42,6 +42,10 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
 
   beforeEach(() => {
     cy.visit(`/project/${mockProjectId}`)
+    // 페이지가 완전히 로드될 때까지 기다림
+    cy.get('body').should('be.visible')
+    // 프로젝트 제목이 로드될 때까지 기다림
+    cy.contains(mockProjectData.title).should('be.visible')
 
     cy.intercept({ method: 'GET', url: `/api/project/${mockProjectId}` }, {
       statusCode: 200,
@@ -63,7 +67,6 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
     }).as('getProjectComments')
 
     cy.wait('@getProjectDetail')
-    cy.wait(2000)
   })
 
   it('메타데이터가 정상적으로 노출된다', () => {
@@ -220,6 +223,10 @@ describe('프로젝트 상세 결제 플로우', () => {
 
   beforeEach(() => {
     cy.visit('/project/test')
+    // 페이지가 완전히 로드될 때까지 기다림
+    cy.get('body').should('be.visible')
+    // 프로젝트 제목이 로드될 때까지 기다림
+    cy.contains(mockProjectData.title).should('be.visible')
     
     cy.intercept({ method: 'GET', url: `/api/project/${mockProjectId}` }, {
       statusCode: 200,
