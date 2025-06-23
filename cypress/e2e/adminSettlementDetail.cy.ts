@@ -2,42 +2,44 @@ describe('정산 상세 페이지', () => {
     const settlementId = '1'
 
     beforeEach(() => {
-        cy.fixture('admin/settlement/settlementDetailInfo.json').then((settlementDetail) => {
-            cy.intercept({
-                method: 'GET',
-                url: `/api/admin/settlement/${settlementId}/info`
-            }, {
-                statusCode: 200,
-                body: settlementDetail
-            }).as('getSettlementDetail')
-        })
-
-        cy.fixture('admin/settlement/settlementDetailProductSummary.json').then((productList) => {
-            cy.intercept({
-                method: 'GET',
-                url: `/api/admin/settlement/${settlementId}/product-summary`
-            }, {
-                statusCode: 200,
-                body: productList
-            }).as('getSettlementProducts')
-        })
-
-        cy.fixture('admin/settlement/settlementDetailHistory.json').then((historyList) => {
-            cy.intercept({
-                method: 'GET',
-                url: `/api/admin/settlement/${settlementId}/history`
-            }, {
-                statusCode: 200,
-                body: historyList
-            }).as('getSettlementHistory')
-        })
-
         cy.visitMainPage()
         cy.adminLogin()
     })
 
     describe('상세 정보 조회', () => {
+        beforeEach(() => {
+            cy.fixture('admin/settlement/settlementDetailProductSummary.json').then((productList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: `/api/admin/settlement/${settlementId}/product-summary`
+                }, {
+                    statusCode: 200,
+                    body: productList
+                }).as('getSettlementProducts')
+            })
+
+            cy.fixture('admin/settlement/settlementDetailHistory.json').then((historyList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: `/api/admin/settlement/${settlementId}/history`
+                }, {
+                    statusCode: 200,
+                    body: historyList
+                }).as('getSettlementHistory')
+            })  
+        })
+
         it('조회 성공 시 상세 정보 정상 표시', () => {
+            cy.fixture('admin/settlement/settlementDetailInfo.json').then((settlementDetail) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: `/api/admin/settlement/${settlementId}/info`
+                }, {
+                    statusCode: 200,
+                    body: settlementDetail
+                }).as('getSettlementDetail')
+            })
+
             cy.visit(`/admin/settlement/${settlementId}`)
 
             cy.wait('@getSettlementDetail').its('response.statusCode').should('eq', 200)
@@ -76,7 +78,39 @@ describe('정산 상세 페이지', () => {
     })
 
     describe('상품 정보 조회', () => {
+        beforeEach(() => {
+            cy.fixture('admin/settlement/settlementDetailInfo.json').then((settlementDetail) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: `/api/admin/settlement/${settlementId}/info`
+                }, {
+                    statusCode: 200,
+                    body: settlementDetail
+                }).as('getSettlementDetail')
+            })
+
+            cy.fixture('admin/settlement/settlementDetailHistory.json').then((historyList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: `/api/admin/settlement/${settlementId}/history`
+                }, {
+                    statusCode: 200,
+                    body: historyList
+                }).as('getSettlementHistory')
+            })
+        })
+
         it('조회 성공 시 상품 정보 정상 표시', () => {
+            cy.fixture('admin/settlement/settlementDetailProductSummary.json').then((productList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: `/api/admin/settlement/${settlementId}/product-summary`
+                }, {
+                    statusCode: 200,
+                    body: productList
+                }).as('getSettlementProducts')
+            })
+
             cy.visit(`/admin/settlement/${settlementId}`)
 
             cy.wait('@getSettlementProducts').its('response.statusCode').should('eq', 200)
@@ -114,7 +148,39 @@ describe('정산 상세 페이지', () => {
     })
 
     describe('정산 이력 조회', () => {
+        beforeEach(() => {
+            cy.fixture('admin/settlement/settlementDetailInfo.json').then((settlementDetail) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: `/api/admin/settlement/${settlementId}/info`
+                }, {
+                    statusCode: 200,
+                    body: settlementDetail
+                }).as('getSettlementDetail')
+            })
+
+            cy.fixture('admin/settlement/settlementDetailProductSummary.json').then((productList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: `/api/admin/settlement/${settlementId}/product-summary`
+                }, {
+                    statusCode: 200,
+                    body: productList
+                }).as('getSettlementProducts')
+            })
+        })
+
         it('조회 성공 시 정산 이력 정상 표시', () => {
+            cy.fixture('admin/settlement/settlementDetailHistory.json').then((historyList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: `/api/admin/settlement/${settlementId}/history`
+                }, {
+                    statusCode: 200,
+                    body: historyList
+                }).as('getSettlementHistory')
+            })
+
             cy.visit(`/admin/settlement/${settlementId}`)
 
             // 이력 리스트 표시 확인
@@ -151,6 +217,36 @@ describe('정산 상세 페이지', () => {
 
     describe('목록 페이지 이동', () => {
         it('목록으로 버튼 클릭 시 목록 페이지로 이동', () => {
+            cy.fixture('admin/settlement/settlementDetailInfo.json').then((settlementDetail) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: `/api/admin/settlement/${settlementId}/info`
+                }, {
+                    statusCode: 200,
+                    body: settlementDetail
+                }).as('getSettlementDetail')
+            })
+
+            cy.fixture('admin/settlement/settlementDetailProductSummary.json').then((productList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: `/api/admin/settlement/${settlementId}/product-summary`
+                }, {
+                    statusCode: 200,
+                    body: productList
+                }).as('getSettlementProducts')
+            })
+
+            cy.fixture('admin/settlement/settlementDetailHistory.json').then((historyList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: `/api/admin/settlement/${settlementId}/history`
+                }, {
+                    statusCode: 200,
+                    body: historyList
+                }).as('getSettlementHistory')
+            })
+
             cy.fixture('admin/settlement/settlementList.json').then((settlementList) => {
                 cy.intercept({
                     method: 'GET',

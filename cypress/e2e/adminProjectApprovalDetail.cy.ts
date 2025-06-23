@@ -1,23 +1,21 @@
 describe("관리자 프로젝트 승인 상세 페이지", () => {
     beforeEach(() => {
-        cy.fixture('admin/approval/projectDetail.json').then((projectDetail) => {
-            cy.intercept('GET', '/api/admin/project/*', {
-                statusCode: 200,
-                body: projectDetail
-            }).as('getProjectDetail')
-        })
-
         cy.visitMainPage();
         cy.adminLogin();
     })
 
     describe("프로젝트 상세 정보", () => {
-        beforeEach(() => {
+        it("상세 정보 정상 표시", () => {
+            cy.fixture('admin/approval/projectDetail.json').then((projectDetail) => {
+                cy.intercept('GET', '/api/admin/project/*', {
+                    statusCode: 200,
+                    body: projectDetail
+                }).as('getProjectDetail')
+            })
+            
             cy.visit('/admin/approval/project/101')
             cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
-        })
 
-        it("상세 정보 정상 표시", () => {
             cy.get('[data-cy="project-detail-info"]').should('be.visible')
             cy.get('[data-cy="project-detail-markdown"]').should('be.visible')
             cy.get('[data-cy="project-detail-product"]').should('be.visible')
@@ -40,6 +38,13 @@ describe("관리자 프로젝트 승인 상세 페이지", () => {
 
     describe("상품 정보", () => {
         beforeEach(() => {
+            cy.fixture('admin/approval/projectDetail.json').then((projectDetail) => {
+                cy.intercept('GET', '/api/admin/project/*', {
+                    statusCode: 200,
+                    body: projectDetail
+                }).as('getProjectDetail')
+            })
+
             cy.visit('/admin/approval/project/101')
             cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
         })
@@ -65,6 +70,13 @@ describe("관리자 프로젝트 승인 상세 페이지", () => {
 
     describe("판매자 정보", () => {
         beforeEach(() => {
+            cy.fixture('admin/approval/projectDetail.json').then((projectDetail) => {
+                cy.intercept('GET', '/api/admin/project/*', {
+                    statusCode: 200,
+                    body: projectDetail
+                }).as('getProjectDetail')
+            })
+
             cy.visit('/admin/approval/project/101')
             cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
         })
@@ -90,6 +102,13 @@ describe("관리자 프로젝트 승인 상세 페이지", () => {
 
     describe("승인 폼", () => {
         it("미승인 시 승인 폼 표시", () => {
+            cy.fixture('admin/approval/projectDetail.json').then((projectDetail) => {
+                cy.intercept('GET', '/api/admin/project/*', {
+                    statusCode: 200,
+                    body: projectDetail
+                }).as('getProjectDetail')
+            })
+
             cy.visit('/admin/approval/project/101')
             cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
             cy.get('[data-cy="project-approve-form"]').should('be.visible')
@@ -117,6 +136,13 @@ describe("관리자 프로젝트 승인 상세 페이지", () => {
 
     describe("승인/반려 처리", () => {
         beforeEach(() => {
+            cy.fixture('admin/approval/projectDetail.json').then((projectDetail) => {
+                cy.intercept('GET', '/api/admin/project/*', {
+                    statusCode: 200,
+                    body: projectDetail
+                }).as('getProjectDetail')
+            })
+
             cy.visit('/admin/approval/project/101')
             cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
         })
@@ -140,7 +166,7 @@ describe("관리자 프로젝트 승인 상세 페이지", () => {
             cy.get('[data-cy="project-save-button"]').click()
             cy.get('[data-cy="project-approve-modal"]').should('be.visible')
             cy.get('[data-cy="confirm-button"]').click()
-            cy.get('[data-cy="confirm-button-loading"]').should('be.visible')
+            cy.get('[data-cy="confirm-button"]').should('have.attr', 'data-loading', 'true')
             cy.wait('@updateProjectApproval').its('response.statusCode').should("eq", 200)
         })
 
@@ -196,6 +222,12 @@ describe("관리자 프로젝트 승인 상세 페이지", () => {
 
     describe("반려 처리", () => {
         beforeEach(() => {
+            cy.fixture('admin/approval/projectDetail.json').then((projectDetail) => {
+                cy.intercept('GET', '/api/admin/project/*', {
+                    statusCode: 200,
+                    body: projectDetail
+                }).as('getProjectDetail')
+            })
             cy.visit('/admin/approval/project/101')
             cy.wait('@getProjectDetail').its('response.statusCode').should("eq", 200)
         })
@@ -219,7 +251,7 @@ describe("관리자 프로젝트 승인 상세 페이지", () => {
             cy.get('[data-cy="project-save-button"]').click()
             cy.get('[data-cy="project-approve-modal"]').should('be.visible')
             cy.get('[data-cy="confirm-button"]').click()
-            cy.get('[data-cy="confirm-button-loading"]').should('be.visible')
+            cy.get('[data-cy="confirm-button"]').should('have.attr', 'data-loading', 'true')
             cy.wait('@updateProjectReject')
         })
 
@@ -275,6 +307,13 @@ describe("관리자 프로젝트 승인 상세 페이지", () => {
 
     describe("목록 페이지 이동", () => {
         it("목록 이동", () => {
+            cy.fixture('admin/approval/projectDetail.json').then((projectDetail) => {
+                cy.intercept('GET', '/api/admin/project/*', {
+                    statusCode: 200,
+                    body: projectDetail
+                }).as('getProjectDetail')
+            })
+            
             cy.fixture('admin/approval/projectList.json').then((projectList) => {
                 cy.intercept('GET', '/api/admin/project?page=0&direction=*', {
                     statusCode: 200,

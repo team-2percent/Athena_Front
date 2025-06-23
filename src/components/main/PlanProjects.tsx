@@ -16,9 +16,16 @@ export default function PlanProjects() {
 
     const [projectsPremium, setProjectsPremium] = useState<MainProject[]>([]);
     const [projectsPro, setProjectsPro] = useState<MainProject[]>([]);
+    const [hasError, setHasError] = useState(false);
 
     const loadProjects = () => {
-        apiCall<ResponseItem[]>('/api/project/planRankingView', "GET").then(({ data }) => {
+        setHasError(false);
+        apiCall<ResponseItem[]>('/api/project/planRankingView', "GET").then(({ data, error }) => {
+            if (error) {
+                console.error('Failed to load plan projects:', error);
+                setHasError(true);
+                return;
+            }
             data?.map(plan => {
                 if (plan.planName === "PREMIUM") {
                     setProjectsPremium(plan.items);
@@ -32,6 +39,11 @@ export default function PlanProjects() {
     useEffect(() => {
         loadProjects();
     }, [])
+
+    // 에러가 있으면 아무것도 렌더링하지 않음
+    if (hasError) {
+        return null;
+    }
 
     return (
         <>

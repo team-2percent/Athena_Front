@@ -41,7 +41,7 @@ export default function AdminHeader() {
     }
 
     return (
-        <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)] z-5">
+        <header className="w-full bg-white shadow-[0_4px_4px_-2px_rgba(0,0,0,0.1)] z-5" data-cy="admin-header">
             <div className="container mx-auto px-4 py-4">
                 {/* 상단 헤더 영역 */}
                 <div className="flex items-center justify-between">
@@ -57,15 +57,20 @@ export default function AdminHeader() {
                             type="button"
                             onClick={() => setShowAuthMenu(!showAuthMenu)}
                             className={clsx("text-gray-500 hover:bg-gray-200 rounded-lg p-1", showAuthMenu && "bg-gray-200")}
+                            data-cy="admin-menu-button"
                         >
                             <Menu className="h-5 w-5" />
                         </button>
                         { showAuthMenu && 
-                        <div className="absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 transition-all duration-200">
+                        <div
+                            className="absolute right-0 top-12 bg-white shadow-md rounded-md px-4 py-2 flex flex-col gap-2 z-50 transition-all duration-200"
+                            data-cy="admin-menu"
+                        >
                             <button
                                 type="button"
                                 onClick={() => router.push("/")}
                                 className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
+                                data-cy="userpage-button"
                             >
                                 <House className="h-4 w-4" />
                                 사용자 페이지
@@ -74,6 +79,7 @@ export default function AdminHeader() {
                                 type="button"
                                 onClick={handleLogout}
                                 className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap flex items-center gap-2 p-2 justify-center"
+                                data-cy="logout-button"
                             >
                                 <LogOut className="h-4 w-4" />
                                 로그아웃

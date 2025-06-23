@@ -154,7 +154,7 @@ describe('쿠폰 등록 페이지', () => {
             cy.get('[data-cy="coupon-submit-button"]').click()
             cy.get('[data-cy="confirm-button"]').click()
 
-            cy.get('[data-cy="confirm-button-loading"]').should('be.visible')
+            cy.get('[data-cy="confirm-button"]').should('have.attr', 'data-loading', 'true')
         })
 
         it('쿠폰 등록 성공 시 목록 페이지로 이동', () => {

@@ -48,6 +48,8 @@ describe("마이페이지", () => {
         cy.login();
         cy.visit("/my");
 
+        cy.wait('@getUser').its('response.statusCode').should('eq', 200);
+
         cy.get('[data-cy="profile-header"]').should("be.visible").within(() => {
             cy.get('[data-cy="profile-image"]').should("be.visible");
             cy.get('[data-cy="profile-nickname"]').should("be.visible");
@@ -414,7 +416,7 @@ describe("마이페이지", () => {
             cy.visit('/my');
             cy.get('[data-cy="menu-tab"]').get('[data-cy="menu-tab-내가 쓴 후기"]').click();
             cy.get('.animate-pulse').should('exist');
-            cy.wait('@getMyCommentsDelay');
+            cy.wait('@getMyCommentsDelay').its('response.statusCode').should('eq', 200);
         });
         it('조회 실패 시 에러 메시지 노출', () => {
             cy.intercept({ method: 'GET', url: '/api/my/comment' }, { statusCode: 500 }).as('getMyCommentsError');
