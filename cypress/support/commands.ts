@@ -61,7 +61,7 @@ Cypress.Commands.add('adminLogin', () => {
           accessToken: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NyIsInJvbGUiOiJST0xFX0FETUlOIiwibmlja25hbWUiOiLqsIDsnoXthYzsiqTtirgiLCJpYXQiOjE3NDg5Njg0NDEsImV4cCI6MTc0OTU3MzI0MX0.2ilTPbIisw2OREhlLLf20N9e9Daop8lfOEGP_s5xKh0",
           userId: "57"
       }
-  }).as('login')
+  }).as('adminLogin')
 
   cy.intercept({
     method: "GET",
@@ -91,7 +91,7 @@ Cypress.Commands.add('adminLogin', () => {
       cy.get('[data-cy="login-button"]').should('not.be.disabled').click()
   })
 
-  cy.wait('@login').its('response.statusCode').should('eq', 200)
+  cy.wait('@adminLogin').its('response.statusCode').should('eq', 200)
   cy.wait('@getHeader').its('response.statusCode').should('eq', 200)
 })
 
