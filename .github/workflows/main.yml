@@ -36,7 +36,7 @@ jobs:
           # https://docs.cypress.io/guides/continuous-integration/introduction#Boot-your-server
           start: npm start
           wait-on: 'http://[::1]:3000' # Waits for above
-          spec: cypress/e2e/mypage.cy.ts # contemporary
+          spec: cypress/e2e
           browser: chrome
           headed: false
           # parallel: true # Runs test in parallel using settings above
