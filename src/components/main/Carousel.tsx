@@ -135,7 +135,7 @@ export default function Carousel({ projects, isLoading }: { projects: MainProjec
 
   if (!projects || projects.length === 0) {
     return (
-      <div className="w-full bg-secondary-color flex flex-col items-center justify-center py-16 select-none">
+      <div className="w-full bg-secondary-color flex flex-col items-center justify-center py-16 select-none" data-cy="premium-carousel-skeleton">
         <div
           className="relative w-full max-w-full mx-auto flex items-center justify-center overflow-hidden"
           style={{ height: skeletonHeight || undefined }}
@@ -171,7 +171,7 @@ export default function Carousel({ projects, isLoading }: { projects: MainProjec
   }
 
   return (
-    <div className="w-full bg-secondary-color flex flex-col items-center justify-center py-16 select-none">
+    <div className="w-full bg-secondary-color flex flex-col items-center justify-center py-16 select-none" data-cy="premium-carousel">
       <div
         className="relative w-full max-w-full mx-auto flex items-center justify-center overflow-hidden"
         style={{ height: CARD_HEIGHT }}

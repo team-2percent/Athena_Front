@@ -96,7 +96,7 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
 
   if (projects === null || projects.length === 0) {
     return (
-      <div className="w-full max-w-7xl mx-auto py-12">
+      <div className="w-full max-w-7xl mx-auto py-12" data-cy="pro-carousel-skeleton">
         <div className="flex flex-col lg:flex-row items-start lg:items-center">
           
           {/* Title */}
@@ -137,7 +137,7 @@ export default function EditorPicks({ projects, isLoading }: {projects: MainProj
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto py-12">
+    <div className="w-full max-w-7xl mx-auto py-12" data-cy="pro-carousel">
       <div className="flex flex-col lg:flex-row items-start lg:items-center">
         {/* Title */}
         <h2 className="text-left font-bold mb-8 lg:mb-0 lg:min-w-[300px] pl-4 text-base sm:text-lg md:text-xl lg:text-3xl">

@@ -92,7 +92,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
     apiCall("/api/user", "POST", { nickname, email, password }).then(({ error }: { data: any, error: string | null }) => {
       setIsLoading(false)
       if (error) {
-        setErrorMessage(error)
+        setErrorMessage("회원가입에 실패했습니다.")
       } else {
         onClose()
       }

@@ -1,39 +1,20 @@
 describe("관리자 프로젝트 승인 페이지", () => {
     beforeEach(() => {
-        cy.fixture('admin/approval/projectList.json').then((projectList) => {
-            cy.intercept('GET', '/api/admin/project?page=0&direction=*', {
-                statusCode: 200,
-                body: projectList
-            })
-        }).as('getProjectList')
-
-        cy.fixture('admin/approval/projectList.json').then((projectList) => {
-            cy.intercept('GET', '/api/admin/project?page=0&direction=*&keyword=*', {
-                statusCode: 200,
-                body: projectList
-            })
-        }).as('getSearchProjectList')
-
-        cy.fixture('admin/approval/nextProjectList.json').then((nextProjectList) => {
-            cy.intercept('GET', '/api/admin/project?page=1&direction=*', {
-                statusCode: 200,
-                body: nextProjectList
-            })
-        }).as('getNextProjectList')
-
-        cy.fixture('admin/approval/projectDetail.json').then((projectDetail) => {
-            cy.intercept('GET', '/api/admin/project/*', {
-                statusCode: 200,
-                body: projectDetail
-            })
-        }).as('getProjectDetail')
-
         cy.visitMainPage();
         cy.adminLogin();
     })
 
     describe("프로젝트 목록", () => {
         it("정상 조회 시 프로젝트 목록 정상 표시", () => {
+            cy.fixture('admin/approval/projectList.json').then((projectList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=0&direction=*'
+                }, {
+                    statusCode: 200,
+                    body: projectList
+                })
+            }).as('getProjectList')
             cy.visit("/admin/approval")
             cy.wait('@getProjectList').its('response.statusCode').should("eq", 200)
             
@@ -63,6 +44,22 @@ describe("관리자 프로젝트 승인 페이지", () => {
         })
 
         it('프로젝트 클릭 시 상세 페이지로 이동', () => {
+            cy.fixture('admin/approval/projectList.json').then((projectList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=0&direction=*'
+                }, {
+                    statusCode: 200,
+                    body: projectList
+                })
+            }).as('getProjectList')
+            cy.fixture('admin/approval/projectDetail.json').then((projectDetail) => {
+                cy.intercept('GET', '/api/admin/project/*', {
+                    statusCode: 200,
+                    body: projectDetail
+                })
+            }).as('getProjectDetail')
+
             cy.visit("/admin/approval")
             cy.wait('@getProjectList').its('response.statusCode').should("eq", 200)
 
@@ -74,6 +71,15 @@ describe("관리자 프로젝트 승인 페이지", () => {
 
     describe("정렬", () => {
         beforeEach(() => {
+            cy.fixture('admin/approval/projectList.json').then((projectList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=0&direction=*'
+                }, {
+                    statusCode: 200,
+                    body: projectList
+                })
+            }).as('getProjectList')
             cy.visit("/admin/approval")
             cy.wait('@getProjectList').its('response.statusCode').should("eq", 200)
         })
@@ -101,6 +107,15 @@ describe("관리자 프로젝트 승인 페이지", () => {
 
     describe("검색", () => {
         beforeEach(() => {
+            cy.fixture('admin/approval/projectList.json').then((projectList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=0&direction=*'
+                }, {
+                    statusCode: 200,
+                    body: projectList
+                })
+            }).as('getProjectList')
             cy.visit("/admin/approval")
             cy.wait('@getProjectList').its('response.statusCode').should("eq", 200)
         })
@@ -124,6 +139,15 @@ describe("관리자 프로젝트 승인 페이지", () => {
         })
 
         it("검색창 입력 후 검색 시 리로드", () => {
+            cy.fixture('admin/approval/projectList.json').then((projectList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=0&direction=*&keyword=*'
+                }, {
+                    statusCode: 200,
+                    body: projectList
+                })
+            }).as('getSearchProjectList')
             cy.get('[data-cy="search-input"]').type("테스트")
             cy.get('[data-cy="search-button"]').click()
             cy.wait('@getSearchProjectList').its('response.statusCode').should("eq", 200)
@@ -133,6 +157,15 @@ describe("관리자 프로젝트 승인 페이지", () => {
 
     describe("페이지네이션", () => {
         beforeEach(() => {
+            cy.fixture('admin/approval/projectList.json').then((projectList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=0&direction=*'
+                }, {
+                    statusCode: 200,
+                    body: projectList
+                })
+            }).as('getProjectList')
             cy.visit("/admin/approval")
             cy.wait('@getProjectList').its('response.statusCode').should("eq", 200)
             cy.scrollTo('bottom')
@@ -149,6 +182,15 @@ describe("관리자 프로젝트 승인 페이지", () => {
         })
 
         it("중간 페이지에서는 현재 페이지 제외 모두 활성화", () => {
+            cy.fixture('admin/approval/nextProjectList.json').then((nextProjectList) => {
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=1&direction=*'
+                }, {
+                    statusCode: 200,
+                    body: nextProjectList
+                })
+            }).as('getNextProjectList')
             cy.get('[data-cy="page-button"]').eq(1).click()
             cy.wait('@getNextProjectList').its('response.statusCode').should("eq", 200)
             cy.get('[data-cy="first-page-button"]').should('not.be.disabled')
@@ -160,6 +202,16 @@ describe("관리자 프로젝트 승인 페이지", () => {
         })
 
         it("마지막 페이지에서는 다른 페이지와 첫 페이지 이동, 이전 페이지 이동 버튼만 활성화", () => {
+            cy.fixture('admin/approval/nextProjectList.json').then((nextProjectList) => {
+                const lastProjectList = {...nextProjectList, pageInfo: {currentPage: 8, totalPages: 9}}
+                cy.intercept({
+                    method: 'GET',
+                    url: '/api/admin/project?page=8&direction=*'
+                }, {
+                    statusCode: 200,
+                    body: lastProjectList
+                })
+            }).as('getNextProjectList')
             cy.get('[data-cy="last-page-button"]').click()
             cy.get('[data-cy="first-page-button"]').should('not.be.disabled')
             cy.get('[data-cy="prev-page-button"]').should('not.be.disabled')

@@ -144,6 +144,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
           onClick={moveToSignupModal}
           className="w-full py-4"
           size="lg"
+          dataCy="move-to-signup-modal-button"
         >회원가입</SecondaryButton>
       </div>
     </Modal>
