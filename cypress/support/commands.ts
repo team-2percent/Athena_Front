@@ -110,17 +110,6 @@ Cypress.Commands.add('visitMainPage', () => {
     fixture: 'categoryRankingView.json'
   }).as('getCategoryRankingView')
 
-  cy.intercept({
-    method: "GET",
-    url: '/api/user/Header'
-  }, {
-    statusCode: 200,
-    body: {
-      nickname: "테스트유저",
-      imageUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"
-    }
-  }).as("getUserHeader")
-
   cy.visit('/', {
     onBeforeLoad(win: any) {
       // Firebase를 동기적으로 초기화
@@ -148,7 +137,6 @@ Cypress.Commands.add('visitMainPage', () => {
   cy.get('body').should('be.visible')
   cy.wait('@getPlanRankingView').its('response.statusCode').should('eq', 200)
   cy.wait('@getCategoryRankingView').its('response.statusCode').should('eq', 200)
-  cy.wait('@getUserHeader').its('response.statusCode').should('eq', 200)
 })
 Cypress.Commands.add('checkErrorTopToast', (title: string, body: string) => {
     cy.get('[data-cy="error-top-toast"]').should('be.visible').within(() => {
