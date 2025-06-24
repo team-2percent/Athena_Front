@@ -32,17 +32,16 @@ export default function RootLayout({
         className={`${pretendard.variable} font-pretendard`} // Pretendard 사용
       >
         <ServiceWorkerRegistration />
-        <AuthProvider>
-          <AlertLoader />
-          <HeaderLoader />
-          <main className="flex-1 bg-white m-none w-full">
-            <div className="flex justify-center mx-auto">
-            {children}
-            </div>
-            <RegisterPageButtonLoader />
-            <FCMMessageListener />
-          </main>
-        </AuthProvider>
+        <AuthProvider />
+        <AlertLoader />
+        <HeaderLoader />
+        <main className="flex-1 bg-white m-none w-full">
+          <div className="flex justify-center mx-auto">
+          {children}
+          </div>
+          <RegisterPageButtonLoader />
+          <FCMMessageListener />
+        </main>
       </body>
     </html>
   );
