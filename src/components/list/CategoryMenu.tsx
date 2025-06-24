@@ -56,7 +56,11 @@ export default function CategoryMenu({ categoryId, handleCategoryError }: Catego
     return (
         <div className="w-full mx-0 py-4" data-cy="category-list">
         {isLoading ?
-            <Spinner message="카테고리를 불러오는 중입니다..." />
+            <div className="flex gap-4">
+                {[...Array(3)].map((_, i) => (
+                    <div key={i} className={`w-20 h-12 rounded-lg bg-gray-${3 - i}00 animate-pulse`} />
+                ))}
+            </div>
         : (
         <div
             className="flex overflow-x-auto gap-4 justify-items-center [&::-webkit-scrollbar]:hidden"

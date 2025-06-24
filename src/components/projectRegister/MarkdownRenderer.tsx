@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import type { ReactNode } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
@@ -231,6 +231,40 @@ const CustomParagraph: React.FC<ComponentProps> = ({ children }) => {
   return <p className="text-foreground leading-relaxed mb-4 text-sm md:text-base">{children}</p>
 }
 
+// 이미지 로딩 스켈레톤 컴포넌트
+const ImageSkeleton = () => (
+  <div className="w-full h-64 bg-gray-200 animate-pulse rounded-md" />
+)
+
+const MarkdownImage = ({ src, alt, title, ...props }: { src?: string, alt?: string, title?: string }) => {
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+
+  return (
+    <div className="relative w-full flex flex-col items-center">
+      {loading && !error && <ImageSkeleton />}
+      {!error ? (
+        <img
+          src={src}
+          alt={alt || "이미지"}
+          title={title}
+          className={`max-w-full h-auto rounded-md border border-[var(--color-gray-border)] shadow-sm mx-auto block ${loading ? "hidden" : ""}`}
+          onLoad={() => setLoading(false)}
+          onError={() => { setError(true); setLoading(false); }}
+          {...props}
+        />
+      ) : (
+        <div className="w-full h-64 flex items-center justify-center bg-gray-200 rounded-md border border-[var(--color-gray-border)] shadow-sm">
+          <span className="text-gray-500 text-base font-semibold">이미지를 불러올 수 없습니다</span>
+        </div>
+      )}
+      {alt && !loading && !error && (
+        <span className="block text-center text-sm text-[var(--color-sub-gray)] mt-2 italic">{alt}</span>
+      )}
+    </div>
+  )
+}
+
 export default function MarkdownRenderer({ content, markdownImages = [] }: MarkdownRendererProps) {
   // 마크다운 콘텐츠를 전처리하여 인라인 코드를 제거
   const processedContent = preprocessMarkdown(content)
@@ -280,16 +314,12 @@ export default function MarkdownRenderer({ content, markdownImages = [] }: Markd
               if (markdownImage) {
                 return (
                   <>
-                    <img
+                    <MarkdownImage
                       src={markdownImage.preview || "/placeholder.svg"}
                       alt={alt || "붙여넣은 이미지"}
                       title={title}
-                      className="max-w-full h-auto rounded-md border border-[var(--color-gray-border)] shadow-sm mx-auto block"
                       {...props}
                     />
-                    {alt && (
-                      <span className="block text-center text-sm text-[var(--color-sub-gray)] mt-2 italic">{alt}</span>
-                    )}
                   </>
                 )
               }
@@ -304,16 +334,12 @@ export default function MarkdownRenderer({ content, markdownImages = [] }: Markd
             // 일반 마크다운 이미지 - 이미지와 캡션을 분리
             return (
               <>
-                <img
+                <MarkdownImage
                   src={srcString || "/placeholder.svg"}
                   alt={alt || "이미지"}
                   title={title}
-                  className="max-w-full h-auto rounded-md border border-[var(--color-gray-border)] shadow-sm mx-auto block"
                   {...props}
                 />
-                {alt && (
-                  <span className="block text-center text-sm text-[var(--color-sub-gray)] mt-2 italic">{alt}</span>
-                )}
               </>
             )
           },

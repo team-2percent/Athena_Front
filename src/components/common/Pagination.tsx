@@ -99,9 +99,10 @@ export default function Pagination({ totalPages, currentPage, onPageChange }: Pa
             key={`page-${item.value}`}
             onClick={() => onPageChange(item.value - 1)} // 오류 생길 수 있으니 잘 보고 고쳐주세여...
             className={cn(
-              "w-8 h-8 flex items-center justify-center rounded-full",
+              "min-w-8 w-fit h-8 px-2 flex items-center justify-center rounded-full",
               currentPage + 1 === item.value ? "bg-main-color text-white font-medium" : "text-black hover:bg-gray-100",
             )}
+            disabled={currentPage + 1 === item.value}
             data-cy="page-button"
           >
             {item.value}
@@ -112,7 +113,7 @@ export default function Pagination({ totalPages, currentPage, onPageChange }: Pa
       {/* 다음 페이지 버튼 */}
       <button
         onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
+        disabled={currentPage + 1 === totalPages}
         className={cn(
           "p-2 rounded-full",
           currentPage + 1 === totalPages ? "text-disabled-text cursor-not-allowed" : "text-main-color hover:bg-secondary-color",
@@ -126,7 +127,7 @@ export default function Pagination({ totalPages, currentPage, onPageChange }: Pa
       {/* 마지막 페이지로 이동 버튼 */}
       <button
         onClick={() => onPageChange(totalPages - 1)}
-        disabled={currentPage === totalPages}
+        disabled={currentPage + 1 === totalPages}
         className={cn(
           "p-2 rounded-full",
           currentPage + 1 === totalPages ? "text-disabled-text cursor-not-allowed" : "text-main-color hover:bg-secondary-color",

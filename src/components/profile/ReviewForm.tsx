@@ -10,6 +10,7 @@ import { reviewContentSchema } from "@/lib/validationSchemas"
 import { REVIEW_CONTENT_MAX_LENGTH } from "@/lib/validationConstant"
 import InputInfo from "../common/InputInfo"
 import { CancelButton, PrimaryButton } from "../common/Button"
+import { validate, getValidatedString } from "@/lib/validationUtil"
 
 interface ReviewFormProps {
   isOpen: boolean
@@ -25,19 +26,16 @@ export default function ReviewForm({ isOpen, onClose, projectId, projectName, se
   const [reviewContent, setReviewContent] = useState("")
   const [reviewsError, setReviewsError] = useState<string>("")
 
-  const validate = (content: string) => {
-    const result = reviewContentSchema.safeParse(content)
-    if (!result.success) {
-      setReviewsError(result.error.errors[0].message)
-      return content.slice(0, REVIEW_CONTENT_MAX_LENGTH)
-    }
-    setReviewsError("")
-    return content
-  }
 
   const handleChangeReviewContent = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const result = validate(e.target.value)
-    setReviewContent(result)
+    const result = validate(e.target.value, reviewContentSchema)
+    const value = getValidatedString(e.target.value, REVIEW_CONTENT_MAX_LENGTH)
+    if (result.error) {
+      setReviewsError(result.message)
+    } else {
+      setReviewsError("")
+    }
+    setReviewContent(value)
   }
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
@@ -47,9 +45,10 @@ export default function ReviewForm({ isOpen, onClose, projectId, projectName, se
 
     try {
       const { data, error, status } = await apiCall(
-        `/api/comment/create?projectId=${projectId}`,
+        "/api/comment/create",
         "POST",
         {
+          projectId: projectId,
           content: reviewContent
         }
       )
@@ -82,6 +81,7 @@ export default function ReviewForm({ isOpen, onClose, projectId, projectName, se
         <div className="mb-4">
           <TextArea
             value={reviewContent}
+            className="h-36"
             onChange={handleChangeReviewContent}
             placeholder="상품에 대한 후기를 작성해주세요."
             isError={!!reviewsError}
@@ -108,6 +108,7 @@ export default function ReviewForm({ isOpen, onClose, projectId, projectName, se
             type="submit"
             dataCy="submit-button"
             disabled={!reviewContent.trim() || !!reviewsError}
+            isLoading={apiLoading}
           >
             등록하기
           </PrimaryButton>

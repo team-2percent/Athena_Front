@@ -45,7 +45,7 @@ export default function TopToast({ title, body, duration = 5000, onClose, classN
   }, [isVisible, isMounted, onClose]);
 
   const toastClasses = `
-    fixed top-4 right-4 z-50 // 우측 상단 고정, top/right 여백도 늘림
+    fixed top-4 right-4 z-60 // 우측 상단 고정, top/right 여백도 늘림
     w-88 // 너비 확장 (기존 w-80 → w-96)
     rounded-xl shadow-2xl // 더 둥글고 그림자 강조
     pointer-events-auto
@@ -80,6 +80,7 @@ export default function TopToast({ title, body, duration = 5000, onClose, classN
             type="button"
             className="inline-flex text-white/70 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
             onClick={() => setIsVisible(false)}
+            data-cy="top-toast-close-button"
           >
             <span className="sr-only">닫기</span>
             <X className="h-6 w-6" aria-hidden="true" />

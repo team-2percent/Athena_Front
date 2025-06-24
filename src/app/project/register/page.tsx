@@ -105,6 +105,24 @@ export default function ProjectRegister() {
     }
   }
 
+  useEffect(() => {
+    resetForm();
+  }, []);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      // 경고 메시지(브라우저 표준에 따라 커스텀 메시지는 무시될 수 있음)
+      e.preventDefault();
+      e.returnValue = ""; // Chrome 등에서는 이 값이 있어야 경고가 뜸
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
   if (isMobile) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">

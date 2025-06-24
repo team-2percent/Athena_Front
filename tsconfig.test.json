@@ -1,0 +1,13 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      "types": ["jest"],
+      "composite": true,
+      "noEmit": false,
+      "paths": {
+      "@/*": ["./src/*"]
+    }
+    },
+    "include": ["src/__tests__/**/*.ts", "src/**/*.ts"]
+}
+  

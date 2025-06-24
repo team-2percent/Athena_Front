@@ -5,7 +5,6 @@ import { useApi } from "@/hooks/useApi"
 import { MainProject } from "@/lib/projectInterface"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation";
-import ProjectGridItem from "../common/ProjectGridItem"
 import ProjectOverlayItem from "../common/ProjectOverlayItem"
 import { SecondaryButton } from "../common/Button"
 
@@ -30,11 +29,19 @@ export default function TopFive() {
   const [categoryProjects, setCategoryProjects] = useState<{ [key: number]: MainProject[] }>({
     0: []
   })
+  const [hasError, setHasError] = useState(false)
   const rank1Project = categoryProjects[activeTab] ? categoryProjects[activeTab][0] : null;
   const restProject = categoryProjects[activeTab] ? categoryProjects[activeTab].slice(1) : [];
+  const top5Projects = categoryProjects[activeTab] || [];
 
   const loadProjects = () => {
-    apiCall<Response>("/api/project/categoryRankingView", "GET").then(({ data }) => {
+    setHasError(false);
+    apiCall<Response>("/api/project/categoryRankingView", "GET").then(({ data, error }) => {
+      if (error) {
+        console.error('Failed to load category ranking view:', error);
+        setHasError(true);
+        return;
+      }
       if (data?.allTopView && data.categoryTopView) {
         setCategoryProjects({
           ...categoryProjects,
@@ -67,12 +74,47 @@ export default function TopFive() {
     loadProjects();
   }, [])
 
-  if (categories === null) {
-    return <div>로딩 중입니다.</div> // 로딩 표시 필요
+  // 에러가 있으면 아무것도 렌더링하지 않음
+  if (hasError) {
+    return null;
+  }
+
+  if (isLoading || top5Projects.length === 0) {
+    return (
+      <div className="w-full max-w-7xl mx-auto px-4 py-12" data-cy="category-top5-skeleton">
+        <div className="flex items-center mb-8">
+          <h2 className="text-2xl font-bold">
+            BEST <span className="text-main-color">TOP 5</span> <span className="text-2xl">🏆</span>
+          </h2>
+        </div>
+        <div className="flex justify-between mb-8">
+          <div className="flex flex-wrap gap-2">
+            {[0,1,2].map(i => (
+              <div key={i} className="px-4 py-2 rounded-full bg-gray-200 animate-pulse w-20 h-8" />
+            ))}
+          </div>
+          <div className="px-4 py-2 rounded bg-gray-200 animate-pulse w-32 h-8" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 1등 (큰 카드) */}
+          <div className="flex flex-col items-start animate-pulse w-full">
+            <div className="w-full aspect-square bg-gray-200 rounded-lg" />
+          </div>
+          {/* 2~5등 (2x2 그리드) */}
+          <div className="grid grid-cols-2 grid-rows-2 gap-4">
+            {[0,1,2,3].map(i => (
+              <div key={i} className="flex flex-col items-start animate-pulse w-full">
+                <div className="w-full aspect-square bg-gray-200 rounded-lg" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
   
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-12">
+    <div className="w-full max-w-7xl mx-auto px-4 py-12" data-cy="category-top5">
       <div className="flex items-center mb-8">
         <h2 className="text-2xl font-bold">
           BEST <span className="text-main-color">TOP 5</span> <span className="text-2xl">🏆</span>

@@ -3,12 +3,16 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import { Upload, ChevronDown, Check, Trash2 } from "lucide-react"
+import { Upload, Trash2 } from "lucide-react"
 import DatePicker from "./DatePicker"
 import { useApi } from "@/hooks/useApi"
 
 import { useProjectFormStore, type ImageFile, type Category } from "@/stores/useProjectFormStore"
 import { VALIDATION_MESSAGES } from "@/lib/validationMessages"
+import { TextInput } from "@/components/common/Input"
+import TextArea from "@/components/common/TextArea"
+import Dropdown from "@/components/common/Dropdown"
+import { formatNumberWithComma } from "@/lib/utils"
 
 interface StepOneFormProps {
   onUpdateFormData: (data: Partial<any>) => void
@@ -121,12 +125,6 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       setForceTargetAmountMaxError(false)
       onUpdateFormData({ targetAmount: value })
     }
-  }
-
-  // 천 단위 콤마 포맷팅
-  const formatAmount = (amount: string) => {
-    if (!amount) return ""
-    return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
   }
 
   // 시작일 변경 핸들러
@@ -308,64 +306,40 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       {/* 카테고리 선택 - 세로 배치로 변경 */}
       <div className="flex flex-col">
         <label htmlFor="category" className="text-xl font-bold mb-4">
-          카테고리 선택 <span className="text-red-500">*</span>
+          카테고리 선택
         </label>
         <div className="w-full max-w-md">
-          <div className="relative">
-            <button
-              type="button"
-              className={`flex w-full items-center justify-between rounded-full border px-4 py-3 text-left focus:outline-none ${getFieldStyle(
-                "categoryId",
-              )} ${getErrorMessage("categoryId") ? "text-red-700" : "text-gray-700"}`}
-              onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-              disabled={categoriesLoading}
-            >
-              {categoriesLoading ? (
-                <span className="text-gray-400">카테고리 로딩 중...</span>
-              ) : category ? (
-                <span>{category}</span>
-              ) : (
-                <span className="text-gray-400">카테고리를 선택해주세요</span>
-              )}
-              <ChevronDown className="h-5 w-5" />
-            </button>
-            {isCategoryDropdownOpen && categories.length > 0 && (
-              <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
-                {categories.map((cat) => (
-                  <div
-                    key={cat.id}
-                    className="flex cursor-pointer items-center justify-between px-4 py-3 hover:bg-gray-100"
-                    onClick={() => handleCategorySelect(cat)}
-                  >
-                    <span>{cat.categoryName}</span>
-                    {category === cat.categoryName && <Check className="h-5 w-5 text-main-color" />}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <Dropdown
+            options={categories.map((cat) => ({ label: cat.categoryName, value: cat.id }))}
+            value={categoryId ?? undefined}
+            onChange={(opt) => handleCategorySelect({ id: opt.value as number, categoryName: opt.label })}
+            placeholder="카테고리를 선택해주세요"
+            disabled={categoriesLoading}
+            className={getFieldStyle("categoryId") + (getErrorMessage("categoryId") ? " text-red-500" : " text-gray-700")}
+          />
           {getErrorMessage("categoryId") && (
             <p className="text-red-500 text-sm mt-1">{getErrorMessage("categoryId")}</p>
           )}
         </div>
       </div>
 
-      {/* 상품 제목 - 세로 배치로 변경 */}
+      {/* 프로젝트 제목 - 세로 배치로 변경 */}
       <div className="flex flex-col">
         <label htmlFor="title" className="text-xl font-bold mb-4">
-          상품 제목 <span className="text-red-500">*</span>
+          프로젝트 제목
           <span className="text-sm text-gray-500 ml-2">(25자 이하)</span>
         </label>
         <div className="w-full">
-          <input
+          <TextInput
             id="title"
-            type="text"
             value={title}
+            designType="outline-round"
             onChange={handleTitleChange}
-            placeholder="상품명을 입력해 주세요."
-            className={`w-full rounded-full border px-4 py-3 focus:outline-none ${getFieldStyle("title")}`}
+            placeholder="프로젝트 이름을 지어주세요"
+            className={getFieldStyle("title") + " w-full px-4 py-3"}
+            isError={!!getErrorMessage("title") || !!forceTitleMaxError}
           />
-          <div className="flex justify-between items-center mt-1">
+          <div className="flex justify-between items-center mt-2">
             {(getErrorMessage("title") || forceTitleMaxError) && (
               <p className="text-red-500 text-sm">{getErrorMessage("title") || VALIDATION_MESSAGES.TITLE_MAX}</p>
             )}
@@ -374,19 +348,20 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
         </div>
       </div>
 
-      {/* 상품 요약 - 세로 배치로 변경 */}
+      {/* 프로젝트 요약 - 세로 배치로 변경 */}
       <div className="flex flex-col">
         <label htmlFor="description" className="text-xl font-bold mb-4">
-          상품 요약 <span className="text-red-500">*</span>
+          프로젝트 요약
           <span className="text-sm text-gray-500 ml-2">(10자 이상 50자 이하)</span>
         </label>
-        <div className="w-full">
-          <textarea
-            id="description"
+        <div className="w-full" data-cy="project-description">
+          <TextArea
             value={description}
             onChange={handleDescriptionChange}
-            placeholder="상품에 대한 간략한 설명을 입력하세요"
-            className={`w-full rounded-3xl border px-4 py-3 min-h-[150px] focus:outline-none ${getFieldStyle("description")}`}
+            placeholder="프로젝트에 대한 간략한 설명을 입력하세요"
+            className={getFieldStyle("description") + " w-full rounded-3xl border px-4 py-3 min-h-[150px]"}
+            isError={!!getErrorMessage("description") || !!forceDescriptionMaxError}
+            
           />
           <div className="flex justify-between items-center mt-1">
             {(getErrorMessage("description") || forceDescriptionMaxError) && (
@@ -401,7 +376,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       <div className="flex flex-col">
         <div className="flex items-center mb-4">
           <h3 className="text-xl font-bold">
-            대표 이미지 <span className="text-red-500">*</span>
+            대표 이미지
           </h3>
         </div>
         <div className="w-full">
@@ -506,7 +481,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
               </ul>
             </div>
           </div>
-          {getErrorMessage("images") && <p className="text-red-500 text-sm mt-1">{getErrorMessage("images")}</p>}
+          {getErrorMessage("images") && <p className="text-red-500 text-sm mt-2">{getErrorMessage("images")}</p>}
         </div>
       </div>
 
@@ -514,24 +489,26 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       <div className="flex flex-col">
         <div className="flex items-center mb-4">
           <h3 className="text-xl font-bold">
-            목표 금액 <span className="text-red-500">*</span>
+            목표 금액
           </h3>
           <span className="text-sm text-gray-500 ml-4">* 최대 10억 원까지 입력 가능합니다.</span>
         </div>
 
         <div className="w-full max-w-md flex items-center">
-          <input
+          <TextInput
             id="targetAmount"
-            type="text"
-            value={formatAmount(targetAmount)}
+            designType="outline-round"
+            value={formatNumberWithComma(targetAmount)}
             onChange={handleAmountChange}
             placeholder="0"
-            className={`w-full rounded-full border px-4 py-3 focus:outline-none text-right ${getFieldStyle("targetAmount")}`}
+            className={getFieldStyle("targetAmount") + " w-full px-4 py-3 text-right"}
+            isError={!!getErrorMessage("targetAmount") || !!forceTargetAmountMaxError}
+            align="right"
           />
           <span className="ml-2 text-lg">원</span>
         </div>
         {(getErrorMessage("targetAmount") || forceTargetAmountMaxError) && (
-          <p className="text-red-500 text-sm">{getErrorMessage("targetAmount") || VALIDATION_MESSAGES.TARGET_AMOUNT_MAX}</p>
+          <p className="text-red-500 text-sm mt-2">{getErrorMessage("targetAmount") || VALIDATION_MESSAGES.TARGET_AMOUNT_MAX}</p>
         )}
       </div>
 
@@ -539,7 +516,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       <div className="flex flex-col">
         <div className="flex items-center mb-4">
           <h3 className="text-xl font-bold">
-            펀딩 일정 <span className="text-red-500">*</span>
+            펀딩 일정
           </h3>
           <span className="text-sm text-gray-500 ml-4">* 펀딩 시작일은 오늘의 일주일 뒤부터 선택 가능합니다.</span>
         </div>
@@ -570,7 +547,7 @@ export default function StepOneForm({ onUpdateFormData }: StepOneFormProps) {
       <div className="flex flex-col">
         <div className="flex items-center mb-4">
           <h3 className="text-xl font-bold">
-            배송 예정일 <span className="text-red-500">*</span>
+            배송 예정일
           </h3>
           <span className="text-sm text-gray-500 ml-4">* 펀딩 종료일의 일주일 뒤부터 선택 가능합니다.</span>
         </div>

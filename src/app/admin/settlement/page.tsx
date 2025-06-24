@@ -171,13 +171,13 @@ export default function SettlementPage() {
                                 onClick={() => router.push(`/admin/settlement/${settlement.settlementId}`)}
                                 data-cy="settlement-list-item"
                             >
-                                <td className="border-b p-4 text-left">{settlement.projectTitle}</td>
-                                <td className="border-b p-4">{settlement.totalSales}</td>
-                                <td className="border-b p-4">{settlement.platformFee}</td>
-                                <td className="border-b p-4">{settlement.payOutAmount}</td>
-                                <td className="border-b p-4">{settlement.sellerName}</td>
-                                <td className="border-b p-4">{formatDateInAdmin(settlement.requestedAt)}</td>
-                                <td className="border-b p-4 flex justify-center"><SettlementTag status={settlement.status} /></td>
+                                <td className="border-b p-4 text-left" data-cy="settlement-project-name">{settlement.projectTitle}</td>
+                                <td className="border-b p-4" data-cy="settlement-total-amount">{settlement.totalSales}</td>
+                                <td className="border-b p-4" data-cy="settlement-fee">{settlement.platformFee}</td>
+                                <td className="border-b p-4" data-cy="settlement-payout-amount">{settlement.payOutAmount}</td>
+                                <td className="border-b p-4" data-cy="settlement-seller-name">{settlement.sellerName}</td>
+                                <td className="border-b p-4" data-cy="settlement-settled-at">{formatDateInAdmin(settlement.requestedAt)}</td>
+                                <td className="border-b p-4 flex justify-center" data-cy="settlement-status"><SettlementTag status={settlement.status} /></td>
                             </tr>
                         ))}
                     </tbody>

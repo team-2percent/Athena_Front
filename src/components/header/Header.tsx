@@ -1,21 +1,19 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
-import Image from "next/image"
+import { useEffect, useState, useRef, Suspense } from "react"
 import Link from "next/link"
-import { Percent, Heart, Bell, X, Trash2, LogOut, User, UserLock, Menu } from "lucide-react"
+import { Percent, X, LogOut, User, UserLock, Menu } from "lucide-react"
 import CouponModal from "./CouponModal"
-import PopularSearch from "./PopularSearch"
 import SearchBar from "./SearchBar"
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import LoginModal from "../login/LoginModal"
 import SignupModal from "../login/SignUpModal"
 import useAuthStore from "@/stores/auth"
 import { usePathname } from 'next/navigation';
 import { useApi } from "@/hooks/useApi";
 import MenuTab from "../common/MenuTab"
-import { getFCMToken } from '@/lib/firebase';
 import useToastStore from "@/stores/useToastStore";
+import { GhostButton, GhostPrimaryButton } from "../common/Button"
 
 const nameToPath: Record<string, string> = {
   "전체": "",
@@ -34,7 +32,7 @@ interface HeaderResponse {
   imageUrl: string
 }
 
-const Header = () => {
+const HeaderContent = () => {
   const { isLoggedIn, role, logout, userId } = useAuthStore();
   const isAdmin = role === "ROLE_ADMIN";
   const { isLoading, apiCall } = useApi();
@@ -48,6 +46,7 @@ const Header = () => {
   const authMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const pathFirst = pathname.split("/")[1];
   const activeTab = pathToName[pathFirst]
   const showUnderline = (
@@ -60,6 +59,14 @@ const Header = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [sidebarAnim, setSidebarAnim] = useState(false);
+
+  // URL의 query 파라미터에서 검색어를 읽어와서 searchWord 상태 초기화
+  useEffect(() => {
+    const query = searchParams.get('query');
+    if (query) {
+      setSearchWord(query);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -154,14 +161,15 @@ const Header = () => {
   // 로그아웃
   const handleLogout = () => {
     apiCall("/api/user/logout", "POST").then(() => {
-      logout();
+      setShowAuthMenu(false)
+      logout()
       router.push("/")
     })
   }
 
   const handleClickMyPage = () => {
     router.push("/my")
-    setShowAuthMenu(false);
+    setShowAuthMenu(false)
   }
 
   const handleTestToast = () => {
@@ -247,9 +255,12 @@ const Header = () => {
             />
             {isLoggedIn ? (
               <>
-                <button type="button" aria-label="쿠폰" onClick={handleCouponClick} data-cy="coupon-event-modal-button">
+                <GhostButton
+                  className="w-fit h-fit p-2 rounded-full"
+                  onClick={handleCouponClick}
+                  dataCy="coupon-event-modal-button">
                   <Percent className="h-6 w-6 text-sub-gray" />
-                </button>
+                </GhostButton>
                 <div className="relative flex items-center space-x-3">
                   {!isLoading ? (
                     <span className="text-sm font-medium whitespace-nowrap" data-cy="user-nickname">{user?.nickname}</span>
@@ -309,14 +320,14 @@ const Header = () => {
                 </div>
               </>
             ) : (
-              <div className="text-main-color font-medium mr-auto flex items-center gap-2 whitespace-nowrap">
-                <button type="button" aria-label="로그인" onClick={openLoginModal} data-cy="open-login-modal-button">
+              <div className="text-main-color font-medium mr-auto flex items-center gap-1 whitespace-nowrap">
+                <GhostPrimaryButton ariaLabel="로그인" onClick={openLoginModal} dataCy="open-login-modal-button" className="px-2 py-1">
                   로그인
-                </button>
+                </GhostPrimaryButton>
                 /
-                <button type="button" aria-label="로그인" onClick={openSignupModal} data-cy="open-signup-modal-button">
+                <GhostPrimaryButton ariaLabel="회원가입" onClick={openSignupModal} dataCy="open-signup-modal-button" className="px-2 py-1">
                   회원가입
-                </button>
+                </GhostPrimaryButton>
               </div>
             )}
           </div>
@@ -374,15 +385,6 @@ const Header = () => {
             <div className="flex flex-col gap-4 mt-4">
               {isLoggedIn ? (
                 <>
-                  {/* 프로젝트 등록 버튼 - 메뉴 항목 스타일로 추가 */}
-                  {/*
-                  <button type="button" className="flex items-center gap-2 text-gray-700" onClick={() => { setShowMobileMenu(false); router.push('/project/register'); }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                    프로젝트 등록
-                  </button>
-                  */}
                   <button type="button" className="flex items-center gap-2 text-gray-700" onClick={() => { setShowMobileMenu(false); handleCouponClick(); }}>
                     <Percent className="h-5 w-5" /> 쿠폰
                   </button>
@@ -413,6 +415,14 @@ const Header = () => {
       <LoginModal isOpen={showLoginModal} onClose={closeLoginModal} moveToSignupModal={openSignupModalInLoginModal} />
       <SignupModal isOpen={showSignupModal} onClose={closeSignupModal} />
     </header>
+  )
+}
+
+const Header = () => {
+  return (
+    <Suspense>
+      <HeaderContent />
+    </Suspense>
   )
 }
 

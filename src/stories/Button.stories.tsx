@@ -79,14 +79,47 @@ export const Large: Story = {
 
 export const Loading: Story = {
   args: {
+    variant: 'primary',
     isLoading: true,
-    children: '버튼',
-  },
-};
+    children: '로그인',
+  }
+}
 
 export const Disabled: Story = {
   args: {
     disabled: true,
     children: '버튼',
+  },
+};
+
+export const Ghost: Story = {
+  args: {
+    variant: 'ghost',
+    children: '버튼',
+    size: 'md',
+  },
+};
+
+export const GhostPrimary: Story = {
+  args: {
+    variant: 'ghost-primary',
+    children: '버튼',
+    size: 'md',
+  },
+};
+
+export const GhostDanger: Story = {
+  args: {
+    variant: 'ghost-danger',
+    children: '버튼',
+    size: 'md',
+  },
+};
+
+export const Danger: Story = {
+  args: {
+    variant: 'danger',
+    children: '버튼',
+    size: 'md',
   },
 };

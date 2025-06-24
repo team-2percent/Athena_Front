@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 
 interface ProjectOverlayItemProps {
-    id: number
+  id: number
   className?: string
   isDeadlineSoon?: boolean
   imageUrl?: string

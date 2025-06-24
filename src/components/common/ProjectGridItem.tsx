@@ -49,9 +49,9 @@ export default function ProjectCard({
   description,
   className,
 }: ProjectCardProps) {
-  const isDeadlineSoon = daysLeft !== undefined && daysLeft <= 7 && daysLeft > 0; // 마감 임박 여부 확인 추후 수정
+  const isDeadlineSoon = daysLeft !== undefined && daysLeft <= 7 && daysLeft >= 0; // 마감 임박 여부 확인 추후 수정
   const router = useRouter();
-  const isSoldOut = daysLeft !== undefined && daysLeft <= 0;
+  const isSoldOut = daysLeft !== undefined && daysLeft < 0;
   const isOverAchieved = achievementRate > 100;
 
   const handleCardClick = () => {
@@ -69,7 +69,7 @@ export default function ProjectCard({
 
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
       <div onClick={handleCardClick} className="w-full flex flex-col rounded-lg overflow-hidden text-left">
-        <div className="relative overflow-hidden rounded-lg">
+        <div className="relative overflow-hidden rounded-lg aspect-square">
           {/* 판매 완료 오버레이 */}
           {isSoldOut && (
             <div className="absolute inset-0 bg-black/50 z-20 flex flex-col items-center justify-center text-white">
@@ -85,8 +85,8 @@ export default function ProjectCard({
 
         <div className="flex flex-col flex-1 justify-between p-1 pt-2">
           <div>
-            <p className={clsx("text-sub-gray", sizeDesign.sellerName[size])}>{sellerName}</p>
-            <p className={clsx("font-medium line-clamp-2", sizeDesign.projectName[size])}>{projectName}</p>
+            <p className={clsx("text-sub-gray line-clamp-1", sizeDesign.sellerName[size])}>{sellerName}</p>
+            <p className={clsx("font-medium line-clamp-1", sizeDesign.projectName[size])}>{projectName}</p>
             <p className={clsx("text-sub-gray mt-1 line-clamp-2", sizeDesign.description[size])}>{description}</p>
             { !showProgressBar && <p
               className={cn("font-bold mt-1", isOverAchieved ? "text-point-color" : "text-main-color", isSoldOut ? "text-sub-gray" : "text-main-color", sizeDesign.achievement[size])}

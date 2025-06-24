@@ -10,6 +10,7 @@ import { EmailInput, PasswordInput, TextInput } from "../common/Input"
 import { EMAIL_MAX_LENGTH, NICKNAME_MAX_LENGTH, PASSWORD_MAX_LENGTH, } from "@/lib/validationConstant"
 import { emailSchema, nicknameSchema, passwordMatchSchema, newPasswordSchema, signupSchema, passwordSchema } from "@/lib/validationSchemas"
 import InputInfo from "../common/InputInfo"
+import { validate, getValidatedString } from "@/lib/validationUtil"
 
 interface SignupModalProps {
   isOpen: boolean
@@ -22,8 +23,15 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
-  const disabled = !signupSchema.safeParse({ nickname, email, password, passwordConfirm: confirmPassword }).success || !passwordMatchSchema.safeParse({ password, passwordConfirm: confirmPassword }).success
+  const disabled = validate({
+    nickname,
+    email,
+    password,
+    passwordConfirm: confirmPassword,
+    passwordMatch: { password, passwordConfirm: confirmPassword }
+  }, signupSchema).error
   
   // 유효성 검사
   const [signupError, setSignupError] = useState({
@@ -36,86 +44,55 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   // api 호출 에러
   const [errorMessage, setErrorMessage] = useState("")
 
-  const validateNickname = (nickname: string) => {
-    const result = nicknameSchema.safeParse(nickname)
-    if (nickname.length > NICKNAME_MAX_LENGTH) {
-      setNickname(nickname.slice(0, NICKNAME_MAX_LENGTH))
-    }
-    setSignupError({
-      ...signupError,
-      nickname: result.success ? "" : result.error.issues[0].message
-    })
-  }
-
-  const validateEmail = (email: string) => {
-    const result = emailSchema.safeParse(email)
-    if (email.length > EMAIL_MAX_LENGTH) {
-      setEmail(email.slice(0, EMAIL_MAX_LENGTH))
-    }
-    setSignupError({
-      ...signupError,
-      email: result.success ? "" : result.error.issues[0].message
-    })
-  }
-  
-  const validatePassword = (password: string) => {
-    const result = newPasswordSchema.safeParse(password)
-    if (password.length > PASSWORD_MAX_LENGTH) {
-      setPassword(password.slice(0, PASSWORD_MAX_LENGTH))
-    }
-    setSignupError({
-      ...signupError,
-      password: result.success ? "" : result.error.issues[0].message
-    })
-  }
-  
-  const validateConfirmPassword = (confirmPassword: string) => {
-    const result = passwordSchema.safeParse(confirmPassword)
-    const matchResult = passwordMatchSchema.safeParse({ password, passwordConfirm: confirmPassword })
-    if (confirmPassword.length > PASSWORD_MAX_LENGTH) {
-      setConfirmPassword(confirmPassword.slice(0, PASSWORD_MAX_LENGTH))
-    }
-    setSignupError({
-      ...signupError,
-      confirmPassword: result.success && matchResult.success ? "" : result.error?.issues[0].message || matchResult.error?.issues[0].message || ""
-    })
-  }
-
   // 입력 핸들링
   const handleChangeNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
-    validateNickname(e.target.value)
-    if (e.target.value.length <= NICKNAME_MAX_LENGTH) {
-      setNickname(e.target.value)
+    const result = validate(e.target.value, nicknameSchema)
+    if (result.error) {
+      setSignupError({ ...signupError, nickname: result.message })
+    } else {
+      setSignupError({ ...signupError, nickname: "" })
     }
+    setNickname(getValidatedString(e.target.value, NICKNAME_MAX_LENGTH))
   }
 
   const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
-    validateEmail(e.target.value)
-    if (e.target.value.length <= EMAIL_MAX_LENGTH) {
-      setEmail(e.target.value)
+    const result = validate(e.target.value, emailSchema)
+    if (result.error) {
+      setSignupError({ ...signupError, email: result.message })
+    } else {
+      setSignupError({ ...signupError, email: "" })
     }
+    setEmail(getValidatedString(e.target.value, EMAIL_MAX_LENGTH))
   }
 
   const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    validatePassword(e.target.value)
-    if (e.target.value.length <= PASSWORD_MAX_LENGTH) {
-      setPassword(e.target.value)
+    const result = validate(e.target.value, newPasswordSchema)
+    if (result.error) {
+      setSignupError({ ...signupError, password: result.message })
+    } else {
+      setSignupError({ ...signupError, password: "" })
     }
+    setPassword(getValidatedString(e.target.value, PASSWORD_MAX_LENGTH))
   }
 
   const handleChangeConfirmPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    validateConfirmPassword(e.target.value)
-    if (e.target.value.length <= PASSWORD_MAX_LENGTH) {
-      setConfirmPassword(e.target.value)
+    const matchResult = validate({ password, passwordConfirm: e.target.value }, passwordMatchSchema)
+    if (matchResult.error) {
+      setSignupError({ ...signupError, confirmPassword: matchResult.message })
+    } else {
+      setSignupError({ ...signupError, confirmPassword: "" })
     }
+    setConfirmPassword(getValidatedString(e.target.value, PASSWORD_MAX_LENGTH))
   }
 
   // 회원가입 로직
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    setIsLoading(true)
     apiCall("/api/user", "POST", { nickname, email, password }).then(({ error }: { data: any, error: string | null }) => {
+      setIsLoading(false)
       if (error) {
-        setErrorMessage(error)
+        setErrorMessage("회원가입에 실패했습니다.")
       } else {
         onClose()
       }
@@ -203,9 +180,10 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
           {/* Signup Button */}
           <PrimaryButton
             type="submit"
-            className="relative w-full py-4"
+            className="w-full py-4"
             disabled={disabled}
             dataCy="signup-button"
+            isLoading={isLoading}
           >
             가입하기
           </PrimaryButton>

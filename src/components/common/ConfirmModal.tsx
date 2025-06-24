@@ -8,9 +8,10 @@ interface ConfirmModalProps {
   onConfirm: () => void
   onClose: () => void
   dataCy?: string
+  isLoading?: boolean
 }
 
-export default function ConfirmModal({ isOpen, message, onConfirm, onClose, dataCy }: ConfirmModalProps) {
+export default function ConfirmModal({ isOpen, message, onConfirm, onClose, dataCy, isLoading = false }: ConfirmModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm" title="확인" dataCy={dataCy}>
       <div className="flex flex-col gap-4">
@@ -19,7 +20,7 @@ export default function ConfirmModal({ isOpen, message, onConfirm, onClose, data
           <Modal.Button variant="secondary" onClick={onClose} dataCy="cancel-button">
             취소
           </Modal.Button>
-          <Modal.Button variant="primary" onClick={onConfirm} dataCy="confirm-button">
+          <Modal.Button variant="primary" onClick={onConfirm} dataCy="confirm-button" isLoading={isLoading}>
             확인
           </Modal.Button>
         </div>

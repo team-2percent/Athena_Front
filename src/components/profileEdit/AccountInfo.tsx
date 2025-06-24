@@ -4,12 +4,15 @@ import { useApi } from "@/hooks/useApi"
 
 import ConfirmModal from "../common/ConfirmModal"
 import AlertModal from "../common/AlertModal"
-import { PrimaryButton } from "../common/Button"
+import { GhostDangerButton, PrimaryButton } from "../common/Button"
 import { TextInput } from "../common/Input"
 import { ACCOUNT_HOLDER_MAX_LENGTH, BANK_ACCOUNT_MAX_LENGTH, BANK_NAME_MAX_LENGTH } from "@/lib/validationConstant"
 import InputInfo from "../common/InputInfo"
 import { accountAddSchema, accountHolderSchema, bankAccountSchema, bankNameSchema } from "@/lib/validationSchemas"
 import useErrorToastStore from "@/stores/useErrorToastStore"
+import { getValidatedString, validate } from "@/lib/validationUtil"
+import ServerErrorComponent from "../common/ServerErrorComponent"
+import EmptyMessage from "../common/EmptyMessage"
 
 interface AccountInfo {
     id: number
@@ -48,10 +51,15 @@ export default function AccountInfo() {
   const [alertMessage, setAlertMessage] = useState<string>("")
   const [isAlertOpen, setIsAlertOpen] = useState(false)
 
+  const [error, setError] = useState<boolean>(false)
+
   const loadAccounts = () => {
-    apiCall<AccountInfo[]>("/api/bankAccount", "GET").then(({ data }) => {
+    setError(false)
+    apiCall<AccountInfo[]>("/api/bankAccount", "GET").then(({ data, error, status }) => {
       if (data) {
         setAccounts(data)
+      } else if (error && status === 500) {
+        setError(true)
       }
     })
   }
@@ -86,42 +94,42 @@ export default function AccountInfo() {
     })
   }
 
-  // 새 계좌 정보 변경 핸들러
-  const validateAccount = (name: string, value: string) => {
-    let returnValue = ""
-    let error = ""
-
-    if (name === "accountHolder") {
-      const result = accountHolderSchema.safeParse(value)
-      returnValue = result.success ? value : value.slice(0, ACCOUNT_HOLDER_MAX_LENGTH)
-      error = result.error?.issues[0].message || ""
-    } else if (name === "bankName") {
-      const result = bankNameSchema.safeParse(value)
-      returnValue = result.success ? value : value.slice(0, BANK_NAME_MAX_LENGTH)
-      error = result.error?.issues[0].message || ""
-    } else if (name === "bankAccount") {
-      const result = bankAccountSchema.safeParse(value)
-      returnValue = result.success ? value : value.slice(0, BANK_ACCOUNT_MAX_LENGTH).replace(/[^0-9]/g, "")
-      error = result.error?.issues[0].message || ""
-    }
-
-    return {
-      value: returnValue,
-      error: error
-    }
-  }
-
   const handleNewAccountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    const { value: returnValue, error } = validateAccount(name, value)
-    setNewAccount(prev => ({
-      ...prev,
-      [name]: returnValue,
-    }))
-    setAccountAddError(prev => ({
-      ...prev,
-      [name]: error
-    }))
+    if (name === "accountHolder") {
+      const result = validate(value, accountHolderSchema)
+      if (result.error) {
+        setAccountAddError({ ...accountAddError, accountHolder: result.message })
+      } else {
+        setAccountAddError({ ...accountAddError, accountHolder: "" })
+      }
+      setNewAccount(prev => ({
+        ...prev,
+        accountHolder: getValidatedString(value, ACCOUNT_HOLDER_MAX_LENGTH),
+      }))
+    } else if (name === "bankName") {
+      const result = validate(value, bankNameSchema)
+      if (result.error) {
+        setAccountAddError({ ...accountAddError, bankName: result.message })
+      } else {
+        setAccountAddError({ ...accountAddError, bankName: "" })
+      }
+      setNewAccount(prev => ({
+        ...prev,
+        bankName: getValidatedString(value, BANK_NAME_MAX_LENGTH),
+      }))
+    } else if (name === "bankAccount") {
+      const result = validate(value, bankAccountSchema)
+      if (result.error) {
+        setAccountAddError({ ...accountAddError, bankAccount: result.message })
+      } else {
+        setAccountAddError({ ...accountAddError, bankAccount: "" })
+      }
+      setNewAccount(prev => ({
+        ...prev,
+        bankAccount: getValidatedString(value, BANK_ACCOUNT_MAX_LENGTH),
+      }))
+    }
   }
 
   // 계좌 추가 핸들러
@@ -158,16 +166,59 @@ export default function AccountInfo() {
     setIsDefaultModalOpen(true)
   }
 
+  const renderAccountList = () => {
+    if (error) return <ServerErrorComponent message="계좌 조회에 실패했습니다." onRetry={loadAccounts} />
+    if (accounts.length === 0) return <EmptyMessage message="등록된 계좌가 없습니다." />
+    return (
+      <div className="space-y-3 mt-2">
+        {accounts.map((account) => (
+            <div key={account.id} className="flex items-center justify-between border-b pb-3" data-cy="account-list-item">
+            <div className="flex items-center">
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium" data-cy="account-bank">{account.bankName}</p>
+                    <p className="text-sm text-sub-gray" data-cy="account-name">{account.accountHolder}</p>
+                  </div>
+                  <p className="text-sm text-sub-gray" data-cy="account-number">{account.bankAccount}</p>
+                </div>
+                {account.isDefault ? 
+                <span
+                  className="ml-2 px-2 py-0.5 bg-secondary-color text-main-color text-xs rounded-full"
+                  data-cy="account-default-badge"
+                >기본</span>
+                :
+                <button
+                  className="border-box ml-2 px-2 py-0.5 text-xs text-main-color underline"
+                  onClick={() => handleClickSetDefaultButton(account.id)}
+                  data-cy="default-change-button"
+                >기본 계좌로 설정</button>
+                }
+            </div>
+            {
+              !account.isDefault &&
+              <GhostDangerButton
+                  onClick={() => handleClickDeleteButton(account.id)}
+                  className="w-fit h-fit p-2 rounded-full"
+                  dataCy="account-delete-button"
+              >
+                  <Trash2 className="w-4 h-4" />
+              </GhostDangerButton>
+            }
+            </div>
+        ))}  
+        </div>
+    )
+  }
+
   useEffect(() => {
     loadAccounts();
   }, []);
 
-
     return <div className="flex gap-4 w-full">
       {/* 5. 컴포넌트 return 문 내부 최상단에 AlertModal 컴포넌트 추가 */}
       <AlertModal isOpen={isAlertOpen} message={alertMessage} onClose={() => setIsAlertOpen(false)} />
-      <ConfirmModal isOpen={isDefaultModalOpen} message={"기본 계좌로 설정할까요?"} onConfirm={setDefaultAccount} onClose={() => setIsDefaultModalOpen(false)} dataCy="default-account-confirm-modal"/>
-      <ConfirmModal isOpen={isDeleteModalOpen} message={"계좌를 삭제할까요?"} onConfirm={deleteAccount} onClose={() => setIsDeleteModalOpen(false)} dataCy="delete-account-confirm-modal"/>
+      <ConfirmModal isOpen={isDefaultModalOpen} message={"기본 계좌로 설정할까요?"} onConfirm={setDefaultAccount} onClose={() => setIsDefaultModalOpen(false)} dataCy="default-account-confirm-modal" isLoading={isLoading}/>
+      <ConfirmModal isOpen={isDeleteModalOpen} message={"계좌를 삭제할까요?"} onConfirm={deleteAccount} onClose={() => setIsDeleteModalOpen(false)} dataCy="delete-account-confirm-modal" isLoading={isLoading}/>
         {/* 계좌 추가 폼 */}
         <div className="flex-1 bg-white rounded-lg shadow py-6 px-10" data-cy="account-add-form">
             <h3 className="text-lg font-medium mb-6">새 계좌 추가</h3>
@@ -216,8 +267,9 @@ export default function AccountInfo() {
                 className="flex items-center appearance-none"
                 disabled={addButtonDisabled}
                 dataCy="account-add-button"
+                isLoading={isLoading}
               >
-                <Plus className="w-4 h-4 mr-1" /> 계좌 추가
+                계좌 추가
               </PrimaryButton>
             </div>
           </div>
@@ -225,48 +277,7 @@ export default function AccountInfo() {
         <div className="flex-1 flex flex-col bg-white rounded-lg shadow py-6 px-10 justify-between" data-cy="account-list">
             <h3 className="text-lg font-medium mb-6">등록된 계좌 목록</h3>
             <div className="flex-1 flex flex-col gap-4" data-cy="account-list">
-            {accounts.length === 0 ? (
-                    <p className="text-sub-gray text-center py-4">등록된 계좌가 없습니다.</p>
-                ) : (
-                    <div className="space-y-3 mt-2">
-                    {accounts.map((account) => (
-                        <div key={account.id} className="flex items-center justify-between border-b pb-3" data-cy="account-list-item">
-                        <div className="flex items-center">
-                            <div className="flex flex-col">
-                              <div className="flex items-center gap-2">
-                                <p className="font-medium">{account.bankName}</p>
-                                <p className="text-sm text-sub-gray">{account.accountHolder}</p>
-                              </div>
-                              <p className="text-sm text-sub-gray">{account.bankAccount}</p>
-                            </div>
-                            {account.isDefault ? 
-                            <span
-                              className="ml-2 px-2 py-0.5 bg-secondary-color text-main-color text-xs rounded-full"
-                              data-cy="account-default-mark"
-                            >기본</span>
-                            :
-                            <button
-                              className="border-box ml-2 px-2 py-0.5 text-xs text-main-color underline"
-                              onClick={() => handleClickSetDefaultButton(account.id)}
-                              data-cy="account-default-change-button"
-                            >기본 계좌로 설정</button>
-                            }
-                        </div>
-                        {
-                          !account.isDefault &&
-                          <button
-                              type="button"
-                              onClick={() => handleClickDeleteButton(account.id)}
-                              className="text-sub-gray hover:text-red-500"
-                              data-cy="account-delete-button"
-                          >
-                              <Trash2 className="w-4 h-4" />
-                          </button>
-                        }
-                        </div>
-                    ))}  
-                    </div>
-                )}
+            {renderAccountList()}
             </div>
         </div>
         </div>

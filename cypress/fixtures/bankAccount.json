@@ -1,0 +1,37 @@
+[
+    {
+      "id": 3,
+      "bankAccount": "0000002001",
+      "accountHolder": null,
+      "bankName": "은행C",
+      "isDefault": true
+    },
+    {
+      "id": 4,
+      "bankAccount": "0000002002",
+      "accountHolder": null,
+      "bankName": "은행D",
+      "isDefault": false
+    },
+    {
+      "id": 56,
+      "bankAccount": "3489354982345",
+      "accountHolder": "내계좌",
+      "bankName": "카카오뱅크",
+      "isDefault": false
+    },
+    {
+      "id": 65,
+      "bankAccount": "230848023890423",
+      "accountHolder": "C가하나더들어감",
+      "bankName": "내가미쳤지",
+      "isDefault": false
+    },
+    {
+      "id": 68,
+      "bankAccount": "123213213",
+      "accountHolder": "123213",
+      "bankName": "123123",
+      "isDefault": false
+    }
+  ]

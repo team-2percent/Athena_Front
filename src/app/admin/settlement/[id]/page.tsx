@@ -8,7 +8,7 @@ import { useApi } from "@/hooks/useApi"
 import { useParams } from "next/navigation";
 import OverlaySpinner from "@/components/common/OverlaySpinner"
 import { formatDateInAdmin } from "@/lib/utils"
-import { SecondaryButton } from "@/components/common/Button"
+import { GhostButton, SecondaryButton } from "@/components/common/Button"
 import Pagination from "@/components/common/Pagination"
 import ServerErrorComponent from "@/components/common/ServerErrorComponent"
 
@@ -153,61 +153,61 @@ export default function SettlementDetailPage() {
                     <tbody>
                         <tr>
                             <td className="p-2 w-[15%] font-semibold">프로젝트명</td>
-                            <td className="p-2">{info.projectTitle}</td>
+                            <td className="p-2" data-cy="settlement-detail-project-title">{info.projectTitle}</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[15%] font-semibold">목표 금액</td>
-                            <td className="p-2">{info.targetAmount} 원</td>
+                            <td className="p-2" data-cy="settlement-detail-target-amount">{info.targetAmount} 원</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[15%] font-semibold">펀딩 기간</td>
-                            <td className="p-2">{formatDateInAdmin(info.fundingStartDate)} ~ {formatDateInAdmin(info.fundingEndDate)}</td>
+                            <td className="p-2" data-cy="settlement-detail-funding-period">{formatDateInAdmin(info.fundingStartDate)} ~ {formatDateInAdmin(info.fundingEndDate)}</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[15%] font-semibold">요금제</td>
-                            <td className="p-2">{info.planName}</td>
+                            <td className="p-2" data-cy="settlement-detail-plan-name">{info.planName}</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[15%] font-semibold">총 판매 금액</td>
-                            <td className="p-2">{info.totalSales} 원</td>
+                            <td className="p-2" data-cy="settlement-detail-total-sales">{info.totalSales} 원</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[15%] font-semibold">플랫폼 수수료</td>
-                            <td className="p-2">{info.platformFeeTotal} 원</td>
+                            <td className="p-2" data-cy="settlement-detail-platform-fee">{info.platformFeeTotal} 원</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[15%] font-semibold">PG 수수료</td>
-                            <td className="p-2">{info.pgFeeTotal} 원</td>
+                            <td className="p-2" data-cy="settlement-detail-pg-fee">{info.pgFeeTotal} 원</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[15%] font-semibold">부가세</td>
-                            <td className="p-2">{info.vatTotal} 원</td>
+                            <td className="p-2" data-cy="settlement-detail-vat">{info.vatTotal} 원</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[15%] font-semibold">정산 금액</td>
-                            <td className="p-2">{(info.payOutAmount)} 원</td>
+                            <td className="p-2" data-cy="settlement-detail-payout-amount">{(info.payOutAmount)} 원</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[15%] font-semibold">총 판매 개수</td>
-                            <td className="p-2">{info.totalCount} 개</td>
+                            <td className="p-2" data-cy="settlement-detail-total-count">{info.totalCount} 개</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[15%] font-semibold">구매자</td>
-                            <td className="p-2">{info.totalCount} 명</td>
+                            <td className="p-2" data-cy="settlement-detail-buyer-count">{info.totalCount} 명</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[15%] font-semibold">정산 일자</td>
-                            <td className="p-2">{info.settledAt ? info.settledAt : "-"}</td>
+                            <td className="p-2" data-cy="settlement-detail-settled-at">{info.settledAt ? info.settledAt : "-"}</td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[15%] font-semibold">정산 상태</td>
-                            <td className="p-2"><SettlementTag status={info.status} /></td>
+                            <td className="p-2" data-cy="settlement-detail-status"><SettlementTag status={info.status} /></td>
                         </tr>
                         <tr>
                             <td className="p-2 w-[15%] font-semibold">정산 계좌 정보</td>
                             <td className="p-2">
                                 <div className="flex gap-2">
-                                    <span>{info.bankAccount.bankName} {info.bankAccount.accountNumber}</span>
+                                    <span data-cy="settlement-detail-bank-account">{info.bankAccount.bankName} {info.bankAccount.accountNumber}</span>
                                 </div>
                             </td>
                         </tr>
@@ -217,20 +217,20 @@ export default function SettlementDetailPage() {
             {/* 판매자 정보 */}
             <div className="flex flex-col gap-6 py-6" data-cy="settlement-detail-seller-info">
                 <h2 className="text-2xl font-medium border-b pb-2">판매자 정보</h2>
-                <div className="flex items-center mt-4 justify-between">
+                <div className="flex items-center mt-4 justify-between" data-cy="seller-info">
                     <div className="flex items-center gap-4">
-                        <button className="h-16 w-16 overflow-hidden rounded-full">
+                        {/* <button className="h-16 w-16 overflow-hidden rounded-full">
                             <img
-                                src="/abstract-profile.png"
+                                src={info.sellerProfileUrl || "/images/default-profile.png"}
                                 alt="프로필 이미지"
                                 width={64}
                                 height={64}
                                 className="h-full w-full object-cover"
                             />
-                        </button>
+                        </button> */}
                         <div className="flex flex-col">
                             <span className="text-xl font-medium">{info.sellerNickname}</span>
-                            <span className="text-sm text-gray-500">판매자 소개</span>
+                            {/* <span className="text-sm text-gray-500">판매자 소개</span> */}
                         </div>
                     </div>
                     
@@ -257,24 +257,24 @@ export default function SettlementDetailPage() {
                             <th className="border-b p-4">PG 수수료</th>
                             <th className="border-b p-4">부가세</th>
                         </tr>
-                        <tr className="text-sm">
+                        <tr className="text-sm" data-cy="settlement-product-summary-total-row">
                             <td className="border-b p-4">전체</td>
-                            <td className="border-b p-4">{productSummaryTotal.totalQuantity}</td>
-                            <td className="border-b p-4">{productSummaryTotal.totalPrice}</td>
-                            <td className="border-b p-4">{productSummaryTotal.payoutAmount}</td>
-                            <td className="border-b p-4">{productSummaryTotal.platformFee}</td>
-                            <td className="border-b p-4">{productSummaryTotal.pgFee}</td>
-                            <td className="border-b p-4">{productSummaryTotal.vat}</td>
+                            <td className="border-b p-4" data-cy="settlement-product-summary-total-quantity">{productSummaryTotal.totalQuantity}</td>
+                            <td className="border-b p-4" data-cy="settlement-product-summary-total-price">{productSummaryTotal.totalPrice}</td>
+                            <td className="border-b p-4" data-cy="settlement-product-summary-total-payout-amount">{productSummaryTotal.payoutAmount}</td>
+                            <td className="border-b p-4" data-cy="settlement-product-summary-total-platform-fee">{productSummaryTotal.platformFee}</td>
+                            <td className="border-b p-4" data-cy="settlement-product-summary-total-pg-fee">{productSummaryTotal.pgFee}</td>
+                            <td className="border-b p-4" data-cy="settlement-product-summary-total-vat">{productSummaryTotal.vat}</td>
                         </tr>
                         {productSummary.map((product, idx) => (
-                            <tr key={product.productName + idx.toString} className="text-sm">
-                                <td className="border-b p-4">{product.productName}</td>
-                                <td className="border-b p-4">{product.totalQuantity}</td>
-                                <td className="border-b p-4">{product.totalPrice}</td>
-                                <td className="border-b p-4">{product.payoutAmount}</td>
-                                <td className="border-b p-4">{product.platformFee}</td>
-                                <td className="border-b p-4">{productSummaryTotal.pgFee}</td>
-                                <td className="border-b p-4">{productSummaryTotal.vat}</td>
+                            <tr key={product.productName + idx.toString} className="text-sm" data-cy="settlement-product-summary-product-row">
+                                <td className="border-b p-4" data-cy="settlement-product-summary-product-name">{product.productName}</td>
+                                <td className="border-b p-4" data-cy="settlement-product-summary-product-quantity">{product.totalQuantity}</td>
+                                <td className="border-b p-4" data-cy="settlement-product-summary-product-total-price">{product.totalPrice}</td>
+                                <td className="border-b p-4" data-cy="settlement-product-summary-product-payout-amount">{product.payoutAmount}</td>
+                                <td className="border-b p-4" data-cy="settlement-product-summary-product-platform-fee">{product.platformFee}</td>
+                                <td className="border-b p-4" data-cy="settlement-product-summary-product-pg-fee">{product.pgFee}</td>
+                                <td className="border-b p-4" data-cy="settlement-product-summary-product-vat">{product.vat}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -296,15 +296,15 @@ export default function SettlementDetailPage() {
                             <th className="border-b p-4">정산 일자</th>
                         </tr>
                         {history.map((item, idx) => (
-                            <tr key={item.productName + idx.toString()} className="text-sm">
-                                <td className="border-b p-4">{item.productName}</td>
-                                <td className="border-b p-4">{item.quantity}</td>
-                                <td className="border-b p-4">{item.totalPrice}</td>
-                                <td className="border-b p-4">{item.platformFee}</td>
-                                <td className="border-b p-4">{item.pgFee}</td>
-                                <td className="border-b p-4">{item.vat}</td>
-                                <td className="border-b p-4">{item.amount}</td>
-                                <td className="border-b p-4">{formatDateInAdmin(item.orderedAt)}</td>
+                            <tr key={item.productName + idx.toString()} className="text-sm" data-cy="settlement-history-item">
+                                <td className="border-b p-4" data-cy="settlement-history-product-name">{item.productName}</td>
+                                <td className="border-b p-4" data-cy="settlement-history-quantity">{item.quantity}</td>
+                                <td className="border-b p-4" data-cy="settlement-history-total-price">{item.totalPrice}</td>
+                                <td className="border-b p-4" data-cy="settlement-history-platform-fee">{item.platformFee}</td>
+                                <td className="border-b p-4" data-cy="settlement-history-pg-fee">{item.pgFee}</td>
+                                <td className="border-b p-4" data-cy="settlement-history-vat">{item.vat}</td>
+                                <td className="border-b p-4" data-cy="settlement-history-amount">{item.amount}</td>
+                                <td className="border-b p-4" data-cy="settlement-history-ordered-at">{formatDateInAdmin(item.orderedAt)}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -327,13 +327,10 @@ export default function SettlementDetailPage() {
     return (
         <div className="flex flex-col mx-auto w-[var(--content-width)] py-8 gap-6">
             <div className="flex w-full">
-                <button 
-                    className="text-sm text-gray-500 flex items-center gap-2" 
-                    onClick={() => router.push("/admin/settlement")}
-                >
+                <GhostButton onClick={() => router.push("/admin/settlement")} className="flex gap-1 items-center" dataCy="back-to-list-button">
                     <ArrowLeftIcon className="w-4 h-4" />
                     목록으로
-                </button>
+                </GhostButton>
             </div>
             {render()}
         </div>

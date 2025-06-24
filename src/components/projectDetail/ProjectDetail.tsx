@@ -8,7 +8,7 @@ import ProjectTabs from "./ProjectTabs"
 import { useApi } from "@/hooks/useApi"
 import { useParams } from "next/navigation"
 
-import { OutlineButton, PrimaryButton } from "../common/Button"
+import { GhostButton, OutlineButton, PrimaryButton } from "../common/Button"
 import gsap from "gsap"
 
 // ProjectData 인터페이스 추가
@@ -161,7 +161,7 @@ const ProjectDetail = () => {
       setTimeout(() => {
         setCopySuccess(false)
         setShowSharePopover(false)
-      }, 2000)
+      }, 3000)
     } catch (err) {
       console.error("URL 복사 실패:", err)
       // fallback for older browsers
@@ -231,8 +231,31 @@ const ProjectDetail = () => {
     <div className="mx-auto max-w-6xl pb-20">
       {/* 로딩 상태 표시 */}
       {isLoading && (
-        <div className="flex justify-center items-center py-20">
-          <p className="text-sub-gray text-lg">프로젝트 정보를 불러오는 중...</p>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+          {/* 왼쪽: 이미지 캐러셀 스켈레톤 */}
+          <div className="flex flex-col">
+            <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-gray-200 animate-pulse flex items-center justify-center">
+            </div>
+            <div className="mt-4 flex justify-center gap-4">
+              {[0,1,2,3,4].map(idx => (
+                <div key={idx} className="h-20 w-20 bg-gray-200 rounded-xl animate-pulse" />
+              ))}
+            </div>
+          </div>
+          {/* 오른쪽: 메타데이터 스켈레톤 */}
+          <div className="flex flex-col justify-center px-4 md:px-0">
+            <div className="mb-4">
+              <div className="h-8 w-2/3 bg-gray-200 rounded mb-2 animate-pulse" />
+              <div className="h-6 w-1/2 bg-gray-100 rounded mb-6 animate-pulse" />
+              <div className="h-8 w-1/3 bg-gray-200 rounded mb-4 animate-pulse" />
+              <div className="h-6 w-1/4 bg-gray-100 rounded mb-6 animate-pulse" />
+              <div className="h-8 w-1/2 bg-gray-200 rounded mb-8 animate-pulse" />
+            </div>
+            <div className="flex gap-2 mt-6">
+              <div className="h-12 w-1/2 bg-gray-200 rounded-xl animate-pulse" />
+              <div className="h-12 w-1/2 bg-gray-200 rounded-xl animate-pulse" />
+            </div>
+          </div>
         </div>
       )}
 
@@ -411,9 +434,9 @@ const ProjectDetail = () => {
                 >
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-medium text-gray-900">프로젝트 공유하기</h3>
-                    <button onClick={() => setShowSharePopover(false)} className="text-gray-400 hover:text-gray-600">
+                    <GhostButton onClick={() => setShowSharePopover(false)} className="p-1 rounded-full">
                       <X className="h-4 w-4" />
-                    </button>
+                    </GhostButton>
                   </div>
 
                   <div className="space-y-3">
@@ -423,11 +446,9 @@ const ProjectDetail = () => {
                       </span>
                     </div>
 
-                    <button
+                    <PrimaryButton
                       onClick={copyToClipboard}
-                      className={`w-full flex items-center justify-center gap-2 text-white py-2 px-4 rounded-lg transition-colors
-                        ${copySuccess ? 'bg-secondary-color-dark' : 'bg-main-color hover:bg-secondary-color-dark'}
-                      `}
+                      className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg transition-colors"
                       disabled={copySuccess}
                     >
                       {copySuccess ? (
@@ -441,7 +462,7 @@ const ProjectDetail = () => {
                           URL 복사하기
                         </>
                       )}
-                    </button>
+                    </PrimaryButton>
                   </div>
                 </div>
               </div>
@@ -458,9 +479,13 @@ const ProjectDetail = () => {
                   후원하기
                 </PrimaryButton>
               ) : (
-                <div className="w-full md:w-2/3 rounded-xl bg-gray-300 px-4 md:px-8 py-3 md:py-4 text-base md:text-xl font-bold text-gray-500 cursor-not-allowed text-center">
+                <PrimaryButton
+                  className="w-full md:w-2/3 rounded-xl px-4 md:px-8 py-3 md:py-4 text-base md:text-xl font-bold"
+                  disabled
+                  data-cy="donate-disabled"
+                >
                   후원 불가
-                </div>
+                </PrimaryButton>
               )}
             </div>
           </div>

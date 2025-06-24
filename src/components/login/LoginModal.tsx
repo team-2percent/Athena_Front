@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
 import Modal from "@/components/common/Modal"
@@ -12,6 +12,7 @@ import { emailSchema, loginSchema, passwordSchema } from "@/lib/validationSchema
 import { EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH } from "@/lib/validationConstant"
 import InputInfo from "../common/InputInfo"
 import { getFCMToken } from '@/lib/firebase'
+import { validate, getValidatedString } from "@/lib/validationUtil"
 
 interface LoginModalProps {
   isOpen: boolean
@@ -29,45 +30,35 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
     email: "",
     password: ""
   })
+  const [isLoading, setIsLoading] = useState(false)
 
-  const disabled: boolean = !loginSchema.safeParse({ email, password }).success
-
-  const validateEmail = (email: string) => {
-    const result = emailSchema.safeParse(email)
-    setLoginError({ 
-      ...loginError,
-      email: result.success ? "" : result.error.issues[0].message
-    })
-  }
-
-  const validatePassword = (password: string) => {
-    const result = passwordSchema.safeParse(password) 
-    setLoginError({
-      ...loginError,
-      password: result.success ? "" : result.error.issues[0].message
-    })
-  }
+  const disabled: boolean = validate({ email, password }, loginSchema).error
 
   const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.length <= EMAIL_MAX_LENGTH) {
-      setEmail(e.target.value)
+    const result = validate(e.target.value, emailSchema)
+    if (result.error) {
+      setLoginError({ ...loginError, email: result.message })
+    } else {
+      setLoginError({ ...loginError, email: "" })
     }
-
-    validateEmail(e.target.value)
+    setEmail(getValidatedString(e.target.value, EMAIL_MAX_LENGTH))
   }
 
   const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.length <= PASSWORD_MAX_LENGTH) {
-      setPassword(e.target.value)
+    const result = validate(e.target.value, passwordSchema)
+    if (result.error) {
+      setLoginError({ ...loginError, password: result.message })
+    } else {
+      setLoginError({ ...loginError, password: "" })
     }
-
-    validatePassword(e.target.value)
+    setPassword(getValidatedString(e.target.value, PASSWORD_MAX_LENGTH))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
+    setIsLoading(true)
     const { data, error } = await apiCall<any>("/api/user/login", "POST", { email, password })
+    setIsLoading(false)
     if (error) {
       setErrorMessage("로그인에 실패했습니다.")
       return;
@@ -126,12 +117,15 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
 
           {/* Login Button */}
           <PrimaryButton
-            type="submit"
-            disabled={disabled}
-            className="w-full py-4"
-            size="lg"
-            dataCy="login-button"
-          >로그인</PrimaryButton>
+              type="submit"
+              disabled={disabled}
+              className="w-full py-4"
+              size="lg"
+              dataCy="login-button"
+              isLoading={isLoading}
+          >
+            로그인
+          </PrimaryButton>
           <div className="h-[1.25rem] text-center mb-2">
             <span className="w-full text-red-500 text-xs">{errorMessage}</span>
           </div>
@@ -150,6 +144,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
           onClick={moveToSignupModal}
           className="w-full py-4"
           size="lg"
+          dataCy="move-to-signup-modal-button"
         >회원가입</SecondaryButton>
       </div>
     </Modal>

@@ -10,6 +10,7 @@ import { PrimaryButton } from "@/components/common/Button";
 import { TextInput } from "@/components/common/Input";
 import { SEARCH_MAX_LENGTH } from "@/lib/validationConstant";
 import ServerErrorComponent from "@/components/common/ServerErrorComponent";
+import { getValidatedString } from "@/lib/validationUtil";
 
 interface Project {
     projectId: number;
@@ -88,12 +89,8 @@ export default function ApprovalPage() {
         })
     }
 
-    const validateSearch = (value: string) => {
-        return value.slice(0, SEARCH_MAX_LENGTH)
-    }
-
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = validateSearch(e.target.value)
+        const value = getValidatedString(e.target.value, SEARCH_MAX_LENGTH)
         setSearch(value);
     }
 
@@ -142,12 +139,13 @@ export default function ApprovalPage() {
                     <PrimaryButton
                         onClick={handleSearchClick}
                         dataCy="search-button"
+                        disabled={!search}
                     >검색</PrimaryButton>
                 </div>
                 <div className="flex gap-4">
                     <select className="border rounded px-4 py-2 h-10" onChange={handleSortChange} data-cy="sort-select">
-                        <option value="asc" data-cy="sort-option">오래된순</option>
-                        <option value="desc" data-cy="sort-option">최신순</option>
+                        <option value="asc">오래된순</option>
+                        <option value="desc">최신순</option>
                     </select>
                 </div>
             </div>
@@ -169,11 +167,11 @@ export default function ApprovalPage() {
                             onClick={() => handleProjectClick(project.projectId)}
                             data-cy="project-approval-list-item"
                         >
-                            <td className="text-center p-4 whitespace-nowrap">{index + 1}</td>
-                            <td className="text-center p-4 truncate max-w-0">{project.title}</td>
-                            <td className="text-center p-4 whitespace-nowrap">{formatDateInAdmin(project.createdAt)}</td>
-                            <td className="text-center p-4 truncate max-w-0">{project.sellerName}</td>
-                            <td className="text-center p-4 whitespace-nowrap">{approvalStatus[project.isApproved]}</td>
+                            <td className="text-center p-4 whitespace-nowrap" data-cy="project-number">{index + 1}</td>
+                            <td className="text-center p-4 truncate max-w-0" data-cy="project-title">{project.title}</td>
+                            <td className="text-center p-4 whitespace-nowrap" data-cy="project-date">{formatDateInAdmin(project.createdAt)}</td>
+                            <td className="text-center p-4 truncate max-w-0" data-cy="project-seller">{project.sellerName}</td>
+                            <td className="text-center p-4 whitespace-nowrap" data-cy="project-status">{approvalStatus[project.isApproved]}</td>
                         </tr>
                     ))}
                 </tbody>

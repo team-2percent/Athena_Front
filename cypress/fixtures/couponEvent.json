@@ -1,0 +1,101 @@
+[
+    {
+      "id": 53,
+      "title": "쿠폰 테스트",
+      "content": "설명은 10자 이상이 되어야합니다.",
+      "stock": 100,
+      "price": 40000,
+      "expiresAt": "2025-06-29T16:00:00",
+      "userIssued": false
+    },
+    {
+      "id": 13,
+      "title": "Previous Coupon 12",
+      "content": "Start in future",
+      "stock": 13,
+      "price": 2100,
+      "expiresAt": "2025-06-15T23:59:59",
+      "userIssued": false
+    },
+    {
+      "id": 12,
+      "title": "Previous Coupon 11",
+      "content": "Start in future",
+      "stock": 11,
+      "price": 2000,
+      "expiresAt": "2025-06-15T23:59:59",
+      "userIssued": false
+    },
+    {
+      "id": 11,
+      "title": "Previous Coupon 10",
+      "content": "Start in future",
+      "stock": 16,
+      "price": 1900,
+      "expiresAt": "2025-06-15T23:59:59",
+      "userIssued": false
+    },
+    {
+      "id": 10,
+      "title": "Previous Coupon 09",
+      "content": "Start in future",
+      "stock": 14,
+      "price": 1800,
+      "expiresAt": "2025-06-15T23:59:59",
+      "userIssued": false
+    },
+    {
+      "id": 9,
+      "title": "Previous Coupon 08",
+      "content": "Start in future",
+      "stock": 17,
+      "price": 1700,
+      "expiresAt": "2025-06-15T23:59:59",
+      "userIssued": false
+    },
+    {
+      "id": 8,
+      "title": "Previous Coupon 07",
+      "content": "Start in future",
+      "stock": 8,
+      "price": 1600,
+      "expiresAt": "2025-06-15T23:59:59",
+      "userIssued": false
+    },
+    {
+      "id": 7,
+      "title": "Previous Coupon 06",
+      "content": "Start in future",
+      "stock": 12,
+      "price": 1400,
+      "expiresAt": "2025-06-15T23:59:59",
+      "userIssued": false
+    },
+    {
+      "id": 6,
+      "title": "Previous Coupon 05",
+      "content": "Start in future",
+      "stock": 30,
+      "price": 1300,
+      "expiresAt": "2025-06-15T23:59:59",
+      "userIssued": false
+    },
+    {
+      "id": 5,
+      "title": "Previous Coupon 04",
+      "content": "Start in future",
+      "stock": 25,
+      "price": 1100,
+      "expiresAt": "2025-06-15T23:59:59",
+      "userIssued": false
+    },
+    {
+      "id": 4,
+      "title": "Previous Coupon 03",
+      "content": "Start in future",
+      "stock": 20,
+      "price": 1500,
+      "expiresAt": "2025-06-15T23:59:59",
+      "userIssued": false
+    }
+]

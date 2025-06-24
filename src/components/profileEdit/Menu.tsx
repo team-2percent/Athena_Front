@@ -1,7 +1,5 @@
 "use client"
 
-import { useState } from "react"
-
 interface MenuProps {
     menus: {
         id: number

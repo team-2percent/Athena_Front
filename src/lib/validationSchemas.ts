@@ -238,8 +238,7 @@ export const emailSchema = z.string()
   .refine((val) => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i.test(val), "올바른 이메일 형식이 아닙니다.")
 
 export const passwordSchema = z.string()
-  .max(PASSWORD_MAX_LENGTH, `${PASSWORD_MAX_LENGTH}자 이내로 입력해주세요.`)
-  .min(PASSWORD_MIN_LENGTH, `${PASSWORD_MIN_LENGTH}자 이상 입력해주세요.`)
+  .min(1, "비밀번호를 입력해주세요.")
 
 export const newPasswordSchema = z.string()
   .max(PASSWORD_MAX_LENGTH, `${PASSWORD_MAX_LENGTH}자 이내로 입력해주세요.`)
@@ -328,13 +327,14 @@ export const signupSchema = z.object({
   email: emailSchema,
   password: newPasswordSchema,
   passwordConfirm: passwordSchema,
+  passwordMatch: passwordMatchSchema,
 })
 
 // 프로필 수정 스키마
 export const profileEditSchema = z.object({
   nickname: nicknameSchema,
   sellerDescription: sellerDescriptionSchema,
-  profileImage: imageSchema.nullable(),
+  profileImage: imageSchema.optional().nullable(),
   linkUrl: linkUrlsSchema,
 })
 
@@ -381,9 +381,9 @@ export const couponPeriodSchema = z.object({
 
 export const couponExpireSchema = z.object({
   endAt: z.date(),
-  expiresAt: z.date(),
+  expireAt: z.date(),
 }).refine((data) => {
-    const hourDiff = (data.expiresAt.getTime() - data.endAt.getTime()) / (1000 * 60 * 60);
+    const hourDiff = (data.expireAt.getTime() - data.endAt.getTime()) / (1000 * 60 * 60);
     return hourDiff >= COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR;
 }, {
     message: `만료 기간은 발급 종료일로부터 최소 ${COUPON_EVENT_END_TO_EXPIRE_MIN_HOUR}시간 이상이어야 합니다.`

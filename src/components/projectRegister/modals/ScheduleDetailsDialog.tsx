@@ -1,6 +1,7 @@
 import { useState } from "react"
 import Modal from "../../common/Modal"
 import { PrimaryButton } from "../../common/Button"
+import { TextInput } from "@/components/common/Input"
 
 interface ScheduleDetailsDialogProps {
   isOpen: boolean
@@ -35,15 +36,12 @@ export default function ScheduleDetailsDialog({ isOpen, onClose, details, onSave
         >
           일정 상세 내용
         </label>
-        <input
+        <TextInput
           id="schedule-details"
-          type="text"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="이 일정에 대한 상세 내용을 입력하세요"
           className={`w-full p-4 border rounded-xl ${focusedField ? "border-secondary-color-dark" : "border-gray-300"} focus:outline-none`}
-          onFocus={() => setFocusedField(true)}
-          onBlur={() => setFocusedField(false)}
         />
         <p className="text-sm text-gray-500 mt-2">* 간단하게 입력해주세요. 줄바꿈은 불가능합니다.</p>
       </div>

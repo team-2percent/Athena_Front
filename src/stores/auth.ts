@@ -7,25 +7,33 @@ interface AuthStore {
   isLoggedIn: boolean;
   role: UserRole;
   userId: number | null;
-  hydrated: boolean;
   fcmToken: string | null;
   setLoggedIn: (loggedIn: boolean) => void;
-  setRole: (role: UserRole) => void;
+  setRole: (role: string) => void;
   setUserId: (userId: number | null) => void;
   setFcmToken: (fcmToken: string | null) => void;
   login: (accessToken: string, userId: number) => void;
   logout: () => void;
-  setHydrated: (hydrated: boolean) => void;
 }
 
 const useAuthStore = create<AuthStore>((set) => ({
   isLoggedIn: false,
   role: "",
   userId: null,
-  hydrated: false,
   fcmToken: null,
   setLoggedIn: (loggedIn) => set({ isLoggedIn: loggedIn }),
-  setRole: (role) => set({ role }),
+  setRole: (role) => {
+    if (role !== 'ROLE_ADMIN' && role !== 'ROLE_USER') { 
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("userId");
+      }
+      set({ isLoggedIn: false, role: "", userId: null });
+      return;
+    } else {
+      set({ role })
+    }
+  },
   setUserId: (userId) => set({ userId }),
   setFcmToken: (fcmToken) => set({ fcmToken }),
   login: (accessToken, userId) => {
@@ -33,8 +41,11 @@ const useAuthStore = create<AuthStore>((set) => ({
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("userId", userId.toString());
     }
-    const { role } = jwtDecode<{ role: UserRole }>(accessToken);
-    set({ isLoggedIn: true, role, userId })
+    const { role } = jwtDecode<{ role: string }>(accessToken);
+    const store = useAuthStore.getState();
+    store.setLoggedIn(true);
+    store.setRole(role);
+    store.setUserId(userId);
     },
   logout: () => {
     if (typeof window !== "undefined") {
@@ -43,7 +54,6 @@ const useAuthStore = create<AuthStore>((set) => ({
     }
     set({ isLoggedIn: false, role: "", userId: null, fcmToken: null })
   },
-  setHydrated: (hydrated) => set({ hydrated }),
 }))
 
 export default useAuthStore

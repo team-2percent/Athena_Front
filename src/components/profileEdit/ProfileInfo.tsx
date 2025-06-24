@@ -5,13 +5,17 @@ import { Camera, Check, Plus, X } from "lucide-react"
 import { TextInput } from "../common/Input"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
-import { CancelButton, PrimaryButton, SecondaryButton } from "../common/Button"
+import { CancelButton, DangerButton, PrimaryButton, SecondaryButton } from "../common/Button"
 import { LINK_URLS_MAX_BYTE, NICKNAME_MAX_LENGTH, SELLER_DESCRIPTION_MAX_LENGTH } from "@/lib/validationConstant"
 import TextArea from "../common/TextArea"
 import InputInfo from "../common/InputInfo"
 import { imageSchema, nicknameSchema, profileEditSchema, profileUrlSchema, sellerDescriptionSchema } from "@/lib/validationSchemas"
 import { getByteLength } from "@/lib/utils"
 import useErrorToastStore from "@/stores/useErrorToastStore"
+import { validate, getValidatedString, getValidatedStringByte } from "@/lib/validationUtil"
+import OverlaySpinner from "../common/OverlaySpinner"
+import ServerError from "../common/ServerErrorComponent"
+import AlertModal from "../common/AlertModal"
 
 interface Profile {
     nickname: string
@@ -42,7 +46,7 @@ interface LoadResponse {
 interface PutResponse {
     nickname: string
     imageUrl: string | null
-    sellerDescription: string
+    sellerIntroduction: string
     linkUrl: string
 }
 
@@ -56,6 +60,8 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
     const { showErrorToast } = useErrorToastStore();
     const [addingUrl, setAddingUrl] = useState(false)
     const [newUrl, setNewUrl] = useState("")
+    const [error, setError] = useState(false)
+    const [isFileError, setIsFileError] = useState(false)
 
     const [prevProfile, setPrevProfile] = useState<Profile>({
         nickname: "",
@@ -77,17 +83,21 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     // 저장 가능 여부
+    const validationError = validate({
+        nickname: profile.nickname,
+        sellerDescription: profile.sellerDescription,
+        linkUrl: profile.linkUrls.join(","),
+        profileImage: profile.imageFile ? profile.imageFile : null,
+    }, profileEditSchema)
+    
     const saveable = (profile.nickname !== prevProfile.nickname || 
         profile.email !== prevProfile.email || 
         profile.sellerDescription !== prevProfile.sellerDescription || 
-        profile.linkUrls.join(",") !== prevProfile.linkUrl.split(",").join(","))
+        profile.linkUrls.join(",") !== prevProfile.linkUrl.split(",").join(",") ||
+        profile.imageFile !== null
+    )
         &&
-        profileEditSchema.safeParse({
-            nickname: profile.nickname,
-            sellerDescription: profile.sellerDescription,
-            profileImage: profile.imageFile,
-            linkUrl: profile.linkUrls.join(","),
-        }).success
+        !validationError.error
 
     const [profileEditError, setProfileEditError] = useState({
         nickname: "",
@@ -100,7 +110,10 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
 
     // 정보 조회
     const loadData = () => {
-        apiCall<LoadResponse>(`/api/user/${userId}`, "GET").then(({ data }) => {
+        apiCall<LoadResponse>(`/api/user/${userId}`, "GET").then(({ data, error, status }) => {
+            if (error && status === 500) {
+                setError(true)
+            }
             if (data) {
                 setPrevProfile({
                     nickname: data.nickname,
@@ -132,29 +145,11 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                     ...prev,
                     nickname: data.nickname,
                     imageUrl: data.imageUrl,
-                    sellerDescription: data.sellerDescription,
+                    sellerDescription: data.sellerIntroduction,
                     linkUrl: data.linkUrl
                 }))
             }
         })
-    }
-    
-    // 프로필 이미지 업로드 핸들러
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (file && validateImage(file)) {
-          const reader = new FileReader()
-          reader.onload = (e) => {
-            if (e.target?.result) {
-              setProfile({
-                ...profile,
-                image: e.target.result as string,
-                imageFile: file
-              })
-            }
-          }
-          reader.readAsDataURL(file)
-        }
     }
 
     // 프로필 이미지 삭제 핸들러
@@ -164,9 +159,7 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
             image: null,
             imageFile: null
         })
-        if (fileInputRef.current) {
-            fileInputRef.current.value = ""
-        }
+        if (fileInputRef.current) fileInputRef.current.value = ""
     }
     
     // 링크 핸들러
@@ -176,7 +169,6 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
     }
 
     const handleUrlAdd = () => {
-        if (profileEditError.urls) return;
         setProfile(prev => ({
             ...prev,
             linkUrls: [...prev.linkUrls, newUrl]
@@ -192,84 +184,63 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
         }))
     }
 
-    // 유효성 검사
-    const validateNickname = (nickname: string) => {
-        const result = nicknameSchema.safeParse(nickname)
-        setProfileEditError(prev => ({
-            ...prev,
-            nickname: result.success ? "" : result.error.issues[0].message
-        }))
-
-        return nickname.slice(0, NICKNAME_MAX_LENGTH)
-    }
-
-    const validateImage = (image: File) => {
-        const result = imageSchema.safeParse(image)
-        if (!result.success) {
-            setProfileEditError(prev => ({
-                ...prev,
-                profileImage: result.error.issues[0].message
-            }))
-            return false
-        } 
-        return true
-    }
-
-    const validateSellerDescription = (sellerDescription: string) => {
-        const result = sellerDescriptionSchema.safeParse(sellerDescription)
-
-        setProfileEditError(prev => ({
-            ...prev,
-            sellerDescription: result.error?.issues[0].message || ""
-        }))
-
-        return sellerDescription.slice(0, SELLER_DESCRIPTION_MAX_LENGTH)
-    }
-
-    const validateUrl = (url: string) => {
-        const result = profileUrlSchema.safeParse({
-            url: url,
-            linkUrl: profile.linkUrls.join(",")
-        })
-        return result.success ? "" : result.error?.issues[0].message || ""
-    }
-
     const handleChangeNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const nickname = validateNickname(e.target.value)
+        const result = validate(e.target.value, nicknameSchema)
+        setProfileEditError(prev => ({
+            ...prev,
+            nickname: result.message
+        }))
         setProfile(prev => ({
             ...prev,
-            nickname: nickname
+            nickname: getValidatedString(e.target.value, NICKNAME_MAX_LENGTH)
         }))
+    }
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            const result = validate(file, imageSchema)
+            if (!result.error)  {
+                const reader = new FileReader()
+                reader.onload = (e) => {
+                    if (e.target?.result) {
+                    setProfile({
+                        ...profile,
+                        image: e.target.result as string,
+                        imageFile: file
+                    })
+                    }
+                }
+                reader.readAsDataURL(file)
+            } else {
+                setIsFileError(true)
+            }
+        }
     }
 
     const handleChangeSellerDescription = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const sellerDescription = validateSellerDescription(e.target.value)
+        const result = validate(e.target.value, sellerDescriptionSchema)
+        setProfileEditError(prev => ({
+            ...prev,
+            sellerDescription: result.message
+        }))
         setProfile(prev => ({
             ...prev,
-            sellerDescription: sellerDescription
+            sellerDescription: getValidatedString(e.target.value, SELLER_DESCRIPTION_MAX_LENGTH)
         }))
     }
 
     const handleChangeUrl = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const message = validateUrl(e.target.value)
+        const result = validate({
+            url: e.target.value,
+            linkUrl: profile.linkUrls.join(",")
+        }, profileUrlSchema)
         setProfileEditError(prev => ({
             ...prev,
-            urls: message
+            urls: result.message
         }))
-        
-        const currentUrlsBytes = getByteLength(profile.linkUrls.join(","))
-        const newUrlBytes = getByteLength(e.target.value)
-        
-        if (newUrlBytes + currentUrlsBytes > LINK_URLS_MAX_BYTE - 1) {
-            // 바이트 제한을 초과하지 않는 최대 길이 찾기
-            let slicedUrl = e.target.value
-            while (getByteLength(slicedUrl) + currentUrlsBytes > LINK_URLS_MAX_BYTE - 1) {
-                slicedUrl = slicedUrl.slice(0, -1)
-            }
-            setNewUrl(slicedUrl)
-        } else {
-            setNewUrl(e.target.value)
-        }
+        const limitBytes = LINK_URLS_MAX_BYTE - getByteLength(profile.linkUrls.join(","))
+        setNewUrl(getValidatedStringByte(e.target.value, limitBytes))
     }
     
     // 전체 저장 핸들러
@@ -277,35 +248,22 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
         saveData();
     }
 
-    useEffect(() => {
-        if (userId) loadData();
-    }, [userId])
-
-    useEffect(() => {
-        setProfile(prev => ({
-            ...prev,
-            nickname: prevProfile.nickname,
-            email: prevProfile.email,
-            image: prevProfile.imageUrl,
-            sellerDescription: prevProfile.sellerDescription,
-            linkUrls: prevProfile.linkUrl === "" ? [] : prevProfile.linkUrl.split(",")
-        }))
-    }, [prevProfile])
-
-    return (
-        <div className="flex flex-col gap-4">
-            <div className="flex gap-5 flex-wrap justify-center">
+    const render = () => {
+        if (isLoading) return <OverlaySpinner message="프로필 정보를 불러오는 중입니다." />
+        else if (error) return <ServerError message="프로필 정보를 불러오는 중에 오류가 발생했습니다." onRetry={loadData} />
+        else return (
+            <div className="flex flex-col gap-4">
+                <div className="flex gap-5 flex-wrap justify-center">
                 {/* 프로필 이미지 섹션 */}
                 <div className="flex flex-col items-center bg-white rounded-lg shadow py-6 px-10 space-y-4">
                     <h3 className="text-lg font-medium">프로필 이미지</h3>                            
                     <div className="relative w-fit">
-                        <button
-                            type="button"
-                            className="bg-red-500 p-1 rounded-full absolute top-0 right-0"
+                        <DangerButton
+                            className="p-1 rounded-full absolute top-0 right-0"
                             onClick={handleRemoveImage}
                         >
-                            <X className="h-3 w-3 text-white"/>
-                        </button>
+                            <X className="h-3 w-3"/>
+                        </DangerButton>
                         <div className="relative w-32 h-32 overflow-hidden rounded-full mb-4">
                             {profile.image ? (
                             <img
@@ -327,6 +285,7 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                         onChange={handleImageUpload}
                         className="hidden"
                         id="profile-image"
+                        data-cy="profile-image-input"
                     />
                     <label
                         htmlFor="profile-image"
@@ -444,10 +403,40 @@ export default function ProfileInfo({ onTo }: ProfileInfoProps) {
                     disabled={!saveable}
                     onClick={handleSave}
                     dataCy="save-button"
+                    isLoading={isLoading}
                 >
                 저장
                 </PrimaryButton>
-            </div>  
-        </div>
+            </div>
+            </div>
+        )
+    }
+
+    useEffect(() => {
+        if (userId) loadData();
+    }, [userId])
+
+    useEffect(() => {
+        setProfile(prev => ({
+            ...prev,
+            nickname: prevProfile.nickname,
+            email: prevProfile.email,
+            image: prevProfile.imageUrl,
+            sellerDescription: prevProfile.sellerDescription,
+            linkUrls: prevProfile.linkUrl === "" ? [] : prevProfile.linkUrl.split(",")
+        }))
+    }, [prevProfile])
+
+    return (
+        <>
+            <AlertModal
+                isOpen={isFileError}
+                message="파일 형식이 올바르지 않습니다."
+                onClose={() => setIsFileError(false)}
+                dataCy="file-upload-error-modal"
+            />
+            {render()}
+        </>
     )
+    
 }

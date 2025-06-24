@@ -10,7 +10,7 @@ import { useParams } from "next/navigation";
 import OverlaySpinner from "@/components/common/OverlaySpinner"
 import { useEffect } from "react";
 import { formatDateInAdmin } from "@/lib/utils"
-import { PrimaryButton, SecondaryButton } from "@/components/common/Button";
+import { GhostButton, PrimaryButton, SecondaryButton } from "@/components/common/Button";
 import useErrorToastStore from "@/stores/useErrorToastStore";
 import ServerErrorComponent from "@/components/common/ServerErrorComponent";
 
@@ -213,17 +213,17 @@ export default function ProjectApprovalDetailPage() {
             </div>
 
             {/* 판매자 정보 */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4" data-cy="project-detail-seller">
                 <h2 className="text-2xl font-medium border-b pb-2">판매자 정보</h2>
                 <div className="flex items-center mt-4 justify-between">
                     <div className="flex items-center gap-4">
-                        <button className="h-16 w-16 overflow-hidden rounded-full">
+                        {/* <button className="h-16 w-16 overflow-hidden rounded-full">
                             <img
-                                src={project.sellerResponse.linkUrl}
+                                src={project.sellerResponse.linkUrl || "/images/default-profile.png"}
                                 alt="프로필 이미지"
                                 className="h-full w-full object-cover"
                             />
-                        </button>
+                        </button> */}
                         <div className="flex flex-col">
                             <span className="text-xl font-medium">{project.sellerResponse.nickname}</span>
                             <span className="text-sm text-gray-500">{project.sellerResponse.sellerIntroduction}</span>
@@ -247,10 +247,10 @@ export default function ProjectApprovalDetailPage() {
         <div className="flex flex-col gap-6 mx-auto w-[var(--content-width)] py-8">
             {isLoading && <OverlaySpinner message="처리 중입니다."/>}
             <div className="flex w-full">
-            <button className="text-sm text-gray-500 flex items-center gap-2" onClick={() => router.back()}>
-                <ArrowLeftIcon className="w-4 h-4" />
-                목록으로
-            </button>
+                <GhostButton onClick={() => router.push("/admin/approval")} className="flex gap-1 items-center" dataCy="back-to-list-button">
+                    <ArrowLeftIcon className="w-4 h-4" />
+                    목록으로
+                </GhostButton>
             </div>
             
             {renderProject()}
@@ -313,6 +313,7 @@ export default function ProjectApprovalDetailPage() {
                     onConfirm={handleConfirm}
                     onClose={() => setIsModalOpen(false)}
                     dataCy="project-approve-modal"
+                    isLoading={isLoading}
                 />
             }
         </div>

@@ -6,12 +6,16 @@ import AddressModal from "./AddressModal"
 import { useApi } from "@/hooks/useApi"
 
 import ConfirmModal from "../common/ConfirmModal"
-import { PrimaryButton } from "../common/Button"
+import { GhostDangerButton, PrimaryButton } from "../common/Button"
 import { TextInput } from "../common/Input"
 import { ADDRESS_DETAIL_MAX_LENGTH } from "@/lib/validationConstant"
 import { addressAddSchema, addressDetailSchema, addressSchema } from "@/lib/validationSchemas"
 import InputInfo from "../common/InputInfo"
 import useErrorToastStore from "@/stores/useErrorToastStore"
+import { validate, getValidatedString } from "@/lib/validationUtil"
+import { error } from "console"
+import EmptyMessage from "../common/EmptyMessage"
+import ServerErrorComponent from "../common/ServerErrorComponent"
 
 interface AddressInfo {
     id: number
@@ -47,6 +51,8 @@ export default function AddressInfo() {
         zipcode: ''
     })
 
+    const [error, setError] = useState<boolean>(false)
+
     const addButtonDisabled = addressAddSchema.safeParse(newAddress).error !== undefined;
 
     const initNewAddress = () => {
@@ -62,8 +68,10 @@ export default function AddressInfo() {
     }
 
     const loadData = () => {
-        apiCall<AddressInfo[]>("/api/delivery/delivery-info", "GET").then(({ data }) => {
+        setError(false)
+        apiCall<AddressInfo[]>("/api/delivery/delivery-info", "GET").then(({ data, error, status }) => {
             if (data) setAddresses(data)
+            else if (error && status === 500) setError(true)
         })
     }
 
@@ -98,41 +106,13 @@ export default function AddressInfo() {
         setIsAddressModalOpen(true)
     }
 
-    const validateAddress = () => {
-        const result = addressSchema.safeParse(newAddress.address)
-        return result.error ? result.error.issues[0].message : "";
-    }
-
-    const validateDetailAddress = (detailAddress: string) => {
-        const result = addressDetailSchema.safeParse(detailAddress)
-        if (result.success) {
-            return {
-                value: detailAddress,
-                error: ""
-            }
-        } else if (detailAddress.length > ADDRESS_DETAIL_MAX_LENGTH) {
-            return {
-                value: detailAddress.slice(0, ADDRESS_DETAIL_MAX_LENGTH),
-                error: result.error?.issues[0].message
-            }
-        } 
-        return {
-            value: "",
-            error: result.error?.issues[0].message || ""
-        }
-    }
-
     const handleChangeDetailAddress = (e: React.ChangeEvent<HTMLInputElement>) => { 
-        const addressError = validateAddress();
-        const { value, error } = validateDetailAddress(e.target.value)
+        const addressResult = validate(newAddress.address, addressSchema)
+        const detailResult = validate(e.target.value, addressDetailSchema)
+        setAddressAddError(prev => ({ ...prev, address: addressResult.message, detailAddress: detailResult.message }))
         setNewAddress(prev => ({
             ...prev,
-            detailAddress: value,
-        }))
-        setAddressAddError(prev => ({
-            ...prev,
-            address: addressError,
-            detailAddress: error
+            detailAddress: getValidatedString(e.target.value, ADDRESS_DETAIL_MAX_LENGTH),
         }))
     }
 
@@ -174,6 +154,52 @@ export default function AddressInfo() {
         setIsDefaultModalOpen(true)
     }
 
+    const renderAddressList = () => {
+        if (error) return <ServerErrorComponent message="배송지 조회에 실패했습니다." onRetry={loadData} />
+        if (addresses.length === 0) return <EmptyMessage message="등록된 배송지가 없습니다." />
+        return (
+            <div className="space-y-4 mt-2">
+                {addresses.map(address => (
+                    <div key={address.id} className="border rounded-md p-4 relative" data-cy="address-list-item">
+                        <div className="flex justify-between items-start">
+                            <div className="flex items-start">
+                                <div>
+                                    <div className="flex items-center">
+                                        <p className="font-medium" data-cy="address">{address.address}</p>
+                                    {address.isDefault ? 
+                                        <span
+                                            className="ml-2 px-2 py-0.5 bg-pink-100 text-secondary-color-dark text-xs rounded-full"
+                                            data-cy="default-address-badge"
+                                        >기본</span>
+                                        :
+                                        <button
+                                            className="border-box ml-2 px-2 py-0.5 text-xs text-main-color underline"
+                                            onClick={() => handleClickSetDefaultButton(address.id)}
+                                            data-cy="default-address-change-button"
+                                        >기본 배송지로 설정</button>
+                                    }
+                                    </div>
+                                    <p className="text-sm text-gray-500 mt-1" data-cy="detail-address">
+                                    [{address.zipcode}] {address.detailAddress && <span className="text-sm text-gray-500">{address.detailAddress}</span>}
+                                    </p>
+                                </div>
+                            </div>
+                            {!address.isDefault && 
+                            <GhostDangerButton
+                                onClick={() => handleClickDeleteButton(address.id)}
+                                className="w-fit h-fit p-2 rounded-full"
+                                dataCy="address-delete-button"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </GhostDangerButton>
+                            }
+                        </div>
+                    </div>
+                ))}
+            </div>
+        )
+    }
+
     useEffect(() => {
         loadData()
     }, [])
@@ -182,17 +208,19 @@ export default function AddressInfo() {
         <div className="flex gap-4">
             <ConfirmModal
                 isOpen={isDefaultModalOpen}
-                message={"기본 계좌로 설정할까요?"}
+                message={"기본 배송지로 설정할까요?"}
                 onConfirm={setDefaultDelivery}
                 onClose={() => setIsDefaultModalOpen(false)}
                 dataCy="default-address-confirm-modal"
+                isLoading={isLoading}
             />
             <ConfirmModal
                 isOpen={isDeleteModalOpen}
-                message={"계좌를 삭제할까요?"}
+                message={"배송지를 삭제할까요?"}
                 onConfirm={deleteDelivery}
                 onClose={() => setIsDeleteModalOpen(false)}
                 dataCy="delete-address-confirm-modal"
+                isLoading={isLoading}
             />
             <div className="flex-1 bg-white rounded-lg shadow py-6 px-10" data-cy="address-add-form">
                 <h3 className="text-lg font-medium mb-6">배송지 추가</h3>
@@ -237,8 +265,9 @@ export default function AddressInfo() {
                                 className="flex items-center"
                                 disabled={addButtonDisabled}
                                 dataCy="address-add-button"
+                                isLoading={isLoading}
                             >
-                                <Plus className="w-4 h-4 mr-1" /> 배송지 추가
+                                배송지 추가
                             </PrimaryButton>
                         </div>
                     </div>
@@ -248,50 +277,7 @@ export default function AddressInfo() {
                 {/* 배송지 목록 */}
                 <h3 className="text-lg font-medium mb-6">등록된 배송지 목록</h3>
                 <div className="flex-1 flex flex-col gap-4">
-                    {addresses.length === 0 ? 
-                        <p className="text-gray-500 text-center py-4">등록된 배송지가 없습니다.</p>
-                    : 
-                        <div className="space-y-4 mt-2">
-                            {addresses.map(address => (
-                                <div key={address.id} className="border rounded-md p-4 relative" data-cy="address-list-item">
-                                    <div className="flex justify-between items-start">
-                                        <div className="flex items-start">
-                                            <div>
-                                                <div className="flex items-center">
-                                                    <p className="font-medium">{address.address}</p>
-                                                {address.isDefault ? 
-                                                    <span
-                                                        className="ml-2 px-2 py-0.5 bg-pink-100 text-secondary-color-dark text-xs rounded-full"
-                                                        data-cy="default-address-mark"
-                                                    >기본</span>
-                                                    :
-                                                    <button
-                                                        className="border-box ml-2 px-2 py-0.5 text-xs text-main-color underline"
-                                                        onClick={() => handleClickSetDefaultButton(address.id)}
-                                                        data-cy="default-address-change-button"
-                                                    >기본 계좌로 설정</button>
-                                                }
-                                                </div>
-                                                <p className="text-sm text-gray-500 mt-1">
-                                                [{address.zipcode}] {address.detailAddress && <span className="text-sm text-gray-500">{address.detailAddress}</span>}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        {!address.isDefault && 
-                                        <button
-                                        type="button"
-                                            onClick={() => handleClickDeleteButton(address.id)}
-                                            className="text-gray-400 hover:text-red-500"
-                                            data-cy="address-delete-button"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                        }
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    }
+                    {renderAddressList()}
                 </div>
             </div>
             {/* 배송지 주소 모달 */}

@@ -2,13 +2,14 @@
 
 import { useApi } from "@/hooks/useApi";
 import { PasswordInput } from "../common/Input";
-import { Check, X } from "lucide-react";
+import { Check } from "lucide-react";
 import { useState } from "react";
 import { PrimaryButton, CancelButton } from "../common/Button";
 import { newPasswordSchema, passwordEditSchema, passwordMatchSchema, passwordSchema } from "@/lib/validationSchemas";
 import InputInfo from "../common/InputInfo";
 import { PASSWORD_MAX_LENGTH } from "@/lib/validationConstant";
 import useErrorToastStore from "@/stores/useErrorToastStore";
+import { getValidatedString, validate } from "@/lib/validationUtil";
 
 interface PasswordInfoProps {
   onBack: () => void;
@@ -46,54 +47,39 @@ export default function PasswordInfo({ onBack }: PasswordInfoProps) {
         setNewPasswordConfirm("")
         setPasswordConfirmed(false)
     }
-    
-    const validatePassword = (value: string) => {
-        const result = passwordSchema.safeParse(value)
-        
-        setPasswordEditError({
-            ...passwordEditError,
-            password: result.success ? "" : result.error.issues[0].message,
-        })
-
-        return value.slice(0, PASSWORD_MAX_LENGTH)
-    }
-
-    const validateNewPassword = (value: string) => {
-        const result = newPasswordSchema.safeParse(value)
-        
-        setPasswordEditError({
-            ...passwordEditError,
-            newPassword: result.success ? "" : result.error.issues[0].message,
-        })
-
-        return value.slice(0, PASSWORD_MAX_LENGTH)
-    }
-
-    const validateConfirmPassword = (value: string) => {
-        const result = passwordSchema.safeParse(value)
-        const matchResult = passwordMatchSchema.safeParse({password: newPassword, passwordConfirm: value})
-        setPasswordEditError({
-            ...passwordEditError,
-            passwordConfirm: result.success && matchResult.success ? "" : result.error?.issues[0].message || matchResult.error?.issues[0].message || "",
-        })
-
-        return value.slice(0, PASSWORD_MAX_LENGTH)
-    }
 
     // 비밀번호 입력 핸들러
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const result = validatePassword(e.target.value);
-        setPassword(result)
+        const result = validate(e.target.value, passwordSchema);
+        if (result.error) {
+            setPasswordEditError({ ...passwordEditError, password: result.message })
+        } else {
+            setPasswordEditError({ ...passwordEditError, password: "" })
+        }
+        setPassword(getValidatedString(e.target.value, PASSWORD_MAX_LENGTH))
     }
 
     const handleNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const result = validateNewPassword(e.target.value);
-        setNewPassword(result)
+        const result = validate(e.target.value, newPasswordSchema);
+        if (result.error) {
+            setPasswordEditError({ ...passwordEditError, newPassword: result.message })
+        } else {
+            setPasswordEditError({ ...passwordEditError, newPassword: "" })
+        }
+        setNewPassword(getValidatedString(e.target.value, PASSWORD_MAX_LENGTH))
     }
 
     const handleNewPasswordConfirmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const result = validateConfirmPassword(e.target.value);
-        setNewPasswordConfirm(result)
+        const result = validate(e.target.value, passwordSchema);
+        const matchResult = validate({password: newPassword, passwordConfirm: e.target.value}, passwordMatchSchema);
+        if (result.error) {
+            setPasswordEditError({ ...passwordEditError, passwordConfirm: result.message })
+        } else if (matchResult.error) {
+            setPasswordEditError({ ...passwordEditError, passwordConfirm: matchResult.message })
+        } else {
+            setPasswordEditError({ ...passwordEditError, passwordConfirm: "" })
+        }
+        setNewPasswordConfirm(getValidatedString(e.target.value, PASSWORD_MAX_LENGTH))
     }
 
     // 비밀번호 확인 핸들러
@@ -148,20 +134,21 @@ export default function PasswordInfo({ onBack }: PasswordInfoProps) {
                             <div className="flex items-center">
                             {
                                 passwordConfirmed ?
-                                <Check className="w-4 h-4 text-green-500" data-cy="password-confirm-success"/>
+                                <Check className="w-4 h-4 text-green-500" data-cy="password-verify-success"/>
                                 :
                                 <div className="flex gap-2 items-center">
                                     <PrimaryButton
                                         type="submit"
                                         onClick={handlePasswordConfirm}
                                         className="px-3 py-2"
-                                        dataCy="password-confirm-button"
+                                        dataCy="password-verify-button"
                                         disabled={!!passwordEditError.password || !password}
+                                        isLoading={isLoading}
                                     >확인</PrimaryButton>
                                 </div>
                             }
                             </div>
-                            <InputInfo errorMessage={passwordConfirmError ||passwordEditError.password} errorMessageDataCy="password-error-message" />
+                            <InputInfo errorMessage={passwordConfirmError ||passwordEditError.password} errorMessageDataCy="password-verify-error-message" />
                         </div>
                     </div>
                     
@@ -198,6 +185,7 @@ export default function PasswordInfo({ onBack }: PasswordInfoProps) {
                         onClick={handleNewPasswordApply}
                         dataCy="password-save-button"
                         disabled={!disabled.success}
+                        isLoading={isLoading}
                     >
                         저장
                     </PrimaryButton>
