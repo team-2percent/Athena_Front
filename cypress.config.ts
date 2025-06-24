@@ -21,5 +21,6 @@ export default defineConfig({
     video: false,
     testIsolation: true,
     experimentalStudio: true,
+    chromeWebSecurity: false,
   },
 });

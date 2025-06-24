@@ -110,6 +110,16 @@ Cypress.Commands.add('visitMainPage', () => {
     fixture: 'categoryRankingView.json'
   }).as('getCategoryRankingView')
 
+  cy.intercept("GET", "**/*.{png,jpg,jpeg,webp}", req => {
+    req.reply({
+      statusCode: 200,
+      body: "",
+      headers: {
+            "Content-Type": "image/png",
+           },
+      })
+  }).as("stubImages")
+
   cy.visit('/', {
     onBeforeLoad(win: any) {
       // Firebase를 동기적으로 초기화
