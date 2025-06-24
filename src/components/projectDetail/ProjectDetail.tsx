@@ -2,6 +2,7 @@ import ProjectTabs from "./ProjectTabs"
 import ImageCarousel from "./client/ImageCarousel"
 import SharePopover from "./client/SharePopover"
 import DonateButton from "./client/DonateButton"
+import { calculateDaysLeft, calculateAchievementRate } from "@/lib/utils"
 
 // ProjectData 인터페이스 추가
 interface ProjectData {
@@ -51,28 +52,7 @@ const ProjectDetail = ({ projectData, isLoading, error }: ProjectDetailProps) =>
 
   const formatDate = (dateString: string) => {
     if (!dateString) return ""
-    const date = new Date(dateString)
-    return date
-      .toLocaleDateString("ko-KR", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      })
-      .replace(/\. /g, ". ")
-  }
-
-  const calculateDaysLeft = (endDate: string) => {
-    if (!endDate) return 0
-    const end = new Date(endDate)
-    const now = new Date()
-    const diffTime = end.getTime() - now.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    return diffDays
-  }
-
-  const calculateAchievementRate = (goal: number, current: number) => {
-    if (!goal || goal === 0) return 0
-    return Math.floor((current / goal) * 100)
+    return require("@/lib/utils").formatDate(new Date(dateString))
   }
 
   return (
