@@ -19,7 +19,7 @@ export default defineConfig({
     defaultCommandTimeout: 5000,
     screenshotOnRunFailure: false,
     video: false,
-    // 각 테스트 파일을 독립적으로 실행
     testIsolation: true,
+    experimentalStudio: true,
   },
 });
