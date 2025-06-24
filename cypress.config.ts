@@ -2,7 +2,7 @@ import { defineConfig } from "cypress";
 import { unlink } from 'fs/promises';
 
 export default defineConfig({
-  projectId: "rsnppr",
+  projectId: "7ovivy",
 
   e2e: {
     setupNodeEvents(on, config) {
@@ -17,5 +17,10 @@ export default defineConfig({
     },
     baseUrl: "http://localhost:3000",
     defaultCommandTimeout: 5000,
+    screenshotOnRunFailure: false,
+    video: false,
+    testIsolation: true,
+    experimentalStudio: true,
+    chromeWebSecurity: false,
   },
 });

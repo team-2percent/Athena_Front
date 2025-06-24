@@ -2,13 +2,11 @@ describe("사용자 인터랙션", () => {
     beforeEach(() => {
         // given - 메인 페이지 방문
         cy.visitMainPage()
+        cy.login()
     })
 
     describe("로그인 시 닉네임, 프로필 사진 확인", () => {
         it("로그인", () => {
-            // given - 로그인
-            cy.login()
-
             // then - 헤더 내 로그인, 회원가입 버튼 not.exist 확인, 헤더 내 닉네임, 프로필 사진 visible 확인
             cy.get('[data-cy="login-button"]').should('not.exist')
             cy.get('[data-cy="signup-button"]').should('not.exist')
@@ -18,11 +16,6 @@ describe("사용자 인터랙션", () => {
     })
 
     describe("사용자 메뉴", () => {
-        beforeEach(() => {
-            // given - 로그인
-            cy.login()
-        })
-
         describe("프로필 사진 클릭 시 사용자 메뉴 표시", () => {
             it("프로필 사진 클릭", () => {
                 // when - 프로필 사진 클릭
