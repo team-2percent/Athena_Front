@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import gsap from "gsap"
+import Image from "next/image"
 
 interface ImageCarouselProps {
   images: string[]
@@ -66,28 +67,26 @@ const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
         {images.length > 0 ? (
           <>
             {prevImageIndex !== null && prevImageIndex !== currentImageIndex && (
-              <img
+              <Image
                 data-cy="project-image"
                 key={prevImageIndex}
                 ref={el => { imageRefs.current[0] = el }}
                 src={images[prevImageIndex] || "/placeholder.svg"}
                 alt={title}
-                className="absolute top-0 left-0 h-full w-full object-cover"
+                className="absolute top-0 left-0 object-cover"
                 style={{ zIndex: 1 }}
-                loading="lazy"
-                decoding="async"
+                fill
               />
             )}
-            <img
+            <Image
               data-cy="project-image"
               key={currentImageIndex}
               ref={el => { imageRefs.current[1] = el }}
               src={images[currentImageIndex] || "/placeholder.svg"}
               alt={title}
-              className="absolute top-0 left-0 h-full w-full object-cover"
+              className="absolute top-0 left-0 object-cover"
               style={{ zIndex: 2 }}
-              loading={currentImageIndex === 0 ? "eager" : "lazy"}
-              decoding={currentImageIndex === 0 ? "sync" : "async"}
+              fill
             />
             {images.length > 1 && (
               <>
@@ -130,12 +129,11 @@ const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
                 onClick={() => !isSliding && setCurrentImageIndex(idx)}
               >
                 <div className="relative h-20 w-20">
-                  <img
+                  <Image
                     src={img || "/placeholder.svg"}
                     alt={`프로젝트 이미지 ${idx + 1}`}
                     className="w-full h-full object-cover"
-                    loading="lazy"
-                    decoding="async"
+                    fill
                   />
                 </div>
               </div>
