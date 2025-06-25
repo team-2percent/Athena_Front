@@ -8,10 +8,10 @@ describe("메인 페이지 내 프로젝트 조회", () => {
       it("GET 요청 중", () => {
         // when - 페이지 방문 (API 요청 시작)
         cy.fixture('planRankingView.json').then((planRankingView) => {
-          cy.task('mockApiResponse', { operationName: 'planRankingView', data: planRankingView });
+          cy.task('mockApiResponse', { endpoint: '/api/project/planRankingView', data: planRankingView });
         })
         cy.fixture('categoryRankingView.json').then((categoryRankingView) => {
-          cy.task('mockApiResponse', { operationName: 'categoryRankingView', data: categoryRankingView });
+          cy.task('mockApiResponse', { endpoint: '/api/project/categoryRankingView', data: categoryRankingView });
         })
 
         cy.visit('/')

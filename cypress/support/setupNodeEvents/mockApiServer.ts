@@ -50,39 +50,26 @@ class MockApiServer {
       }
     }
     
-    mockResponse({ operationName, data }: { operationName: string; data: any }) {
+    mockResponse({ endpoint, data }: { endpoint: string; data: any }) {
       if (!this.isRunning) {
         console.warn('Mock API server is not running. Starting it now...');
         this.start();
       }
-      
-      const endpoint = this.getEndpointForOperation(operationName);
       
       this.server
         .forGet(endpoint)
         .thenJson(200, data);
     }
     
-    mockErrorResponse({ operationName, message }: { operationName: string; message: string }) {
+    mockErrorResponse({ endpoint, message }: { endpoint: string; message: string }) {
       if (!this.isRunning) {
         console.warn('Mock API server is not running. Starting it now...');
         this.start();
       }
       
-      const endpoint = this.getEndpointForOperation(operationName);
-      
       this.server
         .forGet(endpoint)
         .thenJson(500, { error: message });
-    }
-    
-    private getEndpointForOperation(operationName: string): string {
-      const endpointMap: Record<string, string> = {
-        'planRankingView': '/api/project/planRankingView',
-        'categoryRankingView': '/api/project/categoryRankingView',
-      };
-      
-      return endpointMap[operationName] || `/api/${operationName}`;
     }
   }
   
