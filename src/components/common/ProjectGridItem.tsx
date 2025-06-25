@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import clsx from "clsx"
 import Image from "next/image"
+import customLoader from "@/lib/customLoader"
 
 interface ProjectCardProps {
   id: number
@@ -82,6 +83,7 @@ export default function ProjectCard({
             </div>
           )}
           <Image
+            loader={customLoader}
             src={imageUrl || "/placeholder/project-placeholder.png"}
             alt={projectName}
             className="rounded-lg"

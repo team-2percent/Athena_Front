@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import gsap from "gsap"
 import Image from "next/image"
+import customLoader from "@/lib/customLoader"
 
 interface ImageCarouselProps {
   images: string[]
@@ -68,6 +69,7 @@ const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
           <>
             {prevImageIndex !== null && prevImageIndex !== currentImageIndex && (
               <Image
+                loader={customLoader}
                 data-cy="project-image"
                 key={prevImageIndex}
                 ref={el => { imageRefs.current[0] = el }}
@@ -79,6 +81,7 @@ const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
               />
             )}
             <Image
+              loader={customLoader}
               data-cy="project-image"
               key={currentImageIndex}
               ref={el => { imageRefs.current[1] = el }}
@@ -130,6 +133,7 @@ const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
               >
                 <div className="relative h-20 w-20">
                   <Image
+                    loader={customLoader}
                     src={img || "/placeholder.svg"}
                     alt={`프로젝트 이미지 ${idx + 1}`}
                     className="w-full h-full object-cover"

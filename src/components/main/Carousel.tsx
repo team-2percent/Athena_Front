@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 import gsap from "gsap"
 import CarouselSkeleton from "./CarouselSkeleton"
 import Image from "next/image"
+import customLoader from "@/lib/customLoader"
 
 function Carousel({ projects }: { projects: MainProject[] }) {
   const router = useRouter();
@@ -192,6 +193,7 @@ function Carousel({ projects }: { projects: MainProject[] }) {
                 onClick={() => router.push(`/project/${project.projectId}`)}
               >
                 <Image
+                  loader={customLoader}
                   src={project.imageUrl || "/placeholder/project-placeholder.png"}
                   alt={project.title}
                   className="w-full h-full object-cover"

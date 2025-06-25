@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import customLoader from "@/lib/customLoader"
 
 interface FollowItemProps {
   id: number
@@ -27,6 +28,7 @@ export default function FollowItem({ id, username, oneLinear, profileImage, isFo
         <div className="flex items-center">
           <div className="w-12 h-12 md:w-20 md:h-20 rounded-full bg-gray-200 overflow-hidden mr-4 md:mr-6">
             <Image
+              loader={customLoader}
               src={profileImage || "/placeholder.svg"}
               alt={`${username}의 프로필 이미지`}
               className="w-full h-full object-cover"
