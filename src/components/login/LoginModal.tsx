@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useApi } from "@/hooks/useApi"
 import useAuthStore from "@/stores/auth"
 import Modal from "@/components/common/Modal"
@@ -58,7 +58,7 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
     e.preventDefault()
     setIsLoading(true)
     const { data, error } = await apiCall<any>("/api/user/login", "POST", { email, password })
-    setIsLoading(false)
+    
     if (error) {
       setErrorMessage("로그인에 실패했습니다.")
       return;
@@ -84,6 +84,18 @@ export default function LoginModal({ isOpen, onClose, moveToSignupModal }: Login
       }
     }
   }
+
+  useEffect(() => {
+    if (isOpen === false) {
+      setEmail("")
+      setPassword("")
+      setErrorMessage("")
+      setLoginError({ email: "", password: "" })
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 150)
+    }
+  }, [isOpen])
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="md" closeOnOutsideClick closeOnEsc title="로그인" dataCy="login-modal">
