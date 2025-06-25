@@ -4,6 +4,7 @@ import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import clsx from "clsx"
+import Image from "next/image"
 
 interface ProjectCardProps {
   id: number
@@ -80,7 +81,12 @@ export default function ProjectCard({
               <p className="text-sm">감사합니다.</p>
             </div>
           )}
-          <img src={imageUrl || "/placeholder/project-placeholder.png"} alt={projectName} className="rounded-lg object-cover w-full h-full" />
+          <Image
+            src={imageUrl || "/placeholder/project-placeholder.png"}
+            alt={projectName}
+            className="rounded-lg object-cover"
+            fill
+          />
         </div>
 
         <div className="flex flex-col flex-1 justify-between p-1 pt-2">

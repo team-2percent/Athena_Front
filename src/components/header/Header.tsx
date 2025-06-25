@@ -12,7 +12,6 @@ import useAuthStore from "@/stores/auth"
 import { usePathname } from 'next/navigation';
 import { useApi } from "@/hooks/useApi";
 import MenuTab from "../common/MenuTab"
-import useToastStore from "@/stores/useToastStore";
 import { GhostButton, GhostPrimaryButton } from "../common/Button"
 
 const nameToPath: Record<string, string> = {
@@ -55,7 +54,6 @@ const HeaderContent = () => {
     pathname === "/new" ||
     pathname === "/deadline"
   );
-  const { showToast } = useToastStore();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [sidebarAnim, setSidebarAnim] = useState(false);
@@ -171,31 +169,6 @@ const HeaderContent = () => {
     router.push("/my")
     setShowAuthMenu(false)
   }
-
-  const handleTestToast = () => {
-    showToast("테스트 알림", "이것은 토스트 테스트 메시지입니다.")
-  }
-
-  const notifications = [
-    {
-      id: 1,
-      message: "가작가님의 새로운 작품이 공개되었습니다! 지금 바로 확인해보세요.",
-      date: "2025-04-25",
-      profileImage: "/abstract-profile.png",
-    },
-    {
-      id: 2,
-      message: "가작가님의 새로운 작품이 공개되었습니다! 지금 바로 확인해보세요.",
-      date: "2025-04-25",
-      profileImage: "/abstract-profile.png",
-    },
-    {
-      id: 3,
-      message: "가작가님의 새로운 작품이 공개되었습니다! 지금 바로 확인해보세요.",
-      date: "2025-04-25",
-      profileImage: "/abstract-profile.png",
-    },
-  ]
 
   useEffect(() => {
     if (isLoggedIn) loadUserInfo();

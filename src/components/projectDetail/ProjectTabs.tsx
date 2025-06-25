@@ -9,6 +9,8 @@ import { useApi } from "@/hooks/useApi"
 import MarkdownRenderer, { extractHeadings } from "../projectRegister/MarkdownRenderer"
 import TableOfContents from "./TableOfContents"
 import useAuthStore from "@/stores/auth"
+import { formatDate, calculateDaysLeft } from "@/lib/utils"
+import Image from "next/image"
 
 interface Review {
   id: number
@@ -144,29 +146,6 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
     }
   }
 
-  // 날짜 포맷 함수
-  const formatDate = (dateString: string) => {
-    if (!dateString) return ""
-    const date = new Date(dateString)
-    return date
-      .toLocaleDateString("ko-KR", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      })
-      .replace(/\. /g, ". ")
-  }
-
-  // 남은 일수 계산 함수
-  const calculateDaysLeft = (endDate: string) => {
-    if (!endDate) return 0
-    const end = new Date(endDate)
-    const now = new Date()
-    const diffTime = end.getTime() - now.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    return diffDays
-  }
-
   // 기본 마크다운 콘텐츠 (API 데이터가 없을 경우 사용)
   const defaultMarkdown = `
   작성된 내용이 없습니다.
@@ -196,16 +175,6 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
       {isLoading && (
         <div className="flex justify-center py-8">
           <p className="text-sub-gray">프로젝트 정보를 불러오는 중...</p>
-        </div>
-      )}
-
-      {/* 에러 메시지 표시 */}
-      {error && (
-        <div className="rounded-xl bg-red-50 p-4 text-red-500 my-4">
-          <p>{error}</p>
-          <button onClick={() => window.location.reload()} className="mt-2 text-sm underline">
-            다시 시도
-          </button>
         </div>
       )}
 
@@ -269,7 +238,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                       <span className="hidden md:block">
                         {projectData?.endAt ? (
                           <>
-                            {formatDate(projectData?.startAt || "")} ~ {formatDate(projectData.endAt)}
+                            {formatDate(new Date(projectData?.startAt || ""))} ~ {formatDate(new Date(projectData.endAt))}
                             {" ("}
                             {(() => {
                               const daysLeft = calculateDaysLeft(projectData.endAt)
@@ -287,7 +256,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                       <span className="block md:hidden">
                         {projectData?.endAt ? (
                           <>
-                            {formatDate(projectData?.startAt || "")} ~ {formatDate(projectData.endAt)}<br />
+                            {formatDate(new Date(projectData?.startAt || ""))} ~ {formatDate(new Date(projectData.endAt))}<br />
                             ({(() => {
                               const daysLeft = calculateDaysLeft(projectData.endAt)
                               if (daysLeft < 0) return "종료"
@@ -306,18 +275,18 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                     <div className="w-2/3 md:w-3/4 text-xs md:text-base font-medium">
                       {/* 데스크톱: 기존 한 줄 */}
                       <span className="hidden md:block">
-                        목표금액 달성 시 {formatDate(projectData?.endAt || "")} 결제 예정
+                        목표금액 달성 시 {formatDate(new Date(projectData?.endAt || ""))} 결제 예정
                       </span>
                       {/* 모바일: 두 줄 */}
                       <span className="block md:hidden">
                         목표금액 달성 시<br />
-                        {formatDate(projectData?.endAt || "")} 결제 예정
+                        {formatDate(new Date(projectData?.endAt || ""))} 결제 예정
                       </span>
                     </div>
                   </div>
                   <div className="flex gap-4 md:gap-0">
                     <div className="w-1/3 md:w-1/4 text-xs md:text-base font-medium text-sub-gray">예상 발송 시작일</div>
-                    <div className="w-2/3 md:w-3/4 text-xs md:text-base font-medium">{formatDate(projectData?.shippedAt || "")}</div>
+                    <div className="w-2/3 md:w-3/4 text-xs md:text-base font-medium">{formatDate(new Date(projectData?.shippedAt || ""))}</div>
                   </div>
                 </div>
                 {/* 판매자 정보 영역 */}
@@ -328,7 +297,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                     id={projectData.sellerResponse.id}
                     username={projectData.sellerResponse.nickname}
                     oneLinear={projectData.sellerResponse.sellerIntroduction || "판매자 소개가 없습니다."}
-                    profileImage="/abstract-profile.png"
+                    profileImage="/placeholder/profile-placeholder.png"
                     onFollow={handleFollow}
                     isFollowing={false}
                   />
@@ -366,16 +335,17 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                           <div className="flex items-center space-x-3 md:space-x-4">
                             {/* 리뷰 작성자 프로필 사진 */}
                             <div className="h-10 w-10 md:h-16 md:w-16 overflow-hidden rounded-full">
-                              <img
+                              <Image
                                 src={review.imageUrl || "/placeholder.svg"}
                                 alt={`${review.userName} 프로필`}
                                 className="h-full w-full object-cover"
+                                fill
                               />
                             </div>
                             {/* 이름/날짜 */}
                             <div className="flex flex-col justify-center">
                               <h3 className="text-base md:text-xl font-bold" data-cy="review-username">{review.userName}</h3>
-                              <p className="text-xs md:text-base text-sub-gray" data-cy="review-date">{formatDate(review.createdAt)}</p>
+                              <p className="text-xs md:text-base text-sub-gray" data-cy="review-date">{formatDate(new Date(review.createdAt))}</p>
                             </div>
                           </div>
                           {/* 리뷰 내용 */}
