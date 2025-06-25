@@ -28,10 +28,10 @@ describe("메인 페이지 내 프로젝트 조회", () => {
     describe("메인 페이지가 정상적으로 표시", () => {
       it("GET 요청 모두 200", () => {
         cy.fixture('planRankingView.json').then((planRankingView) => {
-          cy.task('mockApiResponse', { operationName: 'planRankingView', data: planRankingView });
+          cy.task('mockApiResponse', { endpoint: '/api/project/planRankingView', data: planRankingView });
         })
         cy.fixture('categoryRankingView.json').then((categoryRankingView) => {
-          cy.task('mockApiResponse', { operationName: 'categoryRankingView', data: categoryRankingView });
+          cy.task('mockApiResponse', { endpoint: '/api/project/categoryRankingView', data: categoryRankingView });
         })
 
         // when - 페이지 방문
@@ -48,7 +48,7 @@ describe("메인 페이지 내 프로젝트 조회", () => {
   describe("프로젝트 조회 실패", () => {
     describe("메인 페이지 내 요금제 캐러셀이 서버 에러로 미표시", () => {
       it("요금제 GET 요청 500", () => {
-        cy.task('mockApiErrorResponse', { operationName: 'planRankingView', message: 'Internal Server Error' });
+        cy.task('mockApiErrorResponse', { endpoint: '/api/project/planRankingView', message: 'Internal Server Error' });
         // when - 페이지 방문
         cy.visit('/')
 
@@ -59,7 +59,7 @@ describe("메인 페이지 내 프로젝트 조회", () => {
 
     describe("메인 페이지 내 카테고리 Top5가 서버 에러로 미표시", () => {
       it("CategoryTop5 GET 요청 500", () => {
-        cy.task('mockApiErrorResponse', { operationName: 'categoryRankingView', message: 'Internal Server Error' });
+        cy.task('mockApiErrorResponse', { endpoint: '/api/project/categoryRankingView', message: 'Internal Server Error' });
         // when - 페이지 방문
         cy.visit('/')
 
