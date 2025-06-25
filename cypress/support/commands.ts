@@ -96,19 +96,12 @@ Cypress.Commands.add('adminLogin', () => {
 })
 
 Cypress.Commands.add('visitMainPage', () => {
-  cy.intercept({
-    method: 'GET',
-    url: '/api/project/planRankingView'
-  }, {
-    fixture: 'planRankingView.json'
-  }).as('getPlanRankingView')
-
-  cy.intercept({
-    method: "GET",
-    url: '/api/project/categoryRankingView'
-  }, {
-    fixture: 'categoryRankingView.json'
-  }).as('getCategoryRankingView')
+  cy.fixture('planRankingView.json').then((planRankingView) => {  
+    cy.task('mockApiResponse', { endpoint: '/api/project/planRankingView', data: planRankingView });
+  })
+  cy.fixture('categoryRankingView.json').then((categoryRankingView) => {
+    cy.task('mockApiResponse', { endpoint: '/api/project/categoryRankingView', data: categoryRankingView });
+  })
 
   cy.intercept("GET", "**/*.{png,jpg,jpeg,webp}", req => {
     req.reply({
@@ -145,8 +138,6 @@ Cypress.Commands.add('visitMainPage', () => {
   });
 
   cy.get('body').should('be.visible')
-  cy.wait('@getPlanRankingView').its('response.statusCode').should('eq', 200)
-  cy.wait('@getCategoryRankingView').its('response.statusCode').should('eq', 200)
 })
 Cypress.Commands.add('checkErrorTopToast', (title: string, body: string) => {
     cy.get('[data-cy="error-top-toast"]').should('be.visible').within(() => {
