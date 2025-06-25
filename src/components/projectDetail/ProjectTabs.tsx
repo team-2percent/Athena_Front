@@ -296,7 +296,7 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                     id={projectData.sellerResponse.id}
                     username={projectData.sellerResponse.nickname}
                     oneLinear={projectData.sellerResponse.sellerIntroduction || "판매자 소개가 없습니다."}
-                    profileImage="/abstract-profile.png"
+                    profileImage="/placeholder/profile-placeholder.png"
                     onFollow={handleFollow}
                     isFollowing={false}
                   />
