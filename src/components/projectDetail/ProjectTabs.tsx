@@ -10,6 +10,7 @@ import MarkdownRenderer, { extractHeadings } from "../projectRegister/MarkdownRe
 import TableOfContents from "./TableOfContents"
 import useAuthStore from "@/stores/auth"
 import { formatDate, calculateDaysLeft } from "@/lib/utils"
+import Image from "next/image"
 
 interface Review {
   id: number
@@ -334,10 +335,11 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
                           <div className="flex items-center space-x-3 md:space-x-4">
                             {/* 리뷰 작성자 프로필 사진 */}
                             <div className="h-10 w-10 md:h-16 md:w-16 overflow-hidden rounded-full">
-                              <img
+                              <Image
                                 src={review.imageUrl || "/placeholder.svg"}
                                 alt={`${review.userName} 프로필`}
                                 className="h-full w-full object-cover"
+                                fill
                               />
                             </div>
                             {/* 이름/날짜 */}
