@@ -199,7 +199,7 @@ function Carousel({ projects }: { projects: MainProject[] }) {
                   className="w-full h-full object-cover"
                   style={{ aspectRatio: '16/12' }}
                   fill
-                  priority
+                  priority={i === 2} // 중앙 카드만 priority 적용
                 />
                 <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent text-white">
                   <div className="space-y-1">

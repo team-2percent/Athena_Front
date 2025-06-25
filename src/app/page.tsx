@@ -5,6 +5,9 @@ import { MainProject } from "@/lib/projectInterface";
 import serverFetch from "@/lib/serverFetch";
 import ServerErrorComponent from "@/components/common/ServerErrorComponent";
 
+// 동적 렌더링 설정
+export const dynamic = 'force-dynamic';
+
 type PlanResponse = PlanResponseItem[];
 
 interface PlanResponseItem {
@@ -27,7 +30,7 @@ async function getPlanData() {
   const planData: {
     data: PlanResponse,
     error: boolean } = await serverFetch('/api/project/planRankingView', {
-    next: { revalidate: 10 }
+    cache: 'no-store'
   });
   return planData;
 }
@@ -36,6 +39,7 @@ async function getTop5Data() {
   const top5Data: {
     data: Top5Response,
     error: boolean } = await serverFetch('/api/project/categoryRankingView', {
+    cache: 'no-store'
   });
   return top5Data;
 }
