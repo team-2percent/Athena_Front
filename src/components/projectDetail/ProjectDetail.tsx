@@ -65,14 +65,14 @@ const ProjectDetail = ({ projectData, error }: ProjectDetailProps) => {
       {/* 상품 정보 영역 */}
       {!error && (
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-          {/* 왼쪽: 이미지 영역 */}
-          <div className="flex flex-col">
+          {/* 왼쪽: 이미지 영역 - 우선순위 중간 */}
+          <div className="flex flex-col order-2 md:order-2">
             {/* 이미지 캐러셀 분리 */}
             <ImageCarousel images={images} title={projectData?.title || "프로젝트 이미지"} />
           </div>
 
-          {/* 오른쪽: 메타데이터 영역 */}
-          <div className="flex flex-col justify-center px-4 md:px-0 text-center md:text-left">
+          {/* 오른쪽: 메타데이터 영역 - 우선순위 낮음 */}
+          <div className="flex flex-col justify-center px-4 md:px-0 text-center md:text-left order-3 md:order-3">
             <div>
               <h1 className="text-lg md:text-3xl font-bold mb-2 text-center md:text-left">{projectData?.title || "프로젝트 제목"}</h1>
               <h2 className="text-sm md:text-2xl text-sub-gray mb-6 break-words leading-tight text-center md:text-left">{projectData?.description || "프로젝트 설명"}</h2>
@@ -132,8 +132,10 @@ const ProjectDetail = ({ projectData, error }: ProjectDetailProps) => {
         </div>
       )}
 
-      {/* 탭 메뉴 및 소개 영역 추가 */}
-      <ProjectTabs projectData={projectData} isLoading={false} error={error} />
+      {/* 탭 메뉴 및 소개 영역 추가 - 우선순위 최고 */}
+      <div className="order-1 md:order-1">
+        <ProjectTabs projectData={projectData} isLoading={false} error={error} />
+      </div>
     </div>
   )
 }

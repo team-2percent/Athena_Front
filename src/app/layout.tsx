@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local"; // 지정한 폰트를 사용하기 위해 불러옴
 import "./globals.css";
 import HeaderLoader from "@/components/HeaderLoader";
 import RegisterPageButtonLoader from "@/components/RegisterPageButtonLoader";
@@ -7,14 +6,6 @@ import AuthProvider from "@/components/AuthProvider";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import FCMMessageListener from "@/components/FcmMessageListener";
 import AlertLoader from "@/components/AlertLoader";
-
-// Pretendard 폰트를 사용하기 위해 불러옴
-const pretendard = localFont({
-  src: "../../public/fonts/PretendardVariable.woff2",
-  display: 'swap',
-  weight: '45 920',
-  variable: '--font-pretendard',
-});
 
 export const metadata: Metadata = {
   title: "아테나",
@@ -28,9 +19,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body
-        className={`${pretendard.variable} font-pretendard`} // Pretendard 사용
-      >
+      <head>
+        <link
+          rel="stylesheet"
+          as="style"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+      </head>
+      <body className="font-pretendard">
         <ServiceWorkerRegistration />
         <AuthProvider />
         <AlertLoader />
