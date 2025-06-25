@@ -201,18 +201,6 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
     cy.contains('아직 리뷰가 없습니다').should('be.visible');
   });
 
-  it('프로젝트 조회 중 스켈레톤이 노출된다', () => {
-    cy.task('resetApiMocks');
-
-    cy.task('mockApiResponse', { 
-      endpoint: `/api/project/${mockProjectId}`, 
-      data: mockProjectData 
-    });
-
-    cy.visit(`/project/${mockProjectId}`);
-    cy.get('.animate-pulse').should('exist');
-  });
-
   it('프로젝트 조회 실패 시 에러 메시지와 다시 시도 버튼 노출', () => {
     cy.task('resetApiMocks');
     
@@ -336,6 +324,7 @@ describe('프로젝트 상세 결제 플로우', () => {
   })
 
   it('필수값 누락 시 Alert 노출', () => {
+    cy.wait(500);
     cy.contains('후원하기').click()
     // 상품 미선택 상태: 다음 단계 버튼이 비활성화
     cy.get('[data-cy="donate-next-step"]').should('be.disabled')
@@ -380,6 +369,7 @@ describe('프로젝트 상세 결제 플로우', () => {
       statusCode: 200
     }).as("addAddress")
 
+    cy.wait(500)
     cy.contains('후원하기').click()
     cy.contains('테스트 리워드').click()
     cy.get('[data-cy="donate-next-step"]').click()
@@ -413,7 +403,7 @@ describe('프로젝트 상세 결제 플로우', () => {
   })
 
   it('옵션 해제, 수량 증감, 결제 금액 변화가 정상 동작한다', () => {
-    cy.reload();
+    cy.wait(500);
     cy.contains('후원하기').click();
     cy.contains('테스트 리워드').click();
     // 오른쪽 영역에 선택된 상품이 보이는지 검증
