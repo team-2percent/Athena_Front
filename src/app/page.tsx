@@ -27,6 +27,7 @@ async function getPlanData() {
   const planData: {
     data: PlanResponse,
     error: boolean } = await serverFetch('/api/project/planRankingView', {
+    next: { revalidate: 10 }
   });
   return planData;
 }
