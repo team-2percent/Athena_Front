@@ -1,4 +1,4 @@
-const serverFetch = async (url: string, options: RequestInit) => {
+const serverFetch = async (url: string, options: RequestInit): Promise<{ data: any | null, error: boolean }> => {
   const fetchOptions: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
@@ -17,13 +17,12 @@ const serverFetch = async (url: string, options: RequestInit) => {
     const response = await fetch(fullUrl, fetchOptions);
     
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      return { data: null, error: true };
     }
     
-    return await response.json();
+    return { data: await response.json(), error: false };
   } catch (error) {
-    console.error('Fetch error:', error);
-    throw error;
+    return { data: null, error: true };
   }
 }
 
