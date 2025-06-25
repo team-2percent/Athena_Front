@@ -24,12 +24,20 @@ export interface CategoryItem {
 }
 
 async function getPlanData() {
-  const planData: { data: PlanResponse, error: boolean } = await serverFetch('/api/project/planRankingView', { cache: 'no-store' });
+  const planData: {
+    data: PlanResponse,
+    error: boolean } = await serverFetch('/api/project/planRankingView', {
+    next: { revalidate: 0 }
+  });
   return planData;
 }
 
 async function getTop5Data() {
-  const top5Data: { data: Top5Response, error: boolean } = await serverFetch('/api/project/categoryRankingView', { cache: 'no-store' });
+  const top5Data: {
+    data: Top5Response,
+    error: boolean } = await serverFetch('/api/project/categoryRankingView', {
+    next: { revalidate: 0 }
+  });
   return top5Data;
 }
 

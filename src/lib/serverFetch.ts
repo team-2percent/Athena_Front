@@ -5,7 +5,6 @@ const serverFetch = async (url: string, options: RequestInit): Promise<{ data: a
       'Accept': 'application/json',
     },
     credentials: 'include', // 쿠키를 포함하기 위한 설정
-    cache: 'no-store', // SSR을 위한 캐시 설정
     ...options,
   };
 
