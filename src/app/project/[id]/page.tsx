@@ -1,4 +1,6 @@
+import { Suspense } from "react"
 import ProjectDetail from "@/components/projectDetail/ProjectDetail"
+import ProjectDetailSkeleton from "@/components/projectDetail/client/ProjectDetailSkeleton"
 import DonateDock from "@/components/projectDetail/client/DonateDock"
 
 async function getProjectData(id: string) {
@@ -12,18 +14,27 @@ async function getProjectData(id: string) {
   return { data, error: null }
 }
 
+async function ProjectDetailContent({ id }: { id: string }) {
+  const { data, error } = await getProjectData(id)
+  
+  return (
+    <ProjectDetail
+      projectData={data}
+      error={error}
+    />
+  )
+}
+
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { data, error } = await getProjectData(id)
+  
   return (
     <main className="min-h-screen bg-white w-[var(--content-width)]">
       <div className="container mx-auto py-8">
         {/* 상품 상세 페이지 영역 */}
-        <ProjectDetail
-          projectData={data}
-          isLoading={false}
-          error={error}
-        />
+        <Suspense fallback={<ProjectDetailSkeleton />}>
+          <ProjectDetailContent id={id} />
+        </Suspense>
       </div>
       {/* 후원하기 독 영역 */}
       <DonateDock />

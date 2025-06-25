@@ -2,7 +2,6 @@ import ProjectTabs from "./ProjectTabs"
 import ImageCarousel from "./client/ImageCarousel"
 import SharePopover from "./client/SharePopover"
 import DonateButton from "./client/DonateButton"
-import ProjectDetailSkeleton from "./client/ProjectDetailSkeleton"
 import { calculateDaysLeft, calculateAchievementRate } from "@/lib/utils"
 import ErrorRetryWrapper from "./client/ErrorRetryWrapper"
 
@@ -36,11 +35,10 @@ interface ProjectData {
 
 interface ProjectDetailProps {
   projectData: ProjectData | null
-  isLoading: boolean
   error: string | null
 }
 
-const ProjectDetail = ({ projectData, isLoading, error }: ProjectDetailProps) => {
+const ProjectDetail = ({ projectData, error }: ProjectDetailProps) => {
   // SSR에서 사용 가능한 순수 함수만 남김
   const canDonate = (projectData: ProjectData | null): boolean => {
     if (!projectData?.productResponses || projectData.productResponses.length === 0) {
@@ -59,16 +57,13 @@ const ProjectDetail = ({ projectData, isLoading, error }: ProjectDetailProps) =>
 
   return (
     <div className="mx-auto max-w-6xl pb-20">
-      {/* 로딩 상태 표시 */}
-      {isLoading && <ProjectDetailSkeleton />}
-
       {/* 에러 메시지 표시 */}
       {error && (
         <ErrorRetryWrapper message={error} />
       )}
 
       {/* 상품 정보 영역 */}
-      {!isLoading && !error && (
+      {!error && (
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           {/* 왼쪽: 이미지 영역 */}
           <div className="flex flex-col">
@@ -138,7 +133,7 @@ const ProjectDetail = ({ projectData, isLoading, error }: ProjectDetailProps) =>
       )}
 
       {/* 탭 메뉴 및 소개 영역 추가 */}
-      <ProjectTabs projectData={projectData} isLoading={isLoading} error={error} />
+      <ProjectTabs projectData={projectData} isLoading={false} error={error} />
     </div>
   )
 }
