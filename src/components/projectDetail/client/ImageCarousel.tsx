@@ -74,6 +74,8 @@ const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
                 alt={title}
                 className="absolute top-0 left-0 h-full w-full object-cover"
                 style={{ zIndex: 1 }}
+                loading="lazy"
+                decoding="async"
               />
             )}
             <img
@@ -84,6 +86,8 @@ const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
               alt={title}
               className="absolute top-0 left-0 h-full w-full object-cover"
               style={{ zIndex: 2 }}
+              loading={currentImageIndex === 0 ? "eager" : "lazy"}
+              decoding={currentImageIndex === 0 ? "sync" : "async"}
             />
             {images.length > 1 && (
               <>
@@ -130,6 +134,8 @@ const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
                     src={img || "/placeholder.svg"}
                     alt={`프로젝트 이미지 ${idx + 1}`}
                     className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
               </div>
