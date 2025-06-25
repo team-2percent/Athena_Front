@@ -8,9 +8,8 @@ import { MainProject } from "@/lib/projectInterface"
 import { useRouter } from "next/navigation"
 import gsap from "gsap"
 import CarouselSkeleton from "./CarouselSkeleton"
-import dynamic from "next/dynamic"
 
-function CarouselComponent({ projects }: { projects: MainProject[] }) {
+function Carousel({ projects }: { projects: MainProject[] }) {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
@@ -234,11 +233,5 @@ function CarouselComponent({ projects }: { projects: MainProject[] }) {
     </div>
   )
 }
-
-// Dynamic export with SSR disabled and skeleton loading
-const Carousel = dynamic(() => Promise.resolve(CarouselComponent), {
-  loading: () => <CarouselSkeleton />,
-  ssr: false
-});
 
 export default Carousel;

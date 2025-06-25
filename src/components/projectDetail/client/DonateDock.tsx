@@ -8,10 +8,10 @@ import { useParams } from "next/navigation"
 import { useApi } from "@/hooks/useApi"
 
 // 1. 상단에 AlertModal import 추가
-import AlertModal from "../common/AlertModal"
-import { CancelButton, GhostButton, PrimaryButton } from "../common/Button"
-import AddressAddModal from "./AddressAddModal"
-import Modal from "../common/Modal"
+import AlertModal from "../../common/AlertModal"
+import { CancelButton, GhostButton, PrimaryButton } from "../../common/Button"
+import AddressAddModal from "../AddressAddModal"
+import Modal from "../../common/Modal"
 
 interface AddressInfo {
   id: string

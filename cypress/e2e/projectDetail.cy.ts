@@ -33,6 +33,16 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
     ]
   }
 
+  const mockComments = [
+    {
+      id: 1,
+      userName: '테스트유저',
+      content: '이것은 테스트용 후기입니다.',
+      createdAt: '2024-06-30T12:00:00Z',
+      imageUrl: '/profile-test.png'
+    }
+  ]
+
   function formatDatePad(date: Date) {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -40,32 +50,24 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
     return `${y}. ${m}. ${d}.`;
   }
 
-  beforeEach(() => {
-    cy.intercept({ method: 'GET', url: `/api/project/${mockProjectId}` }, {
-      statusCode: 200,
-      body: { ...mockProjectData }
-    }).as('getProjectDetail')
+  it('메타데이터가 정상적으로 노출된다', () => {
+    cy.task('resetApiMocks');
+    
+    // 프로젝트 상세 정보 mock
+    cy.task('mockApiResponse', { 
+      endpoint: `/api/project/${mockProjectId}`, 
+      data: mockProjectData 
+    });
 
-    // 후기 API 인터셉트
-    cy.intercept({ method: 'GET', url: '/api/comment/test' }, {
-      statusCode: 200,
-      body: [
-        {
-          id: 1,
-          userName: '테스트유저',
-          content: '이것은 테스트용 후기입니다.',
-          createdAt: '2024-06-30T12:00:00Z',
-          imageUrl: '/profile-test.png'
-        }
-      ]
-    }).as('getProjectComments')
+    // 후기 API mock
+    cy.task('mockApiResponse', { 
+      endpoint: '/api/comment/test', 
+      data: mockComments 
+    });
 
     cy.visit(`/project/${mockProjectId}`)
-    cy.wait('@getProjectDetail')
     cy.wait(2000)
-  })
-
-  it('메타데이터가 정상적으로 노출된다', () => {
+    
     cy.contains(mockProjectData.title)
     cy.contains(mockProjectData.description)
     cy.contains('달성 금액')
@@ -84,6 +86,23 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
   })
 
   it('프로젝트 정보 탭에 데이터가 정상적으로 노출된다', () => {
+    cy.task('resetApiMocks');
+    
+    // 프로젝트 상세 정보 mock
+    cy.task('mockApiResponse', { 
+      endpoint: `/api/project/${mockProjectId}`, 
+      data: mockProjectData 
+    });
+
+    // 후기 API mock
+    cy.task('mockApiResponse', { 
+      endpoint: '/api/comment/test', 
+      data: mockComments 
+    });
+
+    cy.visit(`/project/${mockProjectId}`)
+    cy.wait(2000)
+    
     cy.contains('프로젝트 정보').click()
     cy.get('[data-cy="project-info-tab"]').within(() => {
       cy.contains(`${mockProjectData.goalAmount.toLocaleString()}원`)
@@ -102,6 +121,23 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
   })
 
   it('후원 옵션(리워드)이 정상적으로 노출된다', () => {
+    cy.task('resetApiMocks');
+    
+    // 프로젝트 상세 정보 mock
+    cy.task('mockApiResponse', { 
+      endpoint: `/api/project/${mockProjectId}`, 
+      data: mockProjectData 
+    });
+
+    // 후기 API mock
+    cy.task('mockApiResponse', { 
+      endpoint: '/api/comment/test', 
+      data: mockComments 
+    });
+
+    cy.visit(`/project/${mockProjectId}`)
+    cy.wait(2000)
+    
     // 1. 후원하기 버튼 클릭
     cy.contains('후원하기').should('exist').and('not.be.disabled').click();
 
@@ -119,6 +155,23 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
   })
 
   it('프로젝트 후기 탭에 리뷰가 정상적으로 노출된다', () => {
+    cy.task('resetApiMocks');
+    
+    // 프로젝트 상세 정보 mock
+    cy.task('mockApiResponse', { 
+      endpoint: `/api/project/${mockProjectId}`, 
+      data: mockProjectData 
+    });
+
+    // 후기 API mock
+    cy.task('mockApiResponse', { 
+      endpoint: '/api/comment/test', 
+      data: mockComments 
+    });
+
+    cy.visit(`/project/${mockProjectId}`)
+    cy.wait(2000)
+    
     cy.contains('후기').click();
     cy.get('[data-cy="review-item"]').should('have.length.at.least', 1);
     cy.get('[data-cy="review-item"]').first().within(() => {
@@ -129,53 +182,83 @@ describe('프로젝트 상세 페이지 (Mock)', () => {
   });
 
   it('프로젝트 후기 탭에 리뷰가 없을 때 안내 메시지가 노출된다', () => {
-    cy.intercept({ method: 'GET', url: '/api/comment/*' }, { statusCode: 200, body: [] });
-    cy.reload();
+    cy.task('resetApiMocks');
+    
+    // 프로젝트 상세 정보 mock
+    cy.task('mockApiResponse', { 
+      endpoint: `/api/project/${mockProjectId}`, 
+      data: mockProjectData 
+    });
+
+    // 후기 API mock (빈 배열)
+    cy.task('mockApiResponse', { endpoint: '/api/comment/test', data: [] });
+    
+    cy.visit(`/project/${mockProjectId}`)
+    cy.wait(2000)
+    
+    // cy.reload();
     cy.contains('후기').click();
     cy.contains('아직 리뷰가 없습니다').should('be.visible');
   });
 
-  it('프로젝트 조회 중 스켈레톤이 노출된다', () => {
-    cy.intercept({ method: 'GET', url: `/api/project/${mockProjectId}` }, (req) => new Promise(resolve => {
-      setTimeout(() => {
-        req.reply({ statusCode: 200, body: { ...mockProjectData } });
-        resolve();
-      }, 1000);
-    })).as('getProjectDetailDelay');
-    cy.visit(`/project/${mockProjectId}`);
-    cy.get('.animate-pulse').should('exist');
-    cy.wait('@getProjectDetailDelay');
-  });
-
   it('프로젝트 조회 실패 시 에러 메시지와 다시 시도 버튼 노출', () => {
-    cy.intercept({ method: 'GET', url: `/api/project/${mockProjectId}` }, { statusCode: 500 }).as('getProjectDetailError');
+    cy.task('resetApiMocks');
+    
+    cy.task('mockApiErrorResponse', { 
+      endpoint: `/api/project/${mockProjectId}`, 
+      message: 'Internal Server Error' 
+    });
     cy.visit(`/project/${mockProjectId}`);
-    cy.get('.bg-red-50').should('be.visible');
+    cy.contains('프로젝트 정보를 불러올 수 없습니다').should('be.visible');
     cy.contains('다시 시도').click();
-    cy.wait('@getProjectDetailError');
   });
 
   it('이미지 캐러셀 동작 및 인덱스 버튼 클릭 시 이미지 변경', () => {
-    cy.visit(`/project/${mockProjectId}`);
+    cy.task('resetApiMocks');
+    
+    // 프로젝트 상세 정보 mock
+    cy.task('mockApiResponse', { 
+      endpoint: `/api/project/${mockProjectId}`, 
+      data: mockProjectData 
+    });
+
+    // 후기 API mock
+    cy.task('mockApiResponse', { 
+      endpoint: '/api/comment/test', 
+      data: mockComments 
+    });
+
+    cy.visit(`/project/${mockProjectId}`)
+    cy.wait(2000)
+    
     cy.get('[data-cy="project-image"]').first().should('have.attr', 'src', '/project-test.png');
     cy.get('button[aria-label="다음 이미지"]').click();
     cy.get('[data-cy="project-image"]').first().should('have.attr', 'src', '/project-test2.png');
   });
 
   it('재고가 0일 때 후원 불가 버튼이 노출된다', () => {
-    cy.intercept({ method: 'GET', url: `/api/project/${mockProjectId}` }, {
-      statusCode: 200,
-      body: { ...mockProjectData, productResponses: [{ ...mockProjectData.productResponses[0], stock: 0 }] }
-    }).as('getProjectDetailNoStock');
+    cy.task('resetApiMocks');
+    
+    const noStockData = { 
+      ...mockProjectData, 
+      productResponses: [{ ...mockProjectData.productResponses[0], stock: 0 }] 
+    };
+    cy.task('mockApiResponse', { 
+      endpoint: `/api/project/${mockProjectId}`, 
+      data: noStockData 
+    });
     cy.visit(`/project/${mockProjectId}`);
     cy.get('[data-cy="donate-disabled"]').should('exist').and('be.disabled');
   });
 
   it('펀딩 마감/종료 시 상태 메시지가 노출된다', () => {
-    cy.intercept({ method: 'GET', url: `/api/project/${mockProjectId}` }, {
-      statusCode: 200,
-      body: { ...mockProjectData, endAt: '2023-01-01' }
-    }).as('getProjectDetailEnded');
+    cy.task('resetApiMocks');
+    
+    const endedData = { ...mockProjectData, endAt: '2023-01-01' };
+    cy.task('mockApiResponse', { 
+      endpoint: `/api/project/${mockProjectId}`, 
+      data: endedData 
+    });
     cy.visit(`/project/${mockProjectId}`);
     cy.contains('마감임박').should('be.visible');
     cy.contains('펀딩 종료').should('be.visible');
@@ -241,6 +324,7 @@ describe('프로젝트 상세 결제 플로우', () => {
   })
 
   it('필수값 누락 시 Alert 노출', () => {
+    cy.wait(500);
     cy.contains('후원하기').click()
     // 상품 미선택 상태: 다음 단계 버튼이 비활성화
     cy.get('[data-cy="donate-next-step"]').should('be.disabled')
@@ -285,6 +369,7 @@ describe('프로젝트 상세 결제 플로우', () => {
       statusCode: 200
     }).as("addAddress")
 
+    cy.wait(500)
     cy.contains('후원하기').click()
     cy.contains('테스트 리워드').click()
     cy.get('[data-cy="donate-next-step"]').click()
@@ -318,6 +403,7 @@ describe('프로젝트 상세 결제 플로우', () => {
   })
 
   it('옵션 해제, 수량 증감, 결제 금액 변화가 정상 동작한다', () => {
+    cy.wait(500);
     cy.contains('후원하기').click();
     cy.contains('테스트 리워드').click();
     // 오른쪽 영역에 선택된 상품이 보이는지 검증

@@ -59,3 +59,19 @@ export function getRidOfNonNumber(str: string): string {
 export function getRidOfZero(str: string): string {
   return str.replace(/^0+/, "")
 }
+
+// 남은 일수 계산 함수
+export function calculateDaysLeft(endDate: string): number {
+  if (!endDate) return 0
+  const end = new Date(endDate)
+  const now = new Date()
+  const diffTime = end.getTime() - now.getTime()
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+  return diffDays
+}
+
+// 달성률 계산 함수
+export function calculateAchievementRate(goal: number, current: number): number {
+  if (!goal || goal === 0) return 0
+  return Math.floor((current / goal) * 100)
+}
