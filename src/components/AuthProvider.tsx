@@ -2,7 +2,7 @@
 
 import { useHydrateAuth } from "@/hooks/useHydrateAuth";
 
-export default function AuthProvider({ children }: { children: React.ReactNode }) {
+export default function AuthProvider() {
   useHydrateAuth();
-  return <>{children}</>;
+  return null;
 }
