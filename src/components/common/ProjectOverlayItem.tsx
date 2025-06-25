@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import customLoader from "@/lib/customLoader"
 
 interface ProjectOverlayItemProps {
   id: number
@@ -49,6 +50,7 @@ export default function ProjectOverlayItem({
         <div className="relative overflow-hidden rounded-lg aspect-square group">
           {/* 이미지 */}
           <Image
+            loader={customLoader}
             src={imageUrl || "/placeholder/project-placeholder.png"}
             alt={projectName}
             className="rounded-lg object-cover transition-transform duration-300 group-hover:scale-105"

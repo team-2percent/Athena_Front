@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 import gsap from "gsap"
 import CarouselSkeleton from "./CarouselSkeleton"
 import Image from "next/image"
+import customLoader from "@/lib/customLoader"
 
 function Carousel({ projects }: { projects: MainProject[] }) {
   const router = useRouter();
@@ -192,12 +193,13 @@ function Carousel({ projects }: { projects: MainProject[] }) {
                 onClick={() => router.push(`/project/${project.projectId}`)}
               >
                 <Image
+                  loader={customLoader}
                   src={project.imageUrl || "/placeholder/project-placeholder.png"}
                   alt={project.title}
                   className="w-full h-full object-cover"
                   style={{ aspectRatio: '16/12' }}
                   fill
-                  priority
+                  priority={i === 2} // 중앙 카드만 priority 적용
                 />
                 <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent text-white">
                   <div className="space-y-1">

@@ -9,6 +9,7 @@ import clsx from "clsx";
 import useAuthStore from "@/stores/auth"
 import { useApi } from "@/hooks/useApi"
 import MenuTab from "../common/MenuTab";
+import customLoader from "@/lib/customLoader";
 
 const nameToPath: Record<string, string> = {
     "프로젝트 승인 관리": "approval",
@@ -47,7 +48,7 @@ export default function AdminHeader() {
                 <div className="flex items-center justify-between">
                 {/* 로고 */}
                 <div className="flex items-center space-x-4">
-                    <Image src="/src/athenna_logo.png" alt="Athenna 로고" width={40} height={40} className="object-cover w-10 h-10 overflow-hidden" />
+                    <Image loader={customLoader} src="/src/athenna_logo.png" alt="Athenna 로고" width={40} height={40} className="object-cover w-10 h-10 overflow-hidden" />
                 </div>
 
                 {/* 관리자 이름 + 로그인 메뉴 */}
