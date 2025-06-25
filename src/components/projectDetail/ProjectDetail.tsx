@@ -3,6 +3,7 @@ import ImageCarousel from "./client/ImageCarousel"
 import SharePopover from "./client/SharePopover"
 import DonateButton from "./client/DonateButton"
 import { calculateDaysLeft, calculateAchievementRate } from "@/lib/utils"
+import ErrorRetryWrapper from "./client/ErrorRetryWrapper"
 
 // ProjectData 인터페이스 추가
 interface ProjectData {
@@ -89,12 +90,7 @@ const ProjectDetail = ({ projectData, isLoading, error }: ProjectDetailProps) =>
 
       {/* 에러 메시지 표시 */}
       {error && (
-        <div className="rounded-xl bg-red-50 p-4 text-red-500 my-4">
-          <p>{error}</p>
-          <button onClick={() => typeof window !== "undefined" && window.location.reload()} className="mt-2 text-sm underline">
-            다시 시도
-          </button>
-        </div>
+        <ErrorRetryWrapper message={error} />
       )}
 
       {/* 상품 정보 영역 */}

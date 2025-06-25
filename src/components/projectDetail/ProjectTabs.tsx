@@ -177,16 +177,6 @@ const ProjectTabs = ({ projectData, isLoading, error }: ProjectTabsProps) => {
         </div>
       )}
 
-      {/* 에러 메시지 표시 */}
-      {error && (
-        <div className="rounded-xl bg-red-50 p-4 text-red-500 my-4">
-          <p>{error}</p>
-          <button onClick={() => window.location.reload()} className="mt-2 text-sm underline">
-            다시 시도
-          </button>
-        </div>
-      )}
-
       {!isLoading && !error && (
         <>
           {/* 탭 메뉴 */}
