@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 
 interface ProjectOverlayItemProps {
   id: number
@@ -47,10 +48,11 @@ export default function ProjectOverlayItem({
       >
         <div className="relative overflow-hidden rounded-lg aspect-square group">
           {/* 이미지 */}
-          <img
+          <Image
             src={imageUrl || "/placeholder/project-placeholder.png"}
             alt={projectName}
-            className="rounded-lg object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+            className="rounded-lg object-cover transition-transform duration-300 group-hover:scale-105"
+            fill
           />
 
           {/* 호버 오버레이 */}
