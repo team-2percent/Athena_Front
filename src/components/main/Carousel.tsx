@@ -7,13 +7,28 @@ import { cn } from "@/lib/utils"
 import { MainProject } from "@/lib/projectInterface"
 import { useRouter } from "next/navigation"
 import gsap from "gsap"
+import CarouselSkeleton from "./CarouselSkeleton"
+import dynamic from "next/dynamic"
 
-export default function Carousel({ projects, isLoading }: { projects: MainProject[], isLoading: boolean }) {
+function CarouselComponent({ projects }: { projects: MainProject[] }) {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const containerRef = useRef<HTMLDivElement>(null)
   const cardRef = useRef<HTMLDivElement>(null);
+
+  // 클라이언트 사이드에서만 렌더링
+  useEffect(() => {
+    setIsClient(true);
+    // 컴포넌트가 마운트된 후 로딩 상태 해제
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // 반응형 카드 크기 (16:9 비율)
   const getCardSize = () => {
@@ -117,57 +132,9 @@ export default function Carousel({ projects, isLoading }: { projects: MainProjec
     };
   }, [CARD_WIDTH, GAP, projects]);
 
-  // 스켈레톤 높이만 동적으로 적용
-  const [skeletonHeight, setSkeletonHeight] = useState(0); // 초기값 0
-  useEffect(() => {
-    const getHeight = () => {
-      if (typeof window !== 'undefined') {
-        if (window.innerWidth < 640) return 165;
-        if (window.innerWidth < 1024) return 240;
-      }
-      return 300;
-    };
-    setSkeletonHeight(getHeight());
-    const handleResize = () => setSkeletonHeight(getHeight());
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  if (!projects || projects.length === 0) {
-    return (
-      <div className="w-full bg-secondary-color flex flex-col items-center justify-center py-16 select-none" data-cy="premium-carousel-skeleton">
-        <div
-          className="relative w-full max-w-full mx-auto flex items-center justify-center overflow-hidden"
-          style={{ height: skeletonHeight || undefined }}
-        >
-          <div className="flex items-center justify-center mx-auto w-full gap-2 sm:gap-4 lg:gap-8">
-            {[0,1,2,3,4].map(i => (
-              <div
-                key={i}
-                className="rounded-2xl bg-gray-200 animate-pulse flex-shrink-0 relative shadow-xl h-[165px] sm:h-[240px] lg:h-[300px]"
-                style={{
-                  width: '60%',
-                  height: skeletonHeight || undefined,
-                  aspectRatio: '16/12',
-                }}
-              />
-            ))}
-          </div>
-        </div>
-        {/* 인디케이터 스켈레톤 */}
-        <div className="flex justify-center gap-2 mt-8">
-          {[0,1,2,3,4].map(i => (
-            <div
-              key={i}
-              className="w-3 h-3 rounded-full bg-gray-200 animate-pulse"
-              style={{
-                width: i === 2 ? '24px' : '12px'  // 중앙 인디케이터는 더 길게
-              }}
-            />
-          ))}
-        </div>
-      </div>
-    );
+  // 클라이언트 사이드에서만 렌더링하거나 로딩 중일 때 스켈레톤 표시
+  if (!isClient || isLoading) {
+    return <CarouselSkeleton />;
   }
 
   return (
@@ -267,3 +234,11 @@ export default function Carousel({ projects, isLoading }: { projects: MainProjec
     </div>
   )
 }
+
+// Dynamic export with SSR disabled and skeleton loading
+const Carousel = dynamic(() => Promise.resolve(CarouselComponent), {
+  loading: () => <CarouselSkeleton />,
+  ssr: false
+});
+
+export default Carousel;
