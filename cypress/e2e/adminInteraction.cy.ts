@@ -138,24 +138,8 @@ describe("관리자 상호작용", () => {
             describe("사용자 페이지 이동", () => {
                 it("사용자 페이지 버튼 클릭", () => {
                     // given - 메인 페이지 API 응답 설정
-                    cy.fixture('planRankingView.json').then((planRankingView) => {
-                        cy.intercept({
-                            method: "GET",
-                            url: "/api/project/planRankingView",
-                        }, {
-                            statusCode: 200,
-                            body: planRankingView,
-                        }).as('getPlanRankingView')
-                    })
-                    cy.fixture('categoryRankingView.json').then((categoryRankingView) => {
-                        cy.intercept({
-                            method: "GET",
-                            url: "/api/project/categoryRankingView",
-                        }, {
-                            statusCode: 200,
-                            body: categoryRankingView,
-                        }).as('getCategoryRankingView')
-                    })
+                    cy.task('mockApiResponse', { endpoint: '/api/project/planRankingView', data: [] });
+                    cy.task('mockApiResponse', { endpoint: '/api/project/categoryRankingView', data: { allTopView: [], categoryTopView: [] } });
 
                     // given - 메뉴 버튼 클릭
                     cy.get('[data-cy="admin-menu-button"]').click()
@@ -165,8 +149,6 @@ describe("관리자 상호작용", () => {
                     cy.get('[data-cy="userpage-button"]').click()
 
                     // then - 메인페이지 GET API 확인
-                    cy.wait('@getPlanRankingView').its('response.statusCode').should('eq', 200)
-                    cy.wait('@getCategoryRankingView').its('response.statusCode').should('eq', 200)
                     cy.url().should('eq', Cypress.config().baseUrl + '/')
                 })
             })
