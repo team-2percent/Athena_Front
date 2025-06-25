@@ -1,4 +1,5 @@
 import MockApiServer from './mockApiServer';
+import { unlink } from 'fs/promises';
 
 export const e2eNodeEvents: Cypress.Config['e2e']['setupNodeEvents'] = (on) => {
   const mockApiServer = new MockApiServer();
@@ -48,6 +49,12 @@ export const e2eNodeEvents: Cypress.Config['e2e']['setupNodeEvents'] = (on) => {
         console.error('Failed to reset API mocks:', error);
         return null;
       }
+    },
+
+    deleteFile(filename) {
+      return unlink(filename)
+        .then(() => null)
+        .catch(() => null);
     },
   });
 }
