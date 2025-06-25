@@ -84,8 +84,9 @@ export default function ProjectCard({
           <Image
             src={imageUrl || "/placeholder/project-placeholder.png"}
             alt={projectName}
-            className="rounded-lg object-cover"
+            className="rounded-lg"
             fill
+            objectFit="cover"
           />
         </div>
 
