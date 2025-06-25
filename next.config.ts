@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   images: {
     domains: [hostname],
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
