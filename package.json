@@ -13,7 +13,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "dev:cypress": "NEXT_PUBLIC_API_BASE_URL=http://localhost:9000 next dev"
+    "dev:cypress": "NEXT_PUBLIC_API_BASE_URL=http://localhost:9000 next dev",
+    "build:cypress": "NEXT_PUBLIC_API_BASE_URL=http://localhost:9000 next build"
   },
   "dependencies": {
     "@chromatic-com/storybook": "^4.0.0",
